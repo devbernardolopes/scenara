@@ -6,7 +6,7 @@ Architecture decisions, conventions, and constraints for human and AI-agent main
 
 - **Vite + React** (JavaScript, not TypeScript)
 - **Tailwind CSS v4** (mobile-first, Vite plugin, no PostCSS config)
-- **React Router v6+** (nested routes with `<Outlet />`)
+- **React Router v7+** (nested routes with `<Outlet />`)
 - **Dexie.js** (IndexedDB wrapper, client-side persistence)
 - **ESLint** (flat config) + **Prettier** + **oxlint**
 - Deployment: **Vercel** (SPA rewrites in `vercel.json`)
@@ -53,12 +53,12 @@ All data lives in the browser via IndexedDB. Dexie.js is the only persistence la
 - `src/db.js` — single `new Dexie('scenara')` instance
 - Schema (version 1):
 
-| Table        | Primary Key | Indexes                        |
-|--------------|-------------|--------------------------------|
+| Table        | Primary Key | Indexes                             |
+|--------------|-------------|-------------------------------------|
 | `threads`    | `++id`      | `title`, `characterId`, `updatedAt` |
-| `characters` | `++id`      | `name`, `createdAt`            |
-| `personas`   | `++id`      | `name`, `createdAt`            |
-| `settings`   | `++id`      | `key`                          |
+| `characters` | `++id`      | `name`, `createdAt`                 |
+| `personas`   | `++id`      | `name`, `createdAt`                 |
+| `settings`   | `++id`      | `key`                               |
 
 No business logic in `db.js` — just table definitions. Query/mutate from `services/`.
 
@@ -112,6 +112,10 @@ registerModal('myModal', MyModal)
 const { openModal } = useModal()
 openModal('myModal', { someProp: value })
 ```
+
+## Commit Convention
+
+When there are changes to commit, AI agents should suggest a commit message at the end of their response following conventional commit format: `type(scope): description`. Use types like `feat`, `fix`, `refactor`, `docs`, `chore` and keep descriptions concise but descriptive — focus on the "why" rather than the "what".
 
 ## Deployment
 
