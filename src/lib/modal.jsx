@@ -18,15 +18,19 @@ export function ModalProvider({ children }) {
   const ModalComponent = MODAL_COMPONENTS[modalState.type]
 
   return (
-    <ModalContext.Provider value={{ openModal, closeModal, activeModal: modalState.type, modalProps: modalState.props }}>
+    <ModalContext.Provider
+      value={{
+        openModal,
+        closeModal,
+        activeModal: modalState.type,
+        modalProps: modalState.props,
+      }}
+    >
       {children}
       {ModalComponent && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          onClick={closeModal}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay" onClick={closeModal}>
           <div
-            className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[85vh] overflow-y-auto"
+            className="bg-surface rounded-lg shadow-surface-lg max-w-lg w-full mx-4 max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <ModalComponent {...modalState.props} />

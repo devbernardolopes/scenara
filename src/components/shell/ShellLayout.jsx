@@ -7,7 +7,7 @@ function ShellLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-surface text-text">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex flex-col flex-1 min-w-0">
         <TopBar onMenuToggle={() => setSidebarOpen((prev) => !prev)} />

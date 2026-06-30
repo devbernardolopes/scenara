@@ -4,14 +4,19 @@ function TopBar({ onMenuToggle }) {
   const { openModal } = useModal()
 
   return (
-    <header className="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shrink-0">
+    <header className="flex items-center justify-between px-4 h-14 border-b border-border bg-surface shrink-0">
       <button
         onClick={onMenuToggle}
-        className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 md:hidden"
+        className="text-tertiary hover:text-text md:hidden"
         aria-label="Toggle sidebar"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
 
@@ -19,7 +24,7 @@ function TopBar({ onMenuToggle }) {
 
       <button
         onClick={() => openModal('settings')}
-        className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+        className="text-tertiary hover:text-text p-2 rounded-md hover:bg-surface-hover"
         aria-label="Settings"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

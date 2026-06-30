@@ -1,0 +1,269 @@
+/* ============================================================
+   Design Tokens
+   Single source of truth for all visual properties.
+   Add themes by adding a new `.theme-*` block below.
+   ============================================================ */
+
+/* --- Light (default) --- */
+:root,
+.theme-light {
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-subtle: #dbeafe;
+  --color-on-primary: #ffffff;
+
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f9fafb;
+  --color-surface-hover: #f3f4f6;
+
+  --color-text: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
+
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+
+  --color-overlay: rgba(0, 0, 0, 0.5);
+
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+
+  --color-accent: #7c3aed;
+  --color-accent-hover: #6d28d9;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Dark --- */
+.theme-dark {
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --color-primary-subtle: #1e3a5f;
+  --color-on-primary: #ffffff;
+
+  --color-surface: #0f172a;
+  --color-surface-secondary: #1e293b;
+  --color-surface-hover: #334155;
+
+  --color-text: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-tertiary: #64748b;
+
+  --color-border: #334155;
+  --color-border-light: #1e293b;
+
+  --color-overlay: rgba(0, 0, 0, 0.7);
+
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  --color-accent: #a78bfa;
+  --color-accent-hover: #c4b5fd;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Sepia --- */
+.theme-sepia {
+  --color-primary: #b45309;
+  --color-primary-hover: #d97706;
+  --color-primary-subtle: #fef3c7;
+  --color-on-primary: #ffffff;
+
+  --color-surface: #fffbeb;
+  --color-surface-secondary: #fef3c7;
+  --color-surface-hover: #fde68a;
+
+  --color-text: #451a03;
+  --color-text-secondary: #78350f;
+  --color-text-tertiary: #92400e;
+
+  --color-border: #d4a574;
+  --color-border-light: #e6c9a8;
+
+  --color-overlay: rgba(69, 26, 3, 0.5);
+
+  --color-success: #16a34a;
+  --color-warning: #b45309;
+  --color-error: #dc2626;
+
+  --color-accent: #8b5cf6;
+  --color-accent-hover: #7c3aed;
+
+  --shadow-sm: 0 1px 2px rgba(69, 26, 3, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(69, 26, 3, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(69, 26, 3, 0.12);
+}
+
+/* --- Pastel --- */
+.theme-pastel {
+  --color-primary: #a78bfa;
+  --color-primary-hover: #c4b5fd;
+  --color-primary-subtle: #ede9fe;
+  --color-on-primary: #ffffff;
+
+  --color-surface: #fdf2f8;
+  --color-surface-secondary: #fce7f3;
+  --color-surface-hover: #fbcfe8;
+
+  --color-text: #374151;
+  --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
+
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+
+  --color-overlay: rgba(55, 65, 81, 0.4);
+
+  --color-success: #86efac;
+  --color-warning: #fde68a;
+  --color-error: #fca5a5;
+
+  --color-accent: #f472b6;
+  --color-accent-hover: #f9a8d4;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07);
+}
+
+/* --- High Contrast --- */
+.theme-high-contrast {
+  --color-primary: #1d4ed8;
+  --color-primary-hover: #1e40af;
+  --color-primary-subtle: #bfdbfe;
+  --color-on-primary: #ffffff;
+
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f3f4f6;
+  --color-surface-hover: #e5e7eb;
+
+  --color-text: #000000;
+  --color-text-secondary: #1f2937;
+  --color-text-tertiary: #374151;
+
+  --color-border: #000000;
+  --color-border-light: #6b7280;
+
+  --color-overlay: rgba(0, 0, 0, 0.7);
+
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-error: #b91c1c;
+
+  --color-accent: #6b21a8;
+  --color-accent-hover: #581c87;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.25);
+}
+
+/* ============================================================
+   Utility classes
+   Use these in JSX className instead of hardcoded color values.
+   Example: <div className="bg-surface text-text border-border">
+   ============================================================ */
+
+/* Surface backgrounds */
+.bg-surface {
+  background-color: var(--color-surface);
+}
+.bg-surface-secondary {
+  background-color: var(--color-surface-secondary);
+}
+.hover\:bg-surface-hover:hover {
+  background-color: var(--color-surface-hover);
+}
+
+/* Primary */
+.bg-primary {
+  background-color: var(--color-primary);
+}
+.bg-primary-subtle {
+  background-color: var(--color-primary-subtle);
+}
+.hover\:bg-primary-hover:hover {
+  background-color: var(--color-primary-hover);
+}
+.text-primary {
+  color: var(--color-primary);
+}
+.text-on-primary {
+  color: var(--color-on-primary);
+}
+
+/* Text */
+.text-text {
+  color: var(--color-text);
+}
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+.text-tertiary {
+  color: var(--color-text-tertiary);
+}
+.hover\:text-text:hover {
+  color: var(--color-text);
+}
+
+/* Border */
+.border-border {
+  border-color: var(--color-border);
+}
+.border-border-light {
+  border-color: var(--color-border-light);
+}
+
+/* Overlay backdrop */
+.bg-overlay {
+  background-color: var(--color-overlay);
+}
+
+/* Success / Warning / Error */
+.text-success {
+  color: var(--color-success);
+}
+.text-warning {
+  color: var(--color-warning);
+}
+.text-error {
+  color: var(--color-error);
+}
+.bg-success {
+  background-color: var(--color-success);
+}
+.bg-warning {
+  background-color: var(--color-warning);
+}
+.bg-error {
+  background-color: var(--color-error);
+}
+
+/* Accent */
+.text-accent {
+  color: var(--color-accent);
+}
+.bg-accent {
+  background-color: var(--color-accent);
+}
+.hover\:bg-accent-hover:hover {
+  background-color: var(--color-accent-hover);
+}
+
+/* Shadows (opt into theme-aware shadows with these) */
+.shadow-surface-sm {
+  box-shadow: var(--shadow-sm);
+}
+.shadow-surface-md {
+  box-shadow: var(--shadow-md);
+}
+.shadow-surface-lg {
+  box-shadow: var(--shadow-lg);
+}

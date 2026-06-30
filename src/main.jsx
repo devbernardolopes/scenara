@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { ModalProvider, registerModal } from './lib/modal'
+import { ThemeProvider } from './hooks/useTheme'
 import App from './App'
 import './index.css'
 
@@ -16,9 +17,11 @@ registerModal('personaEditor', PersonaEditorModal)
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <ModalProvider>
-        <App />
-      </ModalProvider>
+      <ThemeProvider>
+        <ModalProvider>
+          <App />
+        </ModalProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </StrictMode>,
 )

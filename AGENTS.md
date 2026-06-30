@@ -72,11 +72,70 @@ src/
   pages/          — CharacterDiscovery, ChatView (route-level, no business logic)
   lib/            — modal system, future utilities (no React components, just context/tools)
   services/       — chat logic, AI provider calls, summarization (pure functions, no JSX)
-  hooks/          — useModal, future shared React hooks
+  hooks/          — useModal, useTheme, future shared React hooks
+  styles/         — tokens.css (design tokens, themes, utility classes)
   db.js           — Dexie database setup
   App.jsx         — route definitions
   main.jsx        — entry point, provider wiring, modal registration
 ```
+
+## Design Tokens
+
+All visual properties are defined as CSS custom properties in `src/styles/tokens.css` — a single source of truth for every theme. **Never hardcode color values in JSX** — use the utility classes below instead.
+
+### Available utility classes
+
+| Token                    | Utility class                    |
+|--------------------------|----------------------------------|
+| Primary background       | `bg-primary`                     |
+| Primary hover            | `hover:bg-primary-hover`         |
+| Primary subtle bg        | `bg-primary-subtle`              |
+| Primary text             | `text-primary`                   |
+| Text on primary bg       | `text-on-primary`                |
+| Surface background       | `bg-surface`                     |
+| Surface secondary bg     | `bg-surface-secondary`           |
+| Surface hover            | `hover:bg-surface-hover`         |
+| Primary text             | `text-text`                      |
+| Secondary text           | `text-secondary`                 |
+| Tertiary text            | `text-tertiary`                  |
+| Default border           | `border-border`                  |
+| Light border             | `border-border-light`            |
+| Backdrop overlay         | `bg-overlay`                     |
+| Success / Warning / Error| `text-success`, `bg-warning` etc.|
+| Accent                   | `text-accent`, `bg-accent`       |
+| Theme-aware shadows      | `shadow-surface-sm/md/lg`        |
+
+Spacing, typography, and radius use Tailwind's built-in classes (`p-4`, `text-sm`, `rounded-lg`). Do not create custom tokens for these.
+
+### Available themes
+
+| Class                  | Description    |
+|------------------------|----------------|
+| (none, default)        | Light          |
+| `theme-dark`           | Dark           |
+| `theme-sepia`          | Sepia          |
+| `theme-pastel`         | Pastel         |
+| `theme-high-contrast`  | High Contrast  |
+
+Switch themes via `useTheme()`:
+
+```js
+import { useTheme } from '../hooks/useTheme'
+const { theme, setTheme, themes } = useTheme()
+setTheme('dark')
+```
+
+### Adding a new theme
+
+1. Add a `.theme-{name}` block in `tokens.css` overriding every `--color-*` and `--shadow-*` variable
+2. Add the name to the `THEMES` array in `src/hooks/useTheme.jsx`
+3. Add a label in `SettingsModal`'s `THEME_LABELS` map
+
+### Adding a new token
+
+1. Add `--token-name` to each `.theme-*` block in `tokens.css`
+2. Add a matching utility class in the utility classes section
+3. Use `className="utility-name"` in components
 
 ## Conventions
 
