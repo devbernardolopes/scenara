@@ -1,0 +1,7 @@
+{
+  "title": "Discussion {{id}}",
+  "placeholder": "Les messages apparaîtront ici.",
+  "inputPlaceholder": "Tapez un message…",
+  "send": "Envoyer",
+  "editPersona": "Modifier la Persona"
+}

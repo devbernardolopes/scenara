@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 const THREADS = [
   { id: '1', title: 'Welcome to Scenara' },
@@ -7,6 +8,7 @@ const THREADS = [
 ]
 
 function Sidebar({ open, onClose }) {
+  const { t } = useTranslation('common')
   const { threadId } = useParams()
 
   return (
@@ -31,12 +33,12 @@ function Sidebar({ open, onClose }) {
             className="font-bold text-lg text-text hover:text-text"
             onClick={onClose}
           >
-            Scenara
+            {t('appName')}
           </Link>
           <button
             onClick={onClose}
             className="text-tertiary hover:text-text md:hidden"
-            aria-label="Close sidebar"
+            aria-label={t('sidebar.close')}
           >
             ✕
           </button>
@@ -48,13 +50,13 @@ function Sidebar({ open, onClose }) {
             onClick={onClose}
             className="block px-3 py-2 rounded-md text-sm font-medium text-secondary hover:bg-surface-hover mb-2"
           >
-            Discovery
+            {t('sidebar.discovery')}
           </Link>
         </nav>
 
         <div className="px-4">
           <h3 className="text-xs font-semibold text-tertiary uppercase tracking-wider px-3 mb-2">
-            Threads
+            {t('sidebar.threads')}
           </h3>
           <ul className="space-y-1">
             {THREADS.map((thread) => (

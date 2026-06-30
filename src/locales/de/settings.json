@@ -1,0 +1,39 @@
+{
+  "title": "Einstellungen",
+  "searchPlaceholder": "Einstellungen durchsuchen…",
+  "noResults": "Keine Einstellungen entsprechen Ihrer Suche.",
+  "categories": {
+    "appearance": "Erscheinungsbild",
+    "api": "API",
+    "chat": "Chat",
+    "prompting": "Eingabeaufforderung",
+    "persona": "Persona",
+    "tts": "TTS",
+    "advanced": "Erweitert"
+  },
+  "appearance": {
+    "theme": {
+      "label": "Design",
+      "desc": "Wählen Sie das visuelle Erscheinungsbild der App."
+    },
+    "language": {
+      "label": "Sprache",
+      "desc": "Wählen Sie die UI-Sprache."
+    }
+  },
+  "themeOptions": {
+    "light": "Hell",
+    "dark": "Dunkel",
+    "sepia": "Sepia",
+    "pastel": "Pastell",
+    "highContrast": "Hoher Kontrast"
+  },
+  "languageOptions": {
+    "en": "English",
+    "pt-BR": "Português (Brasil)",
+    "fr": "Français",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "es": "Español"
+  }
+}

@@ -1,37 +1,9 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import db from '../db'
-
-const THEMES = ['light', 'dark', 'sepia', 'pastel', 'high-contrast']
+import { getSetting, setSetting } from '../services/settings'
 
 const ThemeContext = createContext(null)
 
-export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState('light')
-
-  useEffect(() => {
-    db.settings.where('key').equals('theme').first().then((row) => {
-      if (row && THEMES.includes(row.value)) {
-        applyTheme(row.value)
-        setThemeState(row.value)
-      }
-    })
-  }, [])
-
-  const setTheme = useCallback((next) => {
-    if (!THEMES.includes(next)) return
-    applyTheme(next)
-    setThemeState(next)
-    db.settings.put({ key: 'theme', value: next })
-  }, [])
-
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme, themes: THEMES }}>
-      {children}
-    </ThemeContext.Provider>
-  )
-}
-
-function applyTheme(theme) {
+function applyThemeClass(theme) {
   const html = document.documentElement
   html.className = html.className
     .split(' ')
@@ -40,6 +12,26 @@ function applyTheme(theme) {
   if (theme !== 'light') {
     html.classList.add(`theme-${theme}`)
   }
+}
+
+export function ThemeProvider({ children }) {
+  const [theme, setThemeState] = useState('light')
+
+  useEffect(() => {
+    getSetting('theme').then((val) => {
+      const t = val || 'light'
+      applyThemeClass(t)
+      setThemeState(t)
+    })
+  }, [])
+
+  const setTheme = useCallback((val) => {
+    applyThemeClass(val)
+    setThemeState(val)
+    setSetting('theme', val)
+  }, [])
+
+  return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>
 }
 
 export function useTheme() {

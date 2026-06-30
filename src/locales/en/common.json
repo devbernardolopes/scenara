@@ -1,0 +1,20 @@
+{
+  "appName": "Scenara",
+  "sidebar": {
+    "close": "Close sidebar",
+    "discovery": "Discovery",
+    "threads": "Threads"
+  },
+  "topbar": {
+    "toggleSidebar": "Toggle sidebar",
+    "settings": "Settings"
+  },
+  "discovery": {
+    "title": "Discovery",
+    "subtitle": "Browse and select characters to start a new chat.",
+    "characterCard": "Character {{index}}",
+    "characterDesc": "A brief description of this character.",
+    "createCharacter": "Create Character"
+  },
+  "loading": "Loading…"
+}

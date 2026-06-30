@@ -1,0 +1,39 @@
+{
+  "title": "Ajustes",
+  "searchPlaceholder": "Buscar ajustes…",
+  "noResults": "Ningún ajuste coincide con su búsqueda.",
+  "categories": {
+    "appearance": "Apariencia",
+    "api": "API",
+    "chat": "Chat",
+    "prompting": "Indicaciones",
+    "persona": "Persona",
+    "tts": "TTS",
+    "advanced": "Avanzado"
+  },
+  "appearance": {
+    "theme": {
+      "label": "Tema",
+      "desc": "Elija la apariencia visual de la aplicación."
+    },
+    "language": {
+      "label": "Idioma",
+      "desc": "Seleccione el idioma de la interfaz."
+    }
+  },
+  "themeOptions": {
+    "light": "Claro",
+    "dark": "Oscuro",
+    "sepia": "Sepia",
+    "pastel": "Pastel",
+    "highContrast": "Alto Contraste"
+  },
+  "languageOptions": {
+    "en": "English",
+    "pt-BR": "Português (Brasil)",
+    "fr": "Français",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "es": "Español"
+  }
+}

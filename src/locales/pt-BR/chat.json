@@ -1,0 +1,7 @@
+{
+  "title": "Chat {{id}}",
+  "placeholder": "As mensagens aparecerão aqui.",
+  "inputPlaceholder": "Digite uma mensagem…",
+  "send": "Enviar",
+  "editPersona": "Editar Persona"
+}

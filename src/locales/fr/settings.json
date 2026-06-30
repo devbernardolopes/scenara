@@ -1,0 +1,39 @@
+{
+  "title": "Paramètres",
+  "searchPlaceholder": "Rechercher des paramètres…",
+  "noResults": "Aucun paramètre ne correspond à votre recherche.",
+  "categories": {
+    "appearance": "Apparence",
+    "api": "API",
+    "chat": "Discussion",
+    "prompting": "Invites",
+    "persona": "Persona",
+    "tts": "TTS",
+    "advanced": "Avancé"
+  },
+  "appearance": {
+    "theme": {
+      "label": "Thème",
+      "desc": "Choisissez l'apparence visuelle de l'application."
+    },
+    "language": {
+      "label": "Langue",
+      "desc": "Sélectionnez la langue de l'interface."
+    }
+  },
+  "themeOptions": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "sepia": "Sépia",
+    "pastel": "Pastel",
+    "highContrast": "Contraste Élevé"
+  },
+  "languageOptions": {
+    "en": "English",
+    "pt-BR": "Português (Brasil)",
+    "fr": "Français",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "es": "Español"
+  }
+}

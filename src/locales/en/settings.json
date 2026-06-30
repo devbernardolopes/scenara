@@ -1,0 +1,39 @@
+{
+  "title": "Settings",
+  "searchPlaceholder": "Search settings…",
+  "noResults": "No settings match your search.",
+  "categories": {
+    "appearance": "Appearance",
+    "api": "API",
+    "chat": "Chat",
+    "prompting": "Prompting",
+    "persona": "Persona",
+    "tts": "TTS",
+    "advanced": "Advanced"
+  },
+  "appearance": {
+    "theme": {
+      "label": "Theme",
+      "desc": "Choose the visual appearance of the app."
+    },
+    "language": {
+      "label": "Language",
+      "desc": "Select the UI language."
+    }
+  },
+  "themeOptions": {
+    "light": "Light",
+    "dark": "Dark",
+    "sepia": "Sepia",
+    "pastel": "Pastel",
+    "highContrast": "High Contrast"
+  },
+  "languageOptions": {
+    "en": "English",
+    "pt-BR": "Português (Brasil)",
+    "fr": "Français",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "es": "Español"
+  }
+}

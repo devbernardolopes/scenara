@@ -8,6 +8,7 @@ Architecture decisions, conventions, and constraints for human and AI-agent main
 - **Tailwind CSS v4** (mobile-first, Vite plugin, no PostCSS config)
 - **React Router v7+** (nested routes with `<Outlet />`)
 - **Dexie.js** (IndexedDB wrapper, client-side persistence)
+- **i18next + react-i18next** (localization, EFIGS + pt-BR, namespace-based JSON files)
 - **ESLint** (flat config) + **Prettier** + **oxlint**
 - Deployment: **Vercel** (SPA rewrites in `vercel.json`)
 
@@ -32,6 +33,8 @@ Settings, character creation, and persona management open as **overlays** — no
   - `ModalProvider` — wraps the app, renders the active modal as a portal overlay (click-outside-to-close)
   - `registerModal(type, Component)` — registers a component for a given modal key
 - `src/hooks/useModal.js` — `useModal()` returns `{ openModal, closeModal, activeModal }`
+- Modals are wrapped in `<Suspense>` by the provider. Heavy modals (like Settings) can be `lazy()` imported and automatically code-split — see `main.jsx` for the pattern.
+- Passing `{ modalSize: 'lg' }` to `openModal()` renders the modal at `max-w-3xl` instead of `max-w-lg`.
 - Modals are registered in `src/main.jsx` to keep registration visible in one place:
 
 ```js
@@ -68,11 +71,20 @@ No business logic in `db.js` — just table definitions. Query/mutate from `serv
 src/
   components/
     shell/        — ShellLayout, Sidebar, TopBar
-    modals/       — SettingsModal, CharacterCreateModal, PersonaEditorModal
+    modals/
+      settings/   — SettingsModal, SettingsSidebar, SettingRow, controls
+      SettingsModal.jsx, CharacterCreateModal.jsx, PersonaEditorModal.jsx
   pages/          — CharacterDiscovery, ChatView (route-level, no business logic)
-  lib/            — modal system, future utilities (no React components, just context/tools)
-  services/       — chat logic, AI provider calls, summarization (pure functions, no JSX)
-  hooks/          — useModal, useTheme, future shared React hooks
+  lib/
+    i18n.js       — i18next initialization with static JSON imports
+    modal.jsx     — ModalContext, ModalProvider, registerModal
+  services/
+    settings.js   — SETTINGS + CATEGORIES config, getSetting, setSetting
+  hooks/          — useModal, useTheme, useLocale
+  locales/
+    en/           — common.json, chat.json, settings.json, characterCreation.json
+    pt-BR/        — same namespaces (EFIGS + pt-BR supported)
+    fr/, it/, de/, es/
   styles/         — tokens.css (design tokens, themes, utility classes)
   db.js           — Dexie database setup
   App.jsx         — route definitions
@@ -121,21 +133,77 @@ Switch themes via `useTheme()`:
 
 ```js
 import { useTheme } from '../hooks/useTheme'
-const { theme, setTheme, themes } = useTheme()
+const { theme, setTheme } = useTheme()
 setTheme('dark')
 ```
 
 ### Adding a new theme
 
 1. Add a `.theme-{name}` block in `tokens.css` overriding every `--color-*` and `--shadow-*` variable
-2. Add the name to the `THEMES` array in `src/hooks/useTheme.jsx`
-3. Add a label in `SettingsModal`'s `THEME_LABELS` map
+2. Add the name to the `SETTINGS` config array in `src/services/settings.js` (the `theme` setting's `options` array)
+3. Add a label to the theme options locale key in the settings namespace
 
 ### Adding a new token
 
 1. Add `--token-name` to each `.theme-*` block in `tokens.css`
 2. Add a matching utility class in the utility classes section
 3. Use `className="utility-name"` in components
+
+## Localization
+
+All UI strings live in `src/locales/{lang}/{namespace}.json`. Each language has the same set of namespaces:
+
+| Namespace          | Scope                                                   |
+|--------------------|---------------------------------------------------------|
+| `common`           | Sidebar, TopBar, Discovery, modals, shared labels       |
+| `settings`         | Settings modal, categories, setting labels/descriptions |
+| `chat`             | Chat view, message UI                                   |
+| `characterCreation`| Character and persona creation forms                    |
+
+**Usage in components:**
+
+```jsx
+import { useTranslation } from 'react-i18next'
+
+function MyComponent() {
+  const { t } = useTranslation('common')
+  return <h1>{t('discovery.title')}</h1>
+}
+```
+
+The namespace prefix (`:`) syntax references other namespaces from any component:
+
+```js
+t('settings:appearance.theme.label')
+```
+
+### Adding a new language
+
+1. Copy the `en/` folder to `{lang-code}/`
+2. Translate each JSON file
+3. Add the locale to `src/lib/i18n.js` — static import all 4 namespace files and add to the `resources` object
+4. Add the language option to the `language` setting in `src/services/settings.js`
+5. Add a label in the `settings.json` locale files under `languageOptions`
+
+## Settings System
+
+Settings are defined declaratively in `src/services/settings.js`:
+
+- **`CATEGORIES`** — array of `{ id, labelKey }` that drives the settings sidebar
+- **`SETTINGS`** — array of `{ key, category, type, default, options?, labelKey, descKey, optionLabels? }` that drives the content panel
+- **`getSetting(key)`** — reads from Dexie, falls back to the config default
+- **`setSetting(key, value)`** — persists to Dexie
+
+The settings modal (`components/modals/settings/`) renders from these config arrays — no JSX duplication per setting. The control type is driven by `setting.type`:
+
+| `type`     | Component         |
+|------------|-------------------|
+| `select`   | `SettingSelect`   |
+| `toggle`   | `SettingToggle`   |
+
+To add a new setting: add one object to the `SETTINGS` array. The modal renders it automatically.
+
+Settings are code-split: `SettingsModal` uses `React.lazy()` and is bundled separately. The `ModalProvider` wraps it in `<Suspense>` with a loading fallback.
 
 ## Conventions
 
@@ -171,6 +239,17 @@ registerModal('myModal', MyModal)
 const { openModal } = useModal()
 openModal('myModal', { someProp: value })
 ```
+
+For heavy modals, use `lazy()` for automatic code-splitting:
+
+```js
+import { lazy } from 'react'
+
+const SettingsModal = lazy(() => import('./components/modals/settings/SettingsModal'))
+registerModal('settings', SettingsModal)
+```
+
+The `ModalProvider` wraps every modal in `<Suspense>`, so no additional setup is needed.
 
 ## Commit Convention
 

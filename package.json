@@ -12,10 +12,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "dexie": "^4.4.4",
+    "i18next": "^26.3.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-router-dom": "^7.18.1",
-    "dexie": "^4.4.4"
+    "react-i18next": "^17.0.8",
+    "react-router-dom": "^7.18.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.2",

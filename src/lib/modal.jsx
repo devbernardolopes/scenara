@@ -1,4 +1,5 @@
-import { createContext, useState, useCallback } from 'react'
+import { createContext, useState, useCallback, Suspense } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export const ModalContext = createContext(null)
 
@@ -16,6 +17,8 @@ export function ModalProvider({ children }) {
   }, [])
 
   const ModalComponent = MODAL_COMPONENTS[modalState.type]
+  const { t } = useTranslation('common')
+  const modalSize = modalState.props?.modalSize === 'lg' ? 'max-w-3xl' : 'max-w-lg'
 
   return (
     <ModalContext.Provider
@@ -29,12 +32,20 @@ export function ModalProvider({ children }) {
       {children}
       {ModalComponent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay" onClick={closeModal}>
-          <div
-            className="bg-surface rounded-lg shadow-surface-lg max-w-lg w-full mx-4 max-h-[85vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
+          <Suspense
+            fallback={
+              <div className={`bg-surface rounded-lg shadow-surface-lg ${modalSize} w-full mx-4 p-12 text-center text-secondary text-sm`}>
+                {t('loading')}
+              </div>
+            }
           >
-            <ModalComponent {...modalState.props} />
-          </div>
+            <div
+              className={`bg-surface rounded-lg shadow-surface-lg ${modalSize} w-full mx-4 max-h-[85vh] overflow-y-auto`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ModalComponent {...modalState.props} />
+            </div>
+          </Suspense>
         </div>
       )}
     </ModalContext.Provider>

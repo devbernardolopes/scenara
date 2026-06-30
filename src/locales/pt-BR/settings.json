@@ -1,0 +1,39 @@
+{
+  "title": "Configurações",
+  "searchPlaceholder": "Pesquisar configurações…",
+  "noResults": "Nenhuma configuração corresponde à sua pesquisa.",
+  "categories": {
+    "appearance": "Aparência",
+    "api": "API",
+    "chat": "Chat",
+    "prompting": "Prompt",
+    "persona": "Persona",
+    "tts": "TTS",
+    "advanced": "Avançado"
+  },
+  "appearance": {
+    "theme": {
+      "label": "Tema",
+      "desc": "Escolha a aparência visual do aplicativo."
+    },
+    "language": {
+      "label": "Idioma",
+      "desc": "Selecione o idioma da interface."
+    }
+  },
+  "themeOptions": {
+    "light": "Claro",
+    "dark": "Escuro",
+    "sepia": "Sépia",
+    "pastel": "Pastel",
+    "highContrast": "Alto Contraste"
+  },
+  "languageOptions": {
+    "en": "English",
+    "pt-BR": "Português (Brasil)",
+    "fr": "Français",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "es": "Español"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "title": "Impostazioni",
+  "searchPlaceholder": "Cerca impostazioni…",
+  "noResults": "Nessuna impostazione corrisponde alla ricerca.",
+  "categories": {
+    "appearance": "Aspetto",
+    "api": "API",
+    "chat": "Chat",
+    "prompting": "Prompt",
+    "persona": "Persona",
+    "tts": "TTS",
+    "advanced": "Avanzate"
+  },
+  "appearance": {
+    "theme": {
+      "label": "Tema",
+      "desc": "Scegli l'aspetto visivo dell'applicazione."
+    },
+    "language": {
+      "label": "Lingua",
+      "desc": "Seleziona la lingua dell'interfaccia."
+    }
+  },
+  "themeOptions": {
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "sepia": "Seppia",
+    "pastel": "Pastello",
+    "highContrast": "Alto Contrasto"
+  },
+  "languageOptions": {
+    "en": "English",
+    "pt-BR": "Português (Brasil)",
+    "fr": "Français",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "es": "Español"
+  }
+}

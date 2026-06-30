@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 
 function TopBar({ onMenuToggle }) {
+  const { t } = useTranslation('common')
   const { openModal } = useModal()
 
   return (
@@ -8,7 +10,7 @@ function TopBar({ onMenuToggle }) {
       <button
         onClick={onMenuToggle}
         className="text-tertiary hover:text-text md:hidden"
-        aria-label="Toggle sidebar"
+        aria-label={t('topbar.toggleSidebar')}
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -23,9 +25,9 @@ function TopBar({ onMenuToggle }) {
       <div className="flex-1" />
 
       <button
-        onClick={() => openModal('settings')}
+        onClick={() => openModal('settings', { modalSize: 'lg' })}
         className="text-tertiary hover:text-text p-2 rounded-md hover:bg-surface-hover"
-        aria-label="Settings"
+        aria-label={t('topbar.settings')}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path

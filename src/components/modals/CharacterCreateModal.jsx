@@ -1,12 +1,14 @@
+import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 
 function CharacterCreateModal() {
+  const { t } = useTranslation('characterCreation')
   const { closeModal } = useModal()
 
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-text">Create Character</h2>
+        <h2 className="text-xl font-semibold text-text">{t('title')}</h2>
         <button
           onClick={closeModal}
           className="text-tertiary hover:text-text"
@@ -15,7 +17,7 @@ function CharacterCreateModal() {
           ✕
         </button>
       </div>
-      <p className="text-secondary text-sm">Character creation form will go here.</p>
+      <p className="text-secondary text-sm">{t('placeholder')}</p>
     </div>
   )
 }
