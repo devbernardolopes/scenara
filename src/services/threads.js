@@ -15,8 +15,19 @@ export async function getThread(id) {
 }
 
 export async function getNextThreadNumber() {
-  const all = await db.threads.toArray()
-  return all.reduce((max, t) => Math.max(max, t.threadNumber || 0), 0) + 1
+  return db.transaction('rw', db.settings, async () => {
+    const row = await db.settings.where('key').equals('threadCounter').first()
+    if (row) {
+      const next = row.value + 1
+      await db.settings.update(row.id, { value: next })
+      return next
+    }
+    const all = await db.threads.toArray()
+    const max = all.reduce((m, t) => Math.max(m, t.threadNumber || 0), 0)
+    const next = max + 1
+    await db.settings.add({ key: 'threadCounter', value: next })
+    return next
+  })
 }
 
 export async function createThread({ characterId, personaId, title }) {
