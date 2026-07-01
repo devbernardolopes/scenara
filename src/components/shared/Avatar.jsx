@@ -7,12 +7,12 @@ const SIZES = {
 function Avatar({ src, alt = '', size = 'md', className = '' }) {
   const cls = `${SIZES[size] || SIZES.md} ${className}`
   if (!src) {
-    return <span className={cls}>{'👤'}</span>
+    return <span data-avatar className={cls}>{'👤'}</span>
   }
   if (/^https?:\/\//.test(src) || src.startsWith('data:image/')) {
-    return <img src={src} alt={alt} className={`rounded-full object-cover ${cls}`} />
+    return <img src={src} alt={alt} data-avatar className={`rounded-full object-cover ${cls}`} />
   }
-  return <span className={cls}>{src}</span>
+  return <span data-avatar className={cls}>{src}</span>
 }
 
 export default Avatar

@@ -1,22 +1,23 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
-import { createCharacter } from '../../services/characters'
+import { createCharacter, updateCharacter } from '../../services/characters'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import CloseButton from '../shared/CloseButton'
 
-function CharacterCreateModal() {
+function CharacterCreateModal({ character: existing }) {
   const { t } = useTranslation('characterCreation')
   const { closeModal } = useModal()
+  const isEditing = Boolean(existing)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
-    name: '',
-    avatar: '',
-    description: '',
-    personality: '',
-    greeting: '',
-    scenario: '',
-    sampleChat: '',
+    name: existing?.name || '',
+    avatar: existing?.avatar || '',
+    description: existing?.description || '',
+    personality: existing?.personality || '',
+    greeting: existing?.greeting || '',
+    scenario: existing?.scenario || '',
+    sampleChat: existing?.sampleChat || '',
   })
 
   function update(field) {
@@ -28,7 +29,11 @@ function CharacterCreateModal() {
     if (!form.name.trim()) return
     setSaving(true)
     try {
-      await createCharacter(form)
+      if (isEditing) {
+        await updateCharacter(existing.id, form)
+      } else {
+        await createCharacter(form)
+      }
       window.dispatchEvent(new CustomEvent('characters-changed'))
       closeModal()
     } finally {
@@ -42,7 +47,7 @@ function CharacterCreateModal() {
   return (
     <form onSubmit={handleSubmit} className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-text">{t('title')}</h2>
+        <h2 className="text-xl font-semibold text-text">{isEditing ? t('editTitle') : t('title')}</h2>
         <CloseButton onClick={closeModal} />
       </div>
 
@@ -134,7 +139,7 @@ function CharacterCreateModal() {
           disabled={saving || !form.name.trim()}
           className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
         >
-          {saving ? t('save', 'Saving…') : t('save')}
+          {saving ? (isEditing ? 'Saving…' : t('save')) : t('save')}
         </button>
       </div>
     </form>
