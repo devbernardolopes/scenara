@@ -76,6 +76,12 @@ export async function updatePersona(id, data) {
   const safe = { ...data, updatedAt: new Date() }
   if ('isDefault' in safe) safe.isDefault = safe.isDefault ? 1 : 0
   await db.personas.update(id, safe)
+  if ('isDefault' in data && !data.isDefault) {
+    const stillHasDefault = await db.personas.where('isDefault').equals(1).count()
+    if (!stillHasDefault) {
+      await reassignDefault()
+    }
+  }
   window.dispatchEvent(new CustomEvent('personas-changed'))
   return id
 }
