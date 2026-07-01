@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -35,6 +35,18 @@ function Sidebar({ open, onClose }) {
   const [threads, setThreads] = useState([])
   const [characters, setCharacters] = useState({})
   const [colorPickerId, setColorPickerId] = useState(null)
+  const colorPickerRef = useRef(null)
+
+  useEffect(() => {
+    if (!colorPickerId) return
+    function handleClick(e) {
+      if (colorPickerRef.current && !colorPickerRef.current.contains(e.target)) {
+        setColorPickerId(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [colorPickerId])
 
   const loadData = useCallback(async () => {
     const all = await getAllThreads()
@@ -159,7 +171,10 @@ function Sidebar({ open, onClose }) {
                         <Palette className="w-3.5 h-3.5" />
                       </button>
                       {colorPickerId === thread.id && (
-                        <div className="absolute bottom-full left-0 mb-1 flex gap-1 p-1.5 bg-surface border border-border rounded-md shadow-surface-md z-10">
+                        <div
+                          ref={colorPickerRef}
+                          className="absolute bottom-full left-0 mb-1 flex gap-1 p-1.5 bg-surface border border-border rounded-md shadow-surface-md z-10"
+                        >
                           {COLOR_PRESETS.map((c, i) => (
                             <button
                               key={i}
