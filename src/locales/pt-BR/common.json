@@ -33,5 +33,12 @@
   },
   "loading": "Carregando…",
   "cancel": "Cancelar",
-  "confirm": "Confirmar"
+  "confirm": "Confirmar",
+  "saveDialog": {
+    "title": "Alterações não salvas",
+    "message": "Você tem alterações não salvas. O que deseja fazer?",
+    "save": "Salvar",
+    "discard": "Descartar",
+    "cancel": "Cancelar"
+  }
 }

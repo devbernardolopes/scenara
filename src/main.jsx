@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { ModalProvider, registerModal } from './lib/modal'
 import { ConfirmProvider } from './lib/confirm'
+import { SaveConfirmProvider } from './lib/saveConfirm'
 import { ThemeProvider } from './hooks/useTheme'
 import { LocaleProvider } from './hooks/useLocale'
 import App from './App'
@@ -25,7 +26,9 @@ createRoot(document.getElementById('root')).render(
         <ThemeProvider>
           <ModalProvider>
             <ConfirmProvider>
-              <App />
+              <SaveConfirmProvider>
+                <App />
+              </SaveConfirmProvider>
             </ConfirmProvider>
           </ModalProvider>
         </ThemeProvider>

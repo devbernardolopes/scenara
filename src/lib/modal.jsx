@@ -39,7 +39,7 @@ export function ModalProvider({ children }) {
     >
       {children}
       {ModalComponent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay" onClick={closeModal}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay" onClick={modalState.props?.closeOnOverlay === false ? undefined : closeModal}>
           <Suspense
             fallback={
               <div

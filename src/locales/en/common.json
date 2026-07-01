@@ -33,5 +33,12 @@
   },
   "loading": "Loading…",
   "cancel": "Cancel",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "saveDialog": {
+    "title": "Unsaved changes",
+    "message": "You have unsaved changes. What would you like to do?",
+    "save": "Save",
+    "discard": "Discard",
+    "cancel": "Cancel"
+  }
 }

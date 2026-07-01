@@ -86,7 +86,7 @@ function CharacterDiscovery() {
   }, [])
 
   function handleEditCharacter(character) {
-    openModal('characterCreate', { character })
+    openModal('characterCreate', { character, closeOnOverlay: false })
   }
 
   async function handleSelectCharacter(character) {
@@ -190,7 +190,7 @@ function CharacterDiscovery() {
       )}
 
       <button
-        onClick={() => openModal('characterCreate')}
+        onClick={() => openModal('characterCreate', { closeOnOverlay: false })}
         className="mt-6 min-h-[44px] px-4 py-2 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm"
       >
         {t('discovery.createCharacter')}
