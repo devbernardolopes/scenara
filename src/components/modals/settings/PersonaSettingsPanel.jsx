@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../../hooks/useModal'
 import { useConfirm } from '../../../lib/confirm'
-import { useToast } from '../../../lib/toast'
+import { showToast } from '../../../lib/toast'
 import {
   getAllPersonas,
   deletePersona,
@@ -14,26 +14,14 @@ import {
   exportPersonas,
   importPersonas,
 } from '../../../services/personas'
+import { downloadJson } from '../../../lib/download'
 import PersonaCard from '../../shared/PersonaCard'
 import { Plus, Upload } from '../../../lib/icons'
-
-function downloadJson(data, filename) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
-}
 
 function PersonaSettingsPanel() {
   const { t } = useTranslation('settings')
   const { openModal } = useModal()
   const { confirm } = useConfirm()
-  const { addToast } = useToast()
   const [personas, setPersonas] = useState([])
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [loading, setLoading] = useState(true)
@@ -147,14 +135,13 @@ function PersonaSettingsPanel() {
       try {
         data = JSON.parse(text)
       } catch {
-        addToast(t('persona.import.invalidFormat'), { type: 'error' })
+        showToast(t('persona.import.invalidFormat'), { type: 'error' })
         return
       }
       const items = Array.isArray(data) ? data : data.personas ? data.personas : [data]
-      const added = await importPersonas(items)
-      addToast(t('persona.import.importSuccess', { count: added.length }), { type: 'success' })
+      await importPersonas(items)
     } catch {
-      addToast(t('persona.import.fileError'), { type: 'error' })
+      showToast(t('persona.import.fileError'), { type: 'error' })
     }
   }
 

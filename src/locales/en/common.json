@@ -66,7 +66,50 @@
     "dismiss": "Dismiss",
     "paused": "Paused",
     "pause": "Pause",
-    "resume": "Resume"
+    "resume": "Resume",
+    "character": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{name}} and {{count}} chats deleted",
+      "duplicated": "{{name}} duplicated"
+    },
+    "thread": {
+      "created": "Chat started",
+      "deleted": "Thread deleted",
+      "deletedMultiple": "{{count}} threads deleted",
+      "duplicated": "Thread duplicated"
+    },
+    "persona": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} personas deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} personas duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} personas exported",
+      "imported": "{{count}} personas imported"
+    },
+    "writingInstruction": {
+      "created": "Writing instruction created",
+      "updated": "Writing instruction updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} writing instructions deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} writing instructions duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} writing instructions exported",
+      "imported": "{{count}} writing instructions imported"
+    },
+    "export": {
+      "failed": "Export failed",
+      "invalidItem": "Item not found"
+    },
+    "import": {
+      "invalidFormat": "Invalid file format",
+      "fileError": "Failed to read file"
+    }
   },
   "personaPicker": {
     "title": "Start with persona",

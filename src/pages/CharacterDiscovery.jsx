@@ -3,7 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../hooks/useModal'
 import { useConfirm } from '../lib/confirm'
-import { getAllCharacters, deleteCharacterWithThreads } from '../services/characters'
+import {
+  getAllCharacters,
+  deleteCharacterWithThreads,
+  duplicateCharacter,
+  exportCharacter,
+} from '../services/characters'
+import { downloadJson } from '../lib/download'
 import { getSetting } from '../services/settings'
 import { createThread } from '../services/threads'
 import { createMessage } from '../services/messages'
@@ -112,7 +118,6 @@ function CharacterDiscovery() {
     if (character.greeting) {
       await createMessage(threadId, 'assistant', character.greeting)
     }
-    window.dispatchEvent(new CustomEvent('threads-changed'))
     navigate(`/chat/${threadId}`)
   }
 
@@ -126,8 +131,6 @@ function CharacterDiscovery() {
     })
     if (!ok) return
     await deleteCharacterWithThreads(character.id)
-    window.dispatchEvent(new CustomEvent('characters-changed'))
-    window.dispatchEvent(new CustomEvent('threads-changed'))
     await loadCharacters()
   }
 
@@ -135,12 +138,16 @@ function CharacterDiscovery() {
     // To be implemented
   }
 
-  function handleDuplicate(character) {
-    // To be implemented
+  async function handleDuplicate(character) {
+    await duplicateCharacter(character.id)
   }
 
-  function handleExport(character) {
-    // To be implemented
+  async function handleExport(character) {
+    const data = await exportCharacter(character.id)
+    downloadJson(
+      data,
+      `character-${character.name.replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase()}.json`,
+    )
   }
 
   if (loading) {

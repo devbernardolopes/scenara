@@ -38,6 +38,49 @@
     "dismiss": "Verwerfen",
     "paused": "Pausiert",
     "pause": "Pause",
-    "resume": "Fortsetzen"
+    "resume": "Fortsetzen",
+    "character": {
+      "created": "{{name}} erstellt",
+      "updated": "{{name}} aktualisiert",
+      "deleted": "{{name}} gelöscht",
+      "deletedMultiple": "{{name}} und {{count}} Chats gelöscht",
+      "duplicated": "{{name}} dupliziert"
+    },
+    "thread": {
+      "created": "Chat gestartet",
+      "deleted": "Unterhaltung gelöscht",
+      "deletedMultiple": "{{count}} Unterhaltungen gelöscht",
+      "duplicated": "Unterhaltung dupliziert"
+    },
+    "persona": {
+      "created": "{{name}} erstellt",
+      "updated": "{{name}} aktualisiert",
+      "deleted": "{{name}} gelöscht",
+      "deletedMultiple": "{{count}} Personas gelöscht",
+      "duplicated": "{{name}} dupliziert",
+      "duplicatedMultiple": "{{count}} Personas dupliziert",
+      "exported": "{{name}} exportiert",
+      "exportedMultiple": "{{count}} Personas exportiert",
+      "imported": "{{count}} Personas importiert"
+    },
+    "writingInstruction": {
+      "created": "Schreibanweisung erstellt",
+      "updated": "Schreibanweisung aktualisiert",
+      "deleted": "{{name}} gelöscht",
+      "deletedMultiple": "{{count}} Schreibanweisungen gelöscht",
+      "duplicated": "{{name}} dupliziert",
+      "duplicatedMultiple": "{{count}} Schreibanweisungen dupliziert",
+      "exported": "{{name}} exportiert",
+      "exportedMultiple": "{{count}} Schreibanweisungen exportiert",
+      "imported": "{{count}} Schreibanweisungen importiert"
+    },
+    "export": {
+      "failed": "Export fehlgeschlagen",
+      "invalidItem": "Element nicht gefunden"
+    },
+    "import": {
+      "invalidFormat": "Ungültiges Dateiformat",
+      "fileError": "Fehler beim Lesen der Datei"
+    }
   }
 }

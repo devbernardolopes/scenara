@@ -43,14 +43,22 @@ export async function createThread({ characterId, personaId, title }) {
     color: '',
     threadNumber,
   })
-  window.dispatchEvent(new CustomEvent('threads-changed'))
+  window.dispatchEvent(
+    new CustomEvent('threads-changed', {
+      detail: { action: 'create', entityName: title || 'New Chat' },
+    }),
+  )
   return id
 }
 
 export async function updateThread(id, data) {
   const updated = await db.threads.update(Number(id), { ...data, updatedAt: new Date() })
   if (updated) {
-    window.dispatchEvent(new CustomEvent('threads-changed'))
+    window.dispatchEvent(
+      new CustomEvent('threads-changed', {
+        detail: { action: 'update' },
+      }),
+    )
     return id
   }
   throw new Error('Thread not found')
@@ -59,7 +67,11 @@ export async function updateThread(id, data) {
 export async function updateThreadTitle(id, title) {
   const updated = await db.threads.update(Number(id), { title })
   if (updated) {
-    window.dispatchEvent(new CustomEvent('threads-changed'))
+    window.dispatchEvent(
+      new CustomEvent('threads-changed', {
+        detail: { action: 'update' },
+      }),
+    )
     return id
   }
   throw new Error('Thread not found')
@@ -88,16 +100,25 @@ export async function updateThreadColor(id, color) {
 
 export async function deleteThread(id) {
   const numId = Number(id)
+  const thread = await db.threads.get(numId)
   await db.messages.where('threadId').equals(numId).delete()
   await db.threads.delete(numId)
-  window.dispatchEvent(new CustomEvent('threads-changed'))
+  window.dispatchEvent(
+    new CustomEvent('threads-changed', {
+      detail: { action: 'delete', entityName: thread?.title },
+    }),
+  )
 }
 
 export async function deleteThreads(ids) {
   const numIds = ids.map(Number)
   await Promise.all(numIds.map((id) => db.messages.where('threadId').equals(id).delete()))
   await db.threads.bulkDelete(numIds)
-  window.dispatchEvent(new CustomEvent('threads-changed'))
+  window.dispatchEvent(
+    new CustomEvent('threads-changed', {
+      detail: { action: 'delete', count: ids.length },
+    }),
+  )
 }
 
 export async function duplicateThread(id) {
@@ -105,10 +126,11 @@ export async function duplicateThread(id) {
   if (!original) throw new Error('Thread not found')
   const now = new Date()
   const threadNumber = await getNextThreadNumber()
+  const newTitle = `${original.title} (Copy)`
   const newId = await db.threads.add({
     characterId: original.characterId,
     personaId: original.personaId,
-    title: `${original.title} (Copy)`,
+    title: newTitle,
     createdAt: now,
     updatedAt: now,
     isFavorite: false,
@@ -126,6 +148,10 @@ export async function duplicateThread(id) {
       })),
     )
   }
-  window.dispatchEvent(new CustomEvent('threads-changed'))
+  window.dispatchEvent(
+    new CustomEvent('threads-changed', {
+      detail: { action: 'duplicate', entityName: newTitle },
+    }),
+  )
   return newId
 }

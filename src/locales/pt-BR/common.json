@@ -54,7 +54,50 @@
     "dismiss": "Dispensar",
     "paused": "Pausado",
     "pause": "Pausar",
-    "resume": "Retomar"
+    "resume": "Retomar",
+    "character": {
+      "created": "{{name}} criado",
+      "updated": "{{name}} atualizado",
+      "deleted": "{{name}} excluído",
+      "deletedMultiple": "{{name}} e {{count}} chats excluídos",
+      "duplicated": "{{name}} duplicado"
+    },
+    "thread": {
+      "created": "Chat iniciado",
+      "deleted": "Conversa excluída",
+      "deletedMultiple": "{{count}} conversas excluídas",
+      "duplicated": "Conversa duplicada"
+    },
+    "persona": {
+      "created": "{{name}} criada",
+      "updated": "{{name}} atualizada",
+      "deleted": "{{name}} excluída",
+      "deletedMultiple": "{{count}} personas excluídas",
+      "duplicated": "{{name}} duplicada",
+      "duplicatedMultiple": "{{count}} personas duplicadas",
+      "exported": "{{name}} exportada",
+      "exportedMultiple": "{{count}} personas exportadas",
+      "imported": "{{count}} personas importadas"
+    },
+    "writingInstruction": {
+      "created": "Instrução de escrita criada",
+      "updated": "Instrução de escrita atualizada",
+      "deleted": "{{name}} excluída",
+      "deletedMultiple": "{{count}} instruções de escrita excluídas",
+      "duplicated": "{{name}} duplicada",
+      "duplicatedMultiple": "{{count}} instruções de escrita duplicadas",
+      "exported": "{{name}} exportada",
+      "exportedMultiple": "{{count}} instruções de escrita exportadas",
+      "imported": "{{count}} instruções de escrita importadas"
+    },
+    "export": {
+      "failed": "Exportação falhou",
+      "invalidItem": "Item não encontrado"
+    },
+    "import": {
+      "invalidFormat": "Formato de arquivo inválido",
+      "fileError": "Falha ao ler o arquivo"
+    }
   },
   "personaPicker": {
     "title": "Iniciar com persona",

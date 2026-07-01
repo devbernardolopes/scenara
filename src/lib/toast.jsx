@@ -1,6 +1,10 @@
-import { createContext, useContext, useState, useCallback, useRef, useMemo } from 'react'
+import { createContext, useContext, useState, useCallback, useRef, useMemo, useEffect } from 'react'
 
 const ToastContext = createContext(null)
+
+export function showToast(message, { type = 'info', duration } = {}) {
+  window.dispatchEvent(new CustomEvent('show-toast', { detail: { message, type, duration } }))
+}
 
 const MAX_VISIBLE = 5
 const EXIT_MS = 300
@@ -53,11 +57,15 @@ export function ToastProvider({ children }) {
           const remaining = t._remaining
           const timerId = setTimeout(() => removeToast(id), remaining)
           timersRef.current[id] = timerId
-          return prev.map((x) => (x.id === id ? { ...x, paused: false, _startedAt: Date.now() } : x))
+          return prev.map((x) =>
+            x.id === id ? { ...x, paused: false, _startedAt: Date.now() } : x,
+          )
         } else {
           clearTimeout(timersRef.current[id])
           const elapsed = Date.now() - t._startedAt
-          return prev.map((x) => (x.id === id ? { ...x, paused: true, _remaining: x._remaining - elapsed } : x))
+          return prev.map((x) =>
+            x.id === id ? { ...x, paused: true, _remaining: x._remaining - elapsed } : x,
+          )
         }
       })
     },
@@ -99,7 +107,26 @@ export function ToastProvider({ children }) {
     [toasts, addToast, removeToast, pauseToast, resumeToast, togglePause],
   )
 
-  return <ToastContext.Provider value={value}>{children}</ToastContext.Provider>
+  return (
+    <ToastContext.Provider value={value}>
+      {children}
+      <ToastBridge />
+    </ToastContext.Provider>
+  )
+}
+
+function ToastBridge() {
+  const { addToast } = useContext(ToastContext)
+
+  useEffect(() => {
+    function handler(e) {
+      addToast(e.detail.message, { type: e.detail.type, duration: e.detail.duration })
+    }
+    window.addEventListener('show-toast', handler)
+    return () => window.removeEventListener('show-toast', handler)
+  }, [addToast])
+
+  return null
 }
 
 export function useToast() {

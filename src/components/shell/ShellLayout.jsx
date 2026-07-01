@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import TopBar from './TopBar'
 import ToastContainer from '../shared/ToastContainer'
+import ToastObserver from '../shared/ToastObserver'
 
 function ShellLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -17,6 +18,7 @@ function ShellLayout() {
         </main>
       </div>
       <ToastContainer />
+      <ToastObserver />
     </div>
   )
 }

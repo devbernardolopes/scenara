@@ -38,6 +38,49 @@
     "dismiss": "Ignorer",
     "paused": "En pause",
     "pause": "Pause",
-    "resume": "Reprendre"
+    "resume": "Reprendre",
+    "character": {
+      "created": "{{name}} créé",
+      "updated": "{{name}} mis à jour",
+      "deleted": "{{name}} supprimé",
+      "deletedMultiple": "{{name}} et {{count}} discussions supprimés",
+      "duplicated": "{{name}} dupliqué"
+    },
+    "thread": {
+      "created": "Chat démarré",
+      "deleted": "Discussion supprimée",
+      "deletedMultiple": "{{count}} discussions supprimées",
+      "duplicated": "Discussion dupliquée"
+    },
+    "persona": {
+      "created": "{{name}} créée",
+      "updated": "{{name}} mise à jour",
+      "deleted": "{{name}} supprimée",
+      "deletedMultiple": "{{count}} personas supprimées",
+      "duplicated": "{{name}} dupliquée",
+      "duplicatedMultiple": "{{count}} personas dupliquées",
+      "exported": "{{name}} exportée",
+      "exportedMultiple": "{{count}} personas exportées",
+      "imported": "{{count}} personas importées"
+    },
+    "writingInstruction": {
+      "created": "Instruction d'écriture créée",
+      "updated": "Instruction d'écriture mise à jour",
+      "deleted": "{{name}} supprimée",
+      "deletedMultiple": "{{count}} instructions d'écriture supprimées",
+      "duplicated": "{{name}} dupliquée",
+      "duplicatedMultiple": "{{count}} instructions d'écriture dupliquées",
+      "exported": "{{name}} exportée",
+      "exportedMultiple": "{{count}} instructions d'écriture exportées",
+      "imported": "{{count}} instructions d'écriture importées"
+    },
+    "export": {
+      "failed": "Échec de l'exportation",
+      "invalidItem": "Élément introuvable"
+    },
+    "import": {
+      "invalidFormat": "Format de fichier invalide",
+      "fileError": "Échec de la lecture du fichier"
+    }
   }
 }

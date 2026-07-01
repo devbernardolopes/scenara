@@ -1,4 +1,6 @@
 import db from '../db'
+import { showToast } from '../lib/toast'
+import i18n from '../lib/i18n'
 import { setSetting } from './settings'
 
 export async function getAllPersonas() {
@@ -61,7 +63,11 @@ export async function createPersona(data) {
   if (data.isDefault) {
     await ensureSingleDefault(id, { isDefault: true })
   }
-  window.dispatchEvent(new CustomEvent('personas-changed'))
+  window.dispatchEvent(
+    new CustomEvent('personas-changed', {
+      detail: { action: 'create', entityName: data.name },
+    }),
+  )
   return id
 }
 
@@ -82,7 +88,11 @@ export async function updatePersona(id, data) {
       await reassignDefault()
     }
   }
-  window.dispatchEvent(new CustomEvent('personas-changed'))
+  window.dispatchEvent(
+    new CustomEvent('personas-changed', {
+      detail: { action: 'update', entityName: data.name },
+    }),
+  )
   return id
 }
 
@@ -91,7 +101,8 @@ export async function deletePersona(id) {
   if (all.length <= 1) {
     throw new Error('Cannot delete the last persona')
   }
-  const wasDefault = all.find((p) => p.id === id)?.isDefault
+  const target = all.find((p) => p.id === id)
+  const wasDefault = target?.isDefault
   await db.personas.delete(id)
   if (wasDefault) {
     await reassignDefault()
@@ -101,7 +112,11 @@ export async function deletePersona(id) {
       await reassignDefault()
     }
   }
-  window.dispatchEvent(new CustomEvent('personas-changed'))
+  window.dispatchEvent(
+    new CustomEvent('personas-changed', {
+      detail: { action: 'delete', entityName: target?.name || 'Unknown' },
+    }),
+  )
 }
 
 export async function deletePersonas(ids) {
@@ -122,7 +137,11 @@ export async function deletePersonas(ids) {
       await reassignDefault()
     }
   }
-  window.dispatchEvent(new CustomEvent('personas-changed'))
+  window.dispatchEvent(
+    new CustomEvent('personas-changed', {
+      detail: { action: 'delete', count: ids.length },
+    }),
+  )
 }
 
 export async function duplicatePersona(id) {
@@ -140,7 +159,11 @@ export async function duplicatePersona(id) {
     createdAt: now,
     updatedAt: now,
   })
-  window.dispatchEvent(new CustomEvent('personas-changed'))
+  window.dispatchEvent(
+    new CustomEvent('personas-changed', {
+      detail: { action: 'duplicate', entityName: original.name },
+    }),
+  )
   return newId
 }
 
@@ -161,7 +184,11 @@ export async function setDefaultPersona(id) {
 
 export async function exportPersona(id) {
   const p = await db.personas.get(id)
-  if (!p) throw new Error('Persona not found')
+  if (!p) {
+    showToast(i18n.t('common:toast.export.invalidItem'), { type: 'error' })
+    throw new Error('Persona not found')
+  }
+  showToast(i18n.t('common:toast.persona.exported', { name: p.name }), { type: 'success' })
   return {
     name: p.name,
     title: p.title,
@@ -173,7 +200,14 @@ export async function exportPersona(id) {
 }
 
 export async function exportPersonas(ids) {
-  return Promise.all(ids.map((id) => exportPersona(id)))
+  const all = await Promise.all(ids.map((id) => exportPersona(id).catch(() => null)))
+  const exported = all.filter(Boolean)
+  if (exported.length > 0) {
+    showToast(i18n.t('common:toast.persona.exportedMultiple', { count: exported.length }), {
+      type: 'success',
+    })
+  }
+  return exported
 }
 
 export async function importPersonas(items) {
@@ -195,7 +229,11 @@ export async function importPersonas(items) {
     added.push(id)
   }
   if (added.length > 0) {
-    window.dispatchEvent(new CustomEvent('personas-changed'))
+    window.dispatchEvent(
+      new CustomEvent('personas-changed', {
+        detail: { action: 'import', count: added.length },
+      }),
+    )
   }
   return added
 }

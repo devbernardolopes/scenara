@@ -1,4 +1,6 @@
 import db from '../db'
+import { showToast } from '../lib/toast'
+import i18n from '../lib/i18n'
 import { deleteUIStateByKeyPrefix } from './uiState'
 
 const SEED_CHARACTERS = [
@@ -71,17 +73,36 @@ export async function getCharacter(id) {
 
 export async function createCharacter(data) {
   const now = new Date()
-  return db.characters.add({ ...data, createdAt: now, updatedAt: now })
+  const id = await db.characters.add({ ...data, createdAt: now, updatedAt: now })
+  window.dispatchEvent(
+    new CustomEvent('characters-changed', {
+      detail: { action: 'create', entityName: data.name },
+    }),
+  )
+  return id
 }
 
 export async function updateCharacter(id, data) {
   const updated = await db.characters.update(id, { ...data, updatedAt: new Date() })
-  if (updated) return id
+  if (updated) {
+    window.dispatchEvent(
+      new CustomEvent('characters-changed', {
+        detail: { action: 'update', entityName: data.name },
+      }),
+    )
+    return id
+  }
   throw new Error('Character not found')
 }
 
 export async function deleteCharacter(id) {
-  return db.characters.delete(id)
+  const character = await db.characters.get(id)
+  await db.characters.delete(id)
+  window.dispatchEvent(
+    new CustomEvent('characters-changed', {
+      detail: { action: 'delete', entityName: character?.name || 'Unknown' },
+    }),
+  )
 }
 
 const COLLAPSIBLE_PREFIXES = [
@@ -104,6 +125,8 @@ async function cleanupCollapsibleState(characterId) {
 }
 
 export async function deleteCharacterWithThreads(id) {
+  const character = await db.characters.get(id)
+  if (!character) throw new Error('Character not found')
   const threads = await db.threads.where('characterId').equals(id).toArray()
   await Promise.all(
     threads.map((t) =>
@@ -116,6 +139,42 @@ export async function deleteCharacterWithThreads(id) {
   )
   await db.characters.delete(id)
   await cleanupCollapsibleState(id)
+  window.dispatchEvent(
+    new CustomEvent('characters-changed', {
+      detail: { action: 'delete', entityName: character.name, count: 1 + threads.length },
+    }),
+  )
+  window.dispatchEvent(new CustomEvent('threads-changed'))
+}
+
+export async function duplicateCharacter(id) {
+  const original = await db.characters.get(id)
+  if (!original) throw new Error('Character not found')
+  const now = new Date()
+  const { id: _id, createdAt: _ca, updatedAt: _ua, ...rest } = original
+  const newId = await db.characters.add({
+    ...rest,
+    name: `${original.name} (Copy)`,
+    createdAt: now,
+    updatedAt: now,
+  })
+  window.dispatchEvent(
+    new CustomEvent('characters-changed', {
+      detail: { action: 'duplicate', entityName: original.name },
+    }),
+  )
+  return newId
+}
+
+export async function exportCharacter(id) {
+  const c = await db.characters.get(id)
+  if (!c) {
+    showToast(i18n.t('common:toast.export.invalidItem'), { type: 'error' })
+    throw new Error('Character not found')
+  }
+  const { id: _id, createdAt: _ca, updatedAt: _ua, ...data } = c
+  showToast(i18n.t('common:toast.character.exported', { name: c.name }), { type: 'success' })
+  return data
 }
 
 async function seedCharacters() {

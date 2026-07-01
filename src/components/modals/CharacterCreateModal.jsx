@@ -99,7 +99,6 @@ function CharacterCreateModal({ character: existing }) {
       } else {
         await createCharacter(form)
       }
-      window.dispatchEvent(new CustomEvent('characters-changed'))
     } finally {
       setSaving(false)
     }

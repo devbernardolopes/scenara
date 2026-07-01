@@ -38,6 +38,49 @@
     "dismiss": "Descartar",
     "paused": "En pausa",
     "pause": "Pausa",
-    "resume": "Reanudar"
+    "resume": "Reanudar",
+    "character": {
+      "created": "{{name}} creado",
+      "updated": "{{name}} actualizado",
+      "deleted": "{{name}} eliminado",
+      "deletedMultiple": "{{name}} y {{count}} chats eliminados",
+      "duplicated": "{{name}} duplicado"
+    },
+    "thread": {
+      "created": "Chat iniciado",
+      "deleted": "Conversación eliminada",
+      "deletedMultiple": "{{count}} conversaciones eliminadas",
+      "duplicated": "Conversación duplicada"
+    },
+    "persona": {
+      "created": "{{name}} creada",
+      "updated": "{{name}} actualizada",
+      "deleted": "{{name}} eliminada",
+      "deletedMultiple": "{{count}} personas eliminadas",
+      "duplicated": "{{name}} duplicada",
+      "duplicatedMultiple": "{{count}} personas duplicadas",
+      "exported": "{{name}} exportada",
+      "exportedMultiple": "{{count}} personas exportadas",
+      "imported": "{{count}} personas importadas"
+    },
+    "writingInstruction": {
+      "created": "Instrucción de escritura creada",
+      "updated": "Instrucción de escritura actualizada",
+      "deleted": "{{name}} eliminada",
+      "deletedMultiple": "{{count}} instrucciones de escritura eliminadas",
+      "duplicated": "{{name}} duplicada",
+      "duplicatedMultiple": "{{count}} instrucciones de escritura duplicadas",
+      "exported": "{{name}} exportada",
+      "exportedMultiple": "{{count}} instrucciones de escritura exportadas",
+      "imported": "{{count}} instrucciones de escritura importadas"
+    },
+    "export": {
+      "failed": "Exportación fallida",
+      "invalidItem": "Elemento no encontrado"
+    },
+    "import": {
+      "invalidFormat": "Formato de archivo no válido",
+      "fileError": "Error al leer el archivo"
+    }
   }
 }

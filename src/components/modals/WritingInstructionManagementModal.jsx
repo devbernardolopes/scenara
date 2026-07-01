@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
-import { useToast } from '../../lib/toast'
+import { showToast } from '../../lib/toast'
 import {
   getAllWritingInstructions,
   deleteWritingInstruction,
@@ -13,28 +13,16 @@ import {
   exportWritingInstructions,
   importWritingInstructions,
 } from '../../services/writingInstructions'
+import { downloadJson } from '../../lib/download'
 import CloseButton from '../shared/CloseButton'
 import IconButton from '../shared/IconButton'
 import { Plus, Upload, Edit3, Copy, Download, Trash2 } from '../../lib/icons'
-
-function downloadJson(data, filename) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
-}
 
 function WritingInstructionManagementModal() {
   const { t } = useTranslation('settings')
   const { t: tc } = useTranslation('common')
   const { openModal, closeModal } = useModal()
   const { confirm } = useConfirm()
-  const { addToast } = useToast()
   const [items, setItems] = useState([])
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [loading, setLoading] = useState(true)
@@ -134,7 +122,7 @@ function WritingInstructionManagementModal() {
       try {
         data = JSON.parse(text)
       } catch {
-        addToast(t('writingInstruction.import.invalidFormat'), { type: 'error' })
+        showToast(t('writingInstruction.import.invalidFormat'), { type: 'error' })
         return
       }
       const items = Array.isArray(data)
@@ -142,12 +130,9 @@ function WritingInstructionManagementModal() {
         : data.writingInstructions
           ? data.writingInstructions
           : [data]
-      const added = await importWritingInstructions(items)
-      addToast(t('writingInstruction.import.importSuccess', { count: added.length }), {
-        type: 'success',
-      })
+      await importWritingInstructions(items)
     } catch {
-      addToast(t('writingInstruction.import.fileError'), { type: 'error' })
+      showToast(t('writingInstruction.import.fileError'), { type: 'error' })
     }
   }
 
