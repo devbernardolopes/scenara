@@ -2,10 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
+import ModalShell from '../shared/ModalShell'
 import CollapsibleSection from '../shared/CollapsibleSection'
-import CloseButton from '../shared/CloseButton'
-import { createPersona, updatePersona } from '../../services/personas'
-import { getAllPersonas } from '../../services/personas'
+import { createPersona, updatePersona, getAllPersonas } from '../../services/personas'
 import { estimateTokens } from '../../services/tokenEstimator'
 
 const COLOR_PRESETS = [
@@ -123,8 +122,7 @@ function PersonaFormModal({ persona }) {
     }
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault()
+  async function handleSave() {
     if (!form.name.trim() || saving) return
     await savePersona()
     closeModal()
@@ -141,14 +139,29 @@ function PersonaFormModal({ persona }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-text">
-          {editing ? t('persona.form.editTitle') : t('persona.form.title')}
-        </h2>
-        <CloseButton onClick={isDirty ? handleCloseAttempt : closeModal} />
-      </div>
-
+    <ModalShell
+      title={editing ? t('persona.form.editTitle') : t('persona.form.title')}
+      onClose={isDirty ? handleCloseAttempt : closeModal}
+      footer={
+        <>
+          <button
+            type="button"
+            onClick={isDirty ? handleCloseAttempt : closeModal}
+            className="min-h-[44px] px-4 text-sm text-secondary hover:text-text"
+          >
+            {t('persona.form.cancel')}
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={!form.name.trim() || saving}
+            className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
+          >
+            {saving ? t('persona.form.saving') : t('persona.form.save')}
+          </button>
+        </>
+      }
+    >
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-text mb-1">
@@ -281,24 +294,7 @@ function PersonaFormModal({ persona }) {
           />
         </CollapsibleSection>
       </div>
-
-      <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
-        <button
-          type="button"
-          onClick={isDirty ? handleCloseAttempt : closeModal}
-          className="min-h-[44px] px-4 text-sm text-secondary hover:text-text"
-        >
-          {t('persona.form.cancel')}
-        </button>
-        <button
-          type="submit"
-          disabled={!form.name.trim() || saving}
-          className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
-        >
-          {saving ? t('persona.form.saving') : t('persona.form.save')}
-        </button>
-      </div>
-    </form>
+    </ModalShell>
   )
 }
 

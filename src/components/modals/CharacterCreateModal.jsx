@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import { createCharacter, updateCharacter } from '../../services/characters'
+import ModalShell from '../shared/ModalShell'
 import CollapsibleSection from '../shared/CollapsibleSection'
-import CloseButton from '../shared/CloseButton'
 import { estimateTokens } from '../../services/tokenEstimator'
 
 function CharacterCreateModal({ character: existing }) {
@@ -69,8 +69,7 @@ function CharacterCreateModal({ character: existing }) {
     }
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault()
+  async function handleSave() {
     if (!form.name.trim()) return
     await saveCharacter()
     closeModal()
@@ -90,14 +89,29 @@ function CharacterCreateModal({ character: existing }) {
     'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
 
   return (
-    <form onSubmit={handleSubmit} className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-text">
-          {isEditing ? t('editTitle') : t('title')}
-        </h2>
-        <CloseButton onClick={isDirty ? handleCloseAttempt : closeModal} />
-      </div>
-
+    <ModalShell
+      title={isEditing ? t('editTitle') : t('title')}
+      onClose={isDirty ? handleCloseAttempt : closeModal}
+      footer={
+        <>
+          <button
+            type="button"
+            onClick={isDirty ? handleCloseAttempt : closeModal}
+            className="min-h-[44px] px-4 text-sm text-secondary hover:text-text"
+          >
+            {t('cancel')}
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || !form.name.trim()}
+            className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
+          >
+            {saving ? (isEditing ? 'Saving…' : t('save')) : t('save')}
+          </button>
+        </>
+      }
+    >
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-text mb-1">{t('nameLabel')}</label>
@@ -190,24 +204,7 @@ function CharacterCreateModal({ character: existing }) {
           />
         </CollapsibleSection>
       </div>
-
-      <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
-        <button
-          type="button"
-          onClick={isDirty ? handleCloseAttempt : closeModal}
-          className="min-h-[44px] px-4 text-sm text-secondary hover:text-text"
-        >
-          {t('cancel')}
-        </button>
-        <button
-          type="submit"
-          disabled={saving || !form.name.trim()}
-          className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
-        >
-          {saving ? (isEditing ? 'Saving…' : t('save')) : t('save')}
-        </button>
-      </div>
-    </form>
+    </ModalShell>
   )
 }
 
