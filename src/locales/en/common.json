@@ -17,7 +17,14 @@
     "createCharacter": "Create Character",
     "startChat": "Start Chat",
     "noCharacters": "No characters yet. Create one to get started!",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "actions": {
+      "delete": "Delete character",
+      "favorite": "Favorite character",
+      "duplicate": "Duplicate character",
+      "export": "Export character",
+      "selectPersona": "Select persona"
+    }
   },
   "loading": "Loading…"
 }
