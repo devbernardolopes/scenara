@@ -29,4 +29,6 @@ export {
   AlertTriangle,
   XCircle,
   Palette,
+  CheckSquare,
+  Square,
 } from 'lucide-react'

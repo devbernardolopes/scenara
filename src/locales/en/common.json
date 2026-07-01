@@ -13,7 +13,14 @@
     "unfavorite": "Unfavorite",
     "confirmDeleteTitle": "Delete Thread",
     "confirmDeleteMessage": "Are you sure you want to delete this thread? This action cannot be undone.",
-    "unknownCharacter": "Unknown"
+    "unknownCharacter": "Unknown",
+    "selectThreads": "Select threads",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "selectedCount": "{{count}} selected",
+    "deleteSelected": "Delete selected",
+    "confirmBatchDeleteTitle": "Delete Threads",
+    "confirmBatchDeleteMessage": "Are you sure you want to delete {{count}} threads? This action cannot be undone."
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",

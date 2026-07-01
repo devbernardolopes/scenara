@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   getAllThreads,
   deleteThread,
+  deleteThreads,
   toggleFavorite,
   updateThreadColor,
   duplicateThread,
@@ -13,7 +14,17 @@ import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
 import CloseButton from '../shared/CloseButton'
 import Avatar from '../shared/Avatar'
-import { UserPlus, Settings, Edit3, Trash2, Copy, Star, Palette } from '../../lib/icons'
+import {
+  UserPlus,
+  Settings,
+  Edit3,
+  Trash2,
+  Copy,
+  Star,
+  Palette,
+  CheckSquare,
+  Square,
+} from '../../lib/icons'
 
 const COLOR_PRESETS = [
   '#fef2f2',
@@ -36,6 +47,7 @@ function Sidebar({ open, onClose }) {
   const [characters, setCharacters] = useState({})
   const [colorPickerId, setColorPickerId] = useState(null)
   const colorPickerRef = useRef(null)
+  const [selectedIds, setSelectedIds] = useState(new Set())
 
   useEffect(() => {
     if (!colorPickerId) return
@@ -102,6 +114,39 @@ function Sidebar({ open, onClose }) {
     setColorPickerId(null)
   }
 
+  function toggleSelect(threadId) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(threadId)) {
+        next.delete(threadId)
+      } else {
+        next.add(threadId)
+      }
+      return next
+    })
+  }
+
+  function toggleSelectAll() {
+    if (selectedIds.size === threads.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(threads.map((t) => t.id)))
+    }
+  }
+
+  async function handleBatchDelete() {
+    const ok = await confirm({
+      title: t('sidebar.confirmBatchDeleteTitle'),
+      message: t('sidebar.confirmBatchDeleteMessage', { count: selectedIds.size }),
+      confirmLabel: t('sidebar.deleteSelected'),
+      cancelLabel: t('cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
+    await deleteThreads([...selectedIds])
+    setSelectedIds(new Set())
+  }
+
   return (
     <>
       {open && <div className="fixed inset-0 bg-overlay z-30 md:hidden" onClick={onClose} />}
@@ -115,9 +160,34 @@ function Sidebar({ open, onClose }) {
         `}
       >
         <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
-          <Link to="/" className="font-bold text-lg text-text hover:text-text" onClick={onClose}>
-            {t('appName')}
-          </Link>
+          <div className="flex items-center gap-2">
+            {threads.length > 0 && (
+              <button
+                type="button"
+                onClick={toggleSelectAll}
+                className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                aria-label={
+                  selectedIds.size === threads.length
+                    ? t('sidebar.deselectAll')
+                    : t('sidebar.selectAll')
+                }
+                title={
+                  selectedIds.size === threads.length
+                    ? t('sidebar.deselectAll')
+                    : t('sidebar.selectAll')
+                }
+              >
+                {selectedIds.size === threads.length ? (
+                  <CheckSquare className="w-4 h-4" />
+                ) : (
+                  <Square className="w-4 h-4" />
+                )}
+              </button>
+            )}
+            <Link to="/" className="font-bold text-lg text-text hover:text-text" onClick={onClose}>
+              {t('appName')}
+            </Link>
+          </div>
           <div className="md:hidden">
             <CloseButton onClick={onClose} label={t('sidebar.close')} />
           </div>
@@ -138,6 +208,22 @@ function Sidebar({ open, onClose }) {
                 >
                   <Link to={`/chat/${thread.id}`} onClick={onClose} className="block p-3">
                     <div className="flex items-start gap-3">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          toggleSelect(thread.id)
+                        }}
+                        className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover flex-shrink-0"
+                        aria-label={t('sidebar.selectThreads')}
+                      >
+                        {selectedIds.has(thread.id) ? (
+                          <CheckSquare className="w-4 h-4" />
+                        ) : (
+                          <Square className="w-4 h-4" />
+                        )}
+                      </button>
                       <Avatar src={character?.avatar} size="sm" className="flex-shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -269,6 +355,23 @@ function Sidebar({ open, onClose }) {
             })
           )}
         </div>
+
+        {selectedIds.size > 0 && (
+          <div className="border-t border-border px-3 py-2 shrink-0 flex items-center gap-3">
+            <span className="text-sm text-secondary">
+              {t('sidebar.selectedCount', { count: selectedIds.size })}
+            </span>
+            <div className="flex-1" />
+            <button
+              type="button"
+              onClick={handleBatchDelete}
+              className="min-h-[44px] px-4 rounded-md text-sm font-medium text-on-primary bg-error hover:opacity-90 flex items-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              {t('sidebar.deleteSelected')}
+            </button>
+          </div>
+        )}
 
         <div className="border-t border-border p-3 shrink-0 space-y-1">
           <button

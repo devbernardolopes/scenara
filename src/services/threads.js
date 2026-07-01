@@ -82,6 +82,13 @@ export async function deleteThread(id) {
   window.dispatchEvent(new CustomEvent('threads-changed'))
 }
 
+export async function deleteThreads(ids) {
+  const numIds = ids.map(Number)
+  await Promise.all(numIds.map((id) => db.messages.where('threadId').equals(id).delete()))
+  await db.threads.bulkDelete(numIds)
+  window.dispatchEvent(new CustomEvent('threads-changed'))
+}
+
 export async function duplicateThread(id) {
   const original = await db.threads.get(Number(id))
   if (!original) throw new Error('Thread not found')
