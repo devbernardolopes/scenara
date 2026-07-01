@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   getAllThreads,
@@ -41,6 +41,7 @@ const COLOR_PRESETS = [
 function Sidebar({ open, onClose }) {
   const { t } = useTranslation('common')
   const { threadId } = useParams()
+  const navigate = useNavigate()
   const { openModal } = useModal()
   const { confirm } = useConfirm()
   const [threads, setThreads] = useState([])
@@ -98,7 +99,9 @@ function Sidebar({ open, onClose }) {
       variant: 'danger',
     })
     if (!ok) return
+    const wasActive = String(thread.id) === threadId
     await deleteThread(thread.id)
+    if (wasActive) navigate('/')
   }
 
   async function handleDuplicate(thread) {
@@ -143,8 +146,10 @@ function Sidebar({ open, onClose }) {
       variant: 'danger',
     })
     if (!ok) return
+    const hadActive = [...selectedIds].some((id) => String(id) === threadId)
     await deleteThreads([...selectedIds])
     setSelectedIds(new Set())
+    if (hadActive) navigate('/')
   }
 
   return (
