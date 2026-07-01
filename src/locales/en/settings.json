@@ -187,6 +187,46 @@
       "importSuccess": "Imported {{count}} persona(s)"
     }
   },
+  "writingInstruction": {
+    "title": "Writing Instructions",
+    "createWritingInstruction": "Create Writing Instruction",
+    "importWritingInstruction": "Import",
+    "noWritingInstructions": "No writing instructions yet.",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "confirmDelete": {
+      "title": "Delete Writing Instruction",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} writing instructions?"
+    },
+    "form": {
+      "title": "Create Writing Instruction",
+      "editTitle": "Edit Writing Instruction",
+      "nameLabel": "Name",
+      "namePlaceholder": "Instruction name",
+      "contentLabel": "Content",
+      "contentPlaceholder": "Write your instruction content here…",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    },
+    "import": {
+      "invalidFormat": "Invalid file format.",
+      "fileError": "Could not read file.",
+      "importSuccess": "Imported {{count}} writing instruction(s)"
+    }
+  },
   "versionLabel": "Version",
   "languageOptions": {
     "en": "English",

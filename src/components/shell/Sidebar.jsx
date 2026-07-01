@@ -24,6 +24,11 @@ import {
   Palette,
   CheckSquare,
   Square,
+  FileText,
+  Zap,
+  BookOpen,
+  Tags,
+  Database,
 } from '../../lib/icons'
 
 const COLOR_PRESETS = [
@@ -380,18 +385,41 @@ function Sidebar({ open, onClose }) {
 
         <div className="border-t border-border p-3 shrink-0 space-y-1">
           <button
-            onClick={() => openModal('settings', { modalSize: 'lg' })}
-            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
-          >
-            <Settings className="w-4 h-4" />
-            {t('topbar.settings')}
-          </button>
-          <button
             onClick={() => openModal('personaManagement', { modalSize: 'lg' })}
             className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
           >
             <UserPlus className="w-4 h-4" />
             {t('sidebar.personas')}
+          </button>
+          <button
+            onClick={() => openModal('writingInstructionManagement', { modalSize: 'lg' })}
+            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
+          >
+            <FileText className="w-4 h-4" />
+            {t('sidebar.writingInstructions')}
+          </button>
+          <button className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover">
+            <Zap className="w-4 h-4" />
+            {t('sidebar.inChatShortcuts')}
+          </button>
+          <button className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover">
+            <BookOpen className="w-4 h-4" />
+            {t('sidebar.lorebooks')}
+          </button>
+          <button className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover">
+            <Tags className="w-4 h-4" />
+            {t('sidebar.tags')}
+          </button>
+          <button className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover">
+            <Database className="w-4 h-4" />
+            {t('sidebar.database')}
+          </button>
+          <button
+            onClick={() => openModal('settings', { modalSize: 'lg' })}
+            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
+          >
+            <Settings className="w-4 h-4" />
+            {t('topbar.settings')}
           </button>
         </div>
       </aside>

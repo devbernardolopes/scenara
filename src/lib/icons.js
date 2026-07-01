@@ -31,4 +31,9 @@ export {
   Palette,
   CheckSquare,
   Square,
+  FileText,
+  Zap,
+  BookOpen,
+  Tags,
+  Database,
 } from 'lucide-react'
