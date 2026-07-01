@@ -1,10 +1,11 @@
 import CollapsibleSection from '../../../shared/CollapsibleSection'
+import { estimateTokens } from '../../../../services/tokenEstimator'
 
 function computeSummary(value, mode) {
   if (!value || !mode) return null
   const n =
     mode === 'tokens'
-      ? Math.ceil(value.split(/\s+/).filter(Boolean).length * 1.3)
+      ? estimateTokens(value)
       : mode === 'words'
         ? value.split(/\s+/).filter(Boolean).length
         : mode === 'characters'
@@ -13,7 +14,15 @@ function computeSummary(value, mode) {
   return n != null ? `${n} ${mode}` : null
 }
 
-function SettingTextarea({ value, onChange, rows = 6, placeholder, collapsible, summary, storageKey }) {
+function SettingTextarea({
+  value,
+  onChange,
+  rows = 6,
+  placeholder,
+  collapsible,
+  summary,
+  storageKey,
+}) {
   const content = (
     <textarea
       value={value ?? ''}

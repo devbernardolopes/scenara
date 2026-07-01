@@ -18,6 +18,7 @@ import {
 import PersonaCard from '../../shared/PersonaCard'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import { Plus, Upload, ArrowLeft } from '../../../lib/icons'
+import { estimateTokens } from '../../../services/tokenEstimator'
 
 const COLOR_PRESETS = [
   '#ef4444',
@@ -401,6 +402,7 @@ function PersonaSettingsPanel() {
 
           <CollapsibleSection
             label={t('persona.form.contextLabel')}
+            summary={form.context ? `${estimateTokens(form.context)} tokens` : null}
             storageKey="personaFormContext"
           >
             <textarea

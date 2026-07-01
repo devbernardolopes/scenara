@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import { createPersona, updatePersona } from '../../services/personas'
+import { estimateTokens } from '../../services/tokenEstimator'
 
 const COLOR_PRESETS = [
   '#ef4444',
@@ -218,7 +219,11 @@ function PersonaFormModal({ persona }) {
           <span className="text-sm text-text">{t('persona.form.setDefault')}</span>
         </label>
 
-        <CollapsibleSection label={t('persona.form.contextLabel')} storageKey="personaFormContext">
+        <CollapsibleSection
+          label={t('persona.form.contextLabel')}
+          summary={form.context ? `${estimateTokens(form.context)} tokens` : null}
+          storageKey="personaFormContext"
+        >
           <textarea
             className={`${inputClass} resize-none mt-2`}
             rows={5}

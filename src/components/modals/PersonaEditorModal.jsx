@@ -6,6 +6,7 @@ import db from '../../db'
 import { createCharacter as createPersona } from '../../services/characters'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import CloseButton from '../shared/CloseButton'
+import { estimateTokens } from '../../services/tokenEstimator'
 import Avatar from '../shared/Avatar'
 import { Plus } from '../../lib/icons'
 
@@ -89,12 +90,14 @@ function PersonaEditorModal() {
           <h2 className="text-xl font-semibold text-text">
             {editing === 'new' ? t('addPersona') : t('editPersona')}
           </h2>
-        <CloseButton onClick={cancelEdit} />
+          <CloseButton onClick={cancelEdit} />
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-text mb-1">{t('personaNameLabel')}</label>
+            <label className="block text-sm font-medium text-text mb-1">
+              {t('personaNameLabel')}
+            </label>
             <input
               className={inputClass}
               value={form.name}
@@ -106,7 +109,9 @@ function PersonaEditorModal() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text mb-1">{t('personaAvatarLabel')}</label>
+            <label className="block text-sm font-medium text-text mb-1">
+              {t('personaAvatarLabel')}
+            </label>
             <input
               className={inputClass}
               value={form.avatar}
@@ -128,7 +133,11 @@ function PersonaEditorModal() {
             />
           </div>
 
-          <CollapsibleSection label={t('personaContextLabel')} storageKey="personaContext">
+          <CollapsibleSection
+            label={t('personaContextLabel')}
+            summary={form.context ? `${estimateTokens(form.context)} tokens` : null}
+            storageKey="personaContext"
+          >
             <textarea
               className={`${inputClass} resize-none mt-2`}
               rows={5}

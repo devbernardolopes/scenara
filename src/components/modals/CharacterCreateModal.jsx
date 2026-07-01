@@ -5,6 +5,7 @@ import { useSaveConfirm } from '../../lib/saveConfirm'
 import { createCharacter, updateCharacter } from '../../services/characters'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import CloseButton from '../shared/CloseButton'
+import { estimateTokens } from '../../services/tokenEstimator'
 
 function CharacterCreateModal({ character: existing }) {
   const { t } = useTranslation('characterCreation')
@@ -91,7 +92,9 @@ function CharacterCreateModal({ character: existing }) {
   return (
     <form onSubmit={handleSubmit} className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-text">{isEditing ? t('editTitle') : t('title')}</h2>
+        <h2 className="text-xl font-semibold text-text">
+          {isEditing ? t('editTitle') : t('title')}
+        </h2>
         <CloseButton onClick={isDirty ? handleCloseAttempt : closeModal} />
       </div>
 
@@ -119,7 +122,9 @@ function CharacterCreateModal({ character: existing }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text mb-1">{t('descriptionLabel')}</label>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t('descriptionLabel')}
+          </label>
           <textarea
             className={`${inputClass} resize-none`}
             rows={2}
@@ -129,7 +134,11 @@ function CharacterCreateModal({ character: existing }) {
           />
         </div>
 
-        <CollapsibleSection label={t('personalityLabel')} storageKey="charCreatePersonality">
+        <CollapsibleSection
+          label={t('personalityLabel')}
+          summary={form.personality ? `${estimateTokens(form.personality)} tokens` : null}
+          storageKey="charCreatePersonality"
+        >
           <textarea
             className={`${inputClass} resize-none mt-2`}
             rows={4}
@@ -139,7 +148,11 @@ function CharacterCreateModal({ character: existing }) {
           />
         </CollapsibleSection>
 
-        <CollapsibleSection label={t('greetingLabel')} storageKey="charCreateGreeting">
+        <CollapsibleSection
+          label={t('greetingLabel')}
+          summary={form.greeting ? `${estimateTokens(form.greeting)} tokens` : null}
+          storageKey="charCreateGreeting"
+        >
           <textarea
             className={`${inputClass} resize-none mt-2`}
             rows={3}
@@ -149,7 +162,11 @@ function CharacterCreateModal({ character: existing }) {
           />
         </CollapsibleSection>
 
-        <CollapsibleSection label={t('scenarioLabel')} storageKey="charCreateScenario">
+        <CollapsibleSection
+          label={t('scenarioLabel')}
+          summary={form.scenario ? `${estimateTokens(form.scenario)} tokens` : null}
+          storageKey="charCreateScenario"
+        >
           <textarea
             className={`${inputClass} resize-none mt-2`}
             rows={3}
@@ -159,7 +176,11 @@ function CharacterCreateModal({ character: existing }) {
           />
         </CollapsibleSection>
 
-        <CollapsibleSection label={t('sampleChatLabel')} storageKey="charCreateSampleChat">
+        <CollapsibleSection
+          label={t('sampleChatLabel')}
+          summary={form.sampleChat ? `${estimateTokens(form.sampleChat)} tokens` : null}
+          storageKey="charCreateSampleChat"
+        >
           <textarea
             className={`${inputClass} resize-none mt-2`}
             rows={4}
@@ -171,13 +192,13 @@ function CharacterCreateModal({ character: existing }) {
       </div>
 
       <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
-          <button
-            type="button"
-            onClick={isDirty ? handleCloseAttempt : closeModal}
-            className="min-h-[44px] px-4 text-sm text-secondary hover:text-text"
-          >
-            {t('cancel')}
-          </button>
+        <button
+          type="button"
+          onClick={isDirty ? handleCloseAttempt : closeModal}
+          className="min-h-[44px] px-4 text-sm text-secondary hover:text-text"
+        >
+          {t('cancel')}
+        </button>
         <button
           type="submit"
           disabled={saving || !form.name.trim()}
