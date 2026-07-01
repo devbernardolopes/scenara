@@ -19,6 +19,10 @@
     "language": {
       "label": "Lingua",
       "desc": "Seleziona la lingua dell'interfaccia."
+    },
+    "cardsPerPage": {
+      "label": "Cards per page",
+      "desc": "Number of character cards shown per page in the discovery view."
     }
   },
   "themeOptions": {

@@ -44,6 +44,15 @@ export const SETTINGS = [
     },
   },
   {
+    key: 'cardsPerPage',
+    category: 'appearance',
+    type: 'select',
+    default: 10,
+    options: [5, 10, 25, 50],
+    labelKey: 'settings:appearance.cardsPerPage.label',
+    descKey: 'settings:appearance.cardsPerPage.desc',
+  },
+  {
     key: 'language',
     category: 'appearance',
     type: 'select',
@@ -86,4 +95,5 @@ export async function setSetting(key, value) {
     await db.settings.add({ key, value })
   }
   SETTING_EFFECTS[key]?.(value)
+  window.dispatchEvent(new CustomEvent('settings-changed', { detail: { key } }))
 }

@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../hooks/useModal'
 import { getAllCharacters } from '../services/characters'
+import { getSetting } from '../services/settings'
 import { createThread } from '../services/threads'
 import { createMessage } from '../services/messages'
 import IconButton from '../components/shared/IconButton'
 import Avatar from '../components/shared/Avatar'
+import Pagination from '../components/shared/Pagination'
 import { Trash2, Heart, Copy, Download, UserPlus } from '../lib/icons'
 
 function StartChatButton({ onStart, onSelectPersona }) {
@@ -40,6 +42,19 @@ function CharacterDiscovery() {
   const navigate = useNavigate()
   const [characters, setCharacters] = useState([])
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [cardsPerPage, setCardsPerPage] = useState(10)
+
+  const totalPages = Math.max(1, Math.ceil(characters.length / cardsPerPage))
+  const safePage = Math.min(currentPage, totalPages)
+  const start = (safePage - 1) * cardsPerPage
+  const visibleCharacters = characters.slice(start, start + cardsPerPage)
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages)
+    }
+  }, [totalPages])
 
   async function loadCharacters() {
     setLoading(true)
@@ -53,8 +68,19 @@ function CharacterDiscovery() {
 
   useEffect(() => {
     loadCharacters()
+    getSetting('cardsPerPage').then((val) => setCardsPerPage(val || 10))
     window.addEventListener('characters-changed', loadCharacters)
     return () => window.removeEventListener('characters-changed', loadCharacters)
+  }, [])
+
+  useEffect(() => {
+    function handleSettingsChanged(e) {
+      if (e.detail?.key === 'cardsPerPage') {
+        getSetting('cardsPerPage').then(setCardsPerPage)
+      }
+    }
+    window.addEventListener('settings-changed', handleSettingsChanged)
+    return () => window.removeEventListener('settings-changed', handleSettingsChanged)
   }, [])
 
   function handleEditCharacter(character) {
@@ -109,8 +135,9 @@ function CharacterDiscovery() {
       {characters.length === 0 ? (
         <p className="text-secondary text-sm py-8 text-center">{t('discovery.noCharacters')}</p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {characters.map((char) => (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {visibleCharacters.map((char) => (
             <div
               key={char.id}
               onClick={(e) => {
@@ -140,7 +167,13 @@ function CharacterDiscovery() {
               />
             </div>
           ))}
-        </div>
+          </div>
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </>
       )}
 
       <button
