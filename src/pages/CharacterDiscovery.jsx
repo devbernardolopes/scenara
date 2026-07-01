@@ -6,6 +6,7 @@ import { getAllCharacters } from '../services/characters'
 import { createThread } from '../services/threads'
 import { createMessage } from '../services/messages'
 import IconButton from '../components/shared/IconButton'
+import Avatar from '../components/shared/Avatar'
 import { Trash2, Heart, Copy, Download, UserPlus } from '../lib/icons'
 
 function StartChatButton({ onStart, onSelectPersona }) {
@@ -111,7 +112,7 @@ function CharacterDiscovery() {
               className="border border-border rounded-lg p-4 bg-surface hover:shadow-surface-md transition-shadow"
             >
               <div className="flex items-center gap-3 mb-2">
-                <span className="text-3xl">{char.avatar || '👤'}</span>
+                <Avatar src={char.avatar} size="lg" />
                 <h3 className="font-semibold text-text truncate">{char.name}</h3>
               </div>
               <p className="text-sm text-secondary line-clamp-2 mb-3">

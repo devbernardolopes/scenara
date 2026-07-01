@@ -5,6 +5,7 @@ import db from '../../db'
 import { createCharacter as createPersona } from '../../services/characters'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import CloseButton from '../shared/CloseButton'
+import Avatar from '../shared/Avatar'
 import { Plus } from '../../lib/icons'
 
 function PersonaEditorModal() {
@@ -180,7 +181,7 @@ function PersonaEditorModal() {
               key={p.id}
               className="flex items-center gap-3 p-3 rounded-lg border border-border bg-surface"
             >
-              <span className="text-2xl">{p.avatar || '👤'}</span>
+              <Avatar src={p.avatar} size="md" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-text truncate">{p.name}</p>
                 {p.description && (

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../hooks/useModal'
 import { Send } from '../lib/icons'
+import Avatar from '../components/shared/Avatar'
 import { getThread, deleteThread } from '../services/threads'
 import { getCharacter } from '../services/characters'
 import { getMessagesByThread, createMessage } from '../services/messages'
@@ -87,7 +88,7 @@ function ChatView() {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 md:px-8 py-3 border-b border-border">
         <div className="flex items-center gap-2 min-w-0">
-          {character && <span className="text-xl flex-shrink-0">{character.avatar || '👤'}</span>}
+          {character && <Avatar src={character.avatar} size="sm" className="flex-shrink-0" />}
           <h1 className="font-semibold text-text truncate">{character?.name || thread.title}</h1>
           <span className="text-xs text-tertiary bg-surface-secondary px-2 py-0.5 rounded">
             {t('characterTag')}
