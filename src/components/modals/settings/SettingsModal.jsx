@@ -5,6 +5,7 @@ import { CATEGORIES, SETTINGS, setSetting } from '../../../services/settings'
 import SettingsSidebar from './SettingsSidebar'
 import SettingsSearch from './SettingsSearch'
 import SettingRow from './SettingRow'
+import pkg from '../../../../package.json'
 
 function SettingsModal() {
   const { closeModal } = useModal()
@@ -68,6 +69,9 @@ function SettingsModal() {
             </div>
           )}
         </div>
+      </div>
+      <div className="px-6 py-3 border-t border-border shrink-0">
+        <p className="text-xs text-tertiary">{t('versionLabel')} v{pkg.version}</p>
       </div>
     </div>
   )
