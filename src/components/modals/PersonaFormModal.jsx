@@ -5,6 +5,7 @@ import { useSaveConfirm } from '../../lib/saveConfirm'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import CloseButton from '../shared/CloseButton'
 import { createPersona, updatePersona } from '../../services/personas'
+import { getAllPersonas } from '../../services/personas'
 import { estimateTokens } from '../../services/tokenEstimator'
 
 const COLOR_PRESETS = [
@@ -39,12 +40,23 @@ function PersonaFormModal({ persona }) {
 
   const [form, setForm] = useState({ ...initialRef.current })
   const [saving, setSaving] = useState(false)
+  const [isLastDefault, setIsLastDefault] = useState(false)
   const fileRef = useRef(null)
   const savePendingRef = useRef(false)
 
   const isDirty = Object.keys(initialRef.current).some(
     (key) => form[key] !== initialRef.current[key],
   )
+
+  useEffect(() => {
+    if (editing) {
+      getAllPersonas().then((all) => {
+        if (all.length <= 1 && persona.isDefault) {
+          setIsLastDefault(true)
+        }
+      })
+    }
+  }, [editing, persona])
 
   const handleCloseRef = useRef()
   handleCloseRef.current = handleCloseAttempt
@@ -245,8 +257,12 @@ function PersonaFormModal({ persona }) {
           <input
             type="checkbox"
             checked={form.isDefault}
-            onChange={(e) => setForm((prev) => ({ ...prev, isDefault: e.target.checked }))}
+            onChange={(e) => {
+              if (isLastDefault && !e.target.checked) return
+              setForm((prev) => ({ ...prev, isDefault: e.target.checked }))
+            }}
             className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+            disabled={isLastDefault}
           />
           <span className="text-sm text-text">{t('persona.form.setDefault')}</span>
         </label>

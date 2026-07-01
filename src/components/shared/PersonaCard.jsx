@@ -12,6 +12,7 @@ function PersonaCard({
   onDelete,
   onDuplicate,
   onExport,
+  isOnlyOne,
 }) {
   const { t } = useTranslation('settings')
 
@@ -82,7 +83,8 @@ function PersonaCard({
         <IconButton
           icon={Trash2}
           label={t('persona.actions.delete')}
-          onClick={() => onDelete(persona)}
+          onClick={isOnlyOne ? undefined : () => onDelete(persona)}
+          disabled={isOnlyOne}
         />
       </div>
     </div>

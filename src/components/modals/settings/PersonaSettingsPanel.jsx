@@ -77,6 +77,7 @@ function PersonaSettingsPanel() {
   }
 
   async function handleDeleteSingle(p) {
+    if (personas.length <= 1) return
     const ok = await confirm({
       title: t('persona.confirmDelete.title'),
       message: t('persona.confirmDelete.message', { name: p.name }),
@@ -85,11 +86,16 @@ function PersonaSettingsPanel() {
       variant: 'danger',
     })
     if (!ok) return
-    await deletePersona(p.id)
+    try {
+      await deletePersona(p.id)
+    } catch {
+      return
+    }
     clearSelection()
   }
 
   async function handleDeleteSelected() {
+    if (selectedIds.size >= personas.length) return
     const ok = await confirm({
       title: t('persona.confirmDelete.title'),
       message: t('persona.confirmDelete.messageMultiple', { count: selectedIds.size }),
@@ -98,7 +104,11 @@ function PersonaSettingsPanel() {
       variant: 'danger',
     })
     if (!ok) return
-    await deletePersonas([...selectedIds])
+    try {
+      await deletePersonas([...selectedIds])
+    } catch {
+      return
+    }
     clearSelection()
   }
 
@@ -200,6 +210,7 @@ function PersonaSettingsPanel() {
                 onSetDefault={handleSetDefault}
                 onDuplicate={handleDuplicateSingle}
                 onExport={handleExportSingle}
+                isOnlyOne={personas.length <= 1}
               />
             ))}
           </div>
