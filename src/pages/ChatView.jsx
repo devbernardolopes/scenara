@@ -1,17 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useConfirm } from '../lib/confirm'
 import { Send } from '../lib/icons'
 import Avatar from '../components/shared/Avatar'
-import { getThread, deleteThread } from '../services/threads'
+import { getThread } from '../services/threads'
 import { getCharacter } from '../services/characters'
 import { getMessagesByThread, createMessage } from '../services/messages'
 
 function ChatView() {
   const { threadId } = useParams()
   const { t } = useTranslation('chat')
-  const navigate = useNavigate()
   const messagesEndRef = useRef(null)
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
@@ -19,7 +17,6 @@ function ChatView() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
-  const { confirm } = useConfirm()
 
   async function loadData() {
     setLoading(true)
@@ -59,20 +56,6 @@ function ChatView() {
     }
   }
 
-  async function handleDelete() {
-    const ok = await confirm({
-      title: t('deleteTitle'),
-      message: t('deleteConfirm'),
-      confirmLabel: t('deleteThread'),
-      cancelLabel: t('common:cancel'),
-      variant: 'danger',
-    })
-    if (!ok) return
-    await deleteThread(threadId)
-    window.dispatchEvent(new CustomEvent('threads-changed'))
-    navigate('/')
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -98,14 +81,6 @@ function ChatView() {
           <span className="text-xs text-tertiary bg-surface-secondary px-2 py-0.5 rounded">
             {t('characterTag')}
           </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleDelete}
-            className="min-h-[44px] px-3 text-sm text-error hover:opacity-80"
-          >
-            {t('deleteThread')}
-          </button>
         </div>
       </div>
 
