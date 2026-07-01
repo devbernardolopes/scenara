@@ -4,11 +4,25 @@
     "close": "Fermer la barre latérale",
     "discovery": "Découverte",
     "threads": "Discussions",
-    "personas": "Personas"
+    "personas": "Personas",
+    "deleteThread": "Supprimer la discussion",
+    "editCharacter": "Modifier le personnage",
+    "duplicateThread": "Dupliquer la discussion",
+    "favorite": "Favori",
+    "unfavorite": "Ne plus favori",
+    "confirmDeleteTitle": "Supprimer la Discussion",
+    "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer cette discussion ? Cette action est irréversible.",
+    "unknownCharacter": "Inconnu"
   },
   "topbar": {
     "toggleSidebar": "Basculer la barre latérale",
     "settings": "Paramètres"
+  },
+  "editThreadTitle": {
+    "title": "Modifier le titre de la discussion",
+    "placeholder": "Entrez le titre de la discussion",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…"
   },
   "discovery": {
     "title": "Découverte",

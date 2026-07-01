@@ -4,11 +4,25 @@
     "close": "Chiudi barra laterale",
     "discovery": "Scopri",
     "threads": "Conversazioni",
-    "personas": "Personas"
+    "personas": "Personas",
+    "deleteThread": "Elimina conversazione",
+    "editCharacter": "Modifica personaggio",
+    "duplicateThread": "Duplica conversazione",
+    "favorite": "Preferito",
+    "unfavorite": "Non preferito",
+    "confirmDeleteTitle": "Elimina Conversazione",
+    "confirmDeleteMessage": "Sei sicuro di voler eliminare questa conversazione? Questa azione non può essere annullata.",
+    "unknownCharacter": "Sconosciuto"
   },
   "topbar": {
     "toggleSidebar": "Attiva/disattiva barra laterale",
     "settings": "Impostazioni"
+  },
+  "editThreadTitle": {
+    "title": "Modifica titolo conversazione",
+    "placeholder": "Inserisci il titolo della conversazione",
+    "save": "Salva",
+    "saving": "Salvataggio…"
   },
   "discovery": {
     "title": "Scopri",

@@ -1,19 +1,19 @@
 import db from '../db'
+import { updateThreadTimestamp } from './threads'
 
 export async function getMessagesByThread(threadId) {
-  return db.messages
-    .where('threadId')
-    .equals(Number(threadId))
-    .sortBy('createdAt')
+  return db.messages.where('threadId').equals(Number(threadId)).sortBy('createdAt')
 }
 
 export async function createMessage(threadId, role, content) {
-  return db.messages.add({
+  const id = await db.messages.add({
     threadId: Number(threadId),
     role,
     content,
     createdAt: new Date(),
   })
+  await updateThreadTimestamp(threadId)
+  return id
 }
 
 export async function deleteMessage(id) {

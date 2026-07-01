@@ -4,11 +4,25 @@
     "close": "Cerrar barra lateral",
     "discovery": "Descubrir",
     "threads": "Conversaciones",
-    "personas": "Personas"
+    "personas": "Personas",
+    "deleteThread": "Eliminar conversación",
+    "editCharacter": "Editar personaje",
+    "duplicateThread": "Duplicar conversación",
+    "favorite": "Favorito",
+    "unfavorite": "No favorito",
+    "confirmDeleteTitle": "Eliminar Conversación",
+    "confirmDeleteMessage": "¿Estás seguro de que deseas eliminar esta conversación? Esta acción no se puede deshacer.",
+    "unknownCharacter": "Desconocido"
   },
   "topbar": {
     "toggleSidebar": "Alternar barra lateral",
     "settings": "Ajustes"
+  },
+  "editThreadTitle": {
+    "title": "Editar título de la conversación",
+    "placeholder": "Ingrese el título de la conversación",
+    "save": "Guardar",
+    "saving": "Guardando…"
   },
   "discovery": {
     "title": "Descubrir",

@@ -1,32 +1,113 @@
 import db from '../db'
 
 export async function getAllThreads() {
-  return db.threads.orderBy('updatedAt').reverse().toArray()
+  const all = await db.threads.toArray()
+  all.sort((a, b) => {
+    if (a.isFavorite && !b.isFavorite) return -1
+    if (!a.isFavorite && b.isFavorite) return 1
+    return new Date(b.updatedAt) - new Date(a.updatedAt)
+  })
+  return all
 }
 
 export async function getThread(id) {
   return db.threads.get(Number(id))
 }
 
+export async function getNextThreadNumber() {
+  const all = await db.threads.toArray()
+  return all.reduce((max, t) => Math.max(max, t.threadNumber || 0), 0) + 1
+}
+
 export async function createThread({ characterId, personaId, title }) {
   const now = new Date()
-  return db.threads.add({
+  const threadNumber = await getNextThreadNumber()
+  const id = await db.threads.add({
     characterId,
     personaId: personaId || null,
     title: title || 'New Chat',
     createdAt: now,
     updatedAt: now,
+    isFavorite: false,
+    color: '',
+    threadNumber,
   })
+  window.dispatchEvent(new CustomEvent('threads-changed'))
+  return id
 }
 
 export async function updateThread(id, data) {
   const updated = await db.threads.update(Number(id), { ...data, updatedAt: new Date() })
-  if (updated) return id
+  if (updated) {
+    window.dispatchEvent(new CustomEvent('threads-changed'))
+    return id
+  }
+  throw new Error('Thread not found')
+}
+
+export async function updateThreadTitle(id, title) {
+  const updated = await db.threads.update(Number(id), { title })
+  if (updated) {
+    window.dispatchEvent(new CustomEvent('threads-changed'))
+    return id
+  }
+  throw new Error('Thread not found')
+}
+
+export async function updateThreadTimestamp(id) {
+  await db.threads.update(Number(id), { updatedAt: new Date() })
+  window.dispatchEvent(new CustomEvent('threads-changed'))
+}
+
+export async function toggleFavorite(id) {
+  const thread = await db.threads.get(Number(id))
+  if (!thread) throw new Error('Thread not found')
+  await db.threads.update(Number(id), { isFavorite: !thread.isFavorite })
+  window.dispatchEvent(new CustomEvent('threads-changed'))
+}
+
+export async function updateThreadColor(id, color) {
+  const updated = await db.threads.update(Number(id), { color })
+  if (updated) {
+    window.dispatchEvent(new CustomEvent('threads-changed'))
+    return id
+  }
   throw new Error('Thread not found')
 }
 
 export async function deleteThread(id) {
   const numId = Number(id)
   await db.messages.where('threadId').equals(numId).delete()
-  return db.threads.delete(numId)
+  await db.threads.delete(numId)
+  window.dispatchEvent(new CustomEvent('threads-changed'))
+}
+
+export async function duplicateThread(id) {
+  const original = await db.threads.get(Number(id))
+  if (!original) throw new Error('Thread not found')
+  const now = new Date()
+  const threadNumber = await getNextThreadNumber()
+  const newId = await db.threads.add({
+    characterId: original.characterId,
+    personaId: original.personaId,
+    title: `${original.title} (Copy)`,
+    createdAt: now,
+    updatedAt: now,
+    isFavorite: false,
+    color: '',
+    threadNumber,
+  })
+  const messages = await db.messages.where('threadId').equals(Number(id)).toArray()
+  if (messages.length > 0) {
+    await db.messages.bulkAdd(
+      messages.map((m) => ({
+        threadId: newId,
+        role: m.role,
+        content: m.content,
+        createdAt: m.createdAt,
+      })),
+    )
+  }
+  window.dispatchEvent(new CustomEvent('threads-changed'))
+  return newId
 }

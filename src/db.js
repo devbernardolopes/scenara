@@ -28,4 +28,13 @@ db.version(3).stores({
   messages: '++id, threadId, role, createdAt',
 })
 
+db.version(4).stores({
+  threads: '++id, title, characterId, personaId, updatedAt, isFavorite, threadNumber',
+  characters: '++id, name, createdAt',
+  personas: '++id, name, title, createdAt, isDefault',
+  settings: '++id, key',
+  uiState: '++id, key',
+  messages: '++id, threadId, role, createdAt',
+})
+
 export default db

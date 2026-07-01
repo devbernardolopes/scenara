@@ -15,6 +15,7 @@ import CharacterCreateModal from './components/modals/CharacterCreateModal'
 import PersonaEditorModal from './components/modals/PersonaEditorModal'
 import PersonaFormModal from './components/modals/PersonaFormModal'
 import PersonaManagementModal from './components/modals/PersonaManagementModal'
+import EditThreadTitleModal from './components/modals/EditThreadTitleModal'
 
 const SettingsModal = lazy(() => import('./components/modals/settings/SettingsModal'))
 
@@ -23,6 +24,7 @@ registerModal('characterCreate', CharacterCreateModal)
 registerModal('personaEditor', PersonaEditorModal)
 registerModal('personaForm', PersonaFormModal)
 registerModal('personaManagement', PersonaManagementModal)
+registerModal('editThreadTitle', EditThreadTitleModal)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

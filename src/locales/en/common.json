@@ -5,11 +5,25 @@
     "discovery": "Discovery",
     "threads": "Threads",
     "newChat": "New Chat",
-    "personas": "Personas"
+    "personas": "Personas",
+    "deleteThread": "Delete thread",
+    "editCharacter": "Edit character",
+    "duplicateThread": "Duplicate thread",
+    "favorite": "Favorite",
+    "unfavorite": "Unfavorite",
+    "confirmDeleteTitle": "Delete Thread",
+    "confirmDeleteMessage": "Are you sure you want to delete this thread? This action cannot be undone.",
+    "unknownCharacter": "Unknown"
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",
     "settings": "Settings"
+  },
+  "editThreadTitle": {
+    "title": "Edit thread title",
+    "placeholder": "Enter thread title",
+    "save": "Save",
+    "saving": "Saving…"
   },
   "discovery": {
     "title": "Discovery",

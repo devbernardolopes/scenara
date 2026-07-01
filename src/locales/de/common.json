@@ -4,11 +4,25 @@
     "close": "Seitenleiste schließen",
     "discovery": "Entdecken",
     "threads": "Unterhaltungen",
-    "personas": "Personas"
+    "personas": "Personas",
+    "deleteThread": "Unterhaltung löschen",
+    "editCharacter": "Charakter bearbeiten",
+    "duplicateThread": "Unterhaltung duplizieren",
+    "favorite": "Favorit",
+    "unfavorite": "Kein Favorit",
+    "confirmDeleteTitle": "Unterhaltung löschen",
+    "confirmDeleteMessage": "Bist du sicher, dass du diese Unterhaltung löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "unknownCharacter": "Unbekannt"
   },
   "topbar": {
     "toggleSidebar": "Seitenleiste umschalten",
     "settings": "Einstellungen"
+  },
+  "editThreadTitle": {
+    "title": "Unterhaltungstitel bearbeiten",
+    "placeholder": "Unterhaltungstitel eingeben",
+    "save": "Speichern",
+    "saving": "Speichern…"
   },
   "discovery": {
     "title": "Entdecken",
