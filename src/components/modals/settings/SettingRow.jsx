@@ -33,7 +33,7 @@ function SettingRow({ setting, onSave }) {
   const labelPath = setting.labelKey.replace('settings:', '')
   const descPath = setting.descKey?.replace('settings:', '')
   const Control = CONTROL_MAP[setting.type]
-  const { key, category, default: def, labelKey, descKey, type, ...controlProps } = setting
+  const { key, category, default: def, labelKey, descKey, type, props: extraProps, ...controlProps } = setting
 
   if (!Control) return null
 
@@ -45,7 +45,7 @@ function SettingRow({ setting, onSave }) {
         {descPath && <p className="text-xs text-secondary mt-0.5">{t(descPath)}</p>}
       </div>
       <div className="w-full sm:w-auto sm:shrink-0 min-w-0">
-        <Control value={value} onChange={handleChange} storageKey={key} {...controlProps} />
+        <Control value={value} onChange={handleChange} storageKey={key} {...extraProps} {...controlProps} />
       </div>
     </div>
   )

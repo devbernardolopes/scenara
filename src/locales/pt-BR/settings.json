@@ -32,6 +32,84 @@
     "pastel": "Pastel",
     "highContrast": "Alto Contraste"
   },
+  "api": {
+    "activeProvider": {
+      "label": "Provedor Ativo",
+      "desc": "Selecione qual provedor de IA usar no chat."
+    },
+    "apiKey": {
+      "label": "Chave da API",
+      "placeholder": "Digite sua chave de API"
+    },
+    "useTrialKey": "Usar chave de teste",
+    "removeKey": "Remover chave",
+    "removeKeyConfirm": {
+      "title": "Remover Chave da API",
+      "message": "Tem certeza que deseja remover esta chave de API?"
+    },
+    "model": {
+      "label": "Modelo",
+      "placeholder": "Digite o nome do modelo"
+    },
+    "modelSearchPlaceholder": "Pesquisar modelos…",
+    "noModels": "Nenhum modelo disponível",
+    "refreshModels": "Atualizar modelos",
+    "testConnection": "Testar Conexão",
+    "serverUrl": {
+      "label": "URL do Servidor",
+      "placeholder": "http://localhost:1234"
+    },
+    "anonymousBadge": "Modo anônimo ativo",
+    "stopLimitNote": "Máximo de {{max}} sequências de parada",
+    "providers": {
+      "groq": {
+        "name": "Groq",
+        "desc": "Inferência rápida com LPUs"
+      },
+      "openrouter": {
+        "name": "OpenRouter",
+        "desc": "Acesse centenas de modelos através de uma API"
+      },
+      "aiHorde": {
+        "name": "AI Horde",
+        "desc": "Inferência distribuída colaborativa"
+      },
+      "lmStudio": {
+        "name": "LM Studio",
+        "desc": "Execute modelos localmente na sua máquina"
+      }
+    }
+  },
+  "chat": {
+    "stream": {
+      "label": "Stream de respostas",
+      "desc": "Transmita respostas token por token."
+    },
+    "temperature": {
+      "label": "Temperatura",
+      "desc": "Controla a aleatoriedade da saída (0 = determinístico, 2 = muito aleatório)."
+    },
+    "topP": {
+      "label": "Top P",
+      "desc": "Limiar de amostragem de núcleo."
+    },
+    "frequencyPenalty": {
+      "label": "Penalidade de Frequência",
+      "desc": "Penaliza tokens repetidos."
+    },
+    "presencePenalty": {
+      "label": "Penalidade de Presença",
+      "desc": "Penaliza tokens que já apareceram."
+    },
+    "maxTokens": {
+      "label": "Máx. de Tokens",
+      "desc": "Número máximo de tokens por resposta."
+    },
+    "stopStrings": {
+      "label": "Strings de Parada",
+      "desc": "Sequências de parada personalizadas (uma por linha)."
+    }
+  },
   "versionLabel": "Versão",
   "languageOptions": {
     "en": "English",

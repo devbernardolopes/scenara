@@ -5,6 +5,7 @@ import { CATEGORIES, SETTINGS, setSetting } from '../../../services/settings'
 import SettingsSidebar from './SettingsSidebar'
 import SettingsSearch from './SettingsSearch'
 import SettingRow from './SettingRow'
+import ApiSettingsPanel from './ApiSettingsPanel'
 import CloseButton from '../../shared/CloseButton'
 import pkg from '../../../../package.json'
 
@@ -56,6 +57,8 @@ function SettingsModal() {
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {noResults ? (
             <p className="text-secondary text-sm">{t('noResults')}</p>
+          ) : !search && activeCategory === 'api' ? (
+            <ApiSettingsPanel />
           ) : (
             <div className="space-y-8">
               {filtered.map((setting) => (

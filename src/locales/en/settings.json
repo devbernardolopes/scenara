@@ -32,6 +32,84 @@
     "pastel": "Pastel",
     "highContrast": "High Contrast"
   },
+  "api": {
+    "activeProvider": {
+      "label": "Active Provider",
+      "desc": "Select which AI provider to use for chat."
+    },
+    "apiKey": {
+      "label": "API Key",
+      "placeholder": "Enter your API key"
+    },
+    "useTrialKey": "Use trial key",
+    "removeKey": "Remove key",
+    "removeKeyConfirm": {
+      "title": "Remove API Key",
+      "message": "Are you sure you want to remove this API key?"
+    },
+    "model": {
+      "label": "Model",
+      "placeholder": "Type a model name"
+    },
+    "modelSearchPlaceholder": "Search models…",
+    "noModels": "No models available",
+    "refreshModels": "Refresh models",
+    "testConnection": "Test Connection",
+    "serverUrl": {
+      "label": "Server URL",
+      "placeholder": "http://localhost:1234"
+    },
+    "anonymousBadge": "Anonymous mode active",
+    "stopLimitNote": "Max {{max}} stop sequences",
+    "providers": {
+      "groq": {
+        "name": "Groq",
+        "desc": "Fast inference with LPUs"
+      },
+      "openrouter": {
+        "name": "OpenRouter",
+        "desc": "Access hundreds of models through one API"
+      },
+      "aiHorde": {
+        "name": "AI Horde",
+        "desc": "Crowdsourced distributed inference"
+      },
+      "lmStudio": {
+        "name": "LM Studio",
+        "desc": "Run models locally on your machine"
+      }
+    }
+  },
+  "chat": {
+    "stream": {
+      "label": "Stream responses",
+      "desc": "Stream responses token by token."
+    },
+    "temperature": {
+      "label": "Temperature",
+      "desc": "Controls randomness in output (0 = deterministic, 2 = very random)."
+    },
+    "topP": {
+      "label": "Top P",
+      "desc": "Nucleus sampling threshold."
+    },
+    "frequencyPenalty": {
+      "label": "Frequency Penalty",
+      "desc": "Penalizes repeated tokens."
+    },
+    "presencePenalty": {
+      "label": "Presence Penalty",
+      "desc": "Penalizes tokens that have appeared."
+    },
+    "maxTokens": {
+      "label": "Max Tokens",
+      "desc": "Maximum number of tokens per response."
+    },
+    "stopStrings": {
+      "label": "Stop Strings",
+      "desc": "Custom stop sequences (one per line)."
+    }
+  },
   "versionLabel": "Version",
   "languageOptions": {
     "en": "English",
