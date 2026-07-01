@@ -3,7 +3,7 @@ function IconButton({ icon: Icon, label, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-secondary hover:text-text hover:bg-surface-hover"
+      className="size-[44px] flex items-center justify-center rounded-md text-secondary hover:text-text hover:bg-surface-hover shrink-0"
       aria-label={label}
       title={label}
     >

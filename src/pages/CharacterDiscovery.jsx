@@ -167,7 +167,7 @@ function CharacterDiscovery() {
                 {char.description || t('discovery.characterDesc')}
               </p>
 
-              <div className="flex items-center gap-1 mb-3">
+              <div className="flex items-center gap-2 mb-3">
                 <IconButton icon={Trash2} label={t('discovery.actions.delete')} onClick={() => handleDelete(char)} />
                 <IconButton icon={Heart} label={t('discovery.actions.favorite')} onClick={() => handleFavorite(char)} />
                 <IconButton icon={Copy} label={t('discovery.actions.duplicate')} onClick={() => handleDuplicate(char)} />
