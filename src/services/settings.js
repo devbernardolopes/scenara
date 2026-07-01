@@ -64,12 +64,22 @@ const SETTING_EFFECTS = {
 }
 
 export async function getSetting(key) {
-  const row = await db.settings.where('key').equals(key).first()
+  const rows = await db.settings.where('key').equals(key).toArray()
   const def = SETTINGS.find((s) => s.key === key)?.default
-  return row?.value ?? def ?? null
+  if (rows.length > 1) {
+    const keep = rows[rows.length - 1]
+    await db.settings.bulkDelete(rows.filter((r) => r.id !== keep.id).map((r) => r.id))
+    return keep.value ?? def ?? null
+  }
+  return rows[0]?.value ?? def ?? null
 }
 
 export async function setSetting(key, value) {
-  await db.settings.put({ key, value })
+  const existing = await db.settings.where('key').equals(key).first()
+  if (existing) {
+    await db.settings.update(existing.id, { value })
+  } else {
+    await db.settings.add({ key, value })
+  }
   SETTING_EFFECTS[key]?.(value)
 }
