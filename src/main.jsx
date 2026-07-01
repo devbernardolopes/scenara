@@ -29,11 +29,11 @@ createRoot(document.getElementById('root')).render(
         <ThemeProvider>
           <SaveConfirmProvider>
             <ConfirmProvider>
-              <ModalProvider>
-                <ToastProvider>
+              <ToastProvider>
+                <ModalProvider>
                   <App />
-                </ToastProvider>
-              </ModalProvider>
+                </ModalProvider>
+              </ToastProvider>
             </ConfirmProvider>
           </SaveConfirmProvider>
         </ThemeProvider>
