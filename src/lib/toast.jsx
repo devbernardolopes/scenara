@@ -1,0 +1,109 @@
+import { createContext, useContext, useState, useCallback, useRef, useMemo } from 'react'
+
+const ToastContext = createContext(null)
+
+const MAX_VISIBLE = 5
+const EXIT_MS = 300
+
+export function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([])
+  const timersRef = useRef({})
+
+  const removeToast = useCallback((id) => {
+    clearTimeout(timersRef.current[id])
+    delete timersRef.current[id]
+    setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, exiting: true } : t)))
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id))
+    }, EXIT_MS)
+  }, [])
+
+  const pauseToast = useCallback((id) => {
+    setToasts((prev) =>
+      prev.map((t) => {
+        if (t.id !== id || t.paused) return t
+        clearTimeout(timersRef.current[id])
+        const elapsed = Date.now() - t._startedAt
+        return { ...t, paused: true, _remaining: t._remaining - elapsed }
+      }),
+    )
+  }, [])
+
+  const resumeToast = useCallback(
+    (id) => {
+      setToasts((prev) =>
+        prev.map((t) => {
+          if (t.id !== id || !t.paused) return t
+          const remaining = t._remaining
+          const timerId = setTimeout(() => removeToast(id), remaining)
+          timersRef.current[id] = timerId
+          return { ...t, paused: false, _startedAt: Date.now() }
+        }),
+      )
+    },
+    [removeToast],
+  )
+
+  const togglePause = useCallback(
+    (id) => {
+      setToasts((prev) => {
+        const t = prev.find((x) => x.id === id)
+        if (!t) return prev
+        if (t.paused) {
+          const remaining = t._remaining
+          const timerId = setTimeout(() => removeToast(id), remaining)
+          timersRef.current[id] = timerId
+          return prev.map((x) => (x.id === id ? { ...x, paused: false, _startedAt: Date.now() } : x))
+        } else {
+          clearTimeout(timersRef.current[id])
+          const elapsed = Date.now() - t._startedAt
+          return prev.map((x) => (x.id === id ? { ...x, paused: true, _remaining: x._remaining - elapsed } : x))
+        }
+      })
+    },
+    [removeToast],
+  )
+
+  const addToast = useCallback(
+    (message, { type = 'info', duration } = {}) => {
+      const resolvedDuration = (duration || 4) * 1000
+      const id = crypto.randomUUID()
+      const toast = {
+        id,
+        message,
+        type,
+        _remaining: resolvedDuration,
+        _startedAt: Date.now(),
+        paused: false,
+        exiting: false,
+      }
+      setToasts((prev) => {
+        const timerId = setTimeout(() => removeToast(id), resolvedDuration)
+        timersRef.current[id] = timerId
+        let next = [toast, ...prev]
+        if (next.length > MAX_VISIBLE) {
+          const evicted = next[MAX_VISIBLE]
+          clearTimeout(timersRef.current[evicted.id])
+          delete timersRef.current[evicted.id]
+          next = next.slice(0, MAX_VISIBLE)
+        }
+        return next
+      })
+      return id
+    },
+    [removeToast],
+  )
+
+  const value = useMemo(
+    () => ({ toasts, addToast, removeToast, pauseToast, resumeToast, togglePause }),
+    [toasts, addToast, removeToast, pauseToast, resumeToast, togglePause],
+  )
+
+  return <ToastContext.Provider value={value}>{children}</ToastContext.Provider>
+}
+
+export function useToast() {
+  const ctx = useContext(ToastContext)
+  if (!ctx) throw new Error('useToast must be used within a ToastProvider')
+  return ctx
+}

@@ -257,6 +257,43 @@
   background-color: var(--color-accent-hover);
 }
 
+/* Toast animations */
+@keyframes toast-enter-top {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes toast-enter-bottom {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes toast-exit-top {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-100%); opacity: 0; }
+}
+
+@keyframes toast-exit-bottom {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(100%); opacity: 0; }
+}
+
+.animate-toast-enter-top {
+  animation: toast-enter-top 0.3s ease-out;
+}
+
+.animate-toast-enter-bottom {
+  animation: toast-enter-bottom 0.3s ease-out;
+}
+
+.animate-toast-exit-top {
+  animation: toast-exit-top 0.3s ease-in forwards;
+}
+
+.animate-toast-exit-bottom {
+  animation: toast-exit-bottom 0.3s ease-in forwards;
+}
+
 /* Shadows (opt into theme-aware shadows with these) */
 .shadow-surface-sm {
   box-shadow: var(--shadow-sm);

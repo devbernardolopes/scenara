@@ -6,6 +6,7 @@ import { ConfirmProvider } from './lib/confirm'
 import { SaveConfirmProvider } from './lib/saveConfirm'
 import { ThemeProvider } from './hooks/useTheme'
 import { LocaleProvider } from './hooks/useLocale'
+import { ToastProvider } from './lib/toast'
 import App from './App'
 import './lib/i18n'
 import './index.css'
@@ -27,7 +28,9 @@ createRoot(document.getElementById('root')).render(
           <SaveConfirmProvider>
             <ConfirmProvider>
               <ModalProvider>
-                <App />
+                <ToastProvider>
+                  <App />
+                </ToastProvider>
               </ModalProvider>
             </ConfirmProvider>
           </SaveConfirmProvider>

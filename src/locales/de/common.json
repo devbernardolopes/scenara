@@ -18,5 +18,11 @@
   },
   "loading": "Laden…",
   "save": "Save",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "toast": {
+    "dismiss": "Verwerfen",
+    "paused": "Pausiert",
+    "pause": "Pause",
+    "resume": "Fortsetzen"
+  }
 }

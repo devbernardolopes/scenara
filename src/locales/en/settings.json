@@ -23,6 +23,14 @@
     "cardsPerPage": {
       "label": "Cards per page",
       "desc": "Number of character cards shown per page in the discovery view."
+    },
+    "toastPosition": {
+      "label": "Toast Position",
+      "desc": "Where toast notifications appear on screen."
+    },
+    "toastDuration": {
+      "label": "Toast Duration",
+      "desc": "How long toast messages stay visible (in seconds)."
     }
   },
   "themeOptions": {
@@ -115,6 +123,14 @@
       "label": "Stop Strings",
       "desc": "Custom stop sequences (one per line)."
     }
+  },
+  "toastPositionOptions": {
+    "top-right": "Top Right",
+    "top-left": "Top Left",
+    "top-center": "Top Center",
+    "bottom-right": "Bottom Right",
+    "bottom-left": "Bottom Left",
+    "bottom-center": "Bottom Center"
   },
   "versionLabel": "Version",
   "languageOptions": {

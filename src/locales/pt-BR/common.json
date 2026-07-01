@@ -35,6 +35,12 @@
   "save": "Salvar",
   "cancel": "Cancelar",
   "confirm": "Confirmar",
+  "toast": {
+    "dismiss": "Dispensar",
+    "paused": "Pausado",
+    "pause": "Pausar",
+    "resume": "Retomar"
+  },
   "saveDialog": {
     "title": "Alterações não salvas",
     "message": "Você tem alterações não salvas. O que deseja fazer?",

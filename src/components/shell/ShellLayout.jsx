@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import TopBar from './TopBar'
+import ToastContainer from '../shared/ToastContainer'
 
 function ShellLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -15,6 +16,7 @@ function ShellLayout() {
           <Outlet />
         </main>
       </div>
+      <ToastContainer />
     </div>
   )
 }
