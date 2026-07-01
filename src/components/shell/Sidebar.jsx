@@ -165,7 +165,7 @@ function Sidebar({ open, onClose }) {
               <button
                 type="button"
                 onClick={toggleSelectAll}
-                className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
                 aria-label={
                   selectedIds.size === threads.length
                     ? t('sidebar.deselectAll')
@@ -215,7 +215,7 @@ function Sidebar({ open, onClose }) {
                           e.stopPropagation()
                           toggleSelect(thread.id)
                         }}
-                        className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover flex-shrink-0"
+                        className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover flex-shrink-0"
                         aria-label={t('sidebar.selectThreads')}
                       >
                         {selectedIds.has(thread.id) ? (
@@ -250,7 +250,7 @@ function Sidebar({ open, onClose }) {
                           e.preventDefault()
                           setColorPickerId(colorPickerId === thread.id ? null : thread.id)
                         }}
-                        className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                        className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
                         aria-label="Color"
                         title="Color"
                       >
@@ -290,7 +290,7 @@ function Sidebar({ open, onClose }) {
                         e.preventDefault()
                         handleEditTitle(thread)
                       }}
-                      className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
                       aria-label={t('editThreadTitle.title')}
                       title={t('editThreadTitle.title')}
                     >
@@ -303,7 +303,7 @@ function Sidebar({ open, onClose }) {
                         e.preventDefault()
                         handleDelete(thread)
                       }}
-                      className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded text-tertiary hover:text-error hover:bg-surface-hover"
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-error hover:bg-surface-hover"
                       aria-label={t('sidebar.deleteThread')}
                       title={t('sidebar.deleteThread')}
                     >
@@ -315,7 +315,7 @@ function Sidebar({ open, onClose }) {
                         e.preventDefault()
                         handleEditCharacter(thread)
                       }}
-                      className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
                       aria-label={t('sidebar.editCharacter')}
                       title={t('sidebar.editCharacter')}
                     >
@@ -327,7 +327,7 @@ function Sidebar({ open, onClose }) {
                         e.preventDefault()
                         handleDuplicate(thread)
                       }}
-                      className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
                       aria-label={t('sidebar.duplicateThread')}
                       title={t('sidebar.duplicateThread')}
                     >
@@ -339,7 +339,7 @@ function Sidebar({ open, onClose }) {
                         e.preventDefault()
                         handleToggleFavorite(thread)
                       }}
-                      className={`min-h-[28px] min-w-[28px] flex items-center justify-center rounded hover:bg-surface-hover ${thread.isFavorite ? 'text-yellow-500' : 'text-tertiary hover:text-text'}`}
+                      className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-surface-hover ${thread.isFavorite ? 'text-yellow-500' : 'text-tertiary hover:text-text'}`}
                       aria-label={
                         thread.isFavorite ? t('sidebar.unfavorite') : t('sidebar.favorite')
                       }
