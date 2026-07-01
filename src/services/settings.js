@@ -12,6 +12,10 @@ function applyThemeClass(theme) {
   }
 }
 
+export function applySettingEffect(key, value) {
+  SETTING_EFFECTS[key]?.(value)
+}
+
 export const CATEGORIES = [
   { id: 'appearance', labelKey: 'settings:categories.appearance' },
   { id: 'api', labelKey: 'settings:categories.api' },

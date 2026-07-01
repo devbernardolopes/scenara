@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { getSetting, setSetting } from '../services/settings'
+import { getSetting, setSetting, applySettingEffect } from '../services/settings'
 
 const LocaleContext = createContext(null)
 
@@ -7,7 +7,11 @@ export function LocaleProvider({ children }) {
   const [locale, setLocaleState] = useState('en')
 
   useEffect(() => {
-    getSetting('language').then((val) => setLocaleState(val || 'en'))
+    getSetting('language').then((val) => {
+      const resolved = val || 'en'
+      setLocaleState(resolved)
+      applySettingEffect('language', resolved)
+    })
   }, [])
 
   const setLocale = useCallback((val) => {
