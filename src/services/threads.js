@@ -15,7 +15,7 @@ export async function getThread(id) {
 }
 
 export async function getNextThreadNumber() {
-  return db.transaction('rw', db.settings, async () => {
+  return db.transaction('rw', [db.settings, db.threads], async () => {
     const row = await db.settings.where('key').equals('threadCounter').first()
     if (row) {
       const next = row.value + 1
