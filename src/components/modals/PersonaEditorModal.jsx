@@ -85,70 +85,72 @@ function PersonaEditorModal() {
 
   if (editing) {
     return (
-      <form onSubmit={handleSave} className="p-6">
-        <div className="flex items-center justify-between mb-6">
+      <form onSubmit={handleSave} className="flex flex-col min-h-0 flex-1">
+        <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
           <h2 className="text-xl font-semibold text-text">
             {editing === 'new' ? t('addPersona') : t('editPersona')}
           </h2>
           <CloseButton onClick={cancelEdit} />
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-text mb-1">
-              {t('personaNameLabel')}
-            </label>
-            <input
-              className={inputClass}
-              value={form.name}
-              onChange={update('name')}
-              placeholder={t('personaNamePlaceholder')}
-              required
-              autoFocus
-            />
-          </div>
+        <div className="flex-1 overflow-y-auto p-6 pt-4">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">
+                {t('personaNameLabel')}
+              </label>
+              <input
+                className={inputClass}
+                value={form.name}
+                onChange={update('name')}
+                placeholder={t('personaNamePlaceholder')}
+                required
+                autoFocus
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-text mb-1">
-              {t('personaAvatarLabel')}
-            </label>
-            <input
-              className={inputClass}
-              value={form.avatar}
-              onChange={update('avatar')}
-              placeholder={t('personaAvatarPlaceholder')}
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">
+                {t('personaAvatarLabel')}
+              </label>
+              <input
+                className={inputClass}
+                value={form.avatar}
+                onChange={update('avatar')}
+                placeholder={t('personaAvatarPlaceholder')}
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-text mb-1">
-              {t('personaDescriptionLabel')}
-            </label>
-            <textarea
-              className={`${inputClass} resize-none`}
-              rows={2}
-              value={form.description}
-              onChange={update('description')}
-              placeholder={t('personaDescriptionPlaceholder')}
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">
+                {t('personaDescriptionLabel')}
+              </label>
+              <textarea
+                className={`${inputClass} resize-none`}
+                rows={2}
+                value={form.description}
+                onChange={update('description')}
+                placeholder={t('personaDescriptionPlaceholder')}
+              />
+            </div>
 
-          <CollapsibleSection
-            label={t('personaContextLabel')}
-            summary={form.context ? `${estimateTokens(form.context)} tokens` : null}
-            storageKey="personaContext"
-          >
-            <textarea
-              className={`${inputClass} resize-none mt-2`}
-              rows={5}
-              value={form.context}
-              onChange={update('context')}
-              placeholder={t('personaContextPlaceholder')}
-            />
-          </CollapsibleSection>
+            <CollapsibleSection
+              label={t('personaContextLabel')}
+              summary={form.context ? `${estimateTokens(form.context)} tokens` : null}
+              storageKey="personaContext"
+            >
+              <textarea
+                className={`${inputClass} resize-none mt-2`}
+                rows={5}
+                value={form.context}
+                onChange={update('context')}
+                placeholder={t('personaContextPlaceholder')}
+              />
+            </CollapsibleSection>
+          </div>
         </div>
 
-        <div className="flex justify-between mt-6 pt-4 border-t border-border">
+        <div className="flex justify-between px-6 py-4 border-t border-border shrink-0">
           <div>
             {editing !== 'new' && (
               <button
@@ -182,8 +184,8 @@ function PersonaEditorModal() {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="flex flex-col min-h-0 flex-1">
+      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
         <div>
           <h2 className="text-xl font-semibold text-text">{t('personaTitle')}</h2>
           <p className="text-sm text-secondary mt-1">{t('personaSubtitle')}</p>
@@ -191,41 +193,43 @@ function PersonaEditorModal() {
         <CloseButton onClick={closeModal} />
       </div>
 
-      {personas.length === 0 ? (
-        <p className="text-sm text-secondary py-8 text-center">{t('noPersonas')}</p>
-      ) : (
-        <ul className="space-y-2">
-          {personas.map((p) => (
-            <li
-              key={p.id}
-              className="flex items-center gap-3 p-3 rounded-lg border border-border bg-surface"
-            >
-              <Avatar src={p.avatar} size="md" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-text truncate">{p.name}</p>
-                {p.description && (
-                  <p className="text-xs text-secondary truncate">{p.description}</p>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={() => startEdit(p)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-sm text-secondary hover:text-text"
+      <div className="flex-1 overflow-y-auto p-6 pt-4">
+        {personas.length === 0 ? (
+          <p className="text-sm text-secondary py-8 text-center">{t('noPersonas')}</p>
+        ) : (
+          <ul className="space-y-2">
+            {personas.map((p) => (
+              <li
+                key={p.id}
+                className="flex items-center gap-3 p-3 rounded-lg border border-border bg-surface"
               >
-                {t('editPersona')}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+                <Avatar src={p.avatar} size="md" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-text truncate">{p.name}</p>
+                  {p.description && (
+                    <p className="text-xs text-secondary truncate">{p.description}</p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => startEdit(p)}
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-sm text-secondary hover:text-text"
+                >
+                  {t('editPersona')}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
-      <button
-        type="button"
-        onClick={startCreate}
-        className="mt-4 w-full min-h-[44px] border-2 border-dashed border-border rounded-lg text-sm text-secondary hover:text-text hover:border-border-light"
-      >
-        <Plus className="w-4 h-4" /> {t('addPersona')}
-      </button>
+        <button
+          type="button"
+          onClick={startCreate}
+          className="mt-4 w-full min-h-[44px] border-2 border-dashed border-border rounded-lg text-sm text-secondary hover:text-text hover:border-border-light"
+        >
+          <Plus className="w-4 h-4" /> {t('addPersona')}
+        </button>
+      </div>
     </div>
   )
 }

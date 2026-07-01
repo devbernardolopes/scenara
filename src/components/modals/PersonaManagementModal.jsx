@@ -8,7 +8,7 @@ function PersonaManagementModal() {
   const { t } = useTranslation('common')
 
   return (
-    <div className="flex flex-col max-h-[80vh]">
+    <div className="flex flex-col min-h-0 flex-1">
       <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
         <h2 className="text-xl font-semibold text-text">{t('sidebar.personas')}</h2>
         <CloseButton onClick={closeModal} />

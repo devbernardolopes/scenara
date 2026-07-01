@@ -59,7 +59,6 @@ export function ModalProvider({ children }) {
         const ModalComponent = MODAL_COMPONENTS[state.type]
         if (!ModalComponent) return null
         const isTop = index === modalStack.length - 1
-        const modalSize = state.props?.modalSize === 'lg' ? 'max-w-4xl' : 'max-w-lg'
         return (
           <div
             key={index}
@@ -69,15 +68,13 @@ export function ModalProvider({ children }) {
           >
             <Suspense
               fallback={
-                <div
-                  className={`bg-surface rounded-lg shadow-surface-lg ${modalSize} w-full mx-4 p-12 text-center text-secondary text-sm`}
-                >
+                <div className="bg-surface rounded-lg shadow-surface-lg max-w-4xl w-full mx-4 p-12 text-center text-secondary text-sm">
                   {t('loading')}
                 </div>
               }
             >
               <div
-                className={`bg-surface rounded-lg shadow-surface-lg ${modalSize} w-full mx-4 max-h-[85vh] flex flex-col overflow-hidden`}
+                className="bg-surface rounded-lg shadow-surface-lg max-w-4xl w-full mx-4 h-[65vh] max-h-[85vh] flex flex-col overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
               >
                 <ModalComponent {...state.props} />

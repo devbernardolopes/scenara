@@ -385,14 +385,14 @@ function Sidebar({ open, onClose }) {
 
         <div className="border-t border-border p-3 shrink-0 space-y-1">
           <button
-            onClick={() => openModal('personaManagement', { modalSize: 'lg' })}
+            onClick={() => openModal('personaManagement')}
             className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
           >
             <UserPlus className="w-4 h-4" />
             {t('sidebar.personas')}
           </button>
           <button
-            onClick={() => openModal('writingInstructionManagement', { modalSize: 'lg' })}
+            onClick={() => openModal('writingInstructionManagement')}
             className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
           >
             <FileText className="w-4 h-4" />
@@ -415,7 +415,7 @@ function Sidebar({ open, onClose }) {
             {t('sidebar.database')}
           </button>
           <button
-            onClick={() => openModal('settings', { modalSize: 'lg' })}
+            onClick={() => openModal('settings')}
             className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
           >
             <Settings className="w-4 h-4" />
