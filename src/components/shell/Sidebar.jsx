@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { getAllThreads } from '../../services/threads'
 import { useModal } from '../../hooks/useModal'
 import CloseButton from '../shared/CloseButton'
-import { UserPlus } from '../../lib/icons'
+import { UserPlus, Settings } from '../../lib/icons'
 
 function Sidebar({ open, onClose }) {
   const { t } = useTranslation('common')
@@ -71,7 +71,14 @@ function Sidebar({ open, onClose }) {
           )}
         </div>
 
-        <div className="border-t border-border p-3 shrink-0">
+        <div className="border-t border-border p-3 shrink-0 space-y-1">
+          <button
+            onClick={() => openModal('settings', { modalSize: 'lg' })}
+            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
+          >
+            <Settings className="w-4 h-4" />
+            {t('topbar.settings')}
+          </button>
           <button
             onClick={() => openModal('personaManagement', { modalSize: 'lg' })}
             className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
