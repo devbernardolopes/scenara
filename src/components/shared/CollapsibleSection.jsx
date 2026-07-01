@@ -15,10 +15,19 @@ function CollapsibleSection({ label, summary, hasContent, storageKey, defaultExp
   }, [storageKey])
 
   useEffect(() => {
-    if (contentRef.current) {
-      setContentHeight(contentRef.current.scrollHeight)
-    }
-  }, [children])
+    const el = contentRef.current
+    if (!el) return
+
+    setContentHeight(el.scrollHeight)
+
+    const observer = new ResizeObserver(() => {
+      if (contentRef.current) {
+        setContentHeight(contentRef.current.scrollHeight)
+      }
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   const toggle = () => {
     const next = !open
