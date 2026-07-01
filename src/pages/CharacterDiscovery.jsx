@@ -142,9 +142,6 @@ function CharacterDiscovery() {
 
   return (
     <div className="p-4 md:p-8">
-      <h1 className="text-2xl font-bold text-text mb-2">{t('discovery.title')}</h1>
-      <p className="text-secondary mb-6">{t('discovery.subtitle')}</p>
-
       {characters.length === 0 ? (
         <p className="text-secondary text-sm py-8 text-center">{t('discovery.noCharacters')}</p>
       ) : (

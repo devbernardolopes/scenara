@@ -49,16 +49,6 @@ function Sidebar({ open, onClose }) {
           </div>
         </div>
 
-        <nav className="p-4">
-          <Link
-            to="/"
-            onClick={onClose}
-            className="flex items-center px-3 min-h-[44px] rounded-md text-sm font-medium text-secondary hover:bg-surface-hover mb-2"
-          >
-            {t('sidebar.discovery')}
-          </Link>
-        </nav>
-
         <div className="px-4">
           <h3 className="text-xs font-semibold text-tertiary uppercase tracking-wider px-3 mb-2">
             {t('sidebar.threads')}
