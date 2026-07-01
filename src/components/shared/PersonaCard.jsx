@@ -18,12 +18,16 @@ function PersonaCard({
 
   return (
     <div
-      className={`border rounded-lg p-3 bg-surface transition-shadow ${
+      className={`border rounded-lg p-3 bg-surface transition-shadow cursor-pointer ${
         selected ? 'border-primary ring-1 ring-primary' : 'border-border'
       }`}
+      onClick={() => onEdit(persona)}
     >
       <div className="flex items-start gap-3">
-        <label className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer">
+        <label
+          className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer"
+          onClick={(e) => e.stopPropagation()}
+        >
           <input
             type="checkbox"
             checked={selected}
@@ -32,7 +36,9 @@ function PersonaCard({
           />
         </label>
 
-        <Avatar src={persona.avatar} size="md" />
+        <div onClick={(e) => e.stopPropagation()}>
+          <Avatar src={persona.avatar} size="md" />
+        </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -59,7 +65,7 @@ function PersonaCard({
         </div>
       </div>
 
-      <div className="flex items-center gap-1 mt-1 -ml-1">
+      <div className="flex items-center gap-1 mt-1 -ml-1" onClick={(e) => e.stopPropagation()}>
         <IconButton
           icon={Edit3}
           label={t('persona.actions.edit')}
