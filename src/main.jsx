@@ -24,13 +24,13 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <LocaleProvider>
         <ThemeProvider>
-          <ModalProvider>
+          <SaveConfirmProvider>
             <ConfirmProvider>
-              <SaveConfirmProvider>
+              <ModalProvider>
                 <App />
-              </SaveConfirmProvider>
+              </ModalProvider>
             </ConfirmProvider>
-          </ModalProvider>
+          </SaveConfirmProvider>
         </ThemeProvider>
       </LocaleProvider>
     </BrowserRouter>
