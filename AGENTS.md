@@ -245,7 +245,7 @@ Transient UI state (collapse/expand, scroll positions) lives in the `uiState` De
 ```jsx
 <CollapsibleSection
   label="System Prompt"
-  summary="128 tokens"
+  summary="64 tokens"
   hasContent={true}
   storageKey="systemPrompt"
   defaultExpanded={true}
