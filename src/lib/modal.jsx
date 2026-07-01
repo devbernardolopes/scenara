@@ -6,7 +6,7 @@ export const ModalContext = createContext(null)
 const MODAL_COMPONENTS = {}
 
 export function ModalProvider({ children }) {
-  const [modalState, setModalState] = useState({ type: null, props: {} })
+  const [modalStack, setModalStack] = useState([])
   const closeGuardRef = useRef(null)
 
   const setCloseGuard = useCallback((guard) => {
@@ -15,12 +15,12 @@ export function ModalProvider({ children }) {
 
   const openModal = useCallback((type, props = {}) => {
     closeGuardRef.current = null
-    setModalState({ type, props })
+    setModalStack((prev) => [...prev, { type, props }])
   }, [])
 
   const closeModal = useCallback(() => {
     closeGuardRef.current = null
-    setModalState({ type: null, props: {} })
+    setModalStack((prev) => prev.slice(0, -1))
   }, [])
 
   const closeWithGuard = useCallback(() => {
@@ -40,9 +40,9 @@ export function ModalProvider({ children }) {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [closeWithGuard])
 
-  const ModalComponent = MODAL_COMPONENTS[modalState.type]
   const { t } = useTranslation('common')
-  const modalSize = modalState.props?.modalSize === 'lg' ? 'max-w-4xl' : 'max-w-lg'
+  const activeModal = modalStack.length > 0 ? modalStack[modalStack.length - 1].type : null
+  const modalProps = modalStack.length > 0 ? modalStack[modalStack.length - 1].props : {}
 
   return (
     <ModalContext.Provider
@@ -50,31 +50,42 @@ export function ModalProvider({ children }) {
         openModal,
         closeModal,
         setCloseGuard,
-        activeModal: modalState.type,
-        modalProps: modalState.props,
+        activeModal,
+        modalProps,
       }}
     >
       {children}
-      {ModalComponent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay" onClick={closeWithGuard}>
-          <Suspense
-            fallback={
-              <div
-                className={`bg-surface rounded-lg shadow-surface-lg ${modalSize} w-full mx-4 p-12 text-center text-secondary text-sm`}
-              >
-                {t('loading')}
-              </div>
-            }
+      {modalStack.map((state, index) => {
+        const ModalComponent = MODAL_COMPONENTS[state.type]
+        if (!ModalComponent) return null
+        const isTop = index === modalStack.length - 1
+        const modalSize = state.props?.modalSize === 'lg' ? 'max-w-4xl' : 'max-w-lg'
+        return (
+          <div
+            key={index}
+            className="fixed inset-0 flex items-center justify-center bg-overlay"
+            style={{ zIndex: 50 + index }}
+            onClick={isTop ? closeWithGuard : undefined}
           >
-            <div
-              className={`bg-surface rounded-lg shadow-surface-lg ${modalSize} w-full mx-4 max-h-[85vh] overflow-y-auto`}
-              onClick={(e) => e.stopPropagation()}
+            <Suspense
+              fallback={
+                <div
+                  className={`bg-surface rounded-lg shadow-surface-lg ${modalSize} w-full mx-4 p-12 text-center text-secondary text-sm`}
+                >
+                  {t('loading')}
+                </div>
+              }
             >
-              <ModalComponent {...modalState.props} />
-            </div>
-          </Suspense>
-        </div>
-      )}
+              <div
+                className={`bg-surface rounded-lg shadow-surface-lg ${modalSize} w-full mx-4 max-h-[85vh] overflow-y-auto`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ModalComponent {...state.props} />
+              </div>
+            </Suspense>
+          </div>
+        )
+      })}
     </ModalContext.Provider>
   )
 }

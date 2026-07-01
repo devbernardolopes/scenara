@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
+import { useSaveConfirm } from '../../lib/saveConfirm'
 import CollapsibleSection from '../shared/CollapsibleSection'
+import CloseButton from '../shared/CloseButton'
 import { createPersona, updatePersona } from '../../services/personas'
 import { estimateTokens } from '../../services/tokenEstimator'
 
@@ -21,34 +23,47 @@ const inputClass =
 
 function PersonaFormModal({ persona }) {
   const { t } = useTranslation('settings')
-  const { closeModal } = useModal()
+  const { closeModal, setCloseGuard } = useModal()
+  const { promptSave } = useSaveConfirm()
   const editing = Boolean(persona)
 
-  const [form, setForm] = useState({
-    name: '',
-    title: '',
-    avatar: '',
-    description: '',
-    color: '',
-    context: '',
-    isDefault: false,
+  const initialRef = useRef({
+    name: persona?.name || '',
+    title: persona?.title || '',
+    avatar: persona?.avatar || '',
+    description: persona?.description || '',
+    color: persona?.color || '',
+    context: persona?.context || '',
+    isDefault: Boolean(persona?.isDefault),
   })
+
+  const [form, setForm] = useState({ ...initialRef.current })
   const [saving, setSaving] = useState(false)
   const fileRef = useRef(null)
+  const savePendingRef = useRef(false)
+
+  const isDirty = Object.keys(initialRef.current).some(
+    (key) => form[key] !== initialRef.current[key],
+  )
+
+  const handleCloseRef = useRef()
+  handleCloseRef.current = handleCloseAttempt
 
   useEffect(() => {
-    if (persona) {
-      setForm({
-        name: persona.name || '',
-        title: persona.title || '',
-        avatar: persona.avatar || '',
-        description: persona.description || '',
-        color: persona.color || '',
-        context: persona.context || '',
-        isDefault: Boolean(persona.isDefault),
+    if (isDirty) {
+      setCloseGuard(() => {
+        if (savePendingRef.current) return false
+        savePendingRef.current = true
+        handleCloseRef.current().finally(() => {
+          savePendingRef.current = false
+        })
+        return false
       })
+    } else {
+      setCloseGuard(null)
     }
-  }, [persona])
+    return () => setCloseGuard(null)
+  }, [isDirty, setCloseGuard])
 
   function update(field) {
     return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }))
@@ -67,9 +82,7 @@ function PersonaFormModal({ persona }) {
     reader.readAsDataURL(file)
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    if (!form.name.trim() || saving) return
+  async function savePersona() {
     setSaving(true)
     try {
       if (editing) {
@@ -93,17 +106,36 @@ function PersonaFormModal({ persona }) {
           isDefault: form.isDefault,
         })
       }
-      closeModal()
     } finally {
       setSaving(false)
     }
   }
 
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (!form.name.trim() || saving) return
+    await savePersona()
+    closeModal()
+  }
+
+  async function handleCloseAttempt() {
+    const result = await promptSave()
+    if (result === 'save') {
+      await savePersona()
+      closeModal()
+    } else if (result === 'discard') {
+      closeModal()
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit} className="p-6">
-      <h2 className="text-xl font-semibold text-text mb-6">
-        {editing ? t('persona.form.editTitle') : t('persona.form.title')}
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-text">
+          {editing ? t('persona.form.editTitle') : t('persona.form.title')}
+        </h2>
+        <CloseButton onClick={isDirty ? handleCloseAttempt : closeModal} />
+      </div>
 
       <div className="space-y-4">
         <div>
@@ -237,7 +269,7 @@ function PersonaFormModal({ persona }) {
       <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
         <button
           type="button"
-          onClick={closeModal}
+          onClick={isDirty ? handleCloseAttempt : closeModal}
           className="min-h-[44px] px-4 text-sm text-secondary hover:text-text"
         >
           {t('persona.form.cancel')}
