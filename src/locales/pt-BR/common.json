@@ -32,6 +32,7 @@
     }
   },
   "loading": "Carregando…",
+  "save": "Salvar",
   "cancel": "Cancelar",
   "confirm": "Confirmar",
   "saveDialog": {

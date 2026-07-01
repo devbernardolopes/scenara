@@ -73,18 +73,6 @@ export async function setActiveProvider(providerId) {
   await setSetting('api.activeProvider', providerId)
 }
 
-export async function getApiKey(providerId) {
-  return (await getSetting(pKey(providerId, 'apiKey'))) || null
-}
-
-export async function setApiKey(providerId, key) {
-  await setSetting(pKey(providerId, 'apiKey'), key)
-}
-
-export async function removeApiKey(providerId) {
-  await setSetting(pKey(providerId, 'apiKey'), null)
-}
-
 export async function getModel(providerId) {
   return (await getSetting(pKey(providerId, 'model'))) || null
 }
@@ -120,4 +108,72 @@ export async function toggleFavModel(providerId, model) {
   }
   await setSetting(pKey(providerId, 'favModels'), JSON.stringify(favs))
   return favs
+}
+
+let _keyIdCounter = 0
+
+function generateKeyId() {
+  _keyIdCounter++
+  return `km_${_keyIdCounter}_${Date.now()}`
+}
+
+export async function getKeys(providerId) {
+  const raw = await getSetting(pKey(providerId, 'keys'))
+  try {
+    return JSON.parse(raw) || []
+  } catch {
+    return []
+  }
+}
+
+function saveKeys(providerId, keys) {
+  return setSetting(pKey(providerId, 'keys'), JSON.stringify(keys))
+}
+
+export async function addKey(providerId, { value, label }) {
+  const keys = await getKeys(providerId)
+  const active = keys.length === 0
+  keys.push({ id: generateKeyId(), value, label: label || '', active })
+  await saveKeys(providerId, keys)
+  return keys
+}
+
+export async function updateKey(providerId, keyId, { value, label }) {
+  const keys = await getKeys(providerId)
+  const key = keys.find((k) => k.id === keyId)
+  if (!key) return keys
+  if (value !== undefined) key.value = value
+  if (label !== undefined) key.label = label
+  await saveKeys(providerId, keys)
+  return keys
+}
+
+export async function deleteKey(providerId, keyId) {
+  let keys = await getKeys(providerId)
+  const removed = keys.find((k) => k.id === keyId)
+  keys = keys.filter((k) => k.id !== keyId)
+  if (removed?.active && keys.length > 0) {
+    keys[0].active = true
+  }
+  await saveKeys(providerId, keys)
+  return keys
+}
+
+export async function setActiveKey(providerId, keyId) {
+  const keys = await getKeys(providerId)
+  for (const k of keys) {
+    k.active = k.id === keyId
+  }
+  await saveKeys(providerId, keys)
+  return keys
+}
+
+export async function getActiveKey(providerId) {
+  const keys = await getKeys(providerId)
+  return keys.find((k) => k.active) || null
+}
+
+export function maskKey(value) {
+  if (!value || value.length <= 4) return value || ''
+  return '••••' + value.slice(-4)
 }

@@ -37,16 +37,22 @@
       "label": "Active Provider",
       "desc": "Select which AI provider to use for chat."
     },
-    "apiKey": {
-      "label": "API Key",
-      "placeholder": "Enter your API key"
-    },
+    "addKey": "Add Key",
+    "editKey": "Edit Key",
+    "deleteKey": "Delete",
+    "activeKey": "Active",
+    "noKeys": "No API keys configured",
+    "keyValueLabel": "API Key",
+    "keyValuePlaceholder": "Enter your API key",
+    "keyLabelLabel": "Label (optional)",
+    "keyLabelPlaceholder": "e.g. Work, Home",
     "useTrialKey": "Use trial key",
-    "removeKey": "Remove key",
-    "removeKeyConfirm": {
-      "title": "Remove API Key",
-      "message": "Are you sure you want to remove this API key?"
+    "deleteKeyConfirm": {
+      "title": "Delete API Key",
+      "message": "Are you sure you want to delete this key?"
     },
+    "addKeyDialogTitle": "Add API Key",
+    "editKeyDialogTitle": "Edit API Key",
     "model": {
       "label": "Model",
       "placeholder": "Type a model name"

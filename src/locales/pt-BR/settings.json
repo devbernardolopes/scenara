@@ -37,16 +37,22 @@
       "label": "Provedor Ativo",
       "desc": "Selecione qual provedor de IA usar no chat."
     },
-    "apiKey": {
-      "label": "Chave da API",
-      "placeholder": "Digite sua chave de API"
-    },
+    "addKey": "Adicionar Chave",
+    "editKey": "Editar Chave",
+    "deleteKey": "Excluir",
+    "activeKey": "Ativa",
+    "noKeys": "Nenhuma chave de API configurada",
+    "keyValueLabel": "Chave da API",
+    "keyValuePlaceholder": "Digite sua chave de API",
+    "keyLabelLabel": "Rótulo (opcional)",
+    "keyLabelPlaceholder": "Ex.: Trabalho, Casa",
     "useTrialKey": "Usar chave de teste",
-    "removeKey": "Remover chave",
-    "removeKeyConfirm": {
-      "title": "Remover Chave da API",
-      "message": "Tem certeza que deseja remover esta chave de API?"
+    "deleteKeyConfirm": {
+      "title": "Excluir Chave da API",
+      "message": "Tem certeza que deseja excluir esta chave de API?"
     },
+    "addKeyDialogTitle": "Adicionar Chave da API",
+    "editKeyDialogTitle": "Editar Chave da API",
     "model": {
       "label": "Modelo",
       "placeholder": "Digite o nome do modelo"

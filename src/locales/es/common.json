@@ -16,5 +16,7 @@
     "characterDesc": "Una breve descripción de este personaje.",
     "createCharacter": "Crear Personaje"
   },
-  "loading": "Cargando…"
+  "loading": "Cargando…",
+  "save": "Save",
+  "cancel": "Cancel"
 }
