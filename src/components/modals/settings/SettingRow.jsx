@@ -37,13 +37,14 @@ function SettingRow({ setting, onSave }) {
 
   if (!Control) return null
 
+  // SettingRow.jsx
   return (
-    <div className="flex items-start justify-between gap-4">
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
       <div className="flex-1 min-w-0">
         <label className="block text-sm font-medium text-text">{t(labelPath)}</label>
         {descPath && <p className="text-xs text-secondary mt-0.5">{t(descPath)}</p>}
       </div>
-      <div className="shrink-0">
+      <div className="w-full sm:w-auto sm:shrink-0 min-w-0">
         <Control value={value} onChange={handleChange} storageKey={key} {...controlProps} />
       </div>
     </div>
