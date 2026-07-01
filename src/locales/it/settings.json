@@ -134,6 +134,59 @@
     "bottom-left": "Bottom Left",
     "bottom-center": "Bottom Center"
   },
+  "persona": {
+    "title": "Persone",
+    "createPersona": "Crea Persona",
+    "importPersona": "Importa",
+    "defaultBadge": "Predefinito",
+    "noPersonas": "Ancora nessuna persona. Creane una per definire come appari nelle chat.",
+    "colorLabel": "Colore del fumetto chat",
+    "actions": {
+      "edit": "Modifica",
+      "delete": "Elimina",
+      "setDefault": "Imposta come predefinito",
+      "duplicate": "Duplica",
+      "export": "Esporta"
+    },
+    "batch": {
+      "selected": "{{count}} selezionata(e)",
+      "delete": "Elimina ({{count}})",
+      "duplicate": "Duplica ({{count}})",
+      "export": "Esporta ({{count}})",
+      "clear": "Cancella"
+    },
+    "confirmDelete": {
+      "title": "Elimina Persona",
+      "message": "Sei sicuro di voler eliminare \"{{name}}\"?",
+      "messageMultiple": "Sei sicuro di voler eliminare {{count}} persone?"
+    },
+    "form": {
+      "title": "Crea Persona",
+      "editTitle": "Modifica Persona",
+      "inChatName": "Nome nella chat",
+      "inChatNamePlaceholder": "Come appari nella chat",
+      "displayName": "Titolo / Etichetta",
+      "displayNamePlaceholder": "Per tuo riferimento (non mostrato nella chat)",
+      "avatarLabel": "Avatar",
+      "avatarPlaceholder": "URL, emoji o carica un'immagine",
+      "uploadFile": "Carica immagine",
+      "descriptionLabel": "Descrizione",
+      "descriptionPlaceholder": "Una breve bio per questa persona…",
+      "colorLabel": "Colore del fumetto chat",
+      "setDefault": "Imposta come persona predefinita",
+      "contextLabel": "Contesto della Persona",
+      "contextPlaceholder": "Descrivi il background, la personalità e i tratti della tua persona…",
+      "back": "Torna alle persone",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "cancel": "Annulla"
+    },
+    "import": {
+      "invalidFormat": "Formato file persona non valido.",
+      "fileError": "Impossibile leggere il file.",
+      "importSuccess": "{{count}} persona(e) importata(e)"
+    }
+  },
   "versionLabel": "Versione",
   "languageOptions": {
     "en": "English",

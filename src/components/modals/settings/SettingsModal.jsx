@@ -6,13 +6,17 @@ import SettingsSidebar from './SettingsSidebar'
 import SettingsSearch from './SettingsSearch'
 import SettingRow from './SettingRow'
 import ApiSettingsPanel from './ApiSettingsPanel'
+import PersonaSettingsPanel from './PersonaSettingsPanel'
 import CloseButton from '../../shared/CloseButton'
 import pkg from '../../../../package.json'
 
 function SettingsModal() {
   const { closeModal } = useModal()
   const { t } = useTranslation('settings')
-  const [activeCategory, setActiveCategory] = usePersistedState('modal.settings.category', CATEGORIES[0]?.id)
+  const [activeCategory, setActiveCategory] = usePersistedState(
+    'modal.settings.category',
+    CATEGORIES[0]?.id,
+  )
   const [search, setSearch] = usePersistedState('modal.settings.search', '')
 
   const filtered = SETTINGS.filter((s) => {
@@ -52,24 +56,38 @@ function SettingsModal() {
       </div>
 
       <div className="flex flex-1 min-h-0">
-        {!search && <SettingsSidebar categories={CATEGORIES} active={activeCategory} onSelect={setActiveCategory} />}
+        {!search && (
+          <SettingsSidebar
+            categories={CATEGORIES}
+            active={activeCategory}
+            onSelect={setActiveCategory}
+          />
+        )}
 
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {noResults ? (
             <p className="text-secondary text-sm">{t('noResults')}</p>
           ) : !search && activeCategory === 'api' ? (
             <ApiSettingsPanel />
+          ) : !search && activeCategory === 'persona' ? (
+            <PersonaSettingsPanel />
           ) : (
             <div className="space-y-8">
               {filtered.map((setting) => (
-                <SettingRow key={setting.key} setting={setting} onSave={(v) => setSetting(setting.key, v)} />
+                <SettingRow
+                  key={setting.key}
+                  setting={setting}
+                  onSave={(v) => setSetting(setting.key, v)}
+                />
               ))}
             </div>
           )}
         </div>
       </div>
       <div className="px-6 py-3 border-t border-border shrink-0">
-        <p className="text-xs text-tertiary">{t('versionLabel')} v{pkg.version}</p>
+        <p className="text-xs text-tertiary">
+          {t('versionLabel')} v{pkg.version}
+        </p>
       </div>
     </div>
   )

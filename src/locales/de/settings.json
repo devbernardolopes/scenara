@@ -134,6 +134,59 @@
     "bottom-left": "Bottom Left",
     "bottom-center": "Bottom Center"
   },
+  "persona": {
+    "title": "Personas",
+    "createPersona": "Persona erstellen",
+    "importPersona": "Importieren",
+    "defaultBadge": "Standard",
+    "noPersonas": "Noch keine Personas. Erstellen Sie eine, um festzulegen, wie Sie in Chats erscheinen.",
+    "colorLabel": "Chat-Blaschenfarbe",
+    "actions": {
+      "edit": "Bearbeiten",
+      "delete": "Loschen",
+      "setDefault": "Als Standard festlegen",
+      "duplicate": "Duplizieren",
+      "export": "Exportieren"
+    },
+    "batch": {
+      "selected": "{{count}} ausgewahlt",
+      "delete": "Loschen ({{count}})",
+      "duplicate": "Duplizieren ({{count}})",
+      "export": "Exportieren ({{count}})",
+      "clear": "Leeren"
+    },
+    "confirmDelete": {
+      "title": "Persona loschen",
+      "message": "Sind Sie sicher, dass Sie \"{{name}}\" loschen mocyen?",
+      "messageMultiple": "Sind Sie sicher, dass Sie {{count}} Personas loschen mocyen?"
+    },
+    "form": {
+      "title": "Persona erstellen",
+      "editTitle": "Persona bearbeiten",
+      "inChatName": "Name im Chat",
+      "inChatNamePlaceholder": "Wie Sie im Chat erscheinen",
+      "displayName": "Titel / Bezeichnung",
+      "displayNamePlaceholder": "Zu Ihrer Referenz (nicht im Chat angezeigt)",
+      "avatarLabel": "Avatar",
+      "avatarPlaceholder": "URL, Emoji oder Bild hochladen",
+      "uploadFile": "Bild hochladen",
+      "descriptionLabel": "Beschreibung",
+      "descriptionPlaceholder": "Eine kurze Bio fur diese Persona…",
+      "colorLabel": "Chat-Blaschenfarbe",
+      "setDefault": "Als Standard-Persona festlegen",
+      "contextLabel": "Persona-Kontext",
+      "contextPlaceholder": "Beschreiben Sie Hintergrund, Personlichkeit und Eigenschaften Ihrer Persona…",
+      "back": "Zurück zu Personas",
+      "save": "Speichern",
+      "saving": "Speichern…",
+      "cancel": "Abbrechen"
+    },
+    "import": {
+      "invalidFormat": "Ungultiges Persona-Dateiformat.",
+      "fileError": "Datei konnte nicht gelesen werden.",
+      "importSuccess": "{{count}} Persona(s) importiert"
+    }
+  },
   "versionLabel": "Version",
   "languageOptions": {
     "en": "English",

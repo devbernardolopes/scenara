@@ -134,6 +134,59 @@
     "bottom-left": "Bottom Left",
     "bottom-center": "Bottom Center"
   },
+  "persona": {
+    "title": "Personas",
+    "createPersona": "Crear Persona",
+    "importPersona": "Importar",
+    "defaultBadge": "Predeterminado",
+    "noPersonas": "Aún no hay personas. Crea una para definir cómo apareces en los chats.",
+    "colorLabel": "Color del globo de chat",
+    "actions": {
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "setDefault": "Establecer como predeterminado",
+      "duplicate": "Duplicar",
+      "export": "Exportar"
+    },
+    "batch": {
+      "selected": "{{count}} seleccionada(s)",
+      "delete": "Eliminar ({{count}})",
+      "duplicate": "Duplicar ({{count}})",
+      "export": "Exportar ({{count}})",
+      "clear": "Limpiar"
+    },
+    "confirmDelete": {
+      "title": "Eliminar Persona",
+      "message": "¿Estás seguro de que quieres eliminar \"{{name}}\"?",
+      "messageMultiple": "¿Estás seguro de que quieres eliminar {{count}} personas?"
+    },
+    "form": {
+      "title": "Crear Persona",
+      "editTitle": "Editar Persona",
+      "inChatName": "Nombre en el chat",
+      "inChatNamePlaceholder": "Cómo apareces en el chat",
+      "displayName": "Título / Etiqueta",
+      "displayNamePlaceholder": "Para tu referencia (no se muestra en el chat)",
+      "avatarLabel": "Avatar",
+      "avatarPlaceholder": "URL, emoji o sube una imagen",
+      "uploadFile": "Subir imagen",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Una breve biografía para esta persona…",
+      "colorLabel": "Color del globo de chat",
+      "setDefault": "Establecer como persona predeterminada",
+      "contextLabel": "Contexto de la Persona",
+      "contextPlaceholder": "Describe los antecedentes, la personalidad y los rasgos de tu persona…",
+      "back": "Volver a personas",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "cancel": "Cancelar"
+    },
+    "import": {
+      "invalidFormat": "Formato de archivo de persona no válido.",
+      "fileError": "No se pudo leer el archivo.",
+      "importSuccess": "{{count}} persona(s) importada(s)"
+    }
+  },
   "versionLabel": "Versión",
   "languageOptions": {
     "en": "English",

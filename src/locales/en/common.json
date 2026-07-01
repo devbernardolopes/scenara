@@ -41,6 +41,11 @@
     "pause": "Pause",
     "resume": "Resume"
   },
+  "personaPicker": {
+    "title": "Start with persona",
+    "empty": "No personas yet",
+    "default": "Default"
+  },
   "saveDialog": {
     "title": "Unsaved changes",
     "message": "You have unsaved changes. What would you like to do?",

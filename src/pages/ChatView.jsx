@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useModal } from '../hooks/useModal'
 import { useConfirm } from '../lib/confirm'
 import { Send } from '../lib/icons'
 import Avatar from '../components/shared/Avatar'
@@ -12,7 +11,6 @@ import { getMessagesByThread, createMessage } from '../services/messages'
 function ChatView() {
   const { threadId } = useParams()
   const { t } = useTranslation('chat')
-  const { openModal } = useModal()
   const navigate = useNavigate()
   const messagesEndRef = useRef(null)
   const [thread, setThread] = useState(null)
@@ -26,10 +24,7 @@ function ChatView() {
   async function loadData() {
     setLoading(true)
     try {
-      const [thr, msgs] = await Promise.all([
-        getThread(threadId),
-        getMessagesByThread(threadId),
-      ])
+      const [thr, msgs] = await Promise.all([getThread(threadId), getMessagesByThread(threadId)])
       setThread(thr)
       setMessages(msgs)
       if (thr) {
@@ -105,12 +100,6 @@ function ChatView() {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => openModal('personaEditor')}
-            className="min-h-[44px] px-3 text-sm text-secondary hover:text-text"
-          >
-            {t('editPersona')}
-          </button>
           <button
             onClick={handleDelete}
             className="min-h-[44px] px-3 text-sm text-error hover:opacity-80"

@@ -41,6 +41,11 @@
     "pause": "Pausar",
     "resume": "Retomar"
   },
+  "personaPicker": {
+    "title": "Iniciar com persona",
+    "empty": "Nenhuma persona ainda",
+    "default": "Padrão"
+  },
   "saveDialog": {
     "title": "Alterações não salvas",
     "message": "Você tem alterações não salvas. O que deseja fazer?",

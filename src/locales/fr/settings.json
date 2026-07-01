@@ -134,6 +134,59 @@
     "bottom-left": "Bottom Left",
     "bottom-center": "Bottom Center"
   },
+  "persona": {
+    "title": "Personas",
+    "createPersona": "Créer une Persona",
+    "importPersona": "Importer",
+    "defaultBadge": "Défaut",
+    "noPersonas": "Aucune persona pour l'instant. Créez-en une pour définir comment vous apparaissez dans les chats.",
+    "colorLabel": "Couleur de la bulle de chat",
+    "actions": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "setDefault": "Définir par défaut",
+      "duplicate": "Dupliquer",
+      "export": "Exporter"
+    },
+    "batch": {
+      "selected": "{{count}} sélectionnée(s)",
+      "delete": "Supprimer ({{count}})",
+      "duplicate": "Dupliquer ({{count}})",
+      "export": "Exporter ({{count}})",
+      "clear": "Effacer"
+    },
+    "confirmDelete": {
+      "title": "Supprimer la Persona",
+      "message": "Êtes-vous sûr de vouloir supprimer \"{{name}}\"?",
+      "messageMultiple": "Êtes-vous sûr de vouloir supprimer {{count}} personas?"
+    },
+    "form": {
+      "title": "Créer une Persona",
+      "editTitle": "Modifier la Persona",
+      "inChatName": "Nom dans le chat",
+      "inChatNamePlaceholder": "Comment vous apparaissez dans le chat",
+      "displayName": "Titre / Étiquette",
+      "displayNamePlaceholder": "Pour votre référence (non affiché dans le chat)",
+      "avatarLabel": "Avatar",
+      "avatarPlaceholder": "URL, emoji ou téléchargez une image",
+      "uploadFile": "Télécharger une image",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Une courte bio pour cette persona…",
+      "colorLabel": "Couleur de la bulle de chat",
+      "setDefault": "Définir comme persona par défaut",
+      "contextLabel": "Contexte de la Persona",
+      "contextPlaceholder": "Décrivez l'historique, la personnalité et les traits de votre persona…",
+      "back": "Retour aux personas",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "cancel": "Annuler"
+    },
+    "import": {
+      "invalidFormat": "Format de fichier de persona invalide.",
+      "fileError": "Impossible de lire le fichier.",
+      "importSuccess": "{{count}} persona(s) importée(s)"
+    }
+  },
   "versionLabel": "Version",
   "languageOptions": {
     "en": "English",

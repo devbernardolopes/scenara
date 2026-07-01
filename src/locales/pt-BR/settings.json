@@ -134,6 +134,59 @@
     "bottom-left": "Bottom Left",
     "bottom-center": "Bottom Center"
   },
+  "persona": {
+    "title": "Personas",
+    "createPersona": "Criar Persona",
+    "importPersona": "Importar",
+    "defaultBadge": "Padrão",
+    "noPersonas": "Nenhuma persona ainda. Crie uma para definir como você aparece nos chats.",
+    "colorLabel": "Cor do balão de chat",
+    "actions": {
+      "edit": "Editar",
+      "delete": "Excluir",
+      "setDefault": "Definir como padrão",
+      "duplicate": "Duplicar",
+      "export": "Exportar"
+    },
+    "batch": {
+      "selected": "{{count}} selecionada(s)",
+      "delete": "Excluir ({{count}})",
+      "duplicate": "Duplicar ({{count}})",
+      "export": "Exportar ({{count}})",
+      "clear": "Limpar"
+    },
+    "confirmDelete": {
+      "title": "Excluir Persona",
+      "message": "Tem certeza que deseja excluir \"{{name}}\"?",
+      "messageMultiple": "Tem certeza que deseja excluir {{count}} personas?"
+    },
+    "form": {
+      "title": "Criar Persona",
+      "editTitle": "Editar Persona",
+      "inChatName": "Nome no chat",
+      "inChatNamePlaceholder": "Como você aparece no chat",
+      "displayName": "Título / Rótulo",
+      "displayNamePlaceholder": "Para sua referência (não mostrado no chat)",
+      "avatarLabel": "Avatar",
+      "avatarPlaceholder": "URL, emoji ou faça upload de imagem",
+      "uploadFile": "Upload de imagem",
+      "descriptionLabel": "Descrição",
+      "descriptionPlaceholder": "Uma breve biografia para esta persona…",
+      "colorLabel": "Cor do balão de chat",
+      "setDefault": "Definir como persona padrão",
+      "contextLabel": "Contexto da Persona",
+      "contextPlaceholder": "Descreva o histórico, personalidade e características da sua persona…",
+      "back": "Voltar às personas",
+      "save": "Salvar",
+      "saving": "Salvando…",
+      "cancel": "Cancelar"
+    },
+    "import": {
+      "invalidFormat": "Formato de arquivo de persona inválido.",
+      "fileError": "Não foi possível ler o arquivo.",
+      "importSuccess": "{{count}} persona(s) importada(s)"
+    }
+  },
   "versionLabel": "Versão",
   "languageOptions": {
     "en": "English",

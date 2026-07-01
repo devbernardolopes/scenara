@@ -134,6 +134,59 @@
     "bottom-left": "Bottom Left",
     "bottom-center": "Bottom Center"
   },
+  "persona": {
+    "title": "Personas",
+    "createPersona": "Create Persona",
+    "importPersona": "Import",
+    "defaultBadge": "Default",
+    "noPersonas": "No personas yet. Create one to define how you appear in chats.",
+    "colorLabel": "Chat bubble color",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "setDefault": "Set as default",
+      "duplicate": "Duplicate",
+      "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "confirmDelete": {
+      "title": "Delete Persona",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} personas?"
+    },
+    "form": {
+      "title": "Create Persona",
+      "editTitle": "Edit Persona",
+      "inChatName": "In-chat name",
+      "inChatNamePlaceholder": "How you appear in chat",
+      "displayName": "Title / Label",
+      "displayNamePlaceholder": "For your reference (not shown in chat)",
+      "avatarLabel": "Avatar",
+      "avatarPlaceholder": "URL, emoji, or upload an image",
+      "uploadFile": "Upload image",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "A short bio for this persona…",
+      "colorLabel": "Chat bubble color",
+      "setDefault": "Set as default persona",
+      "contextLabel": "Persona Context",
+      "contextPlaceholder": "Describe your persona's background, personality, and traits…",
+      "back": "Back to personas",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    },
+    "import": {
+      "invalidFormat": "Invalid persona file format.",
+      "fileError": "Could not read file.",
+      "importSuccess": "Imported {{count}} persona(s)"
+    }
+  },
   "versionLabel": "Version",
   "languageOptions": {
     "en": "English",
