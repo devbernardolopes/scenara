@@ -68,6 +68,8 @@
     "modelSearchPlaceholder": "Pesquisar modelos…",
     "noModels": "Nenhum modelo disponível",
     "refreshModels": "Atualizar modelos",
+    "fetchingModels": "Buscando modelos…",
+    "cooldown": "Aguarde {{seconds}}s antes de atualizar novamente",
     "testConnection": "Testar Conexão",
     "serverUrl": {
       "label": "URL do Servidor",

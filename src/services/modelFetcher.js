@@ -19,10 +19,6 @@ export function resetCooldown() {
   _lastFetchTime = 0
 }
 
-function pKey(providerId) {
-  return `api.${providerId}.`
-}
-
 const STRATEGIES = {
   groq: { type: 'openai', baseUrl: 'https://api.groq.com', needsKey: true },
   openrouter: { type: 'openai', baseUrl: 'https://openrouter.ai/api', needsKey: true },

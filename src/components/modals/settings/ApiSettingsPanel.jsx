@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PROVIDERS, DEFAULT_MODELS, getActiveProvider, setActiveProvider, getModel, setModel, getBaseUrl, setBaseUrl } from '../../../services/apiProviders'
+import { PROVIDERS, getActiveProvider, setActiveProvider, getModel, setModel, getBaseUrl, setBaseUrl, getCachedModels, setCachedModels } from '../../../services/apiProviders'
+import { fetchModels, getCooldownRemaining } from '../../../services/modelFetcher'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import ApiKeyManager from './controls/ApiKeyManager'
 import ModelSelect from './controls/ModelSelect'
@@ -12,6 +13,10 @@ function ApiSettingsPanel() {
   const [activeProvider, setActiveProviderState] = useState(null)
   const [models, setModels] = useState({})
   const [baseUrls, setBaseUrls] = useState({})
+  const [cachedModels, setCachedModelsState] = useState({})
+  const [fetching, setFetching] = useState(null)
+  const [cooldown, setCooldown] = useState(0)
+  const abortRef = useRef(null)
 
   useEffect(() => {
     async function load() {
@@ -20,18 +25,33 @@ function ApiSettingsPanel() {
 
       const mods = {}
       const urls = {}
+      const cached = {}
       for (const p of PROVIDERS) {
         mods[p.id] = await getModel(p.id)
         if (p.needsUrl) {
           urls[p.id] = await getBaseUrl(p.id)
         }
+        if (p.hasModelEndpoint) {
+          cached[p.id] = await getCachedModels(p.id)
+        }
       }
       setModels(mods)
       setBaseUrls(urls)
+      setCachedModelsState(cached)
       setLoading(false)
     }
     load()
   }, [])
+
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const id = setInterval(() => {
+      const remaining = getCooldownRemaining()
+      setCooldown(remaining)
+      if (remaining <= 0) clearInterval(id)
+    }, 500)
+    return () => clearInterval(id)
+  }, [cooldown])
 
   function handleActiveProviderChange(e) {
     const next = e.target.value
@@ -47,6 +67,30 @@ function ApiSettingsPanel() {
   async function handleBaseUrlChange(providerId, value) {
     setBaseUrls((prev) => ({ ...prev, [providerId]: value }))
     await setBaseUrl(providerId, value)
+  }
+
+  async function handleRefresh(providerId) {
+    if (abortRef.current) abortRef.current.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+    setFetching(providerId)
+    try {
+      const result = await fetchModels(providerId, { signal: controller.signal })
+      await setCachedModels(providerId, result)
+      setCachedModelsState((prev) => ({ ...prev, [providerId]: result }))
+      setCooldown(getCooldownRemaining())
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        console.error('Failed to fetch models:', err)
+      }
+    } finally {
+      setFetching(null)
+      abortRef.current = null
+    }
+  }
+
+  function handleCancel() {
+    abortRef.current?.abort()
   }
 
   if (loading) {
@@ -78,7 +122,7 @@ function ApiSettingsPanel() {
 
       {PROVIDERS.map((provider) => {
         const currentModel = models[provider.id]
-        const defaultModels = DEFAULT_MODELS[provider.id] || []
+        const availableModels = cachedModels[provider.id] || []
 
         return (
           <CollapsibleSection
@@ -123,7 +167,11 @@ function ApiSettingsPanel() {
                     providerId={provider.id}
                     value={currentModel}
                     onChange={(v) => handleModelChange(provider.id, v)}
-                    models={defaultModels}
+                    models={availableModels}
+                    onRefresh={handleRefresh}
+                    fetching={fetching === provider.id}
+                    onCancelFetch={handleCancel}
+                    cooldownRemaining={cooldown}
                   />
                 </div>
               ) : (
@@ -150,7 +198,6 @@ function ApiSettingsPanel() {
               <button
                 type="button"
                 onClick={() => {
-                  // Placeholder: will test connection later
                   console.log('Test connection for', provider.id)
                 }}
                 className="min-h-[44px] px-4 text-sm border border-border rounded-md bg-surface text-secondary hover:bg-surface-hover"
