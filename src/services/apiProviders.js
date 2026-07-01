@@ -47,18 +47,6 @@ export const PROVIDERS = [
   },
 ]
 
-export const DEFAULT_MODELS = {
-  groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768', 'gemma2-9b-it'],
-  openrouter: [
-    'anthropic/claude-sonnet-4-20250514',
-    'openai/gpt-4o',
-    'google/gemini-2.5-flash',
-    'meta-llama/llama-4-maverick',
-  ],
-  'ai-horde': ['koboldcpp/llama-3.3-70b-instruct', 'microsoft/phi-4'],
-  'lm-studio': [],
-}
-
 export const DEFAULT_ACTIVE_PROVIDER = 'groq'
 
 function pKey(providerId, field) {
@@ -176,4 +164,22 @@ export async function getActiveKey(providerId) {
 export function maskKey(value) {
   if (!value || value.length <= 4) return value || ''
   return '••••' + value.slice(-4)
+}
+
+function cachedModelsKey(providerId) {
+  return `api.${providerId}.cachedModels`
+}
+
+export async function getCachedModels(providerId) {
+  const raw = await getSetting(cachedModelsKey(providerId))
+  try {
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+export async function setCachedModels(providerId, models) {
+  await setSetting(cachedModelsKey(providerId), JSON.stringify(models))
 }

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Star, Check, RefreshCw } from '../../../../lib/icons'
+import { Star, Check, RefreshCw, X } from '../../../../lib/icons'
 import { getFavModels, toggleFavModel } from '../../../../services/apiProviders'
 
-function ModelSelect({ providerId, value, onChange, models = [] }) {
+function ModelSelect({ providerId, value, onChange, models = [], onRefresh, fetching, onCancelFetch, cooldownRemaining }) {
   const { t } = useTranslation('settings')
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -105,17 +105,41 @@ function ModelSelect({ providerId, value, onChange, models = [] }) {
               })
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              // Placeholder: will fetch models via API later
-              console.log('Refresh models for', providerId)
-            }}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] text-sm border-t border-border text-secondary hover:bg-surface-hover"
-          >
-            <RefreshCw className="w-4 h-4" />
-            {t('api.refreshModels')}
-          </button>
+          <div className="border-t border-border">
+            {fetching ? (
+              <div className="flex items-center justify-between px-3 py-2 min-h-[44px]">
+                <span className="flex items-center gap-2 text-sm text-secondary">
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  {t('api.fetchingModels')}
+                </span>
+                {onCancelFetch && (
+                  <button
+                    type="button"
+                    onClick={onCancelFetch}
+                    className="flex items-center gap-1 text-sm text-error hover:opacity-80 min-h-[44px] min-w-[44px] justify-center"
+                  >
+                    <X className="w-4 h-4" />
+                    {t('cancel', { ns: 'common' })}
+                  </button>
+                )}
+              </div>
+            ) : cooldownRemaining > 0 ? (
+              <div className="flex items-center justify-center px-3 py-2 min-h-[44px]">
+                <span className="text-sm text-tertiary">
+                  {t('api.cooldown', { seconds: Math.ceil(cooldownRemaining / 1000) })}
+                </span>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onRefresh?.(providerId)}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] text-sm text-secondary hover:bg-surface-hover"
+              >
+                <RefreshCw className="w-4 h-4" />
+                {t('api.refreshModels')}
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
