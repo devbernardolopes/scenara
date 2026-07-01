@@ -18,3 +18,7 @@ export async function setUIState(key, value) {
     await db.uiState.add({ key, value })
   }
 }
+
+export async function deleteUIStateByKeyPrefix(prefix) {
+  await db.uiState.where('key').startsWith(prefix).delete()
+}

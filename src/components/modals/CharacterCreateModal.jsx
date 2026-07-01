@@ -3,28 +3,66 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import { createCharacter, updateCharacter } from '../../services/characters'
-import ModalShell from '../shared/ModalShell'
-import CollapsibleSection from '../shared/CollapsibleSection'
-import { estimateTokens } from '../../services/tokenEstimator'
+import CloseButton from '../shared/CloseButton'
+import CharacterSidebar from './character/CharacterSidebar'
+import CharacterSection from './character/CharacterSection'
+import OverridesSection from './character/OverridesSection'
+import PlaceholderSection from './character/PlaceholderSection'
+
+const INITIAL_FORM = {
+  name: '',
+  avatar: '',
+  description: '',
+  personality: '',
+  greeting: '',
+  scenario: '',
+  sampleChat: '',
+  autoTitle: false,
+  autoTitleThreshold: 256,
+  autoTitleSystemInstructions: '',
+  autoTitleUserInstructions: '',
+  memory: false,
+  memoryThreshold: 1024,
+  summarizationSystemInstructions: '',
+  summarizationUserInstructions: '',
+  firstMessage: false,
+  userPersonaPrefix: false,
+  includeOOC: false,
+  postProcessing: false,
+  characterAvatarScale: '2x',
+  userPersonaAvatarScale: '2x',
+}
+
+function buildInitialForm(existing) {
+  if (!existing) return { ...INITIAL_FORM }
+  const result = {}
+  for (const key of Object.keys(INITIAL_FORM)) {
+    result[key] = key in existing ? existing[key] : INITIAL_FORM[key]
+  }
+  return result
+}
+
+const SECTION_COMPONENTS = {
+  character: CharacterSection,
+  overrides: OverridesSection,
+  '3d': PlaceholderSection,
+  sfx: PlaceholderSection,
+  tags: PlaceholderSection,
+  lorebooks: PlaceholderSection,
+}
 
 function CharacterCreateModal({ character: existing }) {
   const { t } = useTranslation('characterCreation')
   const { closeModal, setCloseGuard } = useModal()
   const { promptSave } = useSaveConfirm()
   const isEditing = Boolean(existing)
+  const characterId = existing?.id || null
 
-  const initialRef = useRef({
-    name: existing?.name || '',
-    avatar: existing?.avatar || '',
-    description: existing?.description || '',
-    personality: existing?.personality || '',
-    greeting: existing?.greeting || '',
-    scenario: existing?.scenario || '',
-    sampleChat: existing?.sampleChat || '',
-  })
-
+  const initialRef = useRef(buildInitialForm(existing))
+  const [form, setForm] = useState(initialRef.current)
   const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState({ ...initialRef.current })
+  const [activeSection, setActiveSection] = useState('character')
+  const savePendingRef = useRef(false)
 
   const isDirty = Object.keys(initialRef.current).some(
     (key) => form[key] !== initialRef.current[key],
@@ -32,8 +70,6 @@ function CharacterCreateModal({ character: existing }) {
 
   const handleCloseRef = useRef()
   handleCloseRef.current = handleCloseAttempt
-
-  const savePendingRef = useRef(false)
 
   useEffect(() => {
     if (isDirty) {
@@ -51,8 +87,8 @@ function CharacterCreateModal({ character: existing }) {
     return () => setCloseGuard(null)
   }, [isDirty, setCloseGuard])
 
-  function update(field) {
-    return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }))
+  function handleChange(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }))
   }
 
   async function saveCharacter() {
@@ -85,126 +121,57 @@ function CharacterCreateModal({ character: existing }) {
     }
   }
 
-  const inputClass =
-    'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
+  const ActivePanel = SECTION_COMPONENTS[activeSection] || PlaceholderSection
 
   return (
-    <ModalShell
-      title={isEditing ? t('editTitle') : t('title')}
-      onClose={isDirty ? handleCloseAttempt : closeModal}
-      footer={
-        <>
-          <button
-            type="button"
-            onClick={isDirty ? handleCloseAttempt : closeModal}
-            className="min-h-[44px] px-4 text-sm text-secondary hover:text-text"
-          >
-            {t('cancel')}
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving || !form.name.trim()}
-            className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
-          >
-            {saving ? (isEditing ? 'Saving…' : t('save')) : t('save')}
-          </button>
-        </>
-      }
-    >
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-text mb-1">{t('nameLabel')}</label>
-          <input
-            className={inputClass}
-            value={form.name}
-            onChange={update('name')}
-            placeholder={t('namePlaceholder')}
-            required
-            autoFocus
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-text mb-1">{t('avatarLabel')}</label>
-          <input
-            className={inputClass}
-            value={form.avatar}
-            onChange={update('avatar')}
-            placeholder={t('avatarPlaceholder')}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-text mb-1">
-            {t('descriptionLabel')}
-          </label>
-          <textarea
-            className={`${inputClass} resize-none`}
-            rows={2}
-            value={form.description}
-            onChange={update('description')}
-            placeholder={t('descriptionPlaceholder')}
-          />
-        </div>
-
-        <CollapsibleSection
-          label={t('personalityLabel')}
-          summary={form.personality ? `${estimateTokens(form.personality)} tokens` : null}
-          storageKey="charCreatePersonality"
-        >
-          <textarea
-            className={`${inputClass} resize-none mt-2`}
-            rows={4}
-            value={form.personality}
-            onChange={update('personality')}
-            placeholder={t('personalityPlaceholder')}
-          />
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          label={t('greetingLabel')}
-          summary={form.greeting ? `${estimateTokens(form.greeting)} tokens` : null}
-          storageKey="charCreateGreeting"
-        >
-          <textarea
-            className={`${inputClass} resize-none mt-2`}
-            rows={3}
-            value={form.greeting}
-            onChange={update('greeting')}
-            placeholder={t('greetingPlaceholder')}
-          />
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          label={t('scenarioLabel')}
-          summary={form.scenario ? `${estimateTokens(form.scenario)} tokens` : null}
-          storageKey="charCreateScenario"
-        >
-          <textarea
-            className={`${inputClass} resize-none mt-2`}
-            rows={3}
-            value={form.scenario}
-            onChange={update('scenario')}
-            placeholder={t('scenarioPlaceholder')}
-          />
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          label={t('sampleChatLabel')}
-          summary={form.sampleChat ? `${estimateTokens(form.sampleChat)} tokens` : null}
-          storageKey="charCreateSampleChat"
-        >
-          <textarea
-            className={`${inputClass} resize-none mt-2`}
-            rows={4}
-            value={form.sampleChat}
-            onChange={update('sampleChat')}
-            placeholder={t('sampleChatPlaceholder')}
-          />
-        </CollapsibleSection>
+    <div className="flex flex-col min-h-0 flex-1">
+      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
+        <h2 className="text-xl font-semibold text-text">
+          {isEditing ? t('editTitle') : t('title')}
+        </h2>
+        <CloseButton onClick={isDirty ? handleCloseAttempt : closeModal} />
       </div>
-    </ModalShell>
+
+      <div className="px-6 pt-4 pb-2 shrink-0 md:hidden">
+        <select
+          value={activeSection}
+          onChange={(e) => setActiveSection(e.target.value)}
+          className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text text-sm"
+        >
+          <option value="character">{t('sectionCharacter')}</option>
+          <option value="overrides">{t('sectionOverrides')}</option>
+          <option value="3d">{t('section3d')}</option>
+          <option value="sfx">{t('sectionSfx')}</option>
+          <option value="tags">{t('sectionTags')}</option>
+          <option value="lorebooks">{t('sectionLorebooks')}</option>
+        </select>
+      </div>
+
+      <div className="flex flex-1 min-h-0">
+        <CharacterSidebar active={activeSection} onSelect={setActiveSection} />
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <ActivePanel form={form} onChange={handleChange} characterId={characterId} />
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-3 px-6 py-4 border-t border-border shrink-0">
+        <button
+          type="button"
+          onClick={isDirty ? handleCloseAttempt : closeModal}
+          className="min-h-[44px] px-4 text-sm text-secondary hover:text-text"
+        >
+          {t('cancel')}
+        </button>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving || !form.name.trim()}
+          className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
+        >
+          {saving ? t('saving') : t('save')}
+        </button>
+      </div>
+    </div>
   )
 }
 

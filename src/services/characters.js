@@ -1,4 +1,5 @@
 import db from '../db'
+import { deleteUIStateByKeyPrefix } from './uiState'
 
 const SEED_CHARACTERS = [
   {
@@ -30,11 +31,12 @@ const SEED_CHARACTERS = [
   {
     name: 'Dr. Aria Chen',
     avatar: '🔬',
-    description: 'A brilliant scientist at an arcane research facility blending magic and technology.',
+    description:
+      'A brilliant scientist at an arcane research facility blending magic and technology.',
     personality:
       'Curious, precise, occasionally absent-minded when excited about a discovery. Uses technical jargon but tries to explain things simply.',
     greeting:
-      "Oh! Hello there. I was just calibrating the thaumic resonance array. *pushes up glasses* You must be the new research assistant. Excellent timing — I have a theory I need to test!",
+      'Oh! Hello there. I was just calibrating the thaumic resonance array. *pushes up glasses* You must be the new research assistant. Excellent timing — I have a theory I need to test!',
     scenario:
       'A cluttered laboratory filled with bubbling vials, glowing crystals wired to computers, and floating equations projected in the air.',
     sampleChat:
@@ -51,7 +53,7 @@ const SEED_CHARACTERS = [
     scenario:
       'A serene bamboo forest at twilight, with floating spirit lights drifting between the stalks, and a small stone bridge over a murmuring stream.',
     sampleChat:
-      "User: Why are you here?\nKaito: *gazing at the horizon* The threads of fate weave in mysterious patterns. Perhaps you are here because you seek something. Or perhaps, something seeks you.",
+      'User: Why are you here?\nKaito: *gazing at the horizon* The threads of fate weave in mysterious patterns. Perhaps you are here because you seek something. Or perhaps, something seeks you.',
   },
 ]
 
@@ -82,14 +84,38 @@ export async function deleteCharacter(id) {
   return db.characters.delete(id)
 }
 
+const COLLAPSIBLE_PREFIXES = [
+  'charSection.personality.',
+  'charSection.greeting.',
+  'charSection.scenario.',
+  'charSection.sampleChat.',
+  'charSection.autoTitleSystem.',
+  'charSection.autoTitleUser.',
+  'charSection.summarizationSystem.',
+  'charSection.summarizationUser.',
+]
+
+async function cleanupCollapsibleState(characterId) {
+  await Promise.all(
+    COLLAPSIBLE_PREFIXES.map((prefix) =>
+      deleteUIStateByKeyPrefix(`collapsed.${prefix}${characterId}`),
+    ),
+  )
+}
+
 export async function deleteCharacterWithThreads(id) {
   const threads = await db.threads.where('characterId').equals(id).toArray()
   await Promise.all(
     threads.map((t) =>
-      db.messages.where('threadId').equals(t.id).delete().then(() => db.threads.delete(t.id)),
+      db.messages
+        .where('threadId')
+        .equals(t.id)
+        .delete()
+        .then(() => db.threads.delete(t.id)),
     ),
   )
   await db.characters.delete(id)
+  await cleanupCollapsibleState(id)
 }
 
 async function seedCharacters() {
