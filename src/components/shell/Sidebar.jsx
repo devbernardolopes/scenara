@@ -1,15 +1,23 @@
+import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-
-const THREADS = [
-  { id: '1', title: 'Welcome to Scenara' },
-  { id: '2', title: 'Adventure in the Dark Forest' },
-  { id: '3', title: 'A Peaceful Afternoon' },
-]
+import { getAllThreads } from '../../services/threads'
 
 function Sidebar({ open, onClose }) {
   const { t } = useTranslation('common')
   const { threadId } = useParams()
+  const [threads, setThreads] = useState([])
+
+  async function loadThreads() {
+    const all = await getAllThreads()
+    setThreads(all)
+  }
+
+  useEffect(() => {
+    loadThreads()
+    window.addEventListener('threads-changed', loadThreads)
+    return () => window.removeEventListener('threads-changed', loadThreads)
+  }, [])
 
   return (
     <>
@@ -37,7 +45,7 @@ function Sidebar({ open, onClose }) {
           </Link>
           <button
             onClick={onClose}
-            className="text-tertiary hover:text-text md:hidden"
+            className="text-tertiary hover:text-text md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label={t('sidebar.close')}
           >
             ✕
@@ -48,7 +56,7 @@ function Sidebar({ open, onClose }) {
           <Link
             to="/"
             onClick={onClose}
-            className="block px-3 py-2 rounded-md text-sm font-medium text-secondary hover:bg-surface-hover mb-2"
+            className="flex items-center px-3 min-h-[44px] rounded-md text-sm font-medium text-secondary hover:bg-surface-hover mb-2"
           >
             {t('sidebar.discovery')}
           </Link>
@@ -58,23 +66,27 @@ function Sidebar({ open, onClose }) {
           <h3 className="text-xs font-semibold text-tertiary uppercase tracking-wider px-3 mb-2">
             {t('sidebar.threads')}
           </h3>
-          <ul className="space-y-1">
-            {THREADS.map((thread) => (
-              <li key={thread.id}>
-                <Link
-                  to={`/chat/${thread.id}`}
-                  onClick={onClose}
-                  className={`block px-3 py-2 rounded-md text-sm truncate ${
-                    threadId === thread.id
-                      ? 'bg-primary-subtle text-primary font-medium'
-                      : 'text-secondary hover:bg-surface-hover'
-                  }`}
-                >
-                  {thread.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {threads.length === 0 ? (
+            <p className="text-xs text-tertiary px-3">{t('sidebar.newChat')}</p>
+          ) : (
+            <ul className="space-y-1">
+              {threads.map((thread) => (
+                <li key={thread.id}>
+                  <Link
+                    to={`/chat/${thread.id}`}
+                    onClick={onClose}
+                    className={`flex items-center px-3 min-h-[44px] rounded-md text-sm truncate ${
+                      String(thread.id) === threadId
+                        ? 'bg-primary-subtle text-primary font-medium'
+                        : 'text-secondary hover:bg-surface-hover'
+                    }`}
+                  >
+                    {thread.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </aside>
     </>

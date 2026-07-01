@@ -3,7 +3,8 @@
   "sidebar": {
     "close": "Close sidebar",
     "discovery": "Discovery",
-    "threads": "Threads"
+    "threads": "Threads",
+    "newChat": "New Chat"
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",
@@ -12,9 +13,11 @@
   "discovery": {
     "title": "Discovery",
     "subtitle": "Browse and select characters to start a new chat.",
-    "characterCard": "Character {{index}}",
     "characterDesc": "A brief description of this character.",
-    "createCharacter": "Create Character"
+    "createCharacter": "Create Character",
+    "startChat": "Start Chat",
+    "noCharacters": "No characters yet. Create one to get started!",
+    "loading": "Loading…"
   },
   "loading": "Loading…"
 }

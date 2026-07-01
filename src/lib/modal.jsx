@@ -18,7 +18,7 @@ export function ModalProvider({ children }) {
 
   const ModalComponent = MODAL_COMPONENTS[modalState.type]
   const { t } = useTranslation('common')
-  const modalSize = modalState.props?.modalSize === 'lg' ? 'max-w-3xl' : 'max-w-lg'
+  const modalSize = modalState.props?.modalSize === 'lg' ? 'max-w-4xl' : 'max-w-lg'
 
   return (
     <ModalContext.Provider
@@ -34,7 +34,9 @@ export function ModalProvider({ children }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay" onClick={closeModal}>
           <Suspense
             fallback={
-              <div className={`bg-surface rounded-lg shadow-surface-lg ${modalSize} w-full mx-4 p-12 text-center text-secondary text-sm`}>
+              <div
+                className={`bg-surface rounded-lg shadow-surface-lg ${modalSize} w-full mx-4 p-12 text-center text-secondary text-sm`}
+              >
                 {t('loading')}
               </div>
             }

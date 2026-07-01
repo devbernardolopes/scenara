@@ -9,7 +9,7 @@ function TopBar({ onMenuToggle }) {
     <header className="flex items-center justify-between px-4 h-14 border-b border-border bg-surface shrink-0">
       <button
         onClick={onMenuToggle}
-        className="text-tertiary hover:text-text md:hidden"
+        className="text-tertiary hover:text-text md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center"
         aria-label={t('topbar.toggleSidebar')}
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -26,7 +26,7 @@ function TopBar({ onMenuToggle }) {
 
       <button
         onClick={() => openModal('settings', { modalSize: 'lg' })}
-        className="text-tertiary hover:text-text p-2 rounded-md hover:bg-surface-hover"
+        className="text-tertiary hover:text-text min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md hover:bg-surface-hover"
         aria-label={t('topbar.settings')}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

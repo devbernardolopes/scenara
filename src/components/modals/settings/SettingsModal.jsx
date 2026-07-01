@@ -25,32 +25,43 @@ function SettingsModal() {
   const noResults = search && filtered.length === 0
 
   return (
-    <div className="flex flex-col h-[80vh]">
+    <div className="flex flex-col max-h-[80vh]">
       <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
         <h2 className="text-xl font-semibold text-text">{t('title')}</h2>
-        <button onClick={closeModal} className="text-tertiary hover:text-text" aria-label="Close">
+        <button
+          onClick={closeModal}
+          className="text-tertiary hover:text-text min-h-[44px] min-w-[44px] flex items-center justify-center"
+          aria-label="Close"
+        >
           ✕
         </button>
       </div>
 
-      <div className="px-6 pt-4 pb-2 shrink-0">
+      <div className="px-6 pt-4 pb-2 shrink-0 space-y-2">
         <SettingsSearch value={search} onChange={setSearch} />
+        {!search && (
+          <select
+            value={activeCategory}
+            onChange={(e) => setActiveCategory(e.target.value)}
+            className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text text-sm md:hidden"
+          >
+            {CATEGORIES.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {t(cat.labelKey.replace('settings:', ''))}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div className="flex flex-1 min-h-0">
-        {!search && (
-          <SettingsSidebar
-            categories={CATEGORIES}
-            active={activeCategory}
-            onSelect={setActiveCategory}
-          />
-        )}
+        {!search && <SettingsSidebar categories={CATEGORIES} active={activeCategory} onSelect={setActiveCategory} />}
 
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {noResults ? (
             <p className="text-secondary text-sm">{t('noResults')}</p>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {filtered.map((setting) => (
                 <SettingRow key={setting.key} setting={setting} onSave={(v) => setSetting(setting.key, v)} />
               ))}

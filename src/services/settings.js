@@ -1,4 +1,16 @@
+import i18n from '../lib/i18n'
 import db from '../db'
+
+function applyThemeClass(theme) {
+  const html = document.documentElement
+  html.className = html.className
+    .split(' ')
+    .filter((c) => !c.startsWith('theme-'))
+    .join(' ')
+  if (theme !== 'light') {
+    html.classList.add(`theme-${theme}`)
+  }
+}
 
 export const CATEGORIES = [
   { id: 'appearance', labelKey: 'settings:categories.appearance' },
@@ -46,6 +58,11 @@ export const SETTINGS = [
   },
 ]
 
+const SETTING_EFFECTS = {
+  theme: (value) => applyThemeClass(value),
+  language: (value) => i18n.changeLanguage(value),
+}
+
 export async function getSetting(key) {
   const row = await db.settings.where('key').equals(key).first()
   const def = SETTINGS.find((s) => s.key === key)?.default
@@ -54,4 +71,5 @@ export async function getSetting(key) {
 
 export async function setSetting(key, value) {
   await db.settings.put({ key, value })
+  SETTING_EFFECTS[key]?.(value)
 }

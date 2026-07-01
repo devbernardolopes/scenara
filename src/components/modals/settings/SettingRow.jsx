@@ -3,6 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { getSetting } from '../../../services/settings'
 import SettingToggle from './controls/SettingToggle'
 import SettingSelect from './controls/SettingSelect'
+import SettingSlider from './controls/SettingSlider'
+import SettingInput from './controls/SettingInput'
+import SettingTextarea from './controls/SettingTextarea'
+
+const CONTROL_MAP = {
+  toggle: SettingToggle,
+  select: SettingSelect,
+  slider: SettingSlider,
+  text: SettingInput,
+  textarea: SettingTextarea,
+}
 
 function SettingRow({ setting, onSave }) {
   const { t } = useTranslation('settings')
@@ -21,6 +32,9 @@ function SettingRow({ setting, onSave }) {
 
   const labelPath = setting.labelKey.replace('settings:', '')
   const descPath = setting.descKey?.replace('settings:', '')
+  const Control = CONTROL_MAP[setting.type]
+
+  if (!Control) return null
 
   return (
     <div className="flex items-start justify-between gap-4">
@@ -29,15 +43,7 @@ function SettingRow({ setting, onSave }) {
         {descPath && <p className="text-xs text-secondary mt-0.5">{t(descPath)}</p>}
       </div>
       <div className="shrink-0">
-        {setting.type === 'toggle' && <SettingToggle value={value} onChange={handleChange} />}
-        {setting.type === 'select' && (
-          <SettingSelect
-            value={value}
-            options={setting.options}
-            optionLabels={setting.optionLabels}
-            onChange={handleChange}
-          />
-        )}
+        <Control value={value} onChange={handleChange} storageKey={setting.key} {...setting.props} />
       </div>
     </div>
   )

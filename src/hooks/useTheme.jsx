@@ -3,30 +3,14 @@ import { getSetting, setSetting } from '../services/settings'
 
 const ThemeContext = createContext(null)
 
-function applyThemeClass(theme) {
-  const html = document.documentElement
-  html.className = html.className
-    .split(' ')
-    .filter((c) => !c.startsWith('theme-'))
-    .join(' ')
-  if (theme !== 'light') {
-    html.classList.add(`theme-${theme}`)
-  }
-}
-
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState('light')
 
   useEffect(() => {
-    getSetting('theme').then((val) => {
-      const t = val || 'light'
-      applyThemeClass(t)
-      setThemeState(t)
-    })
+    getSetting('theme').then((val) => setThemeState(val || 'light'))
   }, [])
 
   const setTheme = useCallback((val) => {
-    applyThemeClass(val)
     setThemeState(val)
     setSetting('theme', val)
   }, [])

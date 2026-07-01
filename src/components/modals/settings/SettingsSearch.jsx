@@ -9,7 +9,7 @@ function SettingsSearch({ value, onChange }) {
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={t('searchPlaceholder')}
-      className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+      className="w-full px-3 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
     />
   )
 }

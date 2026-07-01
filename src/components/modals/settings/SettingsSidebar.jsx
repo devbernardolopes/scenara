@@ -10,7 +10,7 @@ function SettingsSidebar({ categories, active, onSelect }) {
           <li key={cat.id}>
             <button
               onClick={() => onSelect(cat.id)}
-              className={`w-full text-left px-3 py-2 rounded-md text-sm ${
+              className={`w-full text-left px-3 min-h-[44px] rounded-md text-sm ${
                 active === cat.id
                   ? 'bg-primary-subtle text-primary font-medium'
                   : 'text-secondary hover:bg-surface-hover'

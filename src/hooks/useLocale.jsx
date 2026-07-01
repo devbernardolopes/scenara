@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import i18n from '../lib/i18n'
 import { getSetting, setSetting } from '../services/settings'
 
 const LocaleContext = createContext(null)
@@ -8,15 +7,10 @@ export function LocaleProvider({ children }) {
   const [locale, setLocaleState] = useState('en')
 
   useEffect(() => {
-    getSetting('language').then((val) => {
-      const l = val || 'en'
-      i18n.changeLanguage(l)
-      setLocaleState(l)
-    })
+    getSetting('language').then((val) => setLocaleState(val || 'en'))
   }, [])
 
   const setLocale = useCallback((val) => {
-    i18n.changeLanguage(val)
     setLocaleState(val)
     setSetting('language', val)
   }, [])

@@ -34,7 +34,7 @@ Settings, character creation, and persona management open as **overlays** — no
   - `registerModal(type, Component)` — registers a component for a given modal key
 - `src/hooks/useModal.js` — `useModal()` returns `{ openModal, closeModal, activeModal }`
 - Modals are wrapped in `<Suspense>` by the provider. Heavy modals (like Settings) can be `lazy()` imported and automatically code-split — see `main.jsx` for the pattern.
-- Passing `{ modalSize: 'lg' }` to `openModal()` renders the modal at `max-w-3xl` instead of `max-w-lg`.
+- Passing `{ modalSize: 'lg' }` to `openModal()` renders the modal at `max-w-4xl` instead of `max-w-lg`.
 - Modals are registered in `src/main.jsx` to keep registration visible in one place:
 
 ```js
@@ -62,6 +62,10 @@ All data lives in the browser via IndexedDB. Dexie.js is the only persistence la
 | `characters` | `++id`      | `name`, `createdAt`                 |
 | `personas`   | `++id`      | `name`, `createdAt`                 |
 | `settings`   | `++id`      | `key`                               |
+| `uiState`    | `++id`      | `key`                               |
+
+- **`settings`** — user preferences (theme, language, API config). Persistent, import/exportable.
+- **`uiState`** — transient UI state (collapse/expand, scroll positions). Never exported. Queried via `src/services/uiState.js`.
 
 No business logic in `db.js` — just table definitions. Query/mutate from `services/`.
 
@@ -70,6 +74,7 @@ No business logic in `db.js` — just table definitions. Query/mutate from `serv
 ```plaintext
 src/
   components/
+    shared/       — CollapsibleSection, future reusable primitives
     shell/        — ShellLayout, Sidebar, TopBar
     modals/
       settings/   — SettingsModal, SettingsSidebar, SettingRow, controls
@@ -79,7 +84,8 @@ src/
     i18n.js       — i18next initialization with static JSON imports
     modal.jsx     — ModalContext, ModalProvider, registerModal
   services/
-    settings.js   — SETTINGS + CATEGORIES config, getSetting, setSetting
+    settings.js   — SETTINGS + CATEGORIES config, getSetting, setSetting (with effects)
+    uiState.js    — getUIState / setUIState for transient UI persistence
   hooks/          — useModal, useTheme, useLocale
   locales/
     en/           — common.json, chat.json, settings.json, characterCreation.json
@@ -190,18 +196,28 @@ t('settings:appearance.theme.label')
 Settings are defined declaratively in `src/services/settings.js`:
 
 - **`CATEGORIES`** — array of `{ id, labelKey }` that drives the settings sidebar
-- **`SETTINGS`** — array of `{ key, category, type, default, options?, labelKey, descKey, optionLabels? }` that drives the content panel
+- **`SETTINGS`** — array of `{ key, category, type, default, options?, labelKey, descKey, optionLabels?, props? }` that drives the content panel
 - **`getSetting(key)`** — reads from Dexie, falls back to the config default
-- **`setSetting(key, value)`** — persists to Dexie
+- **`setSetting(key, value)`** — persists to Dexie, then runs the effect from `SETTING_EFFECTS` if one is registered
+- **`SETTING_EFFECTS`** — map of `{ key: (value) => void }` for side effects (theme class, i18n changeLanguage, etc.). Adding a new effect is one line.
+
+Effects ensure that persistence and application are always paired — whether the change comes from the settings modal UI or from a hook.
 
 The settings modal (`components/modals/settings/`) renders from these config arrays — no JSX duplication per setting. The control type is driven by `setting.type`:
 
-| `type`     | Component         |
-|------------|-------------------|
-| `select`   | `SettingSelect`   |
-| `toggle`   | `SettingToggle`   |
+| `type`     | Component          | Props passthrough                               |
+|------------|--------------------|-------------------------------------------------|
+| `select`   | `SettingSelect`    | `options`, `optionLabels`                       |
+| `toggle`   | `SettingToggle`    | —                                               |
+| `slider`   | `SettingSlider`    | `min`, `max`, `step`                            |
+| `text`     | `SettingInput`     | `placeholder`, `type`                           |
+| `textarea` | `SettingTextarea`  | `rows`, `placeholder`, `collapsible`, `summary` |
+
+The `props` field on a setting config is spread onto the control component. This keeps controls generic and the config declarative.
 
 To add a new setting: add one object to the `SETTINGS` array. The modal renders it automatically.
+
+All tappable controls enforce a minimum `44px` hit target as per mobile accessibility guidelines.
 
 Settings are code-split: `SettingsModal` uses `React.lazy()` and is bundled separately. The `ModalProvider` wraps it in `<Suspense>` with a loading fallback.
 
@@ -213,6 +229,41 @@ Settings are code-split: `SettingsModal` uses `React.lazy()` and is bundled sepa
 - **No state management library.** Use React built-ins (`useState`, `useContext`) + Dexie for persistence. Revisit only if genuinely needed.
 - **Imports:** Use relative imports within `src/`. No barrel files (`index.js`) — import directly from the file.
 - **No JSX in `lib/` or `services/`.** Keep non-UI modules free of React.
+
+## UI State Persistence
+
+Transient UI state (collapse/expand, scroll positions) lives in the `uiState` Dexie table — separate from user preferences.
+
+- **`src/services/uiState.js`** exports `getUIState(key)` and `setUIState(key, value)` — identical API to settings but backed by a dedicated table.
+- Storage keys follow a convention: `collapsed.{settingKey}`, `scroll.{panelId}`, etc.
+- This table is never exported / imported / cleared by user-facing operations.
+
+### CollapsibleSection
+
+`src/components/shared/CollapsibleSection.jsx` is a reusable wrapper that any component can use:
+
+```jsx
+<CollapsibleSection
+  label="System Prompt"
+  summary="128 tokens"
+  hasContent={true}
+  storageKey="systemPrompt"
+  defaultExpanded={true}
+>
+  <textarea ... />
+</CollapsibleSection>
+```
+
+- Label highlights in `text-primary` when `hasContent` is true
+- Summary shows computed metrics (tokens, words, characters) or custom text
+- Collapse state persisted per-instance via `storageKey` → `uiState` table
+- All touch targets are `min-h-[44px]`
+
+### Adding a new collapsible control
+
+1. Create the control component wrapping `CollapsibleSection`
+2. Add it to the `CONTROL_MAP` in `SettingRow.jsx`
+3. The `storageKey` is automatically set to `setting.key` by `SettingRow`
 
 ## Modal Registration Pattern
 

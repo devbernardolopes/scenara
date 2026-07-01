@@ -7,6 +7,16 @@ db.version(1).stores({
   characters: '++id, name, createdAt',
   personas: '++id, name, createdAt',
   settings: '++id, key',
+  uiState: '++id, key',
+})
+
+db.version(2).stores({
+  threads: '++id, title, characterId, updatedAt',
+  characters: '++id, name, createdAt',
+  personas: '++id, name, createdAt',
+  settings: '++id, key',
+  uiState: '++id, key',
+  messages: '++id, threadId, role, createdAt',
 })
 
 export default db

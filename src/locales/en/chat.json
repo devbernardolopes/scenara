@@ -1,7 +1,11 @@
 {
-  "title": "Chat Thread {{id}}",
-  "placeholder": "Messages will appear here.",
+  "title": "Chat",
+  "placeholder": "Start the conversation by sending a message.",
   "inputPlaceholder": "Type a message…",
   "send": "Send",
-  "editPersona": "Edit Persona"
+  "editPersona": "Edit Persona",
+  "loading": "Loading…",
+  "deleteConfirm": "Delete this conversation?",
+  "deleteThread": "Delete",
+  "characterTag": "Character"
 }
