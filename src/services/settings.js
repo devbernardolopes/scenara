@@ -21,7 +21,6 @@ export const CATEGORIES = [
   { id: 'api', labelKey: 'settings:categories.api' },
   { id: 'chat', labelKey: 'settings:categories.chat' },
   { id: 'prompting', labelKey: 'settings:categories.prompting' },
-  { id: 'persona', labelKey: 'settings:categories.persona' },
   { id: 'tts', labelKey: 'settings:categories.tts' },
   { id: 'advanced', labelKey: 'settings:categories.advanced' },
 ]
@@ -74,7 +73,14 @@ export const SETTINGS = [
     category: 'appearance',
     type: 'select',
     default: 'top-right',
-    options: ['top-right', 'top-left', 'top-center', 'bottom-right', 'bottom-left', 'bottom-center'],
+    options: [
+      'top-right',
+      'top-left',
+      'top-center',
+      'bottom-right',
+      'bottom-left',
+      'bottom-center',
+    ],
     labelKey: 'settings:appearance.toastPosition.label',
     descKey: 'settings:appearance.toastPosition.desc',
     optionLabels: {
@@ -153,7 +159,12 @@ export const SETTINGS = [
     category: 'chat',
     type: 'textarea',
     default: '',
-    props: { placeholder: 'Enter one stop sequence per line', rows: 4, collapsible: true, summary: 'lines' },
+    props: {
+      placeholder: 'Enter one stop sequence per line',
+      rows: 4,
+      collapsible: true,
+      summary: 'lines',
+    },
     labelKey: 'settings:chat.stopStrings.label',
     descKey: 'settings:chat.stopStrings.desc',
   },

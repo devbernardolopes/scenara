@@ -4,7 +4,8 @@
     "close": "Close sidebar",
     "discovery": "Discovery",
     "threads": "Threads",
-    "newChat": "New Chat"
+    "newChat": "New Chat",
+    "personas": "Personas"
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",

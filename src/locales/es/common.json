@@ -3,7 +3,8 @@
   "sidebar": {
     "close": "Cerrar barra lateral",
     "discovery": "Descubrir",
-    "threads": "Conversaciones"
+    "threads": "Conversaciones",
+    "personas": "Personas"
   },
   "topbar": {
     "toggleSidebar": "Alternar barra lateral",

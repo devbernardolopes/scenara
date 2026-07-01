@@ -3,7 +3,8 @@
   "sidebar": {
     "close": "Seitenleiste schließen",
     "discovery": "Entdecken",
-    "threads": "Unterhaltungen"
+    "threads": "Unterhaltungen",
+    "personas": "Personas"
   },
   "topbar": {
     "toggleSidebar": "Seitenleiste umschalten",

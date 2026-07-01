@@ -3,7 +3,8 @@
   "sidebar": {
     "close": "Chiudi barra laterale",
     "discovery": "Scopri",
-    "threads": "Conversazioni"
+    "threads": "Conversazioni",
+    "personas": "Personas"
   },
   "topbar": {
     "toggleSidebar": "Attiva/disattiva barra laterale",
