@@ -1,4 +1,4 @@
-import { createContext, useState, useCallback, Suspense } from 'react'
+import { createContext, useState, useCallback, useEffect, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export const ModalContext = createContext(null)
@@ -15,6 +15,14 @@ export function ModalProvider({ children }) {
   const closeModal = useCallback(() => {
     setModalState({ type: null, props: {} })
   }, [])
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') closeModal()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [closeModal])
 
   const ModalComponent = MODAL_COMPONENTS[modalState.type]
   const { t } = useTranslation('common')

@@ -3,7 +3,10 @@ import { useEffect } from 'react'
 function ConfirmDialog({ title, message, confirmLabel, cancelLabel, variant = 'default', onConfirm, onCancel }) {
   useEffect(() => {
     function handleKeyDown(e) {
-      if (e.key === 'Escape') onCancel()
+      if (e.key === 'Escape') {
+        e.stopImmediatePropagation()
+        onCancel()
+      }
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)

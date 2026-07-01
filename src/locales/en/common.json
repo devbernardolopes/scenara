@@ -27,7 +27,7 @@
     },
     "confirmDelete": {
       "title": "Delete Character",
-      "message": "Are you sure you want to delete {name}? All associated chats will be permanently deleted.",
+      "message": "Are you sure you want to delete {{name}}? All associated chats will be permanently deleted.",
       "confirm": "Delete"
     }
   },

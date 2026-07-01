@@ -27,7 +27,7 @@
     },
     "confirmDelete": {
       "title": "Excluir Personagem",
-      "message": "Tem certeza que deseja excluir {name}? Todos os chats associados serão permanentemente deletados.",
+      "message": "Tem certeza que deseja excluir {{name}}? Todos os chats associados serão permanentemente deletados.",
       "confirm": "Excluir"
     }
   },
