@@ -1,6 +1,6 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../../hooks/useModal'
+import { usePersistedState } from '../../../hooks/usePersistedState'
 import { CATEGORIES, SETTINGS, setSetting } from '../../../services/settings'
 import SettingsSidebar from './SettingsSidebar'
 import SettingsSearch from './SettingsSearch'
@@ -12,8 +12,8 @@ import pkg from '../../../../package.json'
 function SettingsModal() {
   const { closeModal } = useModal()
   const { t } = useTranslation('settings')
-  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]?.id)
-  const [search, setSearch] = useState('')
+  const [activeCategory, setActiveCategory] = usePersistedState('modal.settings.category', CATEGORIES[0]?.id)
+  const [search, setSearch] = usePersistedState('modal.settings.search', '')
 
   const filtered = SETTINGS.filter((s) => {
     const matchesCategory = search ? true : s.category === activeCategory
