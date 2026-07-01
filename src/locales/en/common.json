@@ -24,7 +24,14 @@
       "duplicate": "Duplicate character",
       "export": "Export character",
       "selectPersona": "Select persona"
+    },
+    "confirmDelete": {
+      "title": "Delete Character",
+      "message": "Are you sure you want to delete {name}? All associated chats will be permanently deleted.",
+      "confirm": "Delete"
     }
   },
-  "loading": "Loading…"
+  "loading": "Loading…",
+  "cancel": "Cancel",
+  "confirm": "Confirm"
 }

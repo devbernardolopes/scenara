@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
+import { useConfirm } from '../../lib/confirm'
 import db from '../../db'
 import { createCharacter as createPersona } from '../../services/characters'
 import CollapsibleSection from '../shared/CollapsibleSection'
@@ -11,6 +12,7 @@ import { Plus } from '../../lib/icons'
 function PersonaEditorModal() {
   const { t } = useTranslation('characterCreation')
   const { closeModal } = useModal()
+  const { confirm } = useConfirm()
   const [personas, setPersonas] = useState([])
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({
@@ -63,6 +65,14 @@ function PersonaEditorModal() {
   }
 
   async function handleDelete(id) {
+    const ok = await confirm({
+      title: t('confirmDeleteTitle'),
+      message: t('confirmDelete'),
+      confirmLabel: t('deletePersona'),
+      cancelLabel: t('cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
     await db.personas.delete(id)
     const updated = await db.personas.orderBy('createdAt').toArray()
     setPersonas(updated)

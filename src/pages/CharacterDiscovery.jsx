@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../hooks/useModal'
-import { getAllCharacters } from '../services/characters'
+import { useConfirm } from '../lib/confirm'
+import { getAllCharacters, deleteCharacterWithThreads } from '../services/characters'
 import { getSetting } from '../services/settings'
 import { createThread } from '../services/threads'
 import { createMessage } from '../services/messages'
@@ -40,6 +41,7 @@ function CharacterDiscovery() {
   const { t } = useTranslation('common')
   const { openModal } = useModal()
   const navigate = useNavigate()
+  const { confirm } = useConfirm()
   const [characters, setCharacters] = useState([])
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
@@ -103,8 +105,19 @@ function CharacterDiscovery() {
     // Will open persona selection panel — to be implemented
   }
 
-  function handleDelete(character) {
-    // To be implemented
+  async function handleDelete(character) {
+    const ok = await confirm({
+      title: t('discovery.confirmDelete.title'),
+      message: t('discovery.confirmDelete.message', { name: character.name }),
+      confirmLabel: t('discovery.confirmDelete.confirm'),
+      cancelLabel: t('cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
+    await deleteCharacterWithThreads(character.id)
+    window.dispatchEvent(new CustomEvent('characters-changed'))
+    window.dispatchEvent(new CustomEvent('threads-changed'))
+    await loadCharacters()
   }
 
   function handleFavorite(character) {

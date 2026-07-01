@@ -82,6 +82,16 @@ export async function deleteCharacter(id) {
   return db.characters.delete(id)
 }
 
+export async function deleteCharacterWithThreads(id) {
+  const threads = await db.threads.where('characterId').equals(id).toArray()
+  await Promise.all(
+    threads.map((t) =>
+      db.messages.where('threadId').equals(t.id).delete().then(() => db.threads.delete(t.id)),
+    ),
+  )
+  await db.characters.delete(id)
+}
+
 async function seedCharacters() {
   const now = new Date()
   await db.characters.bulkAdd(

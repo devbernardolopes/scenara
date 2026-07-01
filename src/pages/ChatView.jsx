@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../hooks/useModal'
+import { useConfirm } from '../lib/confirm'
 import { Send } from '../lib/icons'
 import Avatar from '../components/shared/Avatar'
 import { getThread, deleteThread } from '../services/threads'
@@ -20,6 +21,7 @@ function ChatView() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const { confirm } = useConfirm()
 
   async function loadData() {
     setLoading(true)
@@ -63,6 +65,14 @@ function ChatView() {
   }
 
   async function handleDelete() {
+    const ok = await confirm({
+      title: t('deleteTitle'),
+      message: t('deleteConfirm'),
+      confirmLabel: t('deleteThread'),
+      cancelLabel: t('common:cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
     await deleteThread(threadId)
     window.dispatchEvent(new CustomEvent('threads-changed'))
     navigate('/')

@@ -14,7 +14,24 @@
     "subtitle": "Navegue e selecione personagens para iniciar um novo chat.",
     "characterCard": "Personagem {{index}}",
     "characterDesc": "Uma breve descrição deste personagem.",
-    "createCharacter": "Criar Personagem"
+    "createCharacter": "Criar Personagem",
+    "startChat": "Iniciar Chat",
+    "noCharacters": "Nenhum personagem ainda. Crie um para começar!",
+    "loading": "Carregando…",
+    "actions": {
+      "delete": "Excluir personagem",
+      "favorite": "Favoritar personagem",
+      "duplicate": "Duplicar personagem",
+      "export": "Exportar personagem",
+      "selectPersona": "Selecionar persona"
+    },
+    "confirmDelete": {
+      "title": "Excluir Personagem",
+      "message": "Tem certeza que deseja excluir {name}? Todos os chats associados serão permanentemente deletados.",
+      "confirm": "Excluir"
+    }
   },
-  "loading": "Carregando…"
+  "loading": "Carregando…",
+  "cancel": "Cancelar",
+  "confirm": "Confirmar"
 }

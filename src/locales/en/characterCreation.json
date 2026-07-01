@@ -32,5 +32,6 @@
   "editPersona": "Edit",
   "deletePersona": "Delete",
   "noPersonas": "No personas yet. Create one to define how you appear in chats.",
-  "confirmDelete": "Are you sure you want to delete this persona?"
+  "confirmDelete": "Are you sure you want to delete this persona?",
+  "confirmDeleteTitle": "Delete Persona"
 }

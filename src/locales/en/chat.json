@@ -5,6 +5,7 @@
   "send": "Send",
   "editPersona": "Edit Persona",
   "loading": "Loading…",
+  "deleteTitle": "Delete conversation",
   "deleteConfirm": "Delete this conversation?",
   "deleteThread": "Delete",
   "characterTag": "Character"
