@@ -5,6 +5,7 @@ import { CATEGORIES, SETTINGS, setSetting } from '../../../services/settings'
 import SettingsSidebar from './SettingsSidebar'
 import SettingsSearch from './SettingsSearch'
 import SettingRow from './SettingRow'
+import CloseButton from '../../shared/CloseButton'
 import pkg from '../../../../package.json'
 
 function SettingsModal() {
@@ -29,13 +30,7 @@ function SettingsModal() {
     <div className="flex flex-col max-h-[80vh]">
       <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
         <h2 className="text-xl font-semibold text-text">{t('title')}</h2>
-        <button
-          onClick={closeModal}
-          className="text-tertiary hover:text-text min-h-[44px] min-w-[44px] flex items-center justify-center"
-          aria-label="Close"
-        >
-          ✕
-        </button>
+        <CloseButton onClick={closeModal} />
       </div>
 
       <div className="px-6 pt-4 pb-2 shrink-0 space-y-2">

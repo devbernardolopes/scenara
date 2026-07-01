@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getAllThreads } from '../../services/threads'
+import CloseButton from '../shared/CloseButton'
 
 function Sidebar({ open, onClose }) {
   const { t } = useTranslation('common')
@@ -43,13 +44,9 @@ function Sidebar({ open, onClose }) {
           >
             {t('appName')}
           </Link>
-          <button
-            onClick={onClose}
-            className="text-tertiary hover:text-text md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center"
-            aria-label={t('sidebar.close')}
-          >
-            ✕
-          </button>
+          <div className="md:hidden">
+            <CloseButton onClick={onClose} label={t('sidebar.close')} />
+          </div>
         </div>
 
         <nav className="p-4">

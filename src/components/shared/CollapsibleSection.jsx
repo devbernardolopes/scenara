@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { getUIState, setUIState } from '../../services/uiState'
+import { ChevronDown } from '../../lib/icons'
 
 function CollapsibleSection({ label, summary, hasContent, storageKey, defaultExpanded = true, children }) {
   const [open, setOpen] = useState(defaultExpanded)
@@ -37,14 +38,7 @@ function CollapsibleSection({ label, summary, hasContent, storageKey, defaultExp
         </span>
         <span className="flex items-center gap-2">
           {summary && <span className="text-xs text-tertiary">{summary}</span>}
-          <svg
-            className={`w-4 h-4 text-tertiary transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <ChevronDown className={`w-4 h-4 text-tertiary transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
         </span>
       </button>
       <div

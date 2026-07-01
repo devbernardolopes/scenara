@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../hooks/useModal'
+import { Send } from '../lib/icons'
 import { getThread, deleteThread } from '../services/threads'
 import { getCharacter } from '../services/characters'
 import { getMessagesByThread, createMessage } from '../services/messages'
@@ -155,6 +156,7 @@ function ChatView() {
             disabled={sending || !input.trim()}
             className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
           >
+            <Send className="w-4 h-4" />
             {t('send')}
           </button>
         </div>

@@ -4,6 +4,8 @@ import { useModal } from '../../hooks/useModal'
 import db from '../../db'
 import { createCharacter as createPersona } from '../../services/characters'
 import CollapsibleSection from '../shared/CollapsibleSection'
+import CloseButton from '../shared/CloseButton'
+import { Plus } from '../../lib/icons'
 
 function PersonaEditorModal() {
   const { t } = useTranslation('characterCreation')
@@ -76,14 +78,7 @@ function PersonaEditorModal() {
           <h2 className="text-xl font-semibold text-text">
             {editing === 'new' ? t('addPersona') : t('editPersona')}
           </h2>
-          <button
-            type="button"
-            onClick={cancelEdit}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
-            aria-label="Close"
-          >
-            ✕
-          </button>
+        <CloseButton onClick={cancelEdit} />
         </div>
 
         <div className="space-y-4">
@@ -173,14 +168,7 @@ function PersonaEditorModal() {
           <h2 className="text-xl font-semibold text-text">{t('personaTitle')}</h2>
           <p className="text-sm text-secondary mt-1">{t('personaSubtitle')}</p>
         </div>
-        <button
-          type="button"
-          onClick={closeModal}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
-          aria-label="Close"
-        >
-          ✕
-        </button>
+        <CloseButton onClick={closeModal} />
       </div>
 
       {personas.length === 0 ? (
@@ -216,7 +204,7 @@ function PersonaEditorModal() {
         onClick={startCreate}
         className="mt-4 w-full min-h-[44px] border-2 border-dashed border-border rounded-lg text-sm text-secondary hover:text-text hover:border-border-light"
       >
-        + {t('addPersona')}
+        <Plus className="w-4 h-4" /> {t('addPersona')}
       </button>
     </div>
   )

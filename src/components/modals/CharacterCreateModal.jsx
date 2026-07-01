@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { createCharacter } from '../../services/characters'
 import CollapsibleSection from '../shared/CollapsibleSection'
+import CloseButton from '../shared/CloseButton'
 
 function CharacterCreateModal() {
   const { t } = useTranslation('characterCreation')
@@ -42,14 +43,7 @@ function CharacterCreateModal() {
     <form onSubmit={handleSubmit} className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-text">{t('title')}</h2>
-        <button
-          type="button"
-          onClick={closeModal}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
-          aria-label="Close"
-        >
-          ✕
-        </button>
+        <CloseButton onClick={closeModal} />
       </div>
 
       <div className="space-y-4">
