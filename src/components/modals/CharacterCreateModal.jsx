@@ -8,7 +8,7 @@ import CloseButton from '../shared/CloseButton'
 
 function CharacterCreateModal({ character: existing }) {
   const { t } = useTranslation('characterCreation')
-  const { closeModal } = useModal()
+  const { closeModal, setCloseGuard } = useModal()
   const { promptSave } = useSaveConfirm()
   const isEditing = Boolean(existing)
 
@@ -32,20 +32,23 @@ function CharacterCreateModal({ character: existing }) {
   const handleCloseRef = useRef()
   handleCloseRef.current = handleCloseAttempt
 
+  const savePendingRef = useRef(false)
+
   useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') {
-        if (isDirty) {
-          e.stopImmediatePropagation()
-          handleCloseRef.current()
-        } else {
-          closeModal()
-        }
-      }
+    if (isDirty) {
+      setCloseGuard(() => {
+        if (savePendingRef.current) return false
+        savePendingRef.current = true
+        handleCloseRef.current().finally(() => {
+          savePendingRef.current = false
+        })
+        return false
+      })
+    } else {
+      setCloseGuard(null)
     }
-    document.addEventListener('keydown', handleKeyDown, true)
-    return () => document.removeEventListener('keydown', handleKeyDown, true)
-  }, [isDirty, closeModal])
+    return () => setCloseGuard(null)
+  }, [isDirty, setCloseGuard])
 
   function update(field) {
     return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }))
