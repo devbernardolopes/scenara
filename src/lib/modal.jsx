@@ -74,7 +74,7 @@ export function ModalProvider({ children }) {
               }
             >
               <div
-                className="bg-surface rounded-lg shadow-surface-lg max-w-4xl w-full mx-4 h-[65vh] max-h-[85vh] flex flex-col overflow-hidden"
+                className="bg-surface rounded-lg shadow-surface-lg max-w-4xl w-full mx-4 h-[75vh] max-h-[85vh] flex flex-col overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
               >
                 <ModalComponent {...state.props} />
