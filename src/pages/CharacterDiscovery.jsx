@@ -159,11 +159,11 @@ function CharacterDiscovery() {
   }
 
   return (
-    <div className="p-4 md:p-8">
-      {characters.length === 0 ? (
-        <p className="text-secondary text-sm py-8 text-center">{t('discovery.noCharacters')}</p>
-      ) : (
-        <>
+    <>
+      <div className="p-4 md:p-8">
+        {characters.length === 0 ? (
+          <p className="text-secondary text-sm py-8 text-center">{t('discovery.noCharacters')}</p>
+        ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {visibleCharacters.map((char) => (
               <div
@@ -209,14 +209,18 @@ function CharacterDiscovery() {
               </div>
             ))}
           </div>
+        )}
+      </div>
+      {characters.length > 0 && (
+        <div className="sticky bottom-0 px-4 md:px-8 pb-4 md:pb-8 pt-4 bg-surface border-t border-border">
           <Pagination
             currentPage={safePage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
           />
-        </>
+        </div>
       )}
-    </div>
+    </>
   )
 }
 
