@@ -120,15 +120,6 @@ function ApiSettingsPanel() {
   async function handleUseChatForAllChange(val) {
     setUseChatForAll(val)
     await setSetting('api.useChatForAll', val ? 1 : 0)
-    const chatProfileId = profileAssignments.chat
-    if (val && chatProfileId) {
-      for (const kind of REQUEST_KINDS) {
-        if (kind.id !== 'chat') {
-          setProfileAssignments((prev) => ({ ...prev, [kind.id]: chatProfileId }))
-          await setSetting(`requestKind.${kind.id}.profileId`, chatProfileId)
-        }
-      }
-    }
   }
 
   if (loading) {

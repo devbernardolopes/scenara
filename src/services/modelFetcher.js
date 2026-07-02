@@ -46,7 +46,7 @@ async function fetchOpenAIModels(baseUrl, apiKey, signal, modelsPath) {
 }
 
 async function fetchHordeModels(signal) {
-  const url = 'https://horde.koboldai.net/api/v2/status/models'
+  const url = 'https://stablehorde.net/api/v2/status/models?type=text&model_state=all'
   const res = await fetch(url, { signal })
   if (!res.ok) {
     const body = await res.text().catch(() => '')
@@ -65,7 +65,7 @@ export async function fetchModels(providerId, { signal, hordeMethod } = {}) {
       const keyEntry = await getActiveKey(providerId)
       const apiKey = keyEntry?.value || null
       const models = await fetchOpenAIModels(
-        'https://horde.koboldai.net',
+        'https://stablehorde.net',
         apiKey,
         signal,
         '/v1/models',

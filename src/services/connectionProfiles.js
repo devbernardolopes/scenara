@@ -84,8 +84,16 @@ export async function usedByProfileCount(providerId, keyId) {
 }
 
 export async function getEffectiveProfileFor(requestKind) {
-  let profileId = await getSetting(`requestKind.${requestKind}.profileId`)
-  if (!profileId && requestKind !== 'chat') {
+  let profileId
+  if (requestKind !== 'chat') {
+    const useChatForAll = await getSetting('api.useChatForAll')
+    profileId = useChatForAll
+      ? await getSetting('requestKind.chat.profileId')
+      : await getSetting(`requestKind.${requestKind}.profileId`)
+    if (!profileId) {
+      profileId = await getSetting('requestKind.chat.profileId')
+    }
+  } else {
     profileId = await getSetting('requestKind.chat.profileId')
   }
   if (!profileId) return null

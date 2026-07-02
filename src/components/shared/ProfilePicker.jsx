@@ -38,7 +38,7 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
   return (
     <div
       ref={ref}
-      className="absolute bottom-full mb-2 right-0 w-72 max-h-64 overflow-y-auto bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1"
+      className="absolute top-full mt-1 right-0 w-72 max-h-64 overflow-y-auto bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1"
     >
       <p className="px-3 py-2 text-xs font-medium text-tertiary uppercase tracking-wider">
         {label || t('profilePicker.title')}
