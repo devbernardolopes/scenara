@@ -185,12 +185,15 @@ export function maskKey(value) {
   return '••••' + value.slice(-4)
 }
 
-function cachedModelsKey(providerId) {
+function cachedModelsKey(providerId, hordeMethod) {
+  if (providerId === 'ai-horde' && hordeMethod) {
+    return `api.${providerId}.cachedModels.${hordeMethod}`
+  }
   return `api.${providerId}.cachedModels`
 }
 
-export async function getCachedModels(providerId) {
-  const raw = await getSetting(cachedModelsKey(providerId))
+export async function getCachedModels(providerId, hordeMethod) {
+  const raw = await getSetting(cachedModelsKey(providerId, hordeMethod))
   try {
     const parsed = JSON.parse(raw)
     return Array.isArray(parsed) ? parsed : []
@@ -199,6 +202,6 @@ export async function getCachedModels(providerId) {
   }
 }
 
-export async function setCachedModels(providerId, models) {
-  await setSetting(cachedModelsKey(providerId), JSON.stringify(models))
+export async function setCachedModels(providerId, models, hordeMethod) {
+  await setSetting(cachedModelsKey(providerId, hordeMethod), JSON.stringify(models))
 }

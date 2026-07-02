@@ -26,8 +26,8 @@ const STRATEGIES = {
   'lm-studio': { type: 'openai', baseUrl: null, needsKey: false },
 }
 
-async function fetchOpenAIModels(baseUrl, apiKey, signal) {
-  const url = `${baseUrl}/openai/v1/models`
+async function fetchOpenAIModels(baseUrl, apiKey, signal, modelsPath) {
+  const url = modelsPath ? `${baseUrl}${modelsPath}` : `${baseUrl}/openai/v1/models`
   const headers = { 'Content-Type': 'application/json' }
   if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`
 
@@ -59,7 +59,25 @@ async function fetchHordeModels(signal) {
   return models
 }
 
-export async function fetchModels(providerId, { signal } = {}) {
+export async function fetchModels(providerId, { signal, hordeMethod } = {}) {
+  if (providerId === 'ai-horde') {
+    if (hordeMethod === 'openai-compatible') {
+      const keyEntry = await getActiveKey(providerId)
+      const apiKey = keyEntry?.value || null
+      const models = await fetchOpenAIModels(
+        'https://horde.koboldai.net',
+        apiKey,
+        signal,
+        '/v1/models',
+      )
+      startCooldown()
+      return models
+    }
+    const models = await fetchHordeModels(signal)
+    startCooldown()
+    return models
+  }
+
   const strategy = STRATEGIES[providerId]
   if (!strategy) throw new Error(`No fetch strategy defined for provider "${providerId}"`)
 
@@ -77,8 +95,6 @@ export async function fetchModels(providerId, { signal } = {}) {
     const baseUrl = strategy.baseUrl
     if (!baseUrl) throw new Error(`No base URL configured for ${providerId}`)
     models = await fetchOpenAIModels(baseUrl, apiKey, signal)
-  } else if (strategy.type === 'horde') {
-    models = await fetchHordeModels(signal)
   } else {
     throw new Error(`Unknown fetch strategy "${strategy.type}" for ${providerId}`)
   }

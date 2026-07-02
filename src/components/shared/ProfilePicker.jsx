@@ -10,10 +10,8 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
   const ref = useRef(null)
 
   useEffect(() => {
-    if (open) {
-      getAllProfiles().then(setProfiles)
-    }
-  }, [open])
+    getAllProfiles().then(setProfiles)
+  }, [])
 
   useEffect(() => {
     if (!open) return

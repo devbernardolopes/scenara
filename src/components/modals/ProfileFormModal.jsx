@@ -3,7 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
-import { PROVIDERS, getKeys, getCachedModels } from '../../services/apiProviders'
+import {
+  PROVIDERS,
+  getKeys,
+  getCachedModels,
+  setCachedModels as persistCachedModels,
+} from '../../services/apiProviders'
+import { fetchModels, getCooldownRemaining } from '../../services/modelFetcher'
 import { createProfile, updateProfile } from '../../services/connectionProfiles'
 import ModelSelect from './settings/controls/ModelSelect'
 import SettingSlider from './settings/controls/SettingSlider'
@@ -92,6 +98,8 @@ function ProfileFormModal({ profile }) {
   const [saving, setSaving] = useState(false)
   const [keys, setKeys] = useState([])
   const [cachedModels, setCachedModels] = useState([])
+  const [fetching, setFetching] = useState(false)
+  const abortRef = useRef(null)
   const savePendingRef = useRef(false)
 
   const selectedProvider = PROVIDERS.find((p) => p.id === form.providerId)
@@ -111,13 +119,16 @@ function ProfileFormModal({ profile }) {
     }
   }, [form.providerId])
 
+  const hordeMethod =
+    form.providerId === 'ai-horde' ? form.params.hordeMethod || 'native' : undefined
+
   useEffect(() => {
     if (form.providerId) {
-      getCachedModels(form.providerId).then(setCachedModels)
+      getCachedModels(form.providerId, hordeMethod).then(setCachedModels)
     } else {
       setCachedModels([])
     }
-  }, [form.providerId])
+  }, [form.providerId, hordeMethod])
 
   const handleCloseRef = useRef()
   handleCloseRef.current = handleCloseAttempt
@@ -173,6 +184,30 @@ function ProfileFormModal({ profile }) {
     if (!form.name.trim() || !form.providerId || saving) return
     await saveProfile()
     closeModal()
+  }
+
+  async function handleRefresh() {
+    if (fetching) return
+    setFetching(true)
+    abortRef.current = new AbortController()
+    try {
+      const models = await fetchModels(form.providerId, {
+        signal: abortRef.current.signal,
+        hordeMethod,
+      })
+      await persistCachedModels(form.providerId, models, hordeMethod)
+      setCachedModels(models)
+    } catch (err) {
+      if (err.name !== 'AbortError') throw err
+    } finally {
+      setFetching(false)
+      abortRef.current = null
+    }
+  }
+
+  function handleCancelFetch() {
+    abortRef.current?.abort()
+    abortRef.current = null
   }
 
   async function handleCloseAttempt() {
@@ -302,6 +337,10 @@ function ProfileFormModal({ profile }) {
                 value={form.model}
                 onChange={(v) => setForm((prev) => ({ ...prev, model: v }))}
                 models={cachedModels}
+                onRefresh={handleRefresh}
+                fetching={fetching}
+                onCancelFetch={handleCancelFetch}
+                cooldownRemaining={getCooldownRemaining()}
               />
             ) : (
               <input

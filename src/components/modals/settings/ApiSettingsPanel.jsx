@@ -22,7 +22,7 @@ function ProfileAssignmentRow({ kind, currentId, onAssign }) {
 
   useEffect(() => {
     getAllProfiles().then(setProfiles)
-  }, [open])
+  }, [])
 
   useEffect(() => {
     if (currentId) {
@@ -113,6 +113,7 @@ function ApiSettingsPanel() {
     await setSetting(`requestKind.${kindId}.profileId`, profileId)
     if (kindId === 'chat') {
       setUseChatForAll(false)
+      await setSetting('api.useChatForAll', false)
     }
   }
 
