@@ -4,6 +4,7 @@ import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
 import CollapsibleSection from '../shared/CollapsibleSection'
+import Avatar from '../shared/Avatar'
 import { createPersona, updatePersona, getAllPersonas } from '../../services/personas'
 import { estimateTokens } from '../../services/tokenEstimator'
 
@@ -193,7 +194,8 @@ function PersonaFormModal({ persona }) {
           <label className="block text-sm font-medium text-text mb-1">
             {t('persona.form.avatarLabel')}
           </label>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <Avatar src={form.avatar} size="xl" className="shrink-0" />
             <input
               className={inputClass}
               value={form.avatar}
