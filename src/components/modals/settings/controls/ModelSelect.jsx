@@ -3,7 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { Star, Check, RefreshCw, X } from '../../../../lib/icons'
 import { getFavModels, toggleFavModel } from '../../../../services/apiProviders'
 
-function ModelSelect({ providerId, value, onChange, models = [], onRefresh, fetching, onCancelFetch, cooldownRemaining }) {
+function ModelSelect({
+  providerId,
+  value,
+  onChange,
+  models = [],
+  onRefresh,
+  fetching,
+  onCancelFetch,
+  cooldownRemaining,
+  modelMeta,
+}) {
   const { t } = useTranslation('settings')
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -99,6 +109,30 @@ function ModelSelect({ providerId, value, onChange, models = [], onRefresh, fetc
                       />
                     </span>
                     <span className="flex-1 truncate">{model}</span>
+                    {modelMeta?.[model] && (
+                      <div className="flex items-center gap-1 shrink-0">
+                        {modelMeta[model].count !== undefined && (
+                          <span className="px-1.5 py-0.5 text-[10px] leading-none rounded bg-blue-100 text-blue-700 font-medium">
+                            {modelMeta[model].count}
+                          </span>
+                        )}
+                        {modelMeta[model].queued !== undefined && (
+                          <span className="px-1.5 py-0.5 text-[10px] leading-none rounded bg-yellow-100 text-yellow-700 font-medium">
+                            {modelMeta[model].queued}
+                          </span>
+                        )}
+                        {modelMeta[model].eta !== undefined && (
+                          <span className="px-1.5 py-0.5 text-[10px] leading-none rounded bg-green-100 text-green-700 font-medium">
+                            {modelMeta[model].eta}s
+                          </span>
+                        )}
+                        {modelMeta[model].performance !== undefined && (
+                          <span className="px-1.5 py-0.5 text-[10px] leading-none rounded bg-purple-100 text-purple-700 font-medium">
+                            {modelMeta[model].performance}tok/s
+                          </span>
+                        )}
+                      </div>
+                    )}
                     {value === model && <Check className="w-4 h-4 text-primary shrink-0" />}
                   </button>
                 )

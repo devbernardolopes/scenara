@@ -39,8 +39,8 @@ async function fetchOpenAIModels(baseUrl, apiKey, signal, modelsPath) {
 
   const json = await res.json()
   const models = (json.data || [])
-    .filter((m) => m.id && m.active !== false)
-    .map((m) => m.id)
+    .filter((m) => (m.id || m.name) && m.active !== false)
+    .map((m) => m.name || m.id)
     .sort((a, b) => a.localeCompare(b))
   return models
 }
@@ -53,10 +53,21 @@ async function fetchHordeModels(signal) {
     throw new Error(`HTTP ${res.status}${body ? `: ${body}` : ''}`)
   }
   const json = await res.json()
-  const models = Object.keys(json)
-    .filter((id) => json[id]?.queued !== undefined)
+  const entries = Array.isArray(json) ? json : []
+  const meta = {}
+  const models = entries
+    .filter((entry) => entry?.name)
+    .map((entry) => {
+      meta[entry.name] = {
+        count: entry.count,
+        queued: entry.queued,
+        eta: entry.eta,
+        performance: entry.performance,
+      }
+      return entry.name
+    })
     .sort((a, b) => a.localeCompare(b))
-  return models
+  return { models, meta }
 }
 
 export async function fetchModels(providerId, { signal, hordeMethod } = {}) {
@@ -65,17 +76,17 @@ export async function fetchModels(providerId, { signal, hordeMethod } = {}) {
       const keyEntry = await getActiveKey(providerId)
       const apiKey = keyEntry?.value || null
       const models = await fetchOpenAIModels(
-        'https://stablehorde.net',
+        'https://oai.aihorde.net',
         apiKey,
         signal,
-        '/v1/models',
+        '/v1/models?min_size=0&max_size=-1',
       )
       startCooldown()
-      return models
+      return { models, meta: {} }
     }
-    const models = await fetchHordeModels(signal)
+    const result = await fetchHordeModels(signal)
     startCooldown()
-    return models
+    return result
   }
 
   const strategy = STRATEGIES[providerId]
@@ -100,5 +111,5 @@ export async function fetchModels(providerId, { signal, hordeMethod } = {}) {
   }
 
   startCooldown()
-  return models
+  return { models, meta: {} }
 }

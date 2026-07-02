@@ -8,6 +8,8 @@ import {
   getKeys,
   getCachedModels,
   setCachedModels as persistCachedModels,
+  getCachedModelMeta,
+  setCachedModelMeta as persistCachedModelMeta,
 } from '../../services/apiProviders'
 import { fetchModels, getCooldownRemaining } from '../../services/modelFetcher'
 import { createProfile, updateProfile } from '../../services/connectionProfiles'
@@ -98,6 +100,7 @@ function ProfileFormModal({ profile }) {
   const [saving, setSaving] = useState(false)
   const [keys, setKeys] = useState([])
   const [cachedModels, setCachedModels] = useState([])
+  const [modelMeta, setModelMeta] = useState({})
   const [fetching, setFetching] = useState(false)
   const abortRef = useRef(null)
   const savePendingRef = useRef(false)
@@ -125,8 +128,14 @@ function ProfileFormModal({ profile }) {
   useEffect(() => {
     if (form.providerId) {
       getCachedModels(form.providerId, hordeMethod).then(setCachedModels)
+      if (form.providerId === 'ai-horde' && hordeMethod === 'native') {
+        getCachedModelMeta(form.providerId, hordeMethod).then(setModelMeta)
+      } else {
+        setModelMeta({})
+      }
     } else {
       setCachedModels([])
+      setModelMeta({})
     }
   }, [form.providerId, hordeMethod])
 
@@ -191,12 +200,19 @@ function ProfileFormModal({ profile }) {
     setFetching(true)
     abortRef.current = new AbortController()
     try {
-      const models = await fetchModels(form.providerId, {
+      const result = await fetchModels(form.providerId, {
         signal: abortRef.current.signal,
         hordeMethod,
       })
+      const { models, meta } = result
       await persistCachedModels(form.providerId, models, hordeMethod)
       setCachedModels(models)
+      if (meta && Object.keys(meta).length > 0) {
+        await persistCachedModelMeta(form.providerId, meta, hordeMethod)
+        setModelMeta(meta)
+      } else {
+        setModelMeta({})
+      }
     } catch (err) {
       if (err.name !== 'AbortError') throw err
     } finally {
@@ -337,6 +353,7 @@ function ProfileFormModal({ profile }) {
                 value={form.model}
                 onChange={(v) => setForm((prev) => ({ ...prev, model: v }))}
                 models={cachedModels}
+                modelMeta={modelMeta}
                 onRefresh={handleRefresh}
                 fetching={fetching}
                 onCancelFetch={handleCancelFetch}

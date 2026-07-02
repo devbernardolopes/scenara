@@ -205,3 +205,20 @@ export async function getCachedModels(providerId, hordeMethod) {
 export async function setCachedModels(providerId, models, hordeMethod) {
   await setSetting(cachedModelsKey(providerId, hordeMethod), JSON.stringify(models))
 }
+
+function cachedModelMetaKey(providerId, hordeMethod) {
+  return `api.${providerId}.cachedModelsMeta.${hordeMethod || 'native'}`
+}
+
+export async function getCachedModelMeta(providerId, hordeMethod) {
+  const raw = await getSetting(cachedModelMetaKey(providerId, hordeMethod))
+  try {
+    return JSON.parse(raw) || {}
+  } catch {
+    return {}
+  }
+}
+
+export async function setCachedModelMeta(providerId, meta, hordeMethod) {
+  await setSetting(cachedModelMetaKey(providerId, hordeMethod), JSON.stringify(meta))
+}
