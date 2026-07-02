@@ -184,11 +184,12 @@ function WritingInstructionManagementModal() {
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className={`border rounded-lg p-3 bg-surface transition-shadow ${
+                    className={`border rounded-lg p-3 bg-surface transition-shadow cursor-pointer ${
                       selectedIds.has(item.id)
                         ? 'border-primary ring-1 ring-primary'
                         : 'border-border'
                     }`}
+                    onClick={() => startEdit(item)}
                   >
                     <div className="flex items-start gap-3">
                       <label

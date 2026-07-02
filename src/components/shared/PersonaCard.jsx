@@ -65,7 +65,7 @@ function PersonaCard({
         </div>
       </div>
 
-      <div className="flex items-center gap-1 mt-1 -ml-1" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center gap-1 mt-1 -ml-1">
         <IconButton
           icon={Edit3}
           label={t('persona.actions.edit')}
