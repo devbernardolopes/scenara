@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import { createCharacter, updateCharacter } from '../../services/characters'
+import { getSetting } from '../../services/settings'
 import CloseButton from '../shared/CloseButton'
 import CharacterSidebar from './character/CharacterSidebar'
 import CharacterSection from './character/CharacterSection'
@@ -17,20 +18,33 @@ const INITIAL_FORM = {
   greeting: '',
   scenario: '',
   sampleChat: '',
-  autoTitle: false,
-  autoTitleThreshold: 256,
+  autoTitle: true,
+  autoTitleThreshold: 3,
   autoTitleSystemInstructions: '',
   autoTitleUserInstructions: '',
-  memory: false,
-  memoryThreshold: 1024,
+  memory: true,
+  memoryThreshold: 7,
   summarizationSystemInstructions: '',
   summarizationUserInstructions: '',
-  firstMessage: false,
-  userPersonaPrefix: false,
-  includeOOC: false,
-  postProcessing: false,
-  characterAvatarScale: '2x',
-  userPersonaAvatarScale: '2x',
+  firstMessage: true,
+  userPersonaPrefix: true,
+  includeOOC: true,
+  postProcessing: true,
+  characterAvatarScale: '1x',
+  userPersonaAvatarScale: '1x',
+}
+
+const DEFAULTS_MAP = {
+  defaultAutoTitle: 'autoTitle',
+  defaultAutoTitleThreshold: 'autoTitleThreshold',
+  defaultMemory: 'memory',
+  defaultMemoryThreshold: 'memoryThreshold',
+  defaultFirstMessage: 'firstMessage',
+  defaultUserPersonaPrefix: 'userPersonaPrefix',
+  defaultIncludeOOC: 'includeOOC',
+  defaultPostProcessing: 'postProcessing',
+  defaultCharacterAvatarScale: 'characterAvatarScale',
+  defaultUserPersonaAvatarScale: 'userPersonaAvatarScale',
 }
 
 function buildInitialForm(existing) {
@@ -63,6 +77,24 @@ function CharacterCreateModal({ character: existing }) {
   const [saving, setSaving] = useState(false)
   const [activeSection, setActiveSection] = useState('character')
   const savePendingRef = useRef(false)
+
+  useEffect(() => {
+    if (isEditing) return
+    const keys = Object.keys(DEFAULTS_MAP)
+    Promise.all(keys.map((k) => getSetting(k))).then((values) => {
+      const patches = {}
+      keys.forEach((key, i) => {
+        const val = values[i]
+        if (val !== null && val !== undefined) {
+          patches[DEFAULTS_MAP[key]] = val
+        }
+      })
+      if (Object.keys(patches).length === 0) return
+      const merged = { ...form, ...patches }
+      initialRef.current = merged
+      setForm(merged)
+    })
+  }, [isEditing]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isDirty = Object.keys(initialRef.current).some(
     (key) => form[key] !== initialRef.current[key],

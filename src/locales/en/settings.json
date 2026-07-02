@@ -8,6 +8,7 @@
     "chat": "Chat",
     "prompting": "Prompting",
     "persona": "Persona",
+    "defaults": "Defaults",
     "tts": "TTS",
     "advanced": "Advanced"
   },
@@ -225,6 +226,48 @@
       "invalidFormat": "Invalid file format.",
       "fileError": "Could not read file.",
       "importSuccess": "Imported {{count}} writing instruction(s)"
+    }
+  },
+  "defaults": {
+    "autoTitle": {
+      "label": "Auto-title",
+      "desc": "Default state for the auto-title toggle when creating a new character."
+    },
+    "autoTitleThreshold": {
+      "label": "Auto-title Threshold",
+      "desc": "Default threshold for auto-title."
+    },
+    "memory": {
+      "label": "Memory",
+      "desc": "Default state for the memory toggle when creating a new character."
+    },
+    "memoryThreshold": {
+      "label": "Memory Threshold",
+      "desc": "Default threshold for memory."
+    },
+    "firstMessage": {
+      "label": "First Message",
+      "desc": "Default state for the first message toggle."
+    },
+    "userPersonaPrefix": {
+      "label": "User Persona Prefix",
+      "desc": "Default state for the user persona prefix toggle."
+    },
+    "includeOOC": {
+      "label": "Include OOC",
+      "desc": "Default state for the include OOC toggle."
+    },
+    "postProcessing": {
+      "label": "Post-processing",
+      "desc": "Default state for the post-processing toggle."
+    },
+    "characterAvatarScale": {
+      "label": "Character Avatar Scale",
+      "desc": "Default character avatar scale for new characters."
+    },
+    "userPersonaAvatarScale": {
+      "label": "User Persona Avatar Scale",
+      "desc": "Default user persona avatar scale for new characters."
     }
   },
   "versionLabel": "Version",
