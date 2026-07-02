@@ -37,14 +37,14 @@ import {
 } from '../../lib/icons'
 
 const COLOR_PRESETS = [
-  '#fef2f2',
-  '#fff7ed',
-  '#fefce8',
-  '#f0fdf4',
-  '#ecfeff',
-  '#eff6ff',
-  '#faf5ff',
-  '#fdf2f8',
+  '#ef4444',
+  '#f97316',
+  '#eab308',
+  '#22c55e',
+  '#14b8a6',
+  '#3b82f6',
+  '#a855f7',
+  '#ec4899',
   '',
 ]
 
