@@ -24,6 +24,7 @@ export const CATEGORIES = [
   { id: 'prompting', labelKey: 'settings:categories.prompting' },
   { id: 'tts', labelKey: 'settings:categories.tts' },
   { id: 'advanced', labelKey: 'settings:categories.advanced' },
+  { id: 'database', labelKey: 'settings:categories.database' },
 ]
 
 export const SETTINGS = [

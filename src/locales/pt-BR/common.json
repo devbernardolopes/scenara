@@ -111,20 +111,6 @@
     "empty": "Nenhuma persona ainda",
     "default": "Padrão"
   },
-  "database": {
-    "title": "Database",
-    "export": "Export Database",
-    "import": "Import Database",
-    "reset": "Reset Database",
-    "exportDesc": "Export all data to a JSON file for backup or transfer.",
-    "importDesc": "Import data from a previously exported JSON file.",
-    "resetDesc": "Erase all data and restore the application to its original state.",
-    "resetConfirmTitle": "Reset Database",
-    "resetConfirmMessage": "This will permanently delete all your data, including characters, chats, personas, settings, API keys, and writing instructions. The application will be restored to its original state. This action cannot be undone.",
-    "resetSuccess": "Database has been reset to its default state",
-    "exportNotImplemented": "Export is not yet implemented",
-    "importNotImplemented": "Import is not yet implemented"
-  },
   "saveDialog": {
     "title": "Alterações não salvas",
     "message": "Você tem alterações não salvas. O que deseja fazer?",

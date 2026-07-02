@@ -29,7 +29,6 @@ import {
   Zap,
   BookOpen,
   Tags,
-  Database,
   Plus,
   Upload,
   Globe,
@@ -491,13 +490,6 @@ function Sidebar({ open, onClose }) {
           <button className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover">
             <Tags className="w-4 h-4" />
             {t('sidebar.tags')}
-          </button>
-          <button
-            onClick={() => openModal('database')}
-            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
-          >
-            <Database className="w-4 h-4" />
-            {t('sidebar.database')}
           </button>
           <button
             onClick={() => openModal('settings')}

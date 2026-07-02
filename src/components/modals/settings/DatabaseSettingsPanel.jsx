@@ -1,16 +1,13 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useModal } from '../../hooks/useModal'
-import { useConfirm } from '../../lib/confirm'
-import { showToast } from '../../lib/toast'
-import { resetDatabase } from '../../services/database'
-import { Download, Upload, AlertTriangle } from '../../lib/icons'
-import CloseButton from '../shared/CloseButton'
+import { useConfirm } from '../../../lib/confirm'
+import { showToast } from '../../../lib/toast'
+import { resetDatabase } from '../../../services/database'
+import { Download, Upload, AlertTriangle } from '../../../lib/icons'
 
-function DatabaseModal() {
-  const { closeModal } = useModal()
+function DatabaseSettingsPanel() {
   const { confirm } = useConfirm()
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('settings')
   const [resetting, setResetting] = useState(false)
 
   const handleExport = () => {
@@ -25,8 +22,8 @@ function DatabaseModal() {
     const confirmed = await confirm({
       title: t('database.resetConfirmTitle'),
       message: t('database.resetConfirmMessage'),
-      confirmLabel: t('confirm'),
-      cancelLabel: t('cancel'),
+      confirmLabel: t('common:confirm'),
+      cancelLabel: t('common:cancel'),
       variant: 'danger',
     })
     if (!confirmed) return
@@ -35,7 +32,6 @@ function DatabaseModal() {
     try {
       await resetDatabase()
       showToast(t('database.resetSuccess'), { type: 'success' })
-      closeModal()
     } catch (err) {
       showToast(err.message, { type: 'error' })
     } finally {
@@ -64,35 +60,29 @@ function DatabaseModal() {
   }
 
   return (
-    <div className="flex flex-col min-h-0 flex-1">
-      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
-        <h2 className="text-xl font-semibold text-text">{t('database.title')}</h2>
-        <CloseButton onClick={closeModal} />
-      </div>
-      <div className="flex-1 flex flex-col gap-3 p-6 overflow-y-auto justify-center">
-        <OptionCard
-          icon={Download}
-          label={t('database.export')}
-          desc={t('database.exportDesc')}
-          onClick={handleExport}
-        />
-        <OptionCard
-          icon={Upload}
-          label={t('database.import')}
-          desc={t('database.importDesc')}
-          onClick={handleImport}
-        />
-        <OptionCard
-          icon={AlertTriangle}
-          label={t('database.reset')}
-          desc={t('database.resetDesc')}
-          onClick={handleReset}
-          disabled={resetting}
-          danger
-        />
-      </div>
+    <div className="space-y-3">
+      <OptionCard
+        icon={Download}
+        label={t('database.export')}
+        desc={t('database.exportDesc')}
+        onClick={handleExport}
+      />
+      <OptionCard
+        icon={Upload}
+        label={t('database.import')}
+        desc={t('database.importDesc')}
+        onClick={handleImport}
+      />
+      <OptionCard
+        icon={AlertTriangle}
+        label={t('database.reset')}
+        desc={t('database.resetDesc')}
+        onClick={handleReset}
+        disabled={resetting}
+        danger
+      />
     </div>
   )
 }
 
-export default DatabaseModal
+export default DatabaseSettingsPanel

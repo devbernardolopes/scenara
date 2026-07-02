@@ -6,6 +6,7 @@ import SettingsSidebar from './SettingsSidebar'
 import SettingsSearch from './SettingsSearch'
 import SettingRow from './SettingRow'
 import ApiSettingsPanel from './ApiSettingsPanel'
+import DatabaseSettingsPanel from './DatabaseSettingsPanel'
 import CloseButton from '../../shared/CloseButton'
 import pkg from '../../../../package.json'
 
@@ -68,6 +69,8 @@ function SettingsModal() {
             <p className="text-secondary text-sm">{t('noResults')}</p>
           ) : !search && activeCategory === 'api' ? (
             <ApiSettingsPanel />
+          ) : !search && activeCategory === 'database' ? (
+            <DatabaseSettingsPanel />
           ) : (
             <div className="space-y-8">
               {filtered.map((setting) => (
