@@ -286,6 +286,14 @@ export const SETTINGS = [
     labelKey: 'settings:api.directorProfile.label',
     descKey: 'settings:api.directorProfile.desc',
   },
+  {
+    key: 'api.useChatForAll',
+    category: 'api',
+    type: 'text',
+    default: null,
+    labelKey: 'settings:api.useChatForAll.label',
+    descKey: 'settings:api.useChatForAll.desc',
+  },
 ]
 
 const SETTING_EFFECTS = {

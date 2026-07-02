@@ -43,6 +43,7 @@ export const PROVIDERS = [
     needsUrl: false,
     hasModelEndpoint: true,
     supportsAnonymous: false,
+    supportsHordeMethods: true,
     trialKey: 'placeholder-horde-trial-key',
     params: [{ key: 'temperature', type: 'range', min: 0, max: 2, step: 0.1, default: 1 }],
   },

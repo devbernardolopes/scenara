@@ -88,10 +88,15 @@ function ApiSettingsPanel() {
       }
       setProfileAssignments(assignments)
 
-      const allSame = REQUEST_KINDS.every(
-        (k) => assignments[k.id] === assignments.chat || !assignments[k.id],
-      )
-      setUseChatForAll(allSame)
+      const savedUseChatForAll = await getSetting('api.useChatForAll')
+      if (savedUseChatForAll !== null && savedUseChatForAll !== undefined) {
+        setUseChatForAll(savedUseChatForAll)
+      } else {
+        const allSame = REQUEST_KINDS.every(
+          (k) => assignments[k.id] === assignments.chat || !assignments[k.id],
+        )
+        setUseChatForAll(allSame)
+      }
 
       setLoading(false)
     }
@@ -113,8 +118,9 @@ function ApiSettingsPanel() {
 
   async function handleUseChatForAllChange(val) {
     setUseChatForAll(val)
+    await setSetting('api.useChatForAll', val ? 1 : 0)
     const chatProfileId = profileAssignments.chat
-    if (val) {
+    if (val && chatProfileId) {
       for (const kind of REQUEST_KINDS) {
         if (kind.id !== 'chat') {
           setProfileAssignments((prev) => ({ ...prev, [kind.id]: chatProfileId }))

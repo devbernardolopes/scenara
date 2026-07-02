@@ -105,7 +105,10 @@
         "noKeys": "No keys configured for this provider. Add one in the API Keys section below.",
         "selectKey": "Select a key…",
         "model": "Model",
-        "parameters": "Parameters"
+        "parameters": "Parameters",
+        "hordeMethod": "AI Horde Method",
+        "hordeMethodNative": "Native",
+        "hordeMethodOpenAI": "OpenAI-compatible"
       },
       "add": "Add",
       "maxStopItems": "Limit reached",

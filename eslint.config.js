@@ -2,22 +2,27 @@ import js from '@eslint/js'
 import reactPlugin from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import prettierConfig from 'eslint-config-prettier'
+import globals from 'globals'
+
+const sharedFiles = ['**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs']
 
 export default [
-  js.configs.recommended,
-  reactPlugin.configs.flat.recommended,
-  reactPlugin.configs.flat['jsx-runtime'],
+  { files: sharedFiles, ...js.configs.recommended },
+  { files: sharedFiles, ...reactPlugin.configs.flat.recommended },
+  { files: sharedFiles, ...reactPlugin.configs.flat['jsx-runtime'] },
   {
+    files: sharedFiles,
     plugins: { 'react-hooks': reactHooks },
     rules: reactHooks.configs.recommended.rules,
   },
   {
-    rules: {
-      'react/prop-types': 'off',
-    },
+    files: sharedFiles,
+    rules: { 'react/prop-types': 'off' },
   },
-  prettierConfig,
+  { files: sharedFiles, ...prettierConfig },
   {
-    ignores: ['dist/', 'node_modules/'],
+    files: sharedFiles,
+    languageOptions: { globals: { ...globals.browser } },
   },
+  { ignores: ['dist/', 'node_modules/'] },
 ]

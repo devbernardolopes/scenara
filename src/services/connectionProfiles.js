@@ -101,7 +101,9 @@ export async function getEffectiveProfileFor(requestKind) {
         const parsed = JSON.parse(keys.value)
         const entry = parsed.find((k) => k.id === profile.keyId)
         if (entry) key = entry.value
-      } catch {}
+      } catch {
+        /* key entry not parseable */
+      }
     }
   }
   return {

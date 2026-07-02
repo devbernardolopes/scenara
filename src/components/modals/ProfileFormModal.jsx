@@ -232,7 +232,6 @@ function ProfileFormModal({ profile }) {
             value={form.providerId}
             onChange={(e) => {
               const nextProvider = e.target.value
-              const provider = PROVIDERS.find((p) => p.id === nextProvider)
               setForm((prev) => ({
                 ...prev,
                 providerId: nextProvider,
@@ -273,6 +272,22 @@ function ProfileFormModal({ profile }) {
                 ))}
               </select>
             )}
+          </div>
+        )}
+
+        {selectedProvider?.supportsHordeMethods && (
+          <div>
+            <label className="block text-sm font-medium text-text mb-1">
+              {t('api.profile.form.hordeMethod')}
+            </label>
+            <select
+              value={form.params.hordeMethod || 'native'}
+              onChange={(e) => updateParam('hordeMethod', e.target.value)}
+              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm"
+            >
+              <option value="native">{t('api.profile.form.hordeMethodNative')}</option>
+              <option value="openai-compatible">{t('api.profile.form.hordeMethodOpenAI')}</option>
+            </select>
           </div>
         )}
 
