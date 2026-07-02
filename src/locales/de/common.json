@@ -35,7 +35,25 @@
     "subtitle": "Durchstöbern Sie Charaktere und starten Sie einen neuen Chat.",
     "characterCard": "Charakter {{index}}",
     "characterDesc": "Eine kurze Beschreibung dieses Charakters.",
-    "createCharacter": "Charakter erstellen"
+    "createCharacter": "Charakter erstellen",
+    "search": {
+      "placeholder": "Charaktere suchen...",
+      "noResults": "Keine Charaktere entsprechen Ihrer Suche."
+    },
+    "sort": {
+      "label": "Sortieren nach",
+      "createdAt": "Erstellt",
+      "updatedAt": "Aktualisiert",
+      "chatCount": "Chats",
+      "name": "Name"
+    },
+    "order": {
+      "asc": "Aufsteigend",
+      "desc": "Absteigend"
+    },
+    "filter": {
+      "title": "Filter & Sortierung"
+    }
   },
   "loading": "Laden…",
   "save": "Save",

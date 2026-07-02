@@ -46,6 +46,24 @@
       "export": "Exportar personagem",
       "selectPersona": "Selecionar persona"
     },
+    "search": {
+      "placeholder": "Pesquisar personagens...",
+      "noResults": "Nenhum personagem corresponde à sua pesquisa."
+    },
+    "sort": {
+      "label": "Ordenar por",
+      "createdAt": "Criação",
+      "updatedAt": "Atualização",
+      "chatCount": "Chats",
+      "name": "Nome"
+    },
+    "order": {
+      "asc": "Crescente",
+      "desc": "Decrescente"
+    },
+    "filter": {
+      "title": "Filtros & Ordenação"
+    },
     "confirmDelete": {
       "title": "Excluir Personagem",
       "message": "Tem certeza que deseja excluir {{name}}? Todos os chats associados serão permanentemente deletados.",

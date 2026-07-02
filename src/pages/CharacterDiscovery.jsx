@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../hooks/useModal'
@@ -8,16 +8,30 @@ import {
   deleteCharacterWithThreads,
   duplicateCharacter,
   exportCharacter,
+  getCharacterChatCounts,
 } from '../services/characters'
 import { downloadJson } from '../lib/download'
 import { getSetting } from '../services/settings'
+import { getUIState, setUIState } from '../services/uiState'
 import { createThread } from '../services/threads'
 import { createMessage } from '../services/messages'
+import CollapsibleSection from '../components/shared/CollapsibleSection'
 import IconButton from '../components/shared/IconButton'
 import Avatar from '../components/shared/Avatar'
 import Pagination from '../components/shared/Pagination'
 import PersonaPicker from '../components/shared/PersonaPicker'
-import { Trash2, Heart, Copy, Download, UserPlus } from '../lib/icons'
+import {
+  Trash2,
+  Heart,
+  Copy,
+  Download,
+  UserPlus,
+  Search,
+  ArrowUpDown,
+  SlidersHorizontal,
+} from '../lib/icons'
+
+const SORT_OPTIONS = ['createdAt', 'updatedAt', 'chatCount', 'name']
 
 function StartChatButton({ character, onStart }) {
   const { t } = useTranslation('common')
@@ -65,23 +79,63 @@ function CharacterDiscovery() {
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [cardsPerPage, setCardsPerPage] = useState(10)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState('createdAt')
+  const [sortOrder, setSortOrder] = useState('desc')
+  const [chatCounts, setChatCounts] = useState(new Map())
 
-  const totalPages = Math.max(1, Math.ceil(characters.length / cardsPerPage))
+  const filteredCharacters = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim()
+    if (!q) return characters
+    return characters.filter(
+      (c) =>
+        (c.name || '').toLowerCase().includes(q) ||
+        (c.description || '').toLowerCase().includes(q) ||
+        (c.personality || '').toLowerCase().includes(q) ||
+        (c.scenario || '').toLowerCase().includes(q),
+    )
+  }, [characters, searchQuery])
+
+  const sortedCharacters = useMemo(() => {
+    const list = [...filteredCharacters]
+    list.sort((a, b) => {
+      let cmp = 0
+      switch (sortBy) {
+        case 'createdAt':
+          cmp = new Date(a.createdAt) - new Date(b.createdAt)
+          break
+        case 'updatedAt':
+          cmp = new Date(a.updatedAt || a.createdAt) - new Date(b.updatedAt || b.createdAt)
+          break
+        case 'chatCount':
+          cmp = (chatCounts.get(a.id) || 0) - (chatCounts.get(b.id) || 0)
+          break
+        case 'name':
+          cmp = (a.name || '').localeCompare(b.name || '')
+          break
+      }
+      return sortOrder === 'desc' ? -cmp : cmp
+    })
+    return list
+  }, [filteredCharacters, sortBy, sortOrder, chatCounts])
+
+  const totalPages = Math.max(1, Math.ceil(sortedCharacters.length / cardsPerPage))
   const safePage = Math.min(currentPage, totalPages)
   const start = (safePage - 1) * cardsPerPage
-  const visibleCharacters = characters.slice(start, start + cardsPerPage)
+  const visibleCharacters = sortedCharacters.slice(start, start + cardsPerPage)
 
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages)
     }
-  }, [totalPages])
+  }, [totalPages, currentPage])
 
   async function loadCharacters() {
     setLoading(true)
     try {
-      const chars = await getAllCharacters()
+      const [chars, counts] = await Promise.all([getAllCharacters(), getCharacterChatCounts()])
       setCharacters(chars)
+      setChatCounts(counts)
     } finally {
       setLoading(false)
     }
@@ -90,6 +144,9 @@ function CharacterDiscovery() {
   useEffect(() => {
     loadCharacters()
     getSetting('cardsPerPage').then((val) => setCardsPerPage(val || 10))
+    getUIState('discovery.sortBy').then((val) => val && setSortBy(val))
+    getUIState('discovery.sortOrder').then((val) => val && setSortOrder(val))
+    getUIState('discovery.searchQuery').then((val) => val && setSearchQuery(val))
     window.addEventListener('characters-changed', loadCharacters)
     return () => window.removeEventListener('characters-changed', loadCharacters)
   }, [])
@@ -102,6 +159,25 @@ function CharacterDiscovery() {
     }
     window.addEventListener('settings-changed', handleSettingsChanged)
     return () => window.removeEventListener('settings-changed', handleSettingsChanged)
+  }, [])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery, sortBy, sortOrder])
+
+  const persistSortBy = useCallback((val) => {
+    setSortBy(val)
+    setUIState('discovery.sortBy', val)
+  }, [])
+
+  const persistSortOrder = useCallback((val) => {
+    setSortOrder(val)
+    setUIState('discovery.sortOrder', val)
+  }, [])
+
+  const persistSearchQuery = useCallback((val) => {
+    setSearchQuery(val)
+    setUIState('discovery.searchQuery', val)
   }, [])
 
   function handleEditCharacter(character) {
@@ -134,7 +210,7 @@ function CharacterDiscovery() {
     await loadCharacters()
   }
 
-  function handleFavorite(character) {
+  function handleFavorite(_character) {
     // To be implemented
   }
 
@@ -150,15 +226,80 @@ function CharacterDiscovery() {
     )
   }
 
+  const filterControl = (
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-secondary whitespace-nowrap">
+          {t('discovery.sort.label')}
+        </span>
+        <select
+          value={sortBy}
+          onChange={(e) => persistSortBy(e.target.value)}
+          className="min-h-[44px] px-3 py-2 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+        >
+          {SORT_OPTIONS.map((key) => (
+            <option key={key} value={key}>
+              {t(`discovery.sort.${key}`)}
+            </option>
+          ))}
+        </select>
+      </div>
+      <button
+        type="button"
+        onClick={() => persistSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+        className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 border border-border rounded-md text-sm text-text hover:bg-surface-hover"
+        title={t(`discovery.order.${sortOrder === 'asc' ? 'desc' : 'asc'}`)}
+      >
+        <ArrowUpDown className="w-4 h-4" />
+        <span className="text-xs text-secondary">{t(`discovery.order.${sortOrder}`)}</span>
+      </button>
+    </div>
+  )
+
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-4 md:p-8">
+      <div className="shrink-0 px-4 md:px-8 pt-4 md:pt-8 pb-3 border-b border-border">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => persistSearchQuery(e.target.value)}
+            placeholder={t('discovery.search.placeholder')}
+            className="w-full min-h-[44px] pl-10 pr-4 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+      </div>
+
+      <div className="shrink-0 px-4 md:px-8 pt-2 pb-1">
+        <CollapsibleSection
+          label={
+            <span className="flex items-center gap-2">
+              <SlidersHorizontal className="w-4 h-4" />
+              {t('discovery.filter.title')}
+            </span>
+          }
+          summary={
+            searchQuery || sortBy !== 'createdAt' || sortOrder !== 'desc'
+              ? t('discovery.filter.active', { count: 1 })
+              : ''
+          }
+          storageKey="discoveryFilters"
+          defaultExpanded={false}
+        >
+          <div className="pt-1 pb-2">{filterControl}</div>
+        </CollapsibleSection>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-4">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-secondary text-sm">{t('loading')}</p>
           </div>
-        ) : characters.length === 0 ? (
-          <p className="text-secondary text-sm py-8 text-center">{t('discovery.noCharacters')}</p>
+        ) : sortedCharacters.length === 0 ? (
+          <p className="text-secondary text-sm py-8 text-center">
+            {searchQuery ? t('discovery.search.noResults') : t('discovery.noCharacters')}
+          </p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {visibleCharacters.map((char) => (
@@ -172,7 +313,10 @@ function CharacterDiscovery() {
               >
                 <div className="flex items-center gap-3 mb-2">
                   <Avatar src={char.avatar} size="lg" />
-                  <h3 className="font-semibold text-text truncate">{char.name}</h3>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <h3 className="font-semibold text-text truncate">{char.name}</h3>
+                    <span className="text-xs text-tertiary shrink-0">#{char.characterNumber}</span>
+                  </div>
                 </div>
                 <p className="text-sm text-secondary line-clamp-2 mb-3">
                   {char.description || t('discovery.characterDesc')}
@@ -207,7 +351,7 @@ function CharacterDiscovery() {
           </div>
         )}
       </div>
-      {characters.length > 0 && (
+      {sortedCharacters.length > 0 && (
         <div className="shrink-0 px-4 md:px-8 pb-4 md:pb-8 pt-4 bg-surface border-t border-border">
           <Pagination
             currentPage={safePage}

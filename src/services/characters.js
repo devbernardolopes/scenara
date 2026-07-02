@@ -71,9 +71,40 @@ export async function getCharacter(id) {
   return db.characters.get(id)
 }
 
+export async function getNextCharacterNumber() {
+  return db.transaction('rw', [db.settings, db.characters], async () => {
+    const row = await db.settings.where('key').equals('characterCounter').first()
+    if (row) {
+      const next = row.value + 1
+      await db.settings.update(row.id, { value: next })
+      return next
+    }
+    const all = await db.characters.toArray()
+    const max = all.reduce((m, c) => Math.max(m, c.characterNumber || 0), 0)
+    const next = max + 1
+    await db.settings.add({ key: 'characterCounter', value: next })
+    return next
+  })
+}
+
+export async function getCharacterChatCounts() {
+  const threads = await db.threads.toArray()
+  const counts = new Map()
+  for (const t of threads) {
+    counts.set(t.characterId, (counts.get(t.characterId) || 0) + 1)
+  }
+  return counts
+}
+
 export async function createCharacter(data) {
   const now = new Date()
-  const id = await db.characters.add({ ...data, createdAt: now, updatedAt: now })
+  const characterNumber = await getNextCharacterNumber()
+  const id = await db.characters.add({
+    ...data,
+    characterNumber,
+    createdAt: now,
+    updatedAt: now,
+  })
   window.dispatchEvent(
     new CustomEvent('characters-changed', {
       detail: { action: 'create', entityName: data.name },
@@ -151,10 +182,12 @@ export async function duplicateCharacter(id) {
   const original = await db.characters.get(id)
   if (!original) throw new Error('Character not found')
   const now = new Date()
-  const { id: _id, createdAt: _ca, updatedAt: _ua, ...rest } = original
+  const characterNumber = await getNextCharacterNumber()
+  const { id: _id, createdAt: _ca, updatedAt: _ua, characterNumber: _cn, ...rest } = original
   const newId = await db.characters.add({
     ...rest,
     name: `${original.name} (Copy)`,
+    characterNumber,
     createdAt: now,
     updatedAt: now,
   })
@@ -198,8 +231,9 @@ export function importCharacterFromFile(file) {
 }
 
 async function seedCharacters() {
-  const now = new Date()
-  await db.characters.bulkAdd(
-    SEED_CHARACTERS.map((c) => ({ ...c, createdAt: now, updatedAt: now })),
-  )
+  for (const c of SEED_CHARACTERS) {
+    const now = new Date()
+    const characterNumber = await getNextCharacterNumber()
+    await db.characters.add({ ...c, characterNumber, createdAt: now, updatedAt: now })
+  }
 }

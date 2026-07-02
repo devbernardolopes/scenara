@@ -47,4 +47,20 @@ db.version(5).stores({
   writingInstructions: '++id, name, createdAt',
 })
 
+db.version(6)
+  .stores({
+    threads: '++id, title, characterId, personaId, updatedAt, isFavorite, threadNumber',
+    characters: '++id, name, createdAt, updatedAt, characterNumber',
+    personas: '++id, name, title, createdAt, isDefault',
+    settings: '++id, key',
+    uiState: '++id, key',
+    messages: '++id, threadId, role, createdAt',
+    writingInstructions: '++id, name, createdAt',
+  })
+  .upgrade(async (tx) => {
+    const chars = await tx.table('characters').toArray()
+    const maxNum = chars.reduce((m, c) => Math.max(m, c.characterNumber || c.id || 0), 0)
+    await tx.table('settings').add({ key: 'characterCounter', value: maxNum })
+  })
+
 export default db

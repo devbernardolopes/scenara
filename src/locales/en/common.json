@@ -58,6 +58,24 @@
       "export": "Export character",
       "selectPersona": "Select persona"
     },
+    "search": {
+      "placeholder": "Search characters...",
+      "noResults": "No characters match your search."
+    },
+    "sort": {
+      "label": "Sort by",
+      "createdAt": "Created",
+      "updatedAt": "Updated",
+      "chatCount": "Chats",
+      "name": "Name"
+    },
+    "order": {
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "filter": {
+      "title": "Filters & Sorting"
+    },
     "confirmDelete": {
       "title": "Delete Character",
       "message": "Are you sure you want to delete {{name}}? All associated chats will be permanently deleted.",

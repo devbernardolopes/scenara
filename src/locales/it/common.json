@@ -35,7 +35,25 @@
     "subtitle": "Sfoglia e seleziona personaggi per iniziare una nuova chat.",
     "characterCard": "Personaggio {{index}}",
     "characterDesc": "Una breve descrizione di questo personaggio.",
-    "createCharacter": "Crea Personaggio"
+    "createCharacter": "Crea Personaggio",
+    "search": {
+      "placeholder": "Cerca personaggi...",
+      "noResults": "Nessun personaggio corrisponde alla tua ricerca."
+    },
+    "sort": {
+      "label": "Ordina per",
+      "createdAt": "Creazione",
+      "updatedAt": "Aggiornamento",
+      "chatCount": "Chat",
+      "name": "Nome"
+    },
+    "order": {
+      "asc": "Crescente",
+      "desc": "Decrescente"
+    },
+    "filter": {
+      "title": "Filtri & Ordinamento"
+    }
   },
   "loading": "Caricamento…",
   "save": "Save",

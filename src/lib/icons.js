@@ -38,4 +38,6 @@ export {
   Database,
   Globe,
   FileUp,
+  ArrowUpDown,
+  SlidersHorizontal,
 } from 'lucide-react'

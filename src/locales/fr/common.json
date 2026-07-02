@@ -35,7 +35,25 @@
     "subtitle": "Parcourez et sélectionnez des personnages pour démarrer une conversation.",
     "characterCard": "Personnage {{index}}",
     "characterDesc": "Une brève description de ce personnage.",
-    "createCharacter": "Créer un Personnage"
+    "createCharacter": "Créer un Personnage",
+    "search": {
+      "placeholder": "Rechercher des personnages...",
+      "noResults": "Aucun personnage ne correspond à votre recherche."
+    },
+    "sort": {
+      "label": "Trier par",
+      "createdAt": "Création",
+      "updatedAt": "Mise à jour",
+      "chatCount": "Discussions",
+      "name": "Nom"
+    },
+    "order": {
+      "asc": "Croissant",
+      "desc": "Décroissant"
+    },
+    "filter": {
+      "title": "Filtres & Tri"
+    }
   },
   "loading": "Chargement…",
   "save": "Save",
