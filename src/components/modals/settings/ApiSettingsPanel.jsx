@@ -1,27 +1,98 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PROVIDERS, getActiveProvider, setActiveProvider, getModel, setModel, getBaseUrl, setBaseUrl, getCachedModels, setCachedModels } from '../../../services/apiProviders'
+import {
+  PROVIDERS,
+  getModel,
+  setModel,
+  getBaseUrl,
+  setBaseUrl,
+  getCachedModels,
+  setCachedModels,
+} from '../../../services/apiProviders'
+import {
+  getAllProfiles,
+  getEffectiveProfileFor,
+  migrateFromOldSettings,
+} from '../../../services/connectionProfiles'
+import { getSetting, setSetting } from '../../../services/settings'
 import { fetchModels, getCooldownRemaining } from '../../../services/modelFetcher'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import ApiKeyManager from './controls/ApiKeyManager'
 import ModelSelect from './controls/ModelSelect'
+import ProfilePicker from '../../shared/ProfilePicker'
+
+const REQUEST_KINDS = [
+  { id: 'chat', labelKey: 'settings:api.profileAssignment.chat' },
+  { id: 'autoTitle', labelKey: 'settings:api.profileAssignment.autoTitle' },
+  { id: 'summarization', labelKey: 'settings:api.profileAssignment.summarization' },
+  { id: 'director', labelKey: 'settings:api.profileAssignment.director' },
+]
+
+function ProfileAssignmentRow({ kind, currentId, onAssign }) {
+  const { t } = useTranslation('settings')
+  const [open, setOpen] = useState(false)
+  const [profiles, setProfiles] = useState([])
+  const [currentProfileName, setCurrentProfileName] = useState('')
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    getAllProfiles().then(setProfiles)
+  }, [open])
+
+  useEffect(() => {
+    if (currentId) {
+      const p = profiles.find((pr) => pr.id === currentId)
+      setCurrentProfileName(p ? p.name : '')
+    } else {
+      setCurrentProfileName('')
+    }
+  }, [currentId, profiles])
+
+  function handleSelect(profileId) {
+    onAssign(kind.id, profileId)
+    setOpen(false)
+  }
+
+  return (
+    <div ref={containerRef} className="relative flex items-center justify-between min-h-[44px]">
+      <span className="text-sm text-text">{t(kind.labelKey.replace('settings:', ''))}</span>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="min-h-[44px] px-3 text-sm border border-border rounded-md bg-surface text-text hover:bg-surface-hover"
+      >
+        {currentProfileName || (
+          <span className="text-tertiary">{t('api.profileAssignment.none')}</span>
+        )}
+      </button>
+      <div className="relative">
+        <ProfilePicker
+          open={open}
+          onClose={() => setOpen(false)}
+          onSelect={handleSelect}
+          currentId={currentId}
+        />
+      </div>
+    </div>
+  )
+}
 
 function ApiSettingsPanel() {
   const { t } = useTranslation('settings')
 
   const [loading, setLoading] = useState(true)
-  const [activeProvider, setActiveProviderState] = useState(null)
   const [models, setModels] = useState({})
   const [baseUrls, setBaseUrls] = useState({})
   const [cachedModels, setCachedModelsState] = useState({})
   const [fetching, setFetching] = useState(null)
   const [cooldown, setCooldown] = useState(0)
+  const [profileAssignments, setProfileAssignments] = useState({})
+  const [useChatForAll, setUseChatForAll] = useState(true)
   const abortRef = useRef(null)
 
   useEffect(() => {
     async function load() {
-      const ap = await getActiveProvider()
-      setActiveProviderState(ap)
+      await migrateFromOldSettings()
 
       const mods = {}
       const urls = {}
@@ -38,6 +109,18 @@ function ApiSettingsPanel() {
       setModels(mods)
       setBaseUrls(urls)
       setCachedModelsState(cached)
+
+      const assignments = {}
+      for (const kind of REQUEST_KINDS) {
+        assignments[kind.id] = await getSetting(`requestKind.${kind.id}.profileId`)
+      }
+      setProfileAssignments(assignments)
+
+      const allSame = REQUEST_KINDS.every(
+        (k) => assignments[k.id] === assignments.chat || !assignments[k.id],
+      )
+      setUseChatForAll(allSame)
+
       setLoading(false)
     }
     load()
@@ -52,12 +135,6 @@ function ApiSettingsPanel() {
     }, 500)
     return () => clearInterval(id)
   }, [cooldown])
-
-  function handleActiveProviderChange(e) {
-    const next = e.target.value
-    setActiveProviderState(next)
-    setActiveProvider(next)
-  }
 
   async function handleModelChange(providerId, value) {
     setModels((prev) => ({ ...prev, [providerId]: value }))
@@ -93,6 +170,27 @@ function ApiSettingsPanel() {
     abortRef.current?.abort()
   }
 
+  async function handleAssign(kindId, profileId) {
+    setProfileAssignments((prev) => ({ ...prev, [kindId]: profileId }))
+    await setSetting(`requestKind.${kindId}.profileId`, profileId)
+    if (kindId === 'chat') {
+      setUseChatForAll(false)
+    }
+  }
+
+  async function handleUseChatForAllChange(val) {
+    setUseChatForAll(val)
+    const chatProfileId = profileAssignments.chat
+    if (val) {
+      for (const kind of REQUEST_KINDS) {
+        if (kind.id !== 'chat') {
+          setProfileAssignments((prev) => ({ ...prev, [kind.id]: chatProfileId }))
+          await setSetting(`requestKind.${kind.id}.profileId`, chatProfileId)
+        }
+      }
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -103,111 +201,127 @@ function ApiSettingsPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-text">
-          {t('api.activeProvider.label')}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-text">{t('api.profileAssignment.title')}</h3>
+        <ProfileAssignmentRow
+          kind={REQUEST_KINDS.find((k) => k.id === 'chat')}
+          currentId={profileAssignments.chat}
+          onAssign={handleAssign}
+        />
+
+        <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">
+          <input
+            type="checkbox"
+            checked={useChatForAll}
+            onChange={(e) => handleUseChatForAllChange(e.target.checked)}
+            className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+          />
+          <span className="text-sm text-text">{t('api.profileAssignment.useChatForAll')}</span>
         </label>
-        <select
-          value={activeProvider || ''}
-          onChange={handleActiveProviderChange}
-          className="w-full sm:w-72 px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text text-sm"
-        >
-          {PROVIDERS.map((p) => (
-            <option key={p.id} value={p.id}>
-              {t(p.nameKey.replace('settings:', ''))}
-            </option>
+
+        {!useChatForAll &&
+          REQUEST_KINDS.filter((k) => k.id !== 'chat').map((kind) => (
+            <ProfileAssignmentRow
+              key={kind.id}
+              kind={kind}
+              currentId={profileAssignments[kind.id]}
+              onAssign={handleAssign}
+            />
           ))}
-        </select>
       </div>
 
-      {PROVIDERS.map((provider) => {
-        const currentModel = models[provider.id]
-        const availableModels = cachedModels[provider.id] || []
+      <div className="border-t border-border pt-6">
+        <h3 className="text-sm font-semibold text-text mb-4">
+          {t('api.profileAssignment.apiKeys')}
+        </h3>
+        {PROVIDERS.map((provider) => {
+          const currentModel = models[provider.id]
+          const availableModels = cachedModels[provider.id] || []
 
-        return (
-          <CollapsibleSection
-            key={provider.id}
-            label={t(provider.nameKey.replace('settings:', ''))}
-            summary={t(provider.descKey.replace('settings:', ''))}
-            storageKey={`apiSection.${provider.id}`}
-            defaultExpanded={provider.id === activeProvider}
-          >
-            <div className="space-y-4 pt-2">
-              {provider.needsKey && (
-                <ApiKeyManager providerId={provider.id} />
-              )}
+          return (
+            <CollapsibleSection
+              key={provider.id}
+              label={t(provider.nameKey.replace('settings:', ''))}
+              summary={t(provider.descKey.replace('settings:', ''))}
+              storageKey={`apiSection.${provider.id}`}
+            >
+              <div className="space-y-4 pt-2">
+                {provider.needsKey && <ApiKeyManager providerId={provider.id} />}
 
-              {provider.supportsAnonymous && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary">
-                  {t('api.anonymousBadge')}
-                </span>
-              )}
+                {provider.supportsAnonymous && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary">
+                    {t('api.anonymousBadge')}
+                  </span>
+                )}
 
-              {provider.needsUrl && (
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-secondary">
-                    {t('api.serverUrl.label')}
-                  </label>
-                  <input
-                    type="url"
-                    value={baseUrls[provider.id] || ''}
-                    onChange={(e) => handleBaseUrlChange(provider.id, e.target.value)}
-                    placeholder={t('api.serverUrl.placeholder')}
-                    className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
-                  />
-                </div>
-              )}
+                {provider.needsUrl && (
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-secondary">
+                      {t('api.serverUrl.label')}
+                    </label>
+                    <input
+                      type="url"
+                      value={baseUrls[provider.id] || ''}
+                      onChange={(e) => handleBaseUrlChange(provider.id, e.target.value)}
+                      placeholder={t('api.serverUrl.placeholder')}
+                      className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+                    />
+                  </div>
+                )}
 
-              {provider.hasModelEndpoint ? (
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-secondary">
-                    {t('api.model.label')}
-                  </label>
-                  <ModelSelect
-                    providerId={provider.id}
-                    value={currentModel}
-                    onChange={(v) => handleModelChange(provider.id, v)}
-                    models={availableModels}
-                    onRefresh={handleRefresh}
-                    fetching={fetching === provider.id}
-                    onCancelFetch={handleCancel}
-                    cooldownRemaining={cooldown}
-                  />
-                </div>
-              ) : (
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-secondary">
-                    {t('api.model.label')}
-                  </label>
-                  <input
-                    type="text"
-                    value={currentModel || ''}
-                    onChange={(e) => handleModelChange(provider.id, e.target.value)}
-                    placeholder={t('api.model.placeholder')}
-                    className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
-                  />
-                </div>
-              )}
+                {provider.hasModelEndpoint ? (
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-secondary">
+                      {t('api.model.label')}
+                    </label>
+                    <ModelSelect
+                      providerId={provider.id}
+                      value={currentModel}
+                      onChange={(v) => handleModelChange(provider.id, v)}
+                      models={availableModels}
+                      onRefresh={handleRefresh}
+                      fetching={fetching === provider.id}
+                      onCancelFetch={handleCancel}
+                      cooldownRemaining={cooldown}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-secondary">
+                      {t('api.model.label')}
+                    </label>
+                    <input
+                      type="text"
+                      value={currentModel || ''}
+                      onChange={(e) => handleModelChange(provider.id, e.target.value)}
+                      placeholder={t('api.model.placeholder')}
+                      className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+                    />
+                  </div>
+                )}
 
-              {provider.paramLimits.stopMax && (
-                <p className="text-xs text-secondary">
-                  {t('api.stopLimitNote', { max: provider.paramLimits.stopMax })}
-                </p>
-              )}
+                {provider.params?.some((p) => p.type === 'string-list' && p.maxItems) && (
+                  <p className="text-xs text-secondary">
+                    {t('api.stopLimitNote', {
+                      max: provider.params.find((p) => p.type === 'string-list')?.maxItems,
+                    })}
+                  </p>
+                )}
 
-              <button
-                type="button"
-                onClick={() => {
-                  console.log('Test connection for', provider.id)
-                }}
-                className="min-h-[44px] px-4 text-sm border border-border rounded-md bg-surface text-secondary hover:bg-surface-hover"
-              >
-                {t('api.testConnection')}
-              </button>
-            </div>
-          </CollapsibleSection>
-        )
-      })}
+                <button
+                  type="button"
+                  onClick={() => {
+                    console.log('Test connection for', provider.id)
+                  }}
+                  className="min-h-[44px] px-4 text-sm border border-border rounded-md bg-surface text-secondary hover:bg-surface-hover"
+                >
+                  {t('api.testConnection')}
+                </button>
+              </div>
+            </CollapsibleSection>
+          )
+        })}
+      </div>
     </div>
   )
 }

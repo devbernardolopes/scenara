@@ -254,6 +254,38 @@ export const SETTINGS = [
     labelKey: 'settings:defaults.userPersonaAvatarScale.label',
     descKey: 'settings:defaults.userPersonaAvatarScale.desc',
   },
+  {
+    key: 'requestKind.chat.profileId',
+    category: 'api',
+    type: 'text',
+    default: null,
+    labelKey: 'settings:api.chatProfile.label',
+    descKey: 'settings:api.chatProfile.desc',
+  },
+  {
+    key: 'requestKind.autoTitle.profileId',
+    category: 'api',
+    type: 'text',
+    default: null,
+    labelKey: 'settings:api.autoTitleProfile.label',
+    descKey: 'settings:api.autoTitleProfile.desc',
+  },
+  {
+    key: 'requestKind.summarization.profileId',
+    category: 'api',
+    type: 'text',
+    default: null,
+    labelKey: 'settings:api.summarizationProfile.label',
+    descKey: 'settings:api.summarizationProfile.desc',
+  },
+  {
+    key: 'requestKind.director.profileId',
+    category: 'api',
+    type: 'text',
+    default: null,
+    labelKey: 'settings:api.directorProfile.label',
+    descKey: 'settings:api.directorProfile.desc',
+  },
 ]
 
 const SETTING_EFFECTS = {

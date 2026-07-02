@@ -7,6 +7,7 @@
     "newChat": "New Chat",
     "personas": "Personas",
     "writingInstructions": "Writing Instructions",
+    "connectionProfiles": "Connection Profiles",
     "inChatShortcuts": "In-Chat Shortcuts",
     "lorebooks": "Lorebooks",
     "tags": "Tags",
@@ -83,6 +84,7 @@
     }
   },
   "loading": "Loading…",
+  "saving": "Saving…",
   "save": "Save",
   "cancel": "Cancel",
   "confirm": "Confirm",
@@ -140,6 +142,11 @@
     "title": "Start with persona",
     "empty": "No personas yet",
     "default": "Default"
+  },
+  "profilePicker": {
+    "title": "Select profile",
+    "none": "None (disabled)",
+    "empty": "No profiles yet. Create one in Connection Profiles."
   },
   "saveDialog": {
     "title": "Unsaved changes",

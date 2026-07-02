@@ -72,6 +72,66 @@
     "refreshModels": "Refresh models",
     "fetchingModels": "Fetching models…",
     "cooldown": "Wait {{seconds}}s before refreshing again",
+    "profileAssignment": {
+      "title": "Profile Assignment",
+      "apiKeys": "API Keys",
+      "chat": "Chat",
+      "autoTitle": "Auto-title",
+      "summarization": "Summarization",
+      "director": "Director",
+      "none": "Not assigned",
+      "useChatForAll": "Use chat profile for auto-title, summarization, and director"
+    },
+    "profile": {
+      "createProfile": "Create Profile",
+      "noProfiles": "No connection profiles yet. Create one to bundle a provider, key, model, and parameters together.",
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "duplicate": "Duplicate"
+      },
+      "confirmDelete": {
+        "title": "Delete Profile",
+        "message": "Are you sure you want to delete \"{{name}}\"?"
+      },
+      "form": {
+        "title": "Create Profile",
+        "editTitle": "Edit Profile",
+        "name": "Profile Name",
+        "namePlaceholder": "e.g. Fast Groq, Creative OpenRouter",
+        "provider": "Provider",
+        "selectProvider": "Select a provider…",
+        "apiKey": "API Key",
+        "noKeys": "No keys configured for this provider. Add one in the API Keys section below.",
+        "selectKey": "Select a key…",
+        "model": "Model",
+        "parameters": "Parameters"
+      },
+      "add": "Add",
+      "maxStopItems": "Limit reached",
+      "addStopItem": "Type and press Enter"
+    },
+    "deleteKeyConfirm": {
+      "title": "Delete API Key",
+      "message": "Are you sure you want to delete this key?",
+      "profileWarning": "This key is used by {{count}} connection profile(s). Deleting it will break those profiles."
+    },
+    "chatProfile": {
+      "label": "Chat profile",
+      "desc": "Profile used for chat requests."
+    },
+    "autoTitleProfile": {
+      "label": "Auto-title profile",
+      "desc": "Profile used for auto-title requests."
+    },
+    "summarizationProfile": {
+      "label": "Summarization profile",
+      "desc": "Profile used for summarization requests."
+    },
+    "directorProfile": {
+      "label": "Director profile",
+      "desc": "Profile used for director requests."
+    },
     "testConnection": "Test Connection",
     "serverUrl": {
       "label": "Server URL",

@@ -63,4 +63,15 @@ db.version(6)
     await tx.table('settings').add({ key: 'characterCounter', value: maxNum })
   })
 
+db.version(7).stores({
+  threads: '++id, title, characterId, personaId, updatedAt, isFavorite, threadNumber',
+  characters: '++id, name, createdAt, updatedAt, characterNumber',
+  personas: '++id, name, title, createdAt, isDefault',
+  settings: '++id, key',
+  uiState: '++id, key',
+  messages: '++id, threadId, role, createdAt',
+  writingInstructions: '++id, name, createdAt',
+  connectionProfiles: '++id, name, createdAt',
+})
+
 export default db

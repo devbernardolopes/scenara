@@ -9,8 +9,14 @@ export const PROVIDERS = [
     needsUrl: false,
     hasModelEndpoint: true,
     supportsAnonymous: false,
-    paramLimits: { stopMax: 4 },
     trialKey: 'gsk_placeholder_trial_groq_key',
+    params: [
+      { key: 'temperature', type: 'range', min: 0, max: 2, step: 0.1, default: 1 },
+      { key: 'top_p', type: 'range', min: 0, max: 1, step: 0.05, default: 1 },
+      { key: 'stop', type: 'string-list', maxItems: 4 },
+      { key: 'stream', type: 'boolean', default: true },
+      { key: 'max_tokens', type: 'range', min: 64, max: 32768, step: 64, default: 2048 },
+    ],
   },
   {
     id: 'openrouter',
@@ -20,8 +26,14 @@ export const PROVIDERS = [
     needsUrl: false,
     hasModelEndpoint: true,
     supportsAnonymous: false,
-    paramLimits: {},
     trialKey: 'sk-or-placeholder-trial-openrouter-key',
+    params: [
+      { key: 'temperature', type: 'range', min: 0, max: 2, step: 0.1, default: 1 },
+      { key: 'top_p', type: 'range', min: 0, max: 1, step: 0.05, default: 1 },
+      { key: 'stop', type: 'string-list' },
+      { key: 'stream', type: 'boolean', default: true },
+      { key: 'max_tokens', type: 'range', min: 64, max: 32768, step: 64, default: 2048 },
+    ],
   },
   {
     id: 'ai-horde',
@@ -31,8 +43,8 @@ export const PROVIDERS = [
     needsUrl: false,
     hasModelEndpoint: true,
     supportsAnonymous: true,
-    paramLimits: {},
     trialKey: 'placeholder-horde-trial-key',
+    params: [{ key: 'temperature', type: 'range', min: 0, max: 2, step: 0.1, default: 1 }],
   },
   {
     id: 'lm-studio',
@@ -42,8 +54,14 @@ export const PROVIDERS = [
     needsUrl: true,
     hasModelEndpoint: false,
     supportsAnonymous: false,
-    paramLimits: {},
     trialKey: null,
+    params: [
+      { key: 'temperature', type: 'range', min: 0, max: 2, step: 0.1, default: 1 },
+      { key: 'top_p', type: 'range', min: 0, max: 1, step: 0.05, default: 1 },
+      { key: 'stop', type: 'string-list' },
+      { key: 'stream', type: 'boolean', default: true },
+      { key: 'max_tokens', type: 'range', min: 64, max: 32768, step: 64, default: 2048 },
+    ],
   },
 ]
 

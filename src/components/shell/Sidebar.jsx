@@ -33,6 +33,7 @@ import {
   Upload,
   Globe,
   FileUp,
+  SlidersHorizontal,
 } from '../../lib/icons'
 
 const COLOR_PRESETS = [
@@ -478,6 +479,13 @@ function Sidebar({ open, onClose }) {
           >
             <FileText className="w-4 h-4" />
             {t('sidebar.writingInstructions')}
+          </button>
+          <button
+            onClick={() => openModal('profileManagement')}
+            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            {t('sidebar.connectionProfiles')}
           </button>
           <button className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover">
             <Zap className="w-4 h-4" />

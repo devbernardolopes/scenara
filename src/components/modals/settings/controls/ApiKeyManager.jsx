@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PROVIDERS, getKeys, addKey, updateKey, deleteKey, setActiveKey, maskKey } from '../../../../services/apiProviders'
+import {
+  PROVIDERS,
+  getKeys,
+  addKey,
+  updateKey,
+  deleteKey,
+  setActiveKey,
+  maskKey,
+} from '../../../../services/apiProviders'
+import { usedByProfileCount } from '../../../../services/connectionProfiles'
 import { useConfirm } from '../../../../lib/confirm'
 import KeyEditDialog from './KeyEditDialog'
 import { Plus, Edit3, Trash2, Check, Key } from '../../../../lib/icons'
@@ -41,9 +50,13 @@ function ApiKeyManager({ providerId }) {
   }
 
   async function handleDelete(keyId) {
+    const count = await usedByProfileCount(providerId, keyId)
     const confirmed = await confirm({
       title: t('api.deleteKeyConfirm.title'),
-      message: t('api.deleteKeyConfirm.message'),
+      message:
+        count > 0
+          ? t('api.deleteKeyConfirm.profileWarning', { count })
+          : t('api.deleteKeyConfirm.message'),
       confirmLabel: t('api.deleteKey'),
       cancelLabel: t('cancel', { ns: 'common' }),
       variant: 'danger',
@@ -103,9 +116,7 @@ function ApiKeyManager({ providerId }) {
 
               <div className="flex-1 min-w-0">
                 <span className="text-sm text-text font-mono">{maskKey(key.value)}</span>
-                {key.label && (
-                  <span className="text-xs text-tertiary ml-2">({key.label})</span>
-                )}
+                {key.label && <span className="text-xs text-tertiary ml-2">({key.label})</span>}
               </div>
 
               <button
