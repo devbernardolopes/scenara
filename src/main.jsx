@@ -18,6 +18,7 @@ import PersonaManagementModal from './components/modals/PersonaManagementModal'
 import EditThreadTitleModal from './components/modals/EditThreadTitleModal'
 import WritingInstructionManagementModal from './components/modals/WritingInstructionManagementModal'
 import WritingInstructionFormModal from './components/modals/WritingInstructionFormModal'
+import DatabaseModal from './components/modals/DatabaseModal'
 
 const SettingsModal = lazy(() => import('./components/modals/settings/SettingsModal'))
 
@@ -29,6 +30,7 @@ registerModal('personaManagement', PersonaManagementModal)
 registerModal('editThreadTitle', EditThreadTitleModal)
 registerModal('writingInstructionManagement', WritingInstructionManagementModal)
 registerModal('writingInstructionForm', WritingInstructionFormModal)
+registerModal('database', DatabaseModal)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
