@@ -1,24 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  PROVIDERS,
-  getModel,
-  setModel,
-  getBaseUrl,
-  setBaseUrl,
-  getCachedModels,
-  setCachedModels,
-} from '../../../services/apiProviders'
-import {
-  getAllProfiles,
-  getEffectiveProfileFor,
-  migrateFromOldSettings,
-} from '../../../services/connectionProfiles'
+import { PROVIDERS, getBaseUrl, setBaseUrl } from '../../../services/apiProviders'
+import { getAllProfiles, migrateFromOldSettings } from '../../../services/connectionProfiles'
 import { getSetting, setSetting } from '../../../services/settings'
-import { fetchModels, getCooldownRemaining } from '../../../services/modelFetcher'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import ApiKeyManager from './controls/ApiKeyManager'
-import ModelSelect from './controls/ModelSelect'
 import ProfilePicker from '../../shared/ProfilePicker'
 
 const REQUEST_KINDS = [
@@ -33,7 +19,6 @@ function ProfileAssignmentRow({ kind, currentId, onAssign }) {
   const [open, setOpen] = useState(false)
   const [profiles, setProfiles] = useState([])
   const [currentProfileName, setCurrentProfileName] = useState('')
-  const containerRef = useRef(null)
 
   useEffect(() => {
     getAllProfiles().then(setProfiles)
@@ -54,18 +39,18 @@ function ProfileAssignmentRow({ kind, currentId, onAssign }) {
   }
 
   return (
-    <div ref={containerRef} className="relative flex items-center justify-between min-h-[44px]">
+    <div className="relative flex items-center justify-between min-h-[44px]">
       <span className="text-sm text-text">{t(kind.labelKey.replace('settings:', ''))}</span>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="min-h-[44px] px-3 text-sm border border-border rounded-md bg-surface text-text hover:bg-surface-hover"
-      >
-        {currentProfileName || (
-          <span className="text-tertiary">{t('api.profileAssignment.none')}</span>
-        )}
-      </button>
       <div className="relative">
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className="min-h-[44px] px-3 text-sm border border-border rounded-md bg-surface text-text hover:bg-surface-hover"
+        >
+          {currentProfileName || (
+            <span className="text-tertiary">{t('api.profileAssignment.none')}</span>
+          )}
+        </button>
         <ProfilePicker
           open={open}
           onClose={() => setOpen(false)}
@@ -81,34 +66,21 @@ function ApiSettingsPanel() {
   const { t } = useTranslation('settings')
 
   const [loading, setLoading] = useState(true)
-  const [models, setModels] = useState({})
   const [baseUrls, setBaseUrls] = useState({})
-  const [cachedModels, setCachedModelsState] = useState({})
-  const [fetching, setFetching] = useState(null)
-  const [cooldown, setCooldown] = useState(0)
   const [profileAssignments, setProfileAssignments] = useState({})
   const [useChatForAll, setUseChatForAll] = useState(true)
-  const abortRef = useRef(null)
 
   useEffect(() => {
     async function load() {
       await migrateFromOldSettings()
 
-      const mods = {}
       const urls = {}
-      const cached = {}
       for (const p of PROVIDERS) {
-        mods[p.id] = await getModel(p.id)
         if (p.needsUrl) {
           urls[p.id] = await getBaseUrl(p.id)
         }
-        if (p.hasModelEndpoint) {
-          cached[p.id] = await getCachedModels(p.id)
-        }
       }
-      setModels(mods)
       setBaseUrls(urls)
-      setCachedModelsState(cached)
 
       const assignments = {}
       for (const kind of REQUEST_KINDS) {
@@ -126,48 +98,9 @@ function ApiSettingsPanel() {
     load()
   }, [])
 
-  useEffect(() => {
-    if (cooldown <= 0) return
-    const id = setInterval(() => {
-      const remaining = getCooldownRemaining()
-      setCooldown(remaining)
-      if (remaining <= 0) clearInterval(id)
-    }, 500)
-    return () => clearInterval(id)
-  }, [cooldown])
-
-  async function handleModelChange(providerId, value) {
-    setModels((prev) => ({ ...prev, [providerId]: value }))
-    await setModel(providerId, value)
-  }
-
   async function handleBaseUrlChange(providerId, value) {
     setBaseUrls((prev) => ({ ...prev, [providerId]: value }))
     await setBaseUrl(providerId, value)
-  }
-
-  async function handleRefresh(providerId) {
-    if (abortRef.current) abortRef.current.abort()
-    const controller = new AbortController()
-    abortRef.current = controller
-    setFetching(providerId)
-    try {
-      const result = await fetchModels(providerId, { signal: controller.signal })
-      await setCachedModels(providerId, result)
-      setCachedModelsState((prev) => ({ ...prev, [providerId]: result }))
-      setCooldown(getCooldownRemaining())
-    } catch (err) {
-      if (err.name !== 'AbortError') {
-        console.error('Failed to fetch models:', err)
-      }
-    } finally {
-      setFetching(null)
-      abortRef.current = null
-    }
-  }
-
-  function handleCancel() {
-    abortRef.current?.abort()
   }
 
   async function handleAssign(kindId, profileId) {
@@ -234,93 +167,33 @@ function ApiSettingsPanel() {
         <h3 className="text-sm font-semibold text-text mb-4">
           {t('api.profileAssignment.apiKeys')}
         </h3>
-        {PROVIDERS.map((provider) => {
-          const currentModel = models[provider.id]
-          const availableModels = cachedModels[provider.id] || []
+        {PROVIDERS.map((provider) => (
+          <CollapsibleSection
+            key={provider.id}
+            label={t(provider.nameKey.replace('settings:', ''))}
+            summary={t(provider.descKey.replace('settings:', ''))}
+            storageKey={`apiSection.${provider.id}`}
+          >
+            <div className="space-y-4 pt-2">
+              {provider.needsKey && <ApiKeyManager providerId={provider.id} />}
 
-          return (
-            <CollapsibleSection
-              key={provider.id}
-              label={t(provider.nameKey.replace('settings:', ''))}
-              summary={t(provider.descKey.replace('settings:', ''))}
-              storageKey={`apiSection.${provider.id}`}
-            >
-              <div className="space-y-4 pt-2">
-                {provider.needsKey && <ApiKeyManager providerId={provider.id} />}
-
-                {provider.supportsAnonymous && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary">
-                    {t('api.anonymousBadge')}
-                  </span>
-                )}
-
-                {provider.needsUrl && (
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-medium text-secondary">
-                      {t('api.serverUrl.label')}
-                    </label>
-                    <input
-                      type="url"
-                      value={baseUrls[provider.id] || ''}
-                      onChange={(e) => handleBaseUrlChange(provider.id, e.target.value)}
-                      placeholder={t('api.serverUrl.placeholder')}
-                      className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
-                    />
-                  </div>
-                )}
-
-                {provider.hasModelEndpoint ? (
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-medium text-secondary">
-                      {t('api.model.label')}
-                    </label>
-                    <ModelSelect
-                      providerId={provider.id}
-                      value={currentModel}
-                      onChange={(v) => handleModelChange(provider.id, v)}
-                      models={availableModels}
-                      onRefresh={handleRefresh}
-                      fetching={fetching === provider.id}
-                      onCancelFetch={handleCancel}
-                      cooldownRemaining={cooldown}
-                    />
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-medium text-secondary">
-                      {t('api.model.label')}
-                    </label>
-                    <input
-                      type="text"
-                      value={currentModel || ''}
-                      onChange={(e) => handleModelChange(provider.id, e.target.value)}
-                      placeholder={t('api.model.placeholder')}
-                      className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
-                    />
-                  </div>
-                )}
-
-                {provider.params?.some((p) => p.type === 'string-list' && p.maxItems) && (
-                  <p className="text-xs text-secondary">
-                    {t('api.stopLimitNote', {
-                      max: provider.params.find((p) => p.type === 'string-list')?.maxItems,
-                    })}
-                  </p>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    console.log('Test connection for', provider.id)
-                  }}
-                  className="min-h-[44px] px-4 text-sm border border-border rounded-md bg-surface text-secondary hover:bg-surface-hover"
-                >
-                  {t('api.testConnection')}
-                </button>
-              </div>
-            </CollapsibleSection>
-          )
-        })}
+              {provider.needsUrl && (
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-secondary">
+                    {t('api.serverUrl.label')}
+                  </label>
+                  <input
+                    type="url"
+                    value={baseUrls[provider.id] || ''}
+                    onChange={(e) => handleBaseUrlChange(provider.id, e.target.value)}
+                    placeholder={t('api.serverUrl.placeholder')}
+                    className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+                  />
+                </div>
+              )}
+            </div>
+          </CollapsibleSection>
+        ))}
       </div>
     </div>
   )
