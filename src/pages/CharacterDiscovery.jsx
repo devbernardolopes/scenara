@@ -150,18 +150,14 @@ function CharacterDiscovery() {
     )
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-secondary text-sm">{t('loading')}</p>
-      </div>
-    )
-  }
-
   return (
-    <>
-      <div className="p-4 md:p-8">
-        {characters.length === 0 ? (
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-4 md:p-8">
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-secondary text-sm">{t('loading')}</p>
+          </div>
+        ) : characters.length === 0 ? (
           <p className="text-secondary text-sm py-8 text-center">{t('discovery.noCharacters')}</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -212,7 +208,7 @@ function CharacterDiscovery() {
         )}
       </div>
       {characters.length > 0 && (
-        <div className="sticky bottom-0 px-4 md:px-8 pb-4 md:pb-8 pt-4 bg-surface border-t border-border">
+        <div className="shrink-0 px-4 md:px-8 pb-4 md:pb-8 pt-4 bg-surface border-t border-border">
           <Pagination
             currentPage={safePage}
             totalPages={totalPages}
@@ -220,7 +216,7 @@ function CharacterDiscovery() {
           />
         </div>
       )}
-    </>
+    </div>
   )
 }
 
