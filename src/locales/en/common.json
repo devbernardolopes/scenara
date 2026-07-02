@@ -25,7 +25,13 @@
     "selectedCount": "{{count}} selected",
     "deleteSelected": "Delete selected",
     "confirmBatchDeleteTitle": "Delete Threads",
-    "confirmBatchDeleteMessage": "Are you sure you want to delete {{count}} threads? This action cannot be undone."
+    "confirmBatchDeleteMessage": "Are you sure you want to delete {{count}} threads? This action cannot be undone.",
+    "createCharacter": "Create character",
+    "importCharacter": "Import character",
+    "importFromUrl": "From URL",
+    "importFromFile": "From file",
+    "importUrlPrompt": "Enter the character URL to import:",
+    "importUrlComingSoon": "URL import is not yet implemented"
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",
@@ -72,7 +78,8 @@
       "updated": "{{name}} updated",
       "deleted": "{{name}} deleted",
       "deletedMultiple": "{{name}} and {{count}} chats deleted",
-      "duplicated": "{{name}} duplicated"
+      "duplicated": "{{name}} duplicated",
+      "exported": "{{name}} exported"
     },
     "thread": {
       "created": "Chat started",

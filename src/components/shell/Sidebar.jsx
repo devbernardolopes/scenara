@@ -9,9 +9,10 @@ import {
   updateThreadColor,
   duplicateThread,
 } from '../../services/threads'
-import { getCharacter } from '../../services/characters'
+import { getCharacter, importCharacterFromFile } from '../../services/characters'
 import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
+import { showToast } from '../../lib/toast'
 import CloseButton from '../shared/CloseButton'
 import Avatar from '../shared/Avatar'
 import {
@@ -29,6 +30,10 @@ import {
   BookOpen,
   Tags,
   Database,
+  Plus,
+  Upload,
+  Globe,
+  FileUp,
 } from '../../lib/icons'
 
 const COLOR_PRESETS = [
@@ -54,6 +59,37 @@ function Sidebar({ open, onClose }) {
   const [colorPickerId, setColorPickerId] = useState(null)
   const colorPickerRef = useRef(null)
   const [selectedIds, setSelectedIds] = useState(new Set())
+  const [showImportMenu, setShowImportMenu] = useState(false)
+  const fileInputRef = useRef(null)
+
+  function handleCreateCharacter() {
+    openModal('characterCreate')
+  }
+
+  function handleImportUrl() {
+    setShowImportMenu(false)
+    const url = window.prompt(t('sidebar.importUrlPrompt'))
+    if (url) {
+      showToast(t('sidebar.importUrlComingSoon'), { type: 'info' })
+    }
+  }
+
+  function handleImportFile() {
+    setShowImportMenu(false)
+    fileInputRef.current?.click()
+  }
+
+  async function handleFileSelected(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      const data = await importCharacterFromFile(file)
+      openModal('characterCreate', { initialData: data })
+    } catch (err) {
+      showToast(err.message, { type: 'error' })
+    }
+    e.target.value = ''
+  }
 
   useEffect(() => {
     if (!colorPickerId) return
@@ -173,9 +209,57 @@ function Sidebar({ open, onClose }) {
           <Link to="/" className="font-bold text-lg text-text hover:text-text" onClick={onClose}>
             {t('appName')}
           </Link>
-          <div className="md:hidden">
-            <CloseButton onClick={onClose} label={t('sidebar.close')} />
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleCreateCharacter}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+              aria-label={t('sidebar.createCharacter')}
+              title={t('sidebar.createCharacter')}
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowImportMenu((v) => !v)}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                aria-label={t('sidebar.importCharacter')}
+                title={t('sidebar.importCharacter')}
+              >
+                <Upload className="w-4 h-4" />
+              </button>
+              {showImportMenu && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowImportMenu(false)} />
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-surface border border-border rounded-md shadow-surface-lg z-20 py-1">
+                    <button
+                      onClick={handleImportUrl}
+                      className="flex items-center gap-2 w-full min-h-[44px] px-3 text-sm text-text hover:bg-surface-hover"
+                    >
+                      <Globe className="w-4 h-4" />
+                      {t('sidebar.importFromUrl')}
+                    </button>
+                    <button
+                      onClick={handleImportFile}
+                      className="flex items-center gap-2 w-full min-h-[44px] px-3 text-sm text-text hover:bg-surface-hover"
+                    >
+                      <FileUp className="w-4 h-4" />
+                      {t('sidebar.importFromFile')}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="md:hidden">
+              <CloseButton onClick={onClose} label={t('sidebar.close')} />
+            </div>
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,application/json"
+            className="hidden"
+            onChange={handleFileSelected}
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">

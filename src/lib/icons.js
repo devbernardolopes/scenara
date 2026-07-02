@@ -36,4 +36,6 @@ export {
   BookOpen,
   Tags,
   Database,
+  Globe,
+  FileUp,
 } from 'lucide-react'

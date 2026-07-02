@@ -177,6 +177,26 @@ export async function exportCharacter(id) {
   return data
 }
 
+export function importCharacterFromFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result)
+        if (!data.name) {
+          reject(new Error(i18n.t('common:toast.import.invalidFormat')))
+          return
+        }
+        resolve(data)
+      } catch {
+        reject(new Error(i18n.t('common:toast.import.invalidFormat')))
+      }
+    }
+    reader.onerror = () => reject(new Error(i18n.t('common:toast.import.fileError')))
+    reader.readAsText(file)
+  })
+}
+
 async function seedCharacters() {
   const now = new Date()
   await db.characters.bulkAdd(

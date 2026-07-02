@@ -12,7 +12,13 @@
     "unfavorite": "Desfavoritar",
     "confirmDeleteTitle": "Excluir Conversa",
     "confirmDeleteMessage": "Tem certeza que deseja excluir esta conversa? Esta ação não pode ser desfeita.",
-    "unknownCharacter": "Desconhecido"
+    "unknownCharacter": "Desconhecido",
+    "createCharacter": "Criar personagem",
+    "importCharacter": "Importar personagem",
+    "importFromUrl": "Da URL",
+    "importFromFile": "Do arquivo",
+    "importUrlPrompt": "Digite a URL do personagem para importar:",
+    "importUrlComingSoon": "Importação por URL ainda não implementada"
   },
   "topbar": {
     "toggleSidebar": "Alternar barra lateral",
@@ -60,7 +66,8 @@
       "updated": "{{name}} atualizado",
       "deleted": "{{name}} excluído",
       "deletedMultiple": "{{name}} e {{count}} chats excluídos",
-      "duplicated": "{{name}} duplicado"
+      "duplicated": "{{name}} duplicado",
+      "exported": "{{name}} exportado"
     },
     "thread": {
       "created": "Chat iniciado",

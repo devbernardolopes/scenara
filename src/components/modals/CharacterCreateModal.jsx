@@ -65,21 +65,22 @@ const SECTION_COMPONENTS = {
   lorebooks: PlaceholderSection,
 }
 
-function CharacterCreateModal({ character: existing }) {
+function CharacterCreateModal({ character: existing, initialData }) {
   const { t } = useTranslation('characterCreation')
   const { closeModal, setCloseGuard } = useModal()
   const { promptSave } = useSaveConfirm()
   const isEditing = Boolean(existing)
+  const isImport = Boolean(initialData)
   const characterId = existing?.id || null
 
-  const initialRef = useRef(buildInitialForm(existing))
+  const initialRef = useRef(isImport ? buildInitialForm(initialData) : buildInitialForm(existing))
   const [form, setForm] = useState(initialRef.current)
   const [saving, setSaving] = useState(false)
   const [activeSection, setActiveSection] = useState('character')
   const savePendingRef = useRef(false)
 
   useEffect(() => {
-    if (isEditing) return
+    if (isEditing || isImport) return
     const keys = Object.keys(DEFAULTS_MAP)
     Promise.all(keys.map((k) => getSetting(k))).then((values) => {
       const patches = {}

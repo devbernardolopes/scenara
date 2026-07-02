@@ -12,7 +12,13 @@
     "unfavorite": "Kein Favorit",
     "confirmDeleteTitle": "Unterhaltung löschen",
     "confirmDeleteMessage": "Bist du sicher, dass du diese Unterhaltung löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
-    "unknownCharacter": "Unbekannt"
+    "unknownCharacter": "Unbekannt",
+    "createCharacter": "Charakter erstellen",
+    "importCharacter": "Charakter importieren",
+    "importFromUrl": "Von URL",
+    "importFromFile": "Aus Datei",
+    "importUrlPrompt": "Gib die Charakter-URL zum Importieren ein:",
+    "importUrlComingSoon": "URL-Import ist noch nicht implementiert"
   },
   "topbar": {
     "toggleSidebar": "Seitenleiste umschalten",
@@ -44,7 +50,8 @@
       "updated": "{{name}} aktualisiert",
       "deleted": "{{name}} gelöscht",
       "deletedMultiple": "{{name}} und {{count}} Chats gelöscht",
-      "duplicated": "{{name}} dupliziert"
+      "duplicated": "{{name}} dupliziert",
+      "exported": "{{name}} exportiert"
     },
     "thread": {
       "created": "Chat gestartet",

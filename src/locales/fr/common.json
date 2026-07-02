@@ -12,7 +12,13 @@
     "unfavorite": "Ne plus favori",
     "confirmDeleteTitle": "Supprimer la Discussion",
     "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer cette discussion ? Cette action est irréversible.",
-    "unknownCharacter": "Inconnu"
+    "unknownCharacter": "Inconnu",
+    "createCharacter": "Créer un personnage",
+    "importCharacter": "Importer un personnage",
+    "importFromUrl": "Depuis une URL",
+    "importFromFile": "Depuis un fichier",
+    "importUrlPrompt": "Entrez l'URL du personnage à importer :",
+    "importUrlComingSoon": "L'importation par URL n'est pas encore implémentée"
   },
   "topbar": {
     "toggleSidebar": "Basculer la barre latérale",
@@ -44,7 +50,8 @@
       "updated": "{{name}} mis à jour",
       "deleted": "{{name}} supprimé",
       "deletedMultiple": "{{name}} et {{count}} discussions supprimés",
-      "duplicated": "{{name}} dupliqué"
+      "duplicated": "{{name}} dupliqué",
+      "exported": "{{name}} exporté"
     },
     "thread": {
       "created": "Chat démarré",

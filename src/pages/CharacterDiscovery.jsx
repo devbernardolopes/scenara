@@ -216,13 +216,6 @@ function CharacterDiscovery() {
           />
         </>
       )}
-
-      <button
-        onClick={() => openModal('characterCreate')}
-        className="mt-6 min-h-[44px] px-4 py-2 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm"
-      >
-        {t('discovery.createCharacter')}
-      </button>
     </div>
   )
 }
