@@ -59,10 +59,11 @@ export function ModalProvider({ children }) {
         const ModalComponent = MODAL_COMPONENTS[state.type]
         if (!ModalComponent) return null
         const isTop = index === modalStack.length - 1
+        const isFullscreen = state.props.modalSize === 'fullscreen'
         return (
           <div
             key={index}
-            className="fixed inset-0 flex items-center justify-center bg-overlay"
+            className={`fixed inset-0 ${isFullscreen ? 'bg-overlay' : 'flex items-center justify-center bg-overlay'}`}
             style={{ zIndex: 50 + index }}
             onClick={isTop ? closeWithGuard : undefined}
           >
@@ -73,12 +74,18 @@ export function ModalProvider({ children }) {
                 </div>
               }
             >
-              <div
-                className="bg-surface rounded-lg shadow-surface-lg max-w-4xl w-full mx-4 h-[75vh] max-h-[85vh] flex flex-col overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ModalComponent {...state.props} />
-              </div>
+              {isFullscreen ? (
+                <div className="w-full h-full" onClick={(e) => e.stopPropagation()}>
+                  <ModalComponent {...state.props} />
+                </div>
+              ) : (
+                <div
+                  className="bg-surface rounded-lg shadow-surface-lg max-w-4xl w-full mx-4 h-[75vh] max-h-[85vh] flex flex-col overflow-hidden"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ModalComponent {...state.props} />
+                </div>
+              )}
             </Suspense>
           </div>
         )

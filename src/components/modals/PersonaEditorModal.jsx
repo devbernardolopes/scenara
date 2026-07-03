@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
 import db from '../../db'
-import { createCharacter as createPersona } from '../../services/characters'
 import CloseButton from '../shared/CloseButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import { estimateTokens } from '../../services/tokenEstimator'
@@ -194,7 +193,13 @@ function PersonaEditorModal() {
                 key={p.id}
                 className="flex items-center gap-3 p-3 rounded-lg border border-border bg-surface"
               >
-                <Avatar src={p.avatar} size="md" />
+                <Avatar
+                  src={p.avatar}
+                  size="md"
+                  onClick={() =>
+                    openModal('imageViewer', { src: p.avatar, modalSize: 'fullscreen' })
+                  }
+                />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-text truncate">{p.name}</p>
                   {p.description && (

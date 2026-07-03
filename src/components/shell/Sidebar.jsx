@@ -62,6 +62,12 @@ function Sidebar({ open, onClose }) {
   const [showImportMenu, setShowImportMenu] = useState(false)
   const fileInputRef = useRef(null)
 
+  function handleAvatarClick(e, src) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (src) openModal('imageViewer', { src, modalSize: 'fullscreen' })
+  }
+
   function handleCreateCharacter() {
     openModal('characterCreate')
   }
@@ -316,7 +322,12 @@ function Sidebar({ open, onClose }) {
                           <Square className="w-4 h-4" />
                         )}
                       </button>
-                      <Avatar src={character?.avatar} size="sm" className="flex-shrink-0 mt-0.5" />
+                      <Avatar
+                        src={character?.avatar}
+                        size="sm"
+                        className="flex-shrink-0 mt-0.5"
+                        onClick={(e) => handleAvatarClick(e, character?.avatar)}
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span

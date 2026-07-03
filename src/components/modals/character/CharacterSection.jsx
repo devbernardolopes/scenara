@@ -59,7 +59,12 @@ function CharacterSection({ form, onChange, characterId }) {
       <div>
         <label className="block text-sm font-medium text-text mb-1">{t('avatarLabel')}</label>
         <div className="flex items-center gap-2">
-          <Avatar src={form.avatar} size="xl" className="shrink-0" />
+          <Avatar
+            src={form.avatar}
+            size="xl"
+            className="shrink-0"
+            onClick={() => openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })}
+          />
           <input
             className={`${inputClass} flex-1`}
             value={form.avatar}

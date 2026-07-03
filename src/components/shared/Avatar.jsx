@@ -5,7 +5,7 @@ const SIZES = {
   xl: 'text-4xl w-12 h-12',
 }
 
-function Avatar({ src, alt = '', size = 'md', className = '' }) {
+function Avatar({ src, alt = '', size = 'md', className = '', onClick }) {
   const cls = `${SIZES[size] || SIZES.md} ${className}`
   if (!src) {
     return (
@@ -15,7 +15,15 @@ function Avatar({ src, alt = '', size = 'md', className = '' }) {
     )
   }
   if (/^https?:\/\//.test(src) || src.startsWith('data:image/')) {
-    return <img src={src} alt={alt} data-avatar className={`rounded-full object-cover ${cls}`} />
+    return (
+      <img
+        src={src}
+        alt={alt}
+        data-avatar
+        className={`rounded-full object-cover ${cls} ${onClick ? 'cursor-pointer' : ''}`}
+        onClick={onClick}
+      />
+    )
   }
   return (
     <span data-avatar className={cls}>

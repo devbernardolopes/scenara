@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown } from '../lib/icons'
+import { useModal } from '../hooks/useModal'
 import { showToast } from '../lib/toast'
 import Avatar from '../components/shared/Avatar'
 import ChatInputArea from '../components/chat/ChatInputArea'
@@ -21,6 +22,7 @@ import { getSetting } from '../services/settings'
 function ChatView() {
   const { threadId } = useParams()
   const { t } = useTranslation('chat')
+  const { openModal } = useModal()
   const messagesEndRef = useRef(null)
   const scrollRef = useRef(null)
   const [thread, setThread] = useState(null)
@@ -158,7 +160,16 @@ function ChatView() {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 md:px-8 py-3 border-b border-border">
         <div className="flex items-center gap-2 min-w-0">
-          {character && <Avatar src={character.avatar} size="sm" className="flex-shrink-0" />}
+          {character && (
+            <Avatar
+              src={character.avatar}
+              size="sm"
+              className="flex-shrink-0"
+              onClick={() =>
+                openModal('imageViewer', { src: character.avatar, modalSize: 'fullscreen' })
+              }
+            />
+          )}
           <h1 className="font-semibold text-text truncate">{character?.name || thread.title}</h1>
           <span className="text-xs text-tertiary bg-surface-secondary px-2 py-0.5 rounded">
             {t('characterTag')}

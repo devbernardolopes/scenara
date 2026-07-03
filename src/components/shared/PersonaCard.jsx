@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useModal } from '../../hooks/useModal'
 import IconButton from './IconButton'
 import Avatar from './Avatar'
 import { Edit3, Star, Copy, Download, Trash2 } from '../../lib/icons'
@@ -15,6 +16,7 @@ function PersonaCard({
   isOnlyOne,
 }) {
   const { t } = useTranslation('settings')
+  const { openModal } = useModal()
 
   return (
     <div
@@ -36,9 +38,14 @@ function PersonaCard({
           />
         </label>
 
-        <div onClick={(e) => e.stopPropagation()}>
-          <Avatar src={persona.avatar} size="md" />
-        </div>
+        <Avatar
+          src={persona.avatar}
+          size="md"
+          onClick={(e) => {
+            e.stopPropagation()
+            openModal('imageViewer', { src: persona.avatar, modalSize: 'fullscreen' })
+          }}
+        />
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">

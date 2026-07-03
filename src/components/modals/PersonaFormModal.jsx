@@ -197,7 +197,14 @@ function PersonaFormModal({ persona }) {
             {t('persona.form.avatarLabel')}
           </label>
           <div className="flex items-center gap-2">
-            <Avatar src={form.avatar} size="xl" className="shrink-0" />
+            <Avatar
+              src={form.avatar}
+              size="xl"
+              className="shrink-0 cursor-pointer"
+              onClick={() =>
+                openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })
+              }
+            />
             <input
               className={inputClass}
               value={form.avatar}

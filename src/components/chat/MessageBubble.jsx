@@ -1,5 +1,6 @@
 import { useState, useRef, memo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useModal } from '../../hooks/useModal'
 import { showToast } from '../../lib/toast'
 import { Trash2, Edit3, Copy, GitBranch, RefreshCw, Play, Square, Terminal } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
@@ -29,6 +30,7 @@ function MessageBubble({
   onShowPrompt,
 }) {
   const { t } = useTranslation('chat')
+  const { openModal } = useModal()
   const [editing, setEditing] = useState(false)
   const [editedContent, setEditedContent] = useState('')
   const editRef = useRef(null)
@@ -38,6 +40,10 @@ function MessageBubble({
   const isAssistantOrSystem = role === 'assistant' || role === 'system'
   const avatarSize = AVATAR_SIZE_MAP[avatarScale] || 'sm'
   const tokenCount = estimateTokens(message.content)
+
+  function handleAvatarClick() {
+    if (avatarSrc) openModal('imageViewer', { src: avatarSrc, modalSize: 'fullscreen' })
+  }
 
   function handleCopy() {
     navigator.clipboard
@@ -89,7 +95,12 @@ function MessageBubble({
       >
         {/* Header */}
         <div className="flex items-center gap-1 px-3 pt-2 pb-1.5 border-b border-border-light">
-          <Avatar src={avatarSrc} size={avatarSize} className="flex-shrink-0" />
+          <Avatar
+            src={avatarSrc}
+            size={avatarSize}
+            className="flex-shrink-0"
+            onClick={handleAvatarClick}
+          />
           <span className="text-xs font-medium text-tertiary">{`#${messageNumber}`}</span>
           <div className="flex-1 min-w-0" />
           <button

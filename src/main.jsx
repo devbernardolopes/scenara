@@ -24,8 +24,10 @@ import InChatShortcutManagementModal from './components/modals/InChatShortcutMan
 import InChatShortcutFormModal from './components/modals/InChatShortcutFormModal'
 
 const SettingsModal = lazy(() => import('./components/modals/settings/SettingsModal'))
+const ImageViewerModal = lazy(() => import('./components/modals/ImageViewerModal'))
 
 registerModal('settings', SettingsModal)
+registerModal('imageViewer', ImageViewerModal)
 registerModal('characterCreate', CharacterCreateModal)
 registerModal('personaEditor', PersonaEditorModal)
 registerModal('personaForm', PersonaFormModal)
