@@ -10,7 +10,9 @@ function SettingSlider({ value, onChange, min = 0, max = 100, step = 1 }) {
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-32 accent-primary"
       />
-      <span className="text-sm text-text font-medium w-12 text-right">{value}</span>
+      <span className="text-sm text-text font-medium w-14 text-right">
+        {step < 1 ? Number(value).toFixed(2) : value}
+      </span>
     </div>
   )
 }

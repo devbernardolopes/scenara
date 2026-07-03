@@ -227,6 +227,15 @@ export const SETTINGS = [
     descKey: 'settings:api.useChatForAll.desc',
   },
   {
+    key: 'api.requestCooldown',
+    category: 'api',
+    type: 'slider',
+    default: 2,
+    props: { min: 2, max: 10, step: 0.5 },
+    labelKey: 'settings:api.requestCooldown.label',
+    descKey: 'settings:api.requestCooldown.desc',
+  },
+  {
     key: 'prompting.autoTitleSystem',
     category: 'prompting',
     type: 'textarea',

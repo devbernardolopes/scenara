@@ -79,7 +79,11 @@
       "summarization": "Summarization",
       "director": "Director",
       "none": "Not assigned",
-      "useChatForAll": "Use chat profile for auto-title, summarization, and director"
+      "useChatForAll": "Use chat profile for auto-title, summarization, and director",
+      "requestCooldown": {
+        "label": "API Request Cooldown",
+        "desc": "Minimum waiting time (in seconds) between API requests to providers."
+      }
     },
     "profile": {
       "createProfile": "Create Profile",

@@ -5,6 +5,7 @@ import { getAllProfiles, migrateFromOldSettings } from '../../../services/connec
 import { getSetting, setSetting } from '../../../services/settings'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import ApiKeyManager from './controls/ApiKeyManager'
+import SettingSlider from './controls/SettingSlider'
 import ProfilePicker from '../../shared/ProfilePicker'
 
 const REQUEST_KINDS = [
@@ -69,6 +70,7 @@ function ApiSettingsPanel() {
   const [profileAssignments, setProfileAssignments] = useState({})
   const [useChatForAll, setUseChatForAll] = useState(true)
   const [selectedKind, setSelectedKind] = useState(null)
+  const [cooldown, setCooldown] = useState(2)
 
   useEffect(() => {
     async function load() {
@@ -98,6 +100,8 @@ function ApiSettingsPanel() {
         setUseChatForAll(allSame)
       }
 
+      setCooldown(await getSetting('api.requestCooldown'))
+
       setLoading(false)
     }
     load()
@@ -116,6 +120,11 @@ function ApiSettingsPanel() {
   async function handleUseChatForAllChange(val) {
     setUseChatForAll(val)
     await setSetting('api.useChatForAll', val ? 1 : 0)
+  }
+
+  async function handleCooldownChange(val) {
+    setCooldown(val)
+    await setSetting('api.requestCooldown', val)
   }
 
   if (loading) {
@@ -159,6 +168,22 @@ function ApiSettingsPanel() {
               onToggle={() => setSelectedKind(selectedKind === kind.id ? null : kind.id)}
             />
           ))}
+      </div>
+
+      <div className="border-t border-border pt-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-text">{t('api.requestCooldown.label')}</h3>
+            <p className="text-xs text-secondary mt-0.5">{t('api.requestCooldown.desc')}</p>
+          </div>
+          <SettingSlider
+            value={cooldown}
+            onChange={handleCooldownChange}
+            min={2}
+            max={10}
+            step={0.5}
+          />
+        </div>
       </div>
 
       <div className="border-t border-border pt-6">
