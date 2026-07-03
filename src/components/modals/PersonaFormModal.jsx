@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
+import CollapsibleSection from '../shared/CollapsibleSection'
 import Avatar from '../shared/Avatar'
 import { createPersona, updatePersona, getAllPersonas } from '../../services/personas'
 import { estimateTokens } from '../../services/tokenEstimator'
@@ -164,14 +165,19 @@ function PersonaFormModal({ persona }) {
           <label className="block text-sm font-medium text-text mb-1">
             {t('persona.form.inChatName')} <span className="text-error">*</span>
           </label>
-          <input
-            className={inputClass}
-            value={form.name}
-            onChange={update('name')}
-            placeholder={t('persona.form.inChatNamePlaceholder')}
-            required
-            autoFocus
-          />
+          <div className="relative">
+            <input
+              className={`${inputClass} pr-20`}
+              value={form.name}
+              onChange={update('name')}
+              placeholder={t('persona.form.inChatNamePlaceholder')}
+              required
+              autoFocus
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-tertiary">
+              {estimateTokens(form.name)} tokens
+            </span>
+          </div>
         </div>
 
         <div>
@@ -224,23 +230,20 @@ function PersonaFormModal({ persona }) {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-text mb-1">
-            {t('persona.form.descriptionLabel')}
-          </label>
-          <div className="relative">
-            <textarea
-              className={`${inputClass} resize-none pr-20`}
-              rows={3}
-              value={form.description}
-              onChange={update('description')}
-              placeholder={t('persona.form.descriptionPlaceholder')}
-            />
-            <span className="absolute right-3 bottom-2 text-xs text-tertiary">
-              {estimateTokens(form.description)} tokens
-            </span>
-          </div>
-        </div>
+        <CollapsibleSection
+          label={t('persona.form.descriptionLabel')}
+          summary={form.description ? `${estimateTokens(form.description)} tokens` : null}
+          storageKey="personaFormDescription"
+          defaultExpanded={true}
+        >
+          <textarea
+            className={`${inputClass} resize-none mt-2`}
+            rows={4}
+            value={form.description}
+            onChange={update('description')}
+            placeholder={t('persona.form.descriptionPlaceholder')}
+          />
+        </CollapsibleSection>
 
         <div>
           <label className="block text-sm font-medium text-text mb-2">

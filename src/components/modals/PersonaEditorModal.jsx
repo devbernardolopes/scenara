@@ -5,6 +5,7 @@ import { useConfirm } from '../../lib/confirm'
 import db from '../../db'
 import { createCharacter as createPersona } from '../../services/characters'
 import CloseButton from '../shared/CloseButton'
+import CollapsibleSection from '../shared/CollapsibleSection'
 import { estimateTokens } from '../../services/tokenEstimator'
 import Avatar from '../shared/Avatar'
 import { Plus } from '../../lib/icons'
@@ -96,14 +97,19 @@ function PersonaEditorModal() {
               <label className="block text-sm font-medium text-text mb-1">
                 {t('personaNameLabel')}
               </label>
-              <input
-                className={inputClass}
-                value={form.name}
-                onChange={update('name')}
-                placeholder={t('personaNamePlaceholder')}
-                required
-                autoFocus
-              />
+              <div className="relative">
+                <input
+                  className={`${inputClass} pr-20`}
+                  value={form.name}
+                  onChange={update('name')}
+                  placeholder={t('personaNamePlaceholder')}
+                  required
+                  autoFocus
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-tertiary">
+                  {estimateTokens(form.name)} tokens
+                </span>
+              </div>
             </div>
 
             <div>
@@ -118,23 +124,20 @@ function PersonaEditorModal() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-text mb-1">
-                {t('personaDescriptionLabel')}
-              </label>
-              <div className="relative">
-                <textarea
-                  className={`${inputClass} resize-none pr-20`}
-                  rows={3}
-                  value={form.description}
-                  onChange={update('description')}
-                  placeholder={t('personaDescriptionPlaceholder')}
-                />
-                <span className="absolute right-3 bottom-2 text-xs text-tertiary">
-                  {estimateTokens(form.description)} tokens
-                </span>
-              </div>
-            </div>
+            <CollapsibleSection
+              label={t('personaDescriptionLabel')}
+              summary={form.description ? `${estimateTokens(form.description)} tokens` : null}
+              storageKey="personaEditorDescription"
+              defaultExpanded={true}
+            >
+              <textarea
+                className={`${inputClass} resize-none mt-2`}
+                rows={4}
+                value={form.description}
+                onChange={update('description')}
+                placeholder={t('personaDescriptionPlaceholder')}
+              />
+            </CollapsibleSection>
           </div>
         </div>
 
