@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Send } from '../lib/icons'
 import Avatar from '../components/shared/Avatar'
+import ChatInputArea from '../components/chat/ChatInputArea'
 import { getThread } from '../services/threads'
 import { getCharacter } from '../services/characters'
 import { getMessagesByThread, createMessage } from '../services/messages'
@@ -14,7 +14,6 @@ function ChatView() {
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [messages, setMessages] = useState([])
-  const [input, setInput] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
 
@@ -41,14 +40,12 @@ function ChatView() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  async function handleSend(e) {
-    e.preventDefault()
-    const text = input.trim()
-    if (!text || sending) return
+  async function handleSend(text) {
+    const trimmed = text.trim()
+    if (!trimmed || sending) return
     setSending(true)
     try {
-      await createMessage(threadId, 'user', text)
-      setInput('')
+      await createMessage(threadId, 'user', trimmed)
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
     } finally {
@@ -116,26 +113,7 @@ function ChatView() {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSend} className="border-t border-border p-4">
-        <div className="flex items-center gap-2 max-w-4xl mx-auto">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={t('inputPlaceholder')}
-            className="flex-1 min-h-[44px] px-4 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
-            disabled={sending}
-          />
-          <button
-            type="submit"
-            disabled={sending || !input.trim()}
-            className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
-          >
-            <Send className="w-4 h-4" />
-            {t('send')}
-          </button>
-        </div>
-      </form>
+      <ChatInputArea threadId={threadId} defaultPersonaId={thread?.personaId} onSend={handleSend} />
     </div>
   )
 }

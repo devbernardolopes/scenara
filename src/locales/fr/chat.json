@@ -2,5 +2,23 @@
   "title": "Discussion {{id}}",
   "placeholder": "Les messages apparaîtront ici.",
   "inputPlaceholder": "Tapez un message…",
-  "send": "Envoyer"
+  "send": "Envoyer",
+  "ooc": "Mode OOC",
+  "attachFile": "Joindre un fichier",
+  "shortcuts": "Raccourcis",
+  "memories": "Mémoires",
+  "stt": "Parole en texte",
+  "moreOptions": "Plus d'options",
+  "personaSelector": "Choisir une persona",
+  "promptHistory": {
+    "title": "Prompts récents",
+    "empty": "Aucun prompt précédent",
+    "hint": "Double-clic pour envoyer"
+  },
+  "quickSettings": {
+    "autoTTS": "TTS auto",
+    "enterToSend": "ENTRÉE pour envoyer",
+    "autoReply": "Réponse auto",
+    "autoSend": "Envoi auto"
+  }
 }

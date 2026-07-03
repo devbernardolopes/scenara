@@ -40,4 +40,8 @@ export {
   FileUp,
   ArrowUpDown,
   SlidersHorizontal,
+  MessageSquare,
+  Paperclip,
+  Mic,
+  MoreHorizontal,
 } from 'lucide-react'

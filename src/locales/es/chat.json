@@ -2,5 +2,23 @@
   "title": "Chat {{id}}",
   "placeholder": "Los mensajes aparecerán aquí.",
   "inputPlaceholder": "Escriba un mensaje…",
-  "send": "Enviar"
+  "send": "Enviar",
+  "ooc": "Modo OOC",
+  "attachFile": "Adjuntar archivo",
+  "shortcuts": "Atajos",
+  "memories": "Recuerdos guardados",
+  "stt": "Voz a texto",
+  "moreOptions": "Más opciones",
+  "personaSelector": "Seleccionar persona",
+  "promptHistory": {
+    "title": "Prompts recientes",
+    "empty": "Sin prompts anteriores",
+    "hint": "Doble clic para enviar"
+  },
+  "quickSettings": {
+    "autoTTS": "TTS auto",
+    "enterToSend": "ENTRAR para enviar",
+    "autoReply": "Respuesta auto",
+    "autoSend": "Envío auto"
+  }
 }

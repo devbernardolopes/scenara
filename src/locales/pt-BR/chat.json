@@ -7,5 +7,23 @@
   "deleteTitle": "Excluir conversa",
   "deleteConfirm": "Excluir esta conversa?",
   "deleteThread": "Excluir",
-  "characterTag": "Personagem"
+  "characterTag": "Personagem",
+  "ooc": "Modo OOC",
+  "attachFile": "Anexar arquivo",
+  "shortcuts": "Atalhos no chat",
+  "memories": "Memórias salvas",
+  "stt": "Fala para texto",
+  "moreOptions": "Mais opções",
+  "personaSelector": "Selecionar persona",
+  "promptHistory": {
+    "title": "Prompts recentes",
+    "empty": "Nenhum prompt anterior",
+    "hint": "Duplo clique para enviar"
+  },
+  "quickSettings": {
+    "autoTTS": "TTS automático",
+    "enterToSend": "ENTER para enviar",
+    "autoReply": "Resposta automática",
+    "autoSend": "Envio automático"
+  }
 }

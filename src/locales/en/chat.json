@@ -7,5 +7,23 @@
   "deleteTitle": "Delete conversation",
   "deleteConfirm": "Delete this conversation?",
   "deleteThread": "Delete",
-  "characterTag": "Character"
+  "characterTag": "Character",
+  "ooc": "OOC mode",
+  "attachFile": "Attach file",
+  "shortcuts": "In-chat shortcuts",
+  "memories": "Saved memories",
+  "stt": "Speech to text",
+  "moreOptions": "More options",
+  "personaSelector": "Select persona",
+  "promptHistory": {
+    "title": "Recent prompts",
+    "empty": "No previous prompts",
+    "hint": "Double-click to send"
+  },
+  "quickSettings": {
+    "autoTTS": "Auto TTS",
+    "enterToSend": "ENTER to Send",
+    "autoReply": "Auto-reply",
+    "autoSend": "Auto-send"
+  }
 }
