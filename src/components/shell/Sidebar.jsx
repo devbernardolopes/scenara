@@ -34,7 +34,9 @@ import {
   Globe,
   FileUp,
   SlidersHorizontal,
+  RefreshCw,
 } from '../../lib/icons'
+import { getGeneratingThreads } from '../../services/generatingState'
 
 const COLOR_PRESETS = [
   '#ef4444',
@@ -60,6 +62,7 @@ function Sidebar({ open, onClose }) {
   const colorPickerRef = useRef(null)
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [showImportMenu, setShowImportMenu] = useState(false)
+  const [generatingSet, setGeneratingSet] = useState(() => getGeneratingThreads())
   const fileInputRef = useRef(null)
 
   function handleAvatarClick(e, src) {
@@ -125,6 +128,23 @@ function Sidebar({ open, onClose }) {
     window.addEventListener('threads-changed', loadData)
     return () => window.removeEventListener('threads-changed', loadData)
   }, [loadData])
+
+  useEffect(() => {
+    function handleChange(e) {
+      const { threadId, generating } = e.detail
+      setGeneratingSet((prev) => {
+        const next = new Set(prev)
+        if (generating) {
+          next.add(threadId)
+        } else {
+          next.delete(threadId)
+        }
+        return next
+      })
+    }
+    window.addEventListener('generating-state-changed', handleChange)
+    return () => window.removeEventListener('generating-state-changed', handleChange)
+  }, [])
 
   function handleEditTitle(thread) {
     openModal('editThreadTitle', { thread })
@@ -335,6 +355,9 @@ function Sidebar({ open, onClose }) {
                           >
                             {thread.title}
                           </span>
+                          {generatingSet.has(thread.id) && (
+                            <RefreshCw className="w-3.5 h-3.5 text-primary animate-spin shrink-0" />
+                          )}
                           <span className="text-xs text-tertiary shrink-0">
                             #{thread.threadNumber}
                           </span>

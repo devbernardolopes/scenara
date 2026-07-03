@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Send,
+  Square,
   MessageSquare,
   Paperclip,
   Zap,
@@ -25,7 +26,7 @@ const DEFAULT_QUICK_SETTINGS = Object.fromEntries(
 )
 const STORAGE_PREFIX = 'chatInput.'
 
-function ChatInputArea({ threadId, onSend }) {
+function ChatInputArea({ threadId, onSend, onCancel, generating }) {
   const { t } = useTranslation('chat')
   const textareaRef = useRef(null)
   const promptPanelRef = useRef(null)
@@ -198,8 +199,11 @@ function ChatInputArea({ threadId, onSend }) {
   }, [])
 
   function handleSend() {
-    const text = inputValue.trim()
-    if (!text) return
+    if (generating) {
+      onCancel?.()
+      return
+    }
+    const text = inputValue
     onSend?.(text, selectedPersona?.id, oocActive)
     setInputValue('')
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
@@ -366,14 +370,17 @@ function ChatInputArea({ threadId, onSend }) {
             />
           </div>
 
-          {/* Send button */}
+          {/* Send / Cancel button */}
           <button
             type="button"
             onClick={handleSend}
-            disabled={!inputValue.trim()}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+            className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-sm flex-shrink-0 ${
+              generating
+                ? 'bg-error text-on-primary hover:opacity-90'
+                : 'bg-primary text-on-primary hover:bg-primary-hover'
+            }`}
           >
-            <Send className="w-4 h-4" />
+            {generating ? <Square className="w-4 h-4" /> : <Send className="w-4 h-4" />}
           </button>
         </div>
       </div>

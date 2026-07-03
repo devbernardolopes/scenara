@@ -2,7 +2,7 @@ import { useState, useRef, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { showToast } from '../../lib/toast'
-import { Trash2, Edit3, Copy, GitBranch, RefreshCw, Play, Square, Terminal } from '../../lib/icons'
+import { Trash2, Edit3, Copy, GitBranch, RefreshCw, Play, Terminal } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 
 const AVATAR_SIZE_MAP = { '1x': 'sm', '2x': 'md', '3x': 'lg', '4x': 'xl' }
@@ -23,6 +23,7 @@ function MessageBubble({
   avatarScale,
   role,
   personaMap,
+  streaming,
   onDeleteRequest,
   onEdit,
   onFork,
@@ -197,7 +198,12 @@ function MessageBubble({
               style={isUser ? userBgStyle : undefined}
             />
           ) : (
-            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+            <p className="text-sm whitespace-pre-wrap">
+              {message.content}
+              {streaming && (
+                <span className="inline-block w-0.5 h-4 bg-current ml-0.5 animate-pulse align-text-bottom" />
+              )}
+            </p>
           )}
         </div>
 

@@ -235,8 +235,7 @@
     },
     "firstMessageRoleOptions": {
       "system": "SYSTEM",
-      "assistant": "ASSISTANT",
-      "user": "USER"
+      "assistant": "ASSISTANT"
     },
     "firstMessagePrompt": {
       "label": "FIRST MESSAGE Prompt",

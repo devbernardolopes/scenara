@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown } from '../lib/icons'
+import { ChevronDown, RefreshCw } from '../lib/icons'
 import { useModal } from '../hooks/useModal'
 import { showToast } from '../lib/toast'
 import Avatar from '../components/shared/Avatar'
@@ -10,14 +10,19 @@ import MessageBubble from '../components/chat/MessageBubble'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
 import { getThread } from '../services/threads'
 import { getCharacter } from '../services/characters'
-import { getAllPersonas } from '../services/personas'
+import { getAllPersonas, getPersona } from '../services/personas'
 import {
   getMessagesByThread,
   createMessage,
+  createAssistantMessage,
   updateMessage,
   deleteMessagesFrom,
 } from '../services/messages'
+import { getWritingInstruction } from '../services/writingInstructions'
+import { getEffectiveProfileFor } from '../services/connectionProfiles'
+import { sendChatCompletion, buildMessagesPayload } from '../services/chatApi'
 import { getSetting } from '../services/settings'
+import { startGenerating, stopGenerating } from '../services/generatingState'
 
 function ChatView() {
   const { threadId } = useParams()
@@ -25,12 +30,17 @@ function ChatView() {
   const { openModal } = useModal()
   const messagesEndRef = useRef(null)
   const scrollRef = useRef(null)
+  const abortRef = useRef(null)
+  const generatingRef = useRef(false)
+  const autoTriggeredRef = useRef(false)
+  const handleSendRef = useRef(null)
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
-  const [sending, setSending] = useState(false)
+  const [generating, setGenerating] = useState(false)
+  const [streamingMsgId, setStreamingMsgId] = useState(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [noChatProfile, setNoChatProfile] = useState(false)
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
@@ -92,6 +102,19 @@ function ChatView() {
     }
   }, [thread])
 
+  useEffect(() => {
+    if (loading || !character || noChatProfile) return
+    if (
+      !autoTriggeredRef.current &&
+      messages.length === 0 &&
+      !character.initialMessages?.length &&
+      character.firstMessage
+    ) {
+      autoTriggeredRef.current = true
+      handleSendRef.current?.('', null, false)
+    }
+  }, [loading, character, noChatProfile])
+
   const handleScroll = useCallback(() => {
     const el = scrollRef.current
     if (!el) return
@@ -103,16 +126,167 @@ function ChatView() {
     setShowScrollButton(false)
   }
 
-  async function handleSend(text, personaId, isOOC) {
-    const trimmed = text?.trim()
-    if (!trimmed || sending || noChatProfile) return
-    setSending(true)
+  async function handleCancel() {
+    if (abortRef.current) {
+      abortRef.current.abort()
+      abortRef.current = null
+    }
+  }
+
+  async function doChatRequest(isFirstMessage, currentMsgs, chatPersona, currentPersona) {
+    const profile = await getEffectiveProfileFor('chat')
+    if (!profile?.model) {
+      showToast('No Chat profile configured or model selected.', { type: 'error' })
+      return
+    }
+
+    let writingInstruction = null
+    if (character?.writingInstruction) {
+      writingInstruction = await getWritingInstruction(character.writingInstruction)
+    }
+
+    const settings = {
+      firstMessageRole: await getSetting('prompting.firstMessageRole'),
+      firstMessagePrompt: await getSetting('prompting.firstMessagePrompt'),
+      continueRole: await getSetting('prompting.continueRole'),
+      continuePrompt: await getSetting('prompting.continuePrompt'),
+      personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
+    }
+
+    const payload = await buildMessagesPayload({
+      character,
+      chatPersona,
+      currentPersona,
+      messages: currentMsgs,
+      isFirstMessage,
+      settings,
+      writingInstruction,
+    })
+
+    const assistantMsgId = await createAssistantMessage(threadId, '')
+    setStreamingMsgId(assistantMsgId)
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: assistantMsgId,
+        threadId: Number(threadId),
+        role: 'assistant',
+        content: '',
+        createdAt: new Date(),
+      },
+    ])
+
+    abortRef.current = new AbortController()
+
     try {
-      await createMessage(threadId, 'user', trimmed, personaId, isOOC)
+      const content = await sendChatCompletion({
+        profile,
+        messages: payload,
+        signal: abortRef.current.signal,
+        onToken: (fullContent) => {
+          updateMessage(assistantMsgId, { content: fullContent })
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantMsgId ? { ...m, content: fullContent } : m)),
+          )
+        },
+      })
+
+      await updateMessage(assistantMsgId, { content })
+      setMessages((prev) => prev.map((m) => (m.id === assistantMsgId ? { ...m, content } : m)))
+      showToast(t('messageUpdated'), { type: 'success' })
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        await updateMessage(assistantMsgId, { content: '' })
+        const msgs = await getMessagesByThread(threadId)
+        setMessages(msgs)
+      } else {
+        await updateMessage(assistantMsgId, { content: '' })
+        const msgs = await getMessagesByThread(threadId)
+        setMessages(msgs)
+        showToast(err.message, { type: 'error' })
+      }
+    } finally {
+      setStreamingMsgId(null)
+      abortRef.current = null
+    }
+  }
+
+  async function handleSend(text, personaId, isOOC) {
+    if (generatingRef.current) return
+    generatingRef.current = true
+    setGenerating(true)
+    startGenerating(threadId)
+
+    const isFirstMessage =
+      !character?.initialMessages?.length && !messages.some((m) => m.role === 'user')
+
+    if (isFirstMessage && !text && !character?.firstMessage) {
+      generatingRef.current = false
+      setGenerating(false)
+      stopGenerating(threadId)
+      return
+    }
+
+    try {
+      let currentMsgs = messages
+      let chatPersona = null
+
+      if (thread?.personaId) {
+        chatPersona = await getPersona(thread.personaId)
+      }
+
+      if (text) {
+        await createMessage(threadId, 'user', text, personaId, isOOC)
+        currentMsgs = await getMessagesByThread(threadId)
+        setMessages(currentMsgs)
+      }
+
+      const currentPersona = personaId ? await getPersona(personaId) : null
+      await doChatRequest(isFirstMessage, currentMsgs, chatPersona, currentPersona)
+
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
     } finally {
-      setSending(false)
+      generatingRef.current = false
+      setGenerating(false)
+      stopGenerating(threadId)
+    }
+  }
+
+  useEffect(() => {
+    handleSendRef.current = handleSend
+  })
+
+  async function handleRegenerate(messageId) {
+    if (generatingRef.current) return
+    generatingRef.current = true
+    setGenerating(true)
+    startGenerating(threadId)
+
+    try {
+      const idx = messages.findIndex((m) => m.id === messageId)
+      if (idx === -1) return
+
+      await deleteMessagesFrom(messageId)
+      const currentMsgs = messages.slice(0, idx)
+      setMessages(currentMsgs)
+
+      let chatPersona = null
+      if (thread?.personaId) {
+        chatPersona = await getPersona(thread.personaId)
+      }
+
+      const isFirstMessage =
+        !character?.initialMessages?.length && !currentMsgs.some((m) => m.role === 'user')
+
+      await doChatRequest(isFirstMessage, currentMsgs, chatPersona, null)
+
+      const msgs = await getMessagesByThread(threadId)
+      setMessages(msgs)
+    } finally {
+      generatingRef.current = false
+      setGenerating(false)
+      stopGenerating(threadId)
     }
   }
 
@@ -186,6 +360,7 @@ function ChatView() {
           <span className="text-xs text-tertiary bg-surface-secondary px-2 py-0.5 rounded">
             {t('characterTag')}
           </span>
+          {generating && <RefreshCw className="w-4 h-4 text-primary animate-spin" />}
         </div>
       </div>
 
@@ -194,7 +369,7 @@ function ChatView() {
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto px-4 md:px-8 py-4 space-y-4 relative"
       >
-        {messages.length === 0 ? (
+        {messages.length === 0 && !generating ? (
           <p className="text-secondary text-sm text-center py-8">{t('placeholder')}</p>
         ) : (
           messages.map((msg, idx) => (
@@ -206,10 +381,11 @@ function ChatView() {
               avatarScale={getAvatarScale(msg)}
               role={msg.role}
               personaMap={personaMap}
+              streaming={msg.id === streamingMsgId}
               onDeleteRequest={(id) => setConfirmDeleteId(id)}
               onEdit={handleEditMessage}
               onFork={() => {}}
-              onRegenerate={() => {}}
+              onRegenerate={handleRegenerate}
               onSpeak={() => {}}
               onShowPrompt={() => {}}
             />
@@ -229,7 +405,12 @@ function ChatView() {
         )}
       </div>
 
-      <ChatInputArea threadId={threadId} onSend={handleSend} />
+      <ChatInputArea
+        threadId={threadId}
+        onSend={handleSend}
+        onCancel={handleCancel}
+        generating={generating}
+      />
 
       {confirmDeleteId && (
         <ConfirmDialog
