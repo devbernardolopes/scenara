@@ -40,7 +40,7 @@ async function fetchOpenAIModels(baseUrl, apiKey, signal, modelsPath) {
   const json = await res.json()
   const models = (json.data || [])
     .filter((m) => (m.id || m.name) && m.active !== false)
-    .map((m) => m.name || m.id)
+    .map((m) => m.id)
     .sort((a, b) => a.localeCompare(b))
   return models
 }
