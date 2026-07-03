@@ -33,6 +33,13 @@ function ChatInputArea({ threadId, onSend }) {
   const ellipsisRef = useRef(null)
   const saveTimerRef = useRef(null)
   const initializedRef = useRef(false)
+  const latestRef = useRef({
+    personaId: null,
+    oocActive: false,
+    sttActive: false,
+    inputValue: '',
+    quickSettings: DEFAULT_QUICK_SETTINGS,
+  })
 
   const [inputValue, setInputValue] = useState('')
   const [oocActive, setOocActive] = useState(false)
@@ -71,11 +78,12 @@ function ChatInputArea({ threadId, onSend }) {
 
   // Load saved state on mount / thread change
   useEffect(() => {
+    const keyAtMount = storageKey
     initializedRef.current = false
     setReady(false)
     let cancelled = false
     async function load() {
-      const saved = await getUIState(storageKey)
+      const saved = await getUIState(keyAtMount)
       if (cancelled) return
       if (saved) {
         setInputValue(saved.inputValue || '')
@@ -112,10 +120,21 @@ function ChatInputArea({ threadId, onSend }) {
         saveTimerRef.current = null
       }
       if (initializedRef.current) {
-        persistNow()
+        setUIState(keyAtMount, latestRef.current)
       }
     }
   }, [threadId])
+
+  // Sync latestRef after every render so cleanup always has freshest values
+  useEffect(() => {
+    latestRef.current = {
+      personaId: selectedPersona?.id || null,
+      oocActive,
+      sttActive,
+      inputValue,
+      quickSettings,
+    }
+  })
 
   // Debounced save when input changes
   useEffect(() => {
