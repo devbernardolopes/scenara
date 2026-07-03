@@ -376,7 +376,9 @@ function ProfileFormModal({ profile }) {
             <p className="text-sm font-medium text-text">{t('api.profile.form.parameters')}</p>
             {paramDefs.map((param) => (
               <div key={param.key}>
-                <label className="block text-xs font-medium text-secondary mb-1">{param.key}</label>
+                <label className="block text-xs font-medium text-secondary mb-1">
+                  {param.label || param.key}
+                </label>
                 {param.type === 'range' && (
                   <SettingSlider
                     value={form.params[param.key] ?? param.default ?? param.min ?? 0}
