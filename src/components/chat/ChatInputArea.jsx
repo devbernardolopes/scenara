@@ -15,6 +15,7 @@ import Avatar from '../shared/Avatar'
 import PersonaPicker from '../shared/PersonaPicker'
 import IconButton from '../shared/IconButton'
 import { getPersona, getAllPersonas } from '../../services/personas'
+import { getThread } from '../../services/threads'
 import { getUIState, setUIState } from '../../services/uiState'
 import db from '../../db'
 
@@ -24,7 +25,7 @@ const DEFAULT_QUICK_SETTINGS = Object.fromEntries(
 )
 const STORAGE_PREFIX = 'chatInput.'
 
-function ChatInputArea({ threadId, defaultPersonaId, onSend }) {
+function ChatInputArea({ threadId, onSend }) {
   const { t } = useTranslation('chat')
   const textareaRef = useRef(null)
   const promptPanelRef = useRef(null)
@@ -85,8 +86,10 @@ function ChatInputArea({ threadId, defaultPersonaId, onSend }) {
         }
       }
       if (!saved?.personaId) {
-        if (defaultPersonaId) {
-          const p = await getPersona(defaultPersonaId)
+        const thread = await getThread(threadId)
+        const fallbackPersonaId = thread?.personaId
+        if (fallbackPersonaId) {
+          const p = await getPersona(fallbackPersonaId)
           if (!cancelled) setSelectedPersona(p || null)
         } else {
           const list = await getAllPersonas()

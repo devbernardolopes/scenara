@@ -216,7 +216,7 @@ function ChatView() {
         )}
       </div>
 
-      <ChatInputArea threadId={threadId} defaultPersonaId={thread?.personaId} onSend={handleSend} />
+      <ChatInputArea threadId={threadId} onSend={handleSend} />
 
       {confirmDeleteId && (
         <ConfirmDialog
