@@ -4,9 +4,18 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown } from '../lib/icons'
 import Avatar from '../components/shared/Avatar'
 import ChatInputArea from '../components/chat/ChatInputArea'
+import MessageBubble from '../components/chat/MessageBubble'
+import ConfirmDialog from '../components/shared/ConfirmDialog'
 import { getThread } from '../services/threads'
 import { getCharacter } from '../services/characters'
-import { getMessagesByThread, createMessage } from '../services/messages'
+import { getAllPersonas } from '../services/personas'
+import {
+  getMessagesByThread,
+  createMessage,
+  updateMessage,
+  deleteMessagesFrom,
+} from '../services/messages'
+import { getSetting } from '../services/settings'
 
 function ChatView() {
   const { threadId } = useParams()
@@ -15,10 +24,23 @@ function ChatView() {
   const scrollRef = useRef(null)
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
+  const [personaMap, setPersonaMap] = useState({})
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [showScrollButton, setShowScrollButton] = useState(false)
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+  const [charAvatarScale, setCharAvatarScale] = useState('1x')
+  const [personaAvatarScale, setPersonaAvatarScale] = useState('1x')
+
+  async function loadPersonas() {
+    const list = await getAllPersonas()
+    const map = {}
+    list.forEach((p) => {
+      map[p.id] = p
+    })
+    setPersonaMap(map)
+  }
 
   async function loadData() {
     setLoading(true)
@@ -30,6 +52,11 @@ function ChatView() {
         const chr = await getCharacter(thr.characterId)
         setCharacter(chr)
       }
+      await Promise.all([
+        loadPersonas(),
+        getSetting('defaultCharacterAvatarScale').then((v) => setCharAvatarScale(v || '1x')),
+        getSetting('defaultUserPersonaAvatarScale').then((v) => setPersonaAvatarScale(v || '1x')),
+      ])
     } finally {
       setLoading(false)
     }
@@ -43,6 +70,21 @@ function ChatView() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  useEffect(() => {
+    function onPersonasChanged() {
+      loadPersonas()
+    }
+    function onCharactersChanged() {
+      if (thread) getCharacter(thread.characterId).then(setCharacter)
+    }
+    window.addEventListener('personas-changed', onPersonasChanged)
+    window.addEventListener('characters-changed', onCharactersChanged)
+    return () => {
+      window.removeEventListener('personas-changed', onPersonasChanged)
+      window.removeEventListener('characters-changed', onCharactersChanged)
+    }
+  }, [thread])
+
   const handleScroll = useCallback(() => {
     const el = scrollRef.current
     if (!el) return
@@ -54,18 +96,44 @@ function ChatView() {
     setShowScrollButton(false)
   }
 
-  async function handleSend(text) {
-    const trimmed = text.trim()
+  async function handleSend(text, personaId) {
+    const trimmed = text?.trim()
     if (!trimmed || sending) return
     setSending(true)
     try {
-      await createMessage(threadId, 'user', trimmed)
+      await createMessage(threadId, 'user', trimmed, personaId)
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
     } finally {
       setSending(false)
     }
   }
+
+  async function handleEditMessage(id, content) {
+    await updateMessage(id, { content })
+    const msgs = await getMessagesByThread(threadId)
+    setMessages(msgs)
+  }
+
+  async function handleDeleteMessage(id) {
+    setConfirmDeleteId(null)
+    await deleteMessagesFrom(id)
+    const msgs = await getMessagesByThread(threadId)
+    setMessages(msgs)
+  }
+
+  function getAvatarSrc(msg) {
+    if (msg.role === 'user') return personaMap[msg.personaId]?.avatar || null
+    return character?.avatar || null
+  }
+
+  function getAvatarScale(msg) {
+    return msg.role === 'user' ? personaAvatarScale : charAvatarScale
+  }
+
+  const deletedMsgNumber = confirmDeleteId
+    ? messages.findIndex((m) => m.id === confirmDeleteId) + 1
+    : null
 
   if (loading) {
     return (
@@ -103,29 +171,21 @@ function ChatView() {
         {messages.length === 0 ? (
           <p className="text-secondary text-sm text-center py-8">{t('placeholder')}</p>
         ) : (
-          messages.map((msg) => (
-            <div
+          messages.map((msg, idx) => (
+            <MessageBubble
               key={msg.id}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[80%] md:max-w-[65%] rounded-lg px-4 py-2 ${
-                  msg.role === 'user'
-                    ? 'bg-primary text-on-primary'
-                    : msg.role === 'system'
-                      ? 'bg-surface-secondary text-secondary text-sm italic'
-                      : 'bg-surface-secondary text-text'
-                }`}
-              >
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                <p className="text-xs mt-1 opacity-60">
-                  {new Date(msg.createdAt).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
-              </div>
-            </div>
+              message={msg}
+              messageNumber={idx + 1}
+              avatarSrc={getAvatarSrc(msg)}
+              avatarScale={getAvatarScale(msg)}
+              role={msg.role}
+              onDeleteRequest={(id) => setConfirmDeleteId(id)}
+              onEdit={handleEditMessage}
+              onFork={() => {}}
+              onRegenerate={() => {}}
+              onSpeak={() => {}}
+              onShowPrompt={() => {}}
+            />
           ))
         )}
         <div ref={messagesEndRef} />
@@ -143,6 +203,18 @@ function ChatView() {
       </div>
 
       <ChatInputArea threadId={threadId} defaultPersonaId={thread?.personaId} onSend={handleSend} />
+
+      {confirmDeleteId && (
+        <ConfirmDialog
+          title={t('messageDeleteTitle')}
+          message={t('messageDeleteConfirm', { number: deletedMsgNumber })}
+          confirmLabel={t('deleteThread')}
+          cancelLabel={t('cancel')}
+          variant="danger"
+          onConfirm={() => handleDeleteMessage(confirmDeleteId)}
+          onCancel={() => setConfirmDeleteId(null)}
+        />
+      )}
     </div>
   )
 }

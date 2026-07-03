@@ -44,4 +44,7 @@ export {
   Paperclip,
   Mic,
   MoreHorizontal,
+  GitBranch,
+  Play,
+  Terminal,
 } from 'lucide-react'

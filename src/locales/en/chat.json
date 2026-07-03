@@ -25,5 +25,17 @@
     "enterToSend": "ENTER to Send",
     "autoReply": "Auto-reply",
     "autoSend": "Auto-send"
-  }
+  },
+  "edit": "Edit",
+  "copy": "Copy",
+  "fork": "Fork",
+  "regenerate": "Regenerate",
+  "speak": "Speak",
+  "stop": "Stop",
+  "showPrompt": "Show prompt",
+  "cancel": "Cancel",
+  "messageDeleteTitle": "Delete message",
+  "messageDeleteConfirm": "Delete message #{{number}} and all messages after it?",
+  "tokens": "~{{count}} tokens",
+  "edited": "(edited)"
 }

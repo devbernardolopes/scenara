@@ -20,5 +20,17 @@
     "enterToSend": "EINGABE zum Senden",
     "autoReply": "Auto-Antwort",
     "autoSend": "Auto-Senden"
-  }
+  },
+  "edit": "Bearbeiten",
+  "copy": "Kopieren",
+  "fork": "Abzweigen",
+  "regenerate": "Neu generieren",
+  "speak": "Sprechen",
+  "stop": "Stopp",
+  "showPrompt": "Prompt anzeigen",
+  "cancel": "Abbrechen",
+  "messageDeleteTitle": "Nachricht löschen",
+  "messageDeleteConfirm": "Nachricht #{{number}} und alle folgenden Nachrichten löschen?",
+  "tokens": "~{{count}} Tokens",
+  "edited": "(bearbeitet)"
 }
