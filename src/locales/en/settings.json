@@ -224,6 +224,55 @@
     "userRolePrefixOoc": {
       "label": "USER Role Prefix in OOC",
       "desc": "Prefix for user messages in out-of-character mode."
+    },
+    "writingInjectionTiming": {
+      "label": "Writing Instructions Injection Timing",
+      "desc": "When writing instructions are injected into the prompt."
+    },
+    "writingInjectionTimingOptions": {
+      "always": "Always"
+    },
+    "writingPlacement": {
+      "label": "Writing Instructions Placement",
+      "desc": "Where writing instructions are placed in the prompt."
+    },
+    "writingPlacementOptions": {
+      "endOfSystemPrompt": "End of SYSTEM Prompt",
+      "endOfMessages": "End of Messages"
+    },
+    "writingMessageRole": {
+      "label": "Writing Instructions Message Role",
+      "desc": "Role used for the writing instructions message when placed at the end of messages."
+    },
+    "writingMessageRoleOptions": {
+      "system": "SYSTEM",
+      "assistant": "ASSISTANT"
+    },
+    "firstMessageRole": {
+      "label": "FIRST MESSAGE Prompt Role",
+      "desc": "Role assigned to the first message prompt."
+    },
+    "firstMessageRoleOptions": {
+      "system": "SYSTEM",
+      "assistant": "ASSISTANT",
+      "user": "USER"
+    },
+    "firstMessagePrompt": {
+      "label": "FIRST MESSAGE Prompt",
+      "desc": "Prompt template for generating the first message."
+    },
+    "continueRole": {
+      "label": "CONTINUE Prompt Role",
+      "desc": "Role assigned to the continue prompt."
+    },
+    "continueRoleOptions": {
+      "system": "SYSTEM",
+      "assistant": "ASSISTANT",
+      "user": "USER"
+    },
+    "continuePrompt": {
+      "label": "CONTINUE Prompt",
+      "desc": "Prompt template for continue generation."
     }
   },
   "toastPositionOptions": {
