@@ -4,7 +4,6 @@ import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
 import db from '../../db'
 import { createCharacter as createPersona } from '../../services/characters'
-import CollapsibleSection from '../shared/CollapsibleSection'
 import CloseButton from '../shared/CloseButton'
 import { estimateTokens } from '../../services/tokenEstimator'
 import Avatar from '../shared/Avatar'
@@ -20,7 +19,6 @@ function PersonaEditorModal() {
     name: '',
     avatar: '',
     description: '',
-    context: '',
   })
 
   useEffect(() => {
@@ -33,7 +31,7 @@ function PersonaEditorModal() {
 
   function startCreate() {
     setEditing('new')
-    setForm({ name: '', avatar: '', description: '', context: '' })
+    setForm({ name: '', avatar: '', description: '' })
   }
 
   function startEdit(persona) {
@@ -42,7 +40,6 @@ function PersonaEditorModal() {
       name: persona.name,
       avatar: persona.avatar || '',
       description: persona.description || '',
-      context: persona.context || '',
     })
   }
 
@@ -125,28 +122,19 @@ function PersonaEditorModal() {
               <label className="block text-sm font-medium text-text mb-1">
                 {t('personaDescriptionLabel')}
               </label>
-              <textarea
-                className={`${inputClass} resize-none`}
-                rows={2}
-                value={form.description}
-                onChange={update('description')}
-                placeholder={t('personaDescriptionPlaceholder')}
-              />
+              <div className="relative">
+                <textarea
+                  className={`${inputClass} resize-none pr-20`}
+                  rows={3}
+                  value={form.description}
+                  onChange={update('description')}
+                  placeholder={t('personaDescriptionPlaceholder')}
+                />
+                <span className="absolute right-3 bottom-2 text-xs text-tertiary">
+                  {estimateTokens(form.description)} tokens
+                </span>
+              </div>
             </div>
-
-            <CollapsibleSection
-              label={t('personaContextLabel')}
-              summary={form.context ? `${estimateTokens(form.context)} tokens` : null}
-              storageKey="personaContext"
-            >
-              <textarea
-                className={`${inputClass} resize-none mt-2`}
-                rows={5}
-                value={form.context}
-                onChange={update('context')}
-                placeholder={t('personaContextPlaceholder')}
-              />
-            </CollapsibleSection>
           </div>
         </div>
 

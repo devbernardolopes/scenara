@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
-import CollapsibleSection from '../shared/CollapsibleSection'
 import Avatar from '../shared/Avatar'
 import { createPersona, updatePersona, getAllPersonas } from '../../services/personas'
 import { estimateTokens } from '../../services/tokenEstimator'
@@ -34,7 +33,6 @@ function PersonaFormModal({ persona }) {
     avatar: persona?.avatar || '',
     description: persona?.description || '',
     color: persona?.color || '',
-    context: persona?.context || '',
     isDefault: Boolean(persona?.isDefault),
   })
 
@@ -104,7 +102,6 @@ function PersonaFormModal({ persona }) {
           avatar: form.avatar,
           description: form.description.trim(),
           color: form.color,
-          context: form.context.trim(),
           isDefault: form.isDefault,
         })
       } else {
@@ -114,7 +111,6 @@ function PersonaFormModal({ persona }) {
           avatar: form.avatar,
           description: form.description.trim(),
           color: form.color,
-          context: form.context.trim(),
           isDefault: form.isDefault,
         })
       }
@@ -232,13 +228,18 @@ function PersonaFormModal({ persona }) {
           <label className="block text-sm font-medium text-text mb-1">
             {t('persona.form.descriptionLabel')}
           </label>
-          <textarea
-            className={`${inputClass} resize-none`}
-            rows={2}
-            value={form.description}
-            onChange={update('description')}
-            placeholder={t('persona.form.descriptionPlaceholder')}
-          />
+          <div className="relative">
+            <textarea
+              className={`${inputClass} resize-none pr-20`}
+              rows={3}
+              value={form.description}
+              onChange={update('description')}
+              placeholder={t('persona.form.descriptionPlaceholder')}
+            />
+            <span className="absolute right-3 bottom-2 text-xs text-tertiary">
+              {estimateTokens(form.description)} tokens
+            </span>
+          </div>
         </div>
 
         <div>
@@ -281,20 +282,6 @@ function PersonaFormModal({ persona }) {
           />
           <span className="text-sm text-text">{t('persona.form.setDefault')}</span>
         </label>
-
-        <CollapsibleSection
-          label={t('persona.form.contextLabel')}
-          summary={form.context ? `${estimateTokens(form.context)} tokens` : null}
-          storageKey="personaFormContext"
-        >
-          <textarea
-            className={`${inputClass} resize-none mt-2`}
-            rows={5}
-            value={form.context}
-            onChange={update('context')}
-            placeholder={t('persona.form.contextPlaceholder')}
-          />
-        </CollapsibleSection>
       </div>
     </ModalShell>
   )
