@@ -5,7 +5,6 @@
   "categories": {
     "appearance": "Aspetto",
     "api": "API",
-    "chat": "Chat",
     "prompting": "Prompt",
     "persona": "Persona",
     "tts": "TTS",
@@ -97,34 +96,34 @@
       }
     }
   },
-  "chat": {
-    "stream": {
-      "label": "Stream responses",
-      "desc": "Stream responses token by token."
+  "prompting": {
+    "autoTitleSystem": {
+      "label": "SYSTEM Auto-title Instructions",
+      "desc": "System prompt for auto-title generation."
     },
-    "temperature": {
-      "label": "Temperature",
-      "desc": "Controls randomness in output (0 = deterministic, 2 = very random)."
+    "autoTitleUser": {
+      "label": "USER Auto-title Instructions",
+      "desc": "User prompt for auto-title generation."
     },
-    "topP": {
-      "label": "Top P",
-      "desc": "Nucleus sampling threshold."
+    "summarizationSystem": {
+      "label": "SYSTEM Summarization Instructions",
+      "desc": "System prompt for summarization."
     },
-    "frequencyPenalty": {
-      "label": "Frequency Penalty",
-      "desc": "Penalizes repeated tokens."
+    "summarizationUser": {
+      "label": "USER Summarization Instructions",
+      "desc": "User prompt for summarization."
     },
-    "presencePenalty": {
-      "label": "Presence Penalty",
-      "desc": "Penalizes tokens that have appeared."
+    "oocSystem": {
+      "label": "SYSTEM OOC Instructions",
+      "desc": "System prompt for out-of-character responses."
     },
-    "maxTokens": {
-      "label": "Max Tokens",
-      "desc": "Maximum number of tokens per response."
+    "oocUser": {
+      "label": "USER OOC Instructions",
+      "desc": "User prompt for out-of-character responses."
     },
-    "stopStrings": {
-      "label": "Stop Strings",
-      "desc": "Custom stop sequences (one per line)."
+    "personaInjectionTemplate": {
+      "label": "Persona Injection Template",
+      "desc": "Template for injecting persona context into prompts."
     }
   },
   "toastPositionOptions": {

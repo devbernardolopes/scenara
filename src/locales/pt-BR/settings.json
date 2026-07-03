@@ -5,7 +5,6 @@
   "categories": {
     "appearance": "Aparência",
     "api": "API",
-    "chat": "Chat",
     "prompting": "Prompt",
     "persona": "Persona",
     "tts": "TTS",
@@ -97,34 +96,34 @@
       }
     }
   },
-  "chat": {
-    "stream": {
-      "label": "Stream de respostas",
-      "desc": "Transmita respostas token por token."
+  "prompting": {
+    "autoTitleSystem": {
+      "label": "SYSTEM Auto-title Instructions",
+      "desc": "System prompt for auto-title generation."
     },
-    "temperature": {
-      "label": "Temperatura",
-      "desc": "Controla a aleatoriedade da saída (0 = determinístico, 2 = muito aleatório)."
+    "autoTitleUser": {
+      "label": "USER Auto-title Instructions",
+      "desc": "User prompt for auto-title generation."
     },
-    "topP": {
-      "label": "Top P",
-      "desc": "Limiar de amostragem de núcleo."
+    "summarizationSystem": {
+      "label": "SYSTEM Summarization Instructions",
+      "desc": "System prompt for summarization."
     },
-    "frequencyPenalty": {
-      "label": "Penalidade de Frequência",
-      "desc": "Penaliza tokens repetidos."
+    "summarizationUser": {
+      "label": "USER Summarization Instructions",
+      "desc": "User prompt for summarization."
     },
-    "presencePenalty": {
-      "label": "Penalidade de Presença",
-      "desc": "Penaliza tokens que já apareceram."
+    "oocSystem": {
+      "label": "SYSTEM OOC Instructions",
+      "desc": "System prompt for out-of-character responses."
     },
-    "maxTokens": {
-      "label": "Máx. de Tokens",
-      "desc": "Número máximo de tokens por resposta."
+    "oocUser": {
+      "label": "USER OOC Instructions",
+      "desc": "User prompt for out-of-character responses."
     },
-    "stopStrings": {
-      "label": "Strings de Parada",
-      "desc": "Sequências de parada personalizadas (uma por linha)."
+    "personaInjectionTemplate": {
+      "label": "Persona Injection Template",
+      "desc": "Template for injecting persona context into prompts."
     }
   },
   "toastPositionOptions": {
