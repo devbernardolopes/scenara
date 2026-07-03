@@ -104,17 +104,13 @@ function ChatInputArea({ threadId, onSend }) {
     load()
     return () => {
       cancelled = true
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current)
+        saveTimerRef.current = null
+        persistNow()
+      }
     }
   }, [threadId])
-
-  // Save on unmount
-  useEffect(() => {
-    return () => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
-      persistNow()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storageKey])
 
   // Debounced save when input changes
   useEffect(() => {
