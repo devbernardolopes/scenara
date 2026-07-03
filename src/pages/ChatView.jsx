@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ChevronDown } from '../lib/icons'
 import Avatar from '../components/shared/Avatar'
 import ChatInputArea from '../components/chat/ChatInputArea'
 import { getThread } from '../services/threads'
@@ -11,11 +12,13 @@ function ChatView() {
   const { threadId } = useParams()
   const { t } = useTranslation('chat')
   const messagesEndRef = useRef(null)
+  const scrollRef = useRef(null)
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [showScrollButton, setShowScrollButton] = useState(false)
 
   async function loadData() {
     setLoading(true)
@@ -39,6 +42,17 @@ function ChatView() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current
+    if (!el) return
+    setShowScrollButton(el.scrollHeight - el.scrollTop - el.clientHeight > 100)
+  }, [])
+
+  function scrollToBottom() {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+    setShowScrollButton(false)
+  }
 
   async function handleSend(text) {
     const trimmed = text.trim()
@@ -81,7 +95,11 @@ function ChatView() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-4 space-y-4">
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto px-4 md:px-8 py-4 space-y-4 relative"
+      >
         {messages.length === 0 ? (
           <p className="text-secondary text-sm text-center py-8">{t('placeholder')}</p>
         ) : (
@@ -111,6 +129,17 @@ function ChatView() {
           ))
         )}
         <div ref={messagesEndRef} />
+
+        {showScrollButton && (
+          <button
+            type="button"
+            onClick={scrollToBottom}
+            className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center bg-primary text-on-primary rounded-full shadow-surface-lg hover:bg-primary-hover transition-all duration-200"
+            aria-label="Scroll to bottom"
+          >
+            <ChevronDown className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       <ChatInputArea threadId={threadId} defaultPersonaId={thread?.personaId} onSend={handleSend} />
