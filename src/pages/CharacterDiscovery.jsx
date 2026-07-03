@@ -11,6 +11,7 @@ import {
   getCharacterChatCounts,
 } from '../services/characters'
 import { downloadJson } from '../lib/download'
+import { showToast } from '../lib/toast'
 import { getSetting } from '../services/settings'
 import { getUIState, setUIState } from '../services/uiState'
 import { createThread } from '../services/threads'
@@ -188,6 +189,11 @@ function CharacterDiscovery() {
   }
 
   async function handleSelectCharacter(character, persona) {
+    const chatProfileId = await getSetting('requestKind.chat.profileId')
+    if (!chatProfileId) {
+      showToast(t('toast.chatProfileRequired', { ns: 'common' }), { type: 'warning' })
+      return
+    }
     const personaId = persona?.id || (await getSetting('defaultPersonaId'))
     const threadId = await createThread({
       characterId: character.id,

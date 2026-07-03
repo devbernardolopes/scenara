@@ -32,6 +32,7 @@ function ChatView() {
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [showScrollButton, setShowScrollButton] = useState(false)
+  const [noChatProfile, setNoChatProfile] = useState(false)
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [charAvatarScale, setCharAvatarScale] = useState('1x')
   const [personaAvatarScale, setPersonaAvatarScale] = useState('1x')
@@ -55,6 +56,9 @@ function ChatView() {
         const chr = await getCharacter(thr.characterId)
         setCharacter(chr)
       }
+      const chatProfileId = await getSetting('requestKind.chat.profileId')
+      setNoChatProfile(!chatProfileId)
+
       await Promise.all([
         loadPersonas(),
         getSetting('defaultCharacterAvatarScale').then((v) => setCharAvatarScale(v || '1x')),
@@ -101,7 +105,7 @@ function ChatView() {
 
   async function handleSend(text, personaId, isOOC) {
     const trimmed = text?.trim()
-    if (!trimmed || sending) return
+    if (!trimmed || sending || noChatProfile) return
     setSending(true)
     try {
       await createMessage(threadId, 'user', trimmed, personaId, isOOC)
@@ -152,6 +156,14 @@ function ChatView() {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-secondary text-sm">{t('placeholder')}</p>
+      </div>
+    )
+  }
+
+  if (noChatProfile) {
+    return (
+      <div className="flex items-center justify-center h-full px-4">
+        <p className="text-secondary text-sm text-center max-w-md">{t('noChatProfile')}</p>
       </div>
     )
   }

@@ -40,5 +40,6 @@
   "edited": "(edited)",
   "messageCopied": "Message copied",
   "messageUpdated": "Message updated",
-  "messageDeleted": "Message deleted"
+  "messageDeleted": "Message deleted",
+  "noChatProfile": "No Chat profile assigned. Please configure one in Settings > API before continuing."
 }

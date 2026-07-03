@@ -136,7 +136,8 @@
     "import": {
       "invalidFormat": "Invalid file format",
       "fileError": "Failed to read file"
-    }
+    },
+    "chatProfileRequired": "Assign a Chat profile in Settings > API to start chatting."
   },
   "personaPicker": {
     "title": "Start with persona",
