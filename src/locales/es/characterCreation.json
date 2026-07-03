@@ -2,5 +2,13 @@
   "title": "Crear Personaje",
   "placeholder": "El formulario de creación de personaje estará aquí.",
   "personaTitle": "Editar Persona",
-  "personaPlaceholder": "El editor de persona estará aquí."
+  "personaPlaceholder": "El editor de persona estará aquí.",
+  "sectionInitialMessages": "Mensajes Iniciales",
+  "addInitialMessage": "Añadir Mensaje Inicial",
+  "initialMessageLabel": "Mensaje Inicial",
+  "initialMessagePlaceholder": "Escribe el primer mensaje del personaje…",
+  "deleteInitialMessage": "Eliminar",
+  "confirmDeleteInitialMessage": "¿Estás seguro de que deseas eliminar este mensaje inicial?",
+  "confirmDeleteInitialMessageTitle": "Eliminar Mensaje Inicial",
+  "noInitialMessages": "Aún no hay mensajes iniciales. Añade uno para saludar al usuario cuando comience un nuevo chat."
 }

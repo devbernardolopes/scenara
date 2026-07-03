@@ -9,6 +9,7 @@ import CharacterSidebar from './character/CharacterSidebar'
 import CharacterSection from './character/CharacterSection'
 import OverridesSection from './character/OverridesSection'
 import PlaceholderSection from './character/PlaceholderSection'
+import InitialMessagesSection from './character/InitialMessagesSection'
 
 const INITIAL_FORM = {
   name: '',
@@ -17,6 +18,7 @@ const INITIAL_FORM = {
   prompt: '',
   writingInstruction: null,
   extraPrompt: '',
+  initialMessages: [],
   autoTitle: true,
   autoTitleThreshold: 3,
   autoTitleSystemInstructions: '',
@@ -60,7 +62,9 @@ function buildInitialForm(existing) {
   if (!existing) return { ...INITIAL_FORM }
   const result = {}
   for (const key of Object.keys(INITIAL_FORM)) {
-    if (key in existing) {
+    if (key === 'initialMessages' && existing.greeting && !existing.initialMessages) {
+      result[key] = [{ id: crypto.randomUUID(), content: existing.greeting }]
+    } else if (key in existing) {
       result[key] = existing[key]
     } else if (key === 'tagline' && 'description' in existing) {
       result[key] = existing.description
@@ -74,6 +78,7 @@ function buildInitialForm(existing) {
 const SECTION_COMPONENTS = {
   character: CharacterSection,
   overrides: OverridesSection,
+  initialMessages: InitialMessagesSection,
   '3d': PlaceholderSection,
   sfx: PlaceholderSection,
   tags: PlaceholderSection,
@@ -187,6 +192,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
         >
           <option value="character">{t('sectionCharacter')}</option>
           <option value="overrides">{t('sectionOverrides')}</option>
+          <option value="initialMessages">{t('sectionInitialMessages')}</option>
           <option value="3d">{t('section3d')}</option>
           <option value="sfx">{t('sectionSfx')}</option>
           <option value="tags">{t('sectionTags')}</option>

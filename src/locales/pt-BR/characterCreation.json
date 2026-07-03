@@ -26,5 +26,13 @@
   "noPersonas": "Nenhuma persona ainda. Crie uma para definir como você aparece nos chats.",
   "confirmDelete": "Tem certeza que deseja excluir esta persona?",
   "confirmDeleteTitle": "Excluir Persona",
-  "editTitle": "Editar Personagem"
+  "editTitle": "Editar Personagem",
+  "sectionInitialMessages": "Mensagens Iniciais",
+  "addInitialMessage": "Adicionar Mensagem Inicial",
+  "initialMessageLabel": "Mensagem Inicial",
+  "initialMessagePlaceholder": "Escreva a primeira mensagem do personagem…",
+  "deleteInitialMessage": "Excluir",
+  "confirmDeleteInitialMessage": "Tem certeza que deseja excluir esta mensagem inicial?",
+  "confirmDeleteInitialMessageTitle": "Excluir Mensagem Inicial",
+  "noInitialMessages": "Nenhuma mensagem inicial ainda. Adicione uma para saudar o usuário quando um novo chat iniciar."
 }

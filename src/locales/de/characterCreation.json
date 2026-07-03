@@ -2,5 +2,13 @@
   "title": "Charakter erstellen",
   "placeholder": "Das Charaktererstellungsformular wird hier sein.",
   "personaTitle": "Persona bearbeiten",
-  "personaPlaceholder": "Der Persona-Editor wird hier sein."
+  "personaPlaceholder": "Der Persona-Editor wird hier sein.",
+  "sectionInitialMessages": "Erste Nachrichten",
+  "addInitialMessage": "Erste Nachricht hinzufügen",
+  "initialMessageLabel": "Erste Nachricht",
+  "initialMessagePlaceholder": "Schreibe die erste Nachricht des Charakters…",
+  "deleteInitialMessage": "Löschen",
+  "confirmDeleteInitialMessage": "Bist du sicher, dass du diese erste Nachricht löschen möchtest?",
+  "confirmDeleteInitialMessageTitle": "Erste Nachricht löschen",
+  "noInitialMessages": "Noch keine ersten Nachrichten. Füge eine hinzu, um den Benutzer zu begrüßen, wenn ein neuer Chat startet."
 }
