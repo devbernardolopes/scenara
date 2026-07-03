@@ -14,9 +14,8 @@ const REQUEST_KINDS = [
   { id: 'director', labelKey: 'settings:api.profileAssignment.director' },
 ]
 
-function ProfileAssignmentRow({ kind, currentId, onAssign }) {
+function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle }) {
   const { t } = useTranslation('settings')
-  const [open, setOpen] = useState(false)
   const [profiles, setProfiles] = useState([])
   const [currentProfileName, setCurrentProfileName] = useState('')
 
@@ -35,7 +34,7 @@ function ProfileAssignmentRow({ kind, currentId, onAssign }) {
 
   function handleSelect(profileId) {
     onAssign(kind.id, profileId)
-    setOpen(false)
+    onToggle()
   }
 
   return (
@@ -44,7 +43,7 @@ function ProfileAssignmentRow({ kind, currentId, onAssign }) {
       <div className="relative">
         <button
           type="button"
-          onClick={() => setOpen(!open)}
+          onClick={onToggle}
           className="min-h-[44px] px-3 text-sm border border-border rounded-md bg-surface text-text hover:bg-surface-hover"
         >
           {currentProfileName || (
@@ -53,7 +52,7 @@ function ProfileAssignmentRow({ kind, currentId, onAssign }) {
         </button>
         <ProfilePicker
           open={open}
-          onClose={() => setOpen(false)}
+          onClose={onToggle}
           onSelect={handleSelect}
           currentId={currentId}
         />
@@ -69,6 +68,7 @@ function ApiSettingsPanel() {
   const [baseUrls, setBaseUrls] = useState({})
   const [profileAssignments, setProfileAssignments] = useState({})
   const [useChatForAll, setUseChatForAll] = useState(true)
+  const [selectedKind, setSelectedKind] = useState(null)
 
   useEffect(() => {
     async function load() {
@@ -138,6 +138,8 @@ function ApiSettingsPanel() {
           kind={REQUEST_KINDS.find((k) => k.id === 'chat')}
           currentId={profileAssignments.chat}
           onAssign={handleAssign}
+          open={selectedKind === 'chat'}
+          onToggle={() => setSelectedKind(selectedKind === 'chat' ? null : 'chat')}
         />
 
         <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">
@@ -157,6 +159,8 @@ function ApiSettingsPanel() {
               kind={kind}
               currentId={profileAssignments[kind.id]}
               onAssign={handleAssign}
+              open={selectedKind === kind.id}
+              onToggle={() => setSelectedKind(selectedKind === kind.id ? null : kind.id)}
             />
           ))}
       </div>
