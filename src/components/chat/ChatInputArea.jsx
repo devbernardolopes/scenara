@@ -182,7 +182,7 @@ function ChatInputArea({ threadId, defaultPersonaId, onSend }) {
         />
 
         {/* Bottom bar */}
-        <div className="flex flex-nowrap items-center gap-1.5 mt-2 overflow-hidden">
+        <div className="flex flex-nowrap items-center gap-1.5 mt-2">
           {/* Left button group */}
           <div className="flex items-center gap-0.5 bg-surface-secondary rounded-lg px-1 py-0.5 flex-shrink-0">
             <IconButton
