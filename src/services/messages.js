@@ -5,12 +5,13 @@ export async function getMessagesByThread(threadId) {
   return db.messages.where('threadId').equals(Number(threadId)).sortBy('createdAt')
 }
 
-export async function createMessage(threadId, role, content, personaId) {
+export async function createMessage(threadId, role, content, personaId, isOOC = false) {
   const id = await db.messages.add({
     threadId: Number(threadId),
     role,
     content,
     personaId: personaId || null,
+    isOOC: !!isOOC,
     createdAt: new Date(),
   })
   if (role === 'user') {

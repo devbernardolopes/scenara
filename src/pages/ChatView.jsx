@@ -99,12 +99,12 @@ function ChatView() {
     setShowScrollButton(false)
   }
 
-  async function handleSend(text, personaId) {
+  async function handleSend(text, personaId, isOOC) {
     const trimmed = text?.trim()
     if (!trimmed || sending) return
     setSending(true)
     try {
-      await createMessage(threadId, 'user', trimmed, personaId)
+      await createMessage(threadId, 'user', trimmed, personaId, isOOC)
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
     } finally {
@@ -193,6 +193,7 @@ function ChatView() {
               avatarSrc={getAvatarSrc(msg)}
               avatarScale={getAvatarScale(msg)}
               role={msg.role}
+              personaMap={personaMap}
               onDeleteRequest={(id) => setConfirmDeleteId(id)}
               onEdit={handleEditMessage}
               onFork={() => {}}

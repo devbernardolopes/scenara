@@ -200,7 +200,7 @@ function ChatInputArea({ threadId, onSend }) {
   function handleSend() {
     const text = inputValue.trim()
     if (!text) return
-    onSend?.(text, selectedPersona?.id)
+    onSend?.(text, selectedPersona?.id, oocActive)
     setInputValue('')
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
     persistNow({ inputValue: '' })
@@ -246,7 +246,7 @@ function ChatInputArea({ threadId, onSend }) {
                   onDoubleClick={() => {
                     setInputValue(entry.content)
                     setPromptHistoryOpen(false)
-                    onSend?.(entry.content, selectedPersona?.id)
+                    onSend?.(entry.content, selectedPersona?.id, oocActive)
                     persistNow({ inputValue: '' })
                   }}
                 >

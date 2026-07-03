@@ -22,6 +22,7 @@ function MessageBubble({
   avatarSrc,
   avatarScale,
   role,
+  personaMap,
   onDeleteRequest,
   onEdit,
   onFork,
@@ -40,6 +41,18 @@ function MessageBubble({
   const isAssistantOrSystem = role === 'assistant' || role === 'system'
   const avatarSize = AVATAR_SIZE_MAP[avatarScale] || 'sm'
   const tokenCount = estimateTokens(message.content)
+  const persona = personaMap?.[message.personaId]
+  const personaColor = persona?.color
+  const isOOC = message.isOOC
+
+  let userBgClass = 'bg-primary'
+  let userBgStyle = null
+  if (isOOC) {
+    userBgClass = 'bg-red-500'
+  } else if (personaColor) {
+    userBgStyle = { backgroundColor: personaColor }
+    userBgClass = ''
+  }
 
   function handleAvatarClick() {
     if (avatarSrc) openModal('imageViewer', { src: avatarSrc, modalSize: 'fullscreen' })
@@ -87,11 +100,12 @@ function MessageBubble({
       <div
         className={`max-w-[80%] md:max-w-[65%] rounded-lg ${
           isUser
-            ? 'bg-primary text-on-primary'
+            ? `${userBgClass} text-on-primary`
             : isSystem
               ? 'bg-surface-secondary text-secondary text-sm italic'
               : 'bg-surface-secondary text-text'
         }`}
+        style={isUser ? userBgStyle : undefined}
       >
         {/* Header */}
         <div className="flex items-center gap-1 px-3 pt-2 pb-1.5 border-b border-border-light">
@@ -106,7 +120,7 @@ function MessageBubble({
           <button
             type="button"
             onClick={() => onDeleteRequest?.(message.id)}
-            className="size-7 flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
             title={t('delete')}
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -114,7 +128,7 @@ function MessageBubble({
           <button
             type="button"
             onClick={handleStartEdit}
-            className="size-7 flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
             title={t('edit')}
           >
             <Edit3 className="w-3.5 h-3.5" />
@@ -122,7 +136,7 @@ function MessageBubble({
           <button
             type="button"
             onClick={handleCopy}
-            className="size-7 flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
             title={t('copy')}
           >
             <Copy className="w-3.5 h-3.5" />
@@ -130,7 +144,7 @@ function MessageBubble({
           <button
             type="button"
             onClick={() => onFork?.(message.id)}
-            className="size-7 flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
             title={t('fork')}
           >
             <GitBranch className="w-3.5 h-3.5" />
@@ -140,7 +154,7 @@ function MessageBubble({
               <button
                 type="button"
                 onClick={() => onRegenerate?.(message.id)}
-                className="size-7 flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
                 title={t('regenerate')}
               >
                 <RefreshCw className="w-3.5 h-3.5" />
@@ -148,7 +162,7 @@ function MessageBubble({
               <button
                 type="button"
                 onClick={() => onSpeak?.(message.id)}
-                className="size-7 flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
                 title={t('speak')}
               >
                 <Play className="w-3.5 h-3.5" />
@@ -156,7 +170,7 @@ function MessageBubble({
               <button
                 type="button"
                 onClick={() => onShowPrompt?.(message.id)}
-                className="size-7 flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
                 title={t('showPrompt')}
               >
                 <Terminal className="w-3.5 h-3.5" />
@@ -177,9 +191,10 @@ function MessageBubble({
               autoFocus
               className={`w-full resize-none rounded border p-2 text-sm min-h-[60px] focus:outline-none focus:ring-1 ${
                 isUser
-                  ? 'bg-primary text-on-primary border-white/20 focus:ring-white/40'
+                  ? `${userBgClass || 'bg-transparent'} text-on-primary border-white/20 focus:ring-white/40`
                   : 'bg-surface text-text border-border focus:ring-primary/40'
               }`}
+              style={isUser ? userBgStyle : undefined}
             />
           ) : (
             <p className="text-sm whitespace-pre-wrap">{message.content}</p>
