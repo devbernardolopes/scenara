@@ -225,29 +225,6 @@
       "label": "USER Role Prefix in OOC",
       "desc": "Prefix for user messages in out-of-character mode."
     },
-    "writingInjectionTiming": {
-      "label": "Writing Instructions Injection Timing",
-      "desc": "When writing instructions are injected into the prompt."
-    },
-    "writingInjectionTimingOptions": {
-      "always": "Always"
-    },
-    "writingPlacement": {
-      "label": "Writing Instructions Placement",
-      "desc": "Where writing instructions are placed in the prompt."
-    },
-    "writingPlacementOptions": {
-      "endOfSystemPrompt": "End of SYSTEM Prompt",
-      "endOfMessages": "End of Messages"
-    },
-    "writingMessageRole": {
-      "label": "Writing Instructions Message Role",
-      "desc": "Role used for the writing instructions message when placed at the end of messages."
-    },
-    "writingMessageRoleOptions": {
-      "system": "SYSTEM",
-      "assistant": "ASSISTANT"
-    },
     "firstMessageRole": {
       "label": "FIRST MESSAGE Prompt Role",
       "desc": "Role assigned to the first message prompt."
@@ -416,6 +393,45 @@
     "userPersonaAvatarScale": {
       "label": "User Persona Avatar Scale",
       "desc": "Default user persona avatar scale for new characters."
+    },
+    "writingInjectionTiming": {
+      "label": "Writing Instructions Injection Timing",
+      "desc": "When writing instructions are injected into the prompt."
+    },
+    "writingInjectionTimingOptions": {
+      "always": "Always"
+    },
+    "writingPlacement": {
+      "label": "Writing Instructions Placement",
+      "desc": "Where writing instructions are placed in the prompt."
+    },
+    "writingPlacementOptions": {
+      "endOfSystemPrompt": "End of SYSTEM Prompt",
+      "endOfMessages": "End of Messages"
+    },
+    "writingMessageRole": {
+      "label": "Writing Instructions Message Role",
+      "desc": "Role used for the writing instructions message when placed at the end of messages."
+    },
+    "writingMessageRoleOptions": {
+      "system": "SYSTEM",
+      "assistant": "ASSISTANT"
+    },
+    "personaInjectionPlacement": {
+      "label": "Persona Injection Placement",
+      "desc": "Where persona context is injected into the prompt."
+    },
+    "personaInjectionPlacementOptions": {
+      "endOfSystemPrompt": "End of SYSTEM Prompt",
+      "endOfMessages": "End of Messages"
+    },
+    "personaInjectionMessageRole": {
+      "label": "Persona Injection Message Role",
+      "desc": "Role used for the persona injection message when placed at the end of messages."
+    },
+    "personaInjectionMessageRoleOptions": {
+      "system": "SYSTEM",
+      "assistant": "ASSISTANT"
     }
   },
   "database": {

@@ -90,9 +90,8 @@ function CharacterDiscovery() {
     return characters.filter(
       (c) =>
         (c.name || '').toLowerCase().includes(q) ||
-        (c.description || '').toLowerCase().includes(q) ||
-        (c.personality || '').toLowerCase().includes(q) ||
-        (c.scenario || '').toLowerCase().includes(q),
+        (c.tagline || c.description || '').toLowerCase().includes(q) ||
+        (c.prompt || c.personality || '').toLowerCase().includes(q),
     )
   }, [characters, searchQuery])
 
@@ -319,7 +318,7 @@ function CharacterDiscovery() {
                   </div>
                 </div>
                 <p className="text-sm text-secondary line-clamp-2 mb-3">
-                  {char.description || t('discovery.characterDesc')}
+                  {char.tagline || char.description || t('discovery.characterDesc')}
                 </p>
 
                 <div className="flex items-center gap-2 mb-3">

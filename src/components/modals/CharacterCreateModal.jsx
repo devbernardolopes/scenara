@@ -13,11 +13,10 @@ import PlaceholderSection from './character/PlaceholderSection'
 const INITIAL_FORM = {
   name: '',
   avatar: '',
-  description: '',
-  personality: '',
-  greeting: '',
-  scenario: '',
-  sampleChat: '',
+  tagline: '',
+  prompt: '',
+  writingInstruction: null,
+  extraPrompt: '',
   autoTitle: true,
   autoTitleThreshold: 3,
   autoTitleSystemInstructions: '',
@@ -32,6 +31,11 @@ const INITIAL_FORM = {
   postProcessing: true,
   characterAvatarScale: '1x',
   userPersonaAvatarScale: '1x',
+  writingInjectionTiming: 'always',
+  writingPlacement: 'endOfSystemPrompt',
+  writingMessageRole: 'system',
+  personaInjectionPlacement: 'endOfSystemPrompt',
+  personaInjectionMessageRole: 'system',
 }
 
 const DEFAULTS_MAP = {
@@ -45,13 +49,24 @@ const DEFAULTS_MAP = {
   defaultPostProcessing: 'postProcessing',
   defaultCharacterAvatarScale: 'characterAvatarScale',
   defaultUserPersonaAvatarScale: 'userPersonaAvatarScale',
+  'prompting.writingInjectionTiming': 'writingInjectionTiming',
+  'prompting.writingPlacement': 'writingPlacement',
+  'prompting.writingMessageRole': 'writingMessageRole',
+  personaInjectionPlacement: 'personaInjectionPlacement',
+  personaInjectionMessageRole: 'personaInjectionMessageRole',
 }
 
 function buildInitialForm(existing) {
   if (!existing) return { ...INITIAL_FORM }
   const result = {}
   for (const key of Object.keys(INITIAL_FORM)) {
-    result[key] = key in existing ? existing[key] : INITIAL_FORM[key]
+    if (key in existing) {
+      result[key] = existing[key]
+    } else if (key === 'tagline' && 'description' in existing) {
+      result[key] = existing.description
+    } else {
+      result[key] = INITIAL_FORM[key]
+    }
   }
   return result
 }

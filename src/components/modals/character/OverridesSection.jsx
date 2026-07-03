@@ -6,8 +6,34 @@ const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
 const numberClass =
   'w-24 px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
+const selectClass =
+  'px-3 py-2 border border-border rounded-md bg-surface text-text text-sm min-w-[160px]'
 
 const AVATAR_SCALE_OPTIONS = ['1x', '2x', '3x', '4x']
+
+const WRITING_INJECTION_TIMING_OPTIONS = [
+  { value: 'always', labelKey: 'writingInjectionTimingOptions.always' },
+]
+
+const WRITING_PLACEMENT_OPTIONS = [
+  { value: 'endOfSystemPrompt', labelKey: 'writingPlacementOptions.endOfSystemPrompt' },
+  { value: 'endOfMessages', labelKey: 'writingPlacementOptions.endOfMessages' },
+]
+
+const WRITING_MESSAGE_ROLE_OPTIONS = [
+  { value: 'system', labelKey: 'writingMessageRoleOptions.system' },
+  { value: 'assistant', labelKey: 'writingMessageRoleOptions.assistant' },
+]
+
+const PERSONA_PLACEMENT_OPTIONS = [
+  { value: 'endOfSystemPrompt', labelKey: 'personaInjectionPlacementOptions.endOfSystemPrompt' },
+  { value: 'endOfMessages', labelKey: 'personaInjectionPlacementOptions.endOfMessages' },
+]
+
+const PERSONA_MESSAGE_ROLE_OPTIONS = [
+  { value: 'system', labelKey: 'personaInjectionMessageRoleOptions.system' },
+  { value: 'assistant', labelKey: 'personaInjectionMessageRoleOptions.assistant' },
+]
 
 function OverridesSection({ form, onChange, characterId }) {
   const { t } = useTranslation('characterCreation')
@@ -195,7 +221,7 @@ function OverridesSection({ form, onChange, characterId }) {
         <select
           value={form.characterAvatarScale}
           onChange={(e) => onChange('characterAvatarScale', e.target.value)}
-          className="px-3 py-2 border border-border rounded-md bg-surface text-text text-sm min-w-[80px]"
+          className={selectClass}
         >
           {AVATAR_SCALE_OPTIONS.map((opt) => (
             <option key={opt} value={opt}>
@@ -210,7 +236,7 @@ function OverridesSection({ form, onChange, characterId }) {
         <select
           value={form.userPersonaAvatarScale}
           onChange={(e) => onChange('userPersonaAvatarScale', e.target.value)}
-          className="px-3 py-2 border border-border rounded-md bg-surface text-text text-sm min-w-[80px]"
+          className={selectClass}
         >
           {AVATAR_SCALE_OPTIONS.map((opt) => (
             <option key={opt} value={opt}>
@@ -218,6 +244,103 @@ function OverridesSection({ form, onChange, characterId }) {
             </option>
           ))}
         </select>
+      </div>
+
+      <hr className="border-border" />
+
+      <div className="space-y-4">
+        <p className="text-xs text-tertiary uppercase tracking-wider font-medium">
+          {t('writingInjectionTiming')}
+        </p>
+
+        <div className="flex items-center gap-3 min-h-[44px]">
+          <label className="text-sm text-text shrink-0">{t('writingInjectionTiming')}</label>
+          <select
+            value={form.writingInjectionTiming}
+            onChange={(e) => onChange('writingInjectionTiming', e.target.value)}
+            className={selectClass}
+          >
+            {WRITING_INJECTION_TIMING_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {t(opt.labelKey)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-center gap-3 min-h-[44px]">
+          <label className="text-sm text-text shrink-0">{t('writingPlacement')}</label>
+          <select
+            value={form.writingPlacement}
+            onChange={(e) => onChange('writingPlacement', e.target.value)}
+            className={selectClass}
+          >
+            {WRITING_PLACEMENT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {t(opt.labelKey)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div
+          className={`flex items-center gap-3 min-h-[44px] ${disabledCls(form.writingPlacement !== 'endOfMessages')}`}
+        >
+          <label className="text-sm text-text shrink-0">{t('writingMessageRole')}</label>
+          <select
+            value={form.writingMessageRole}
+            onChange={(e) => onChange('writingMessageRole', e.target.value)}
+            className={selectClass}
+            disabled={form.writingPlacement !== 'endOfMessages'}
+          >
+            {WRITING_MESSAGE_ROLE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {t(opt.labelKey)}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <hr className="border-border" />
+
+      <div className="space-y-4">
+        <p className="text-xs text-tertiary uppercase tracking-wider font-medium">
+          {t('personaInjectionPlacement')}
+        </p>
+
+        <div className="flex items-center gap-3 min-h-[44px]">
+          <label className="text-sm text-text shrink-0">{t('personaInjectionPlacement')}</label>
+          <select
+            value={form.personaInjectionPlacement}
+            onChange={(e) => onChange('personaInjectionPlacement', e.target.value)}
+            className={selectClass}
+          >
+            {PERSONA_PLACEMENT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {t(opt.labelKey)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div
+          className={`flex items-center gap-3 min-h-[44px] ${disabledCls(form.personaInjectionPlacement !== 'endOfMessages')}`}
+        >
+          <label className="text-sm text-text shrink-0">{t('personaInjectionMessageRole')}</label>
+          <select
+            value={form.personaInjectionMessageRole}
+            onChange={(e) => onChange('personaInjectionMessageRole', e.target.value)}
+            className={selectClass}
+            disabled={form.personaInjectionPlacement !== 'endOfMessages'}
+          >
+            {PERSONA_MESSAGE_ROLE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {t(opt.labelKey)}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   )

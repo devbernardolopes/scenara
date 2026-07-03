@@ -9,16 +9,13 @@
   "namePlaceholder": "Character name",
   "avatarLabel": "Avatar",
   "avatarPlaceholder": "Emoji or URL",
-  "descriptionLabel": "Description",
-  "descriptionPlaceholder": "A short description of your character…",
-  "personalityLabel": "Personality",
-  "personalityPlaceholder": "Describe how the character behaves, speaks, and thinks…",
-  "greetingLabel": "Greeting",
-  "greetingPlaceholder": "The character's first message to the user…",
-  "scenarioLabel": "Scenario",
-  "scenarioPlaceholder": "Describe the setting and context…",
-  "sampleChatLabel": "Sample Chat",
-  "sampleChatPlaceholder": "Example dialogue showing the character's speaking style…",
+  "taglineLabel": "Tagline",
+  "taglinePlaceholder": "A short tagline for your character…",
+  "promptLabel": "Prompt",
+  "promptPlaceholder": "Describe the character's behavior, personality, and setting…",
+  "writingInstructionLabel": "Writing Instruction",
+  "extraPromptLabel": "One-time only Extra Prompt",
+  "extraPromptPlaceholder": "Additional instructions that will only be sent once…",
   "personaTitle": "Edit Persona",
   "personaSubtitle": "Manage your personas — who you are in the story.",
   "personaNameLabel": "Name",
@@ -59,5 +56,31 @@
   "includeOOC": "Include OOC",
   "postProcessing": "Post-processing",
   "characterAvatarScale": "Character Avatar Scale",
-  "userPersonaAvatarScale": "User Persona Avatar Scale"
+  "userPersonaAvatarScale": "User Persona Avatar Scale",
+  "writingInjectionTiming": "Writing Instructions Injection Timing",
+  "writingPlacement": "Writing Instructions Placement",
+  "writingMessageRole": "Writing Instructions Message Role",
+  "personaInjectionPlacement": "Persona Injection Placement",
+  "personaInjectionMessageRole": "Persona Injection Message Role",
+  "writingInjectionTimingOptions": {
+    "always": "Always"
+  },
+  "writingPlacementOptions": {
+    "endOfSystemPrompt": "End of SYSTEM Prompt",
+    "endOfMessages": "End of Messages"
+  },
+  "writingMessageRoleOptions": {
+    "system": "SYSTEM",
+    "assistant": "ASSISTANT"
+  },
+  "personaInjectionPlacementOptions": {
+    "endOfSystemPrompt": "End of SYSTEM Prompt",
+    "endOfMessages": "End of Messages"
+  },
+  "personaInjectionMessageRoleOptions": {
+    "system": "SYSTEM",
+    "assistant": "ASSISTANT"
+  },
+  "noWritingInstructions": "No writing instructions available. Create one in Settings.",
+  "manageWritingInstructions": "Manage Writing Instructions"
 }
