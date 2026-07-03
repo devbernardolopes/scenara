@@ -37,5 +37,8 @@
   "messageDeleteTitle": "Delete message",
   "messageDeleteConfirm": "Delete message #{{number}} and all messages after it?",
   "tokens": "~{{count}} tokens",
-  "edited": "(edited)"
+  "edited": "(edited)",
+  "messageCopied": "Message copied",
+  "messageUpdated": "Message updated",
+  "messageDeleted": "Message deleted"
 }

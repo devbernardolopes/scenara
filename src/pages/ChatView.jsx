@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown } from '../lib/icons'
+import { showToast } from '../lib/toast'
 import Avatar from '../components/shared/Avatar'
 import ChatInputArea from '../components/chat/ChatInputArea'
 import MessageBubble from '../components/chat/MessageBubble'
@@ -113,6 +114,7 @@ function ChatView() {
     await updateMessage(id, { content })
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
+    showToast(t('messageUpdated'), { type: 'success' })
   }
 
   async function handleDeleteMessage(id) {
@@ -120,6 +122,7 @@ function ChatView() {
     await deleteMessagesFrom(id)
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
+    showToast(t('messageDeleted'), { type: 'success' })
   }
 
   function getAvatarSrc(msg) {

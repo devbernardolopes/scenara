@@ -37,5 +37,8 @@
   "messageDeleteTitle": "Excluir mensagem",
   "messageDeleteConfirm": "Excluir mensagem #{{number}} e todas as mensagens seguintes?",
   "tokens": "~{{count}} tokens",
-  "edited": "(editado)"
+  "edited": "(editado)",
+  "messageCopied": "Mensagem copiada",
+  "messageUpdated": "Mensagem atualizada",
+  "messageDeleted": "Mensagem excluída"
 }

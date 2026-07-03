@@ -32,5 +32,8 @@
   "messageDeleteTitle": "Elimina messaggio",
   "messageDeleteConfirm": "Eliminare il messaggio #{{number}} e tutti i messaggi successivi?",
   "tokens": "~{{count}} token",
-  "edited": "(modificato)"
+  "edited": "(modificato)",
+  "messageCopied": "Messaggio copiato",
+  "messageUpdated": "Messaggio aggiornato",
+  "messageDeleted": "Messaggio eliminato"
 }

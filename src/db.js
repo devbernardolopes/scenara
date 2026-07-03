@@ -98,4 +98,17 @@ db.version(9).stores({
   inChatShortcuts: '++id, name, createdAt',
 })
 
+db.version(10).stores({
+  threads: '++id, title, characterId, personaId, updatedAt, isFavorite, threadNumber',
+  characters: '++id, name, createdAt, updatedAt, characterNumber',
+  personas: '++id, name, title, createdAt, isDefault',
+  settings: '++id, key',
+  uiState: '++id, key',
+  messages: '++id, threadId, role, personaId, createdAt',
+  writingInstructions: '++id, name, createdAt',
+  connectionProfiles: '++id, name, createdAt',
+  inChatShortcuts: '++id, name, createdAt',
+  promptHistory: '++id, threadId, createdAt',
+})
+
 export default db

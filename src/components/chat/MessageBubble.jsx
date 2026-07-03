@@ -1,5 +1,6 @@
 import { useState, useRef, memo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { showToast } from '../../lib/toast'
 import { Trash2, Edit3, Copy, GitBranch, RefreshCw, Play, Square, Terminal } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 
@@ -39,7 +40,10 @@ function MessageBubble({
   const tokenCount = estimateTokens(message.content)
 
   function handleCopy() {
-    navigator.clipboard.writeText(message.content).catch(() => {})
+    navigator.clipboard
+      .writeText(message.content)
+      .then(() => showToast(t('messageCopied'), { type: 'success' }))
+      .catch(() => {})
   }
 
   function handleStartEdit() {

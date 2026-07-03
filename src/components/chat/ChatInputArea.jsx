@@ -15,9 +15,14 @@ import Avatar from '../shared/Avatar'
 import PersonaPicker from '../shared/PersonaPicker'
 import IconButton from '../shared/IconButton'
 import { getPersona, getAllPersonas } from '../../services/personas'
+import { getUIState, setUIState } from '../../services/uiState'
 import db from '../../db'
 
 const QUICK_SETTING_KEYS = ['autoTTS', 'enterToSend', 'autoReply', 'autoSend']
+const DEFAULT_QUICK_SETTINGS = Object.fromEntries(
+  QUICK_SETTING_KEYS.map((k) => [k, k === 'enterToSend']),
+)
+const STORAGE_PREFIX = 'chatInput.'
 
 function ChatInputArea({ threadId, defaultPersonaId, onSend }) {
   const { t } = useTranslation('chat')
@@ -25,6 +30,7 @@ function ChatInputArea({ threadId, defaultPersonaId, onSend }) {
   const promptPanelRef = useRef(null)
   const quickPanelRef = useRef(null)
   const ellipsisRef = useRef(null)
+  const saveTimerRef = useRef(null)
 
   const [inputValue, setInputValue] = useState('')
   const [oocActive, setOocActive] = useState(false)
@@ -32,32 +38,103 @@ function ChatInputArea({ threadId, defaultPersonaId, onSend }) {
   const [selectedPersona, setSelectedPersona] = useState(null)
   const [personaPickerOpen, setPersonaPickerOpen] = useState(false)
   const [quickSettingsOpen, setQuickSettingsOpen] = useState(false)
-  const [quickSettings, setQuickSettings] = useState(
-    Object.fromEntries(QUICK_SETTING_KEYS.map((k) => [k, k === 'enterToSend'])),
-  )
+  const [quickSettings, setQuickSettings] = useState(DEFAULT_QUICK_SETTINGS)
   const [promptHistoryOpen, setPromptHistoryOpen] = useState(false)
   const [promptHistory, setPromptHistory] = useState([])
+  const [ready, setReady] = useState(false)
 
+  const storageKey = `${STORAGE_PREFIX}${threadId}`
+
+  async function persistNow(overrides = {}) {
+    await setUIState(storageKey, {
+      personaId: selectedPersona?.id || null,
+      oocActive,
+      sttActive,
+      inputValue,
+      quickSettings,
+      ...overrides,
+    })
+  }
+
+  const schedulePersist = useCallback(
+    (overrides = {}) => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+      saveTimerRef.current = setTimeout(() => {
+        persistNow(overrides)
+      }, 400)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [storageKey, selectedPersona, oocActive, sttActive, inputValue, quickSettings],
+  )
+
+  // Load saved state on mount / thread change
   useEffect(() => {
-    if (defaultPersonaId) {
-      getPersona(defaultPersonaId).then(setSelectedPersona)
-    } else {
-      getAllPersonas().then((list) => {
-        if (list.length > 0) setSelectedPersona(list[0])
-      })
+    setReady(false)
+    let cancelled = false
+    async function load() {
+      const saved = await getUIState(storageKey)
+      if (cancelled) return
+      if (saved) {
+        setInputValue(saved.inputValue || '')
+        setOocActive(!!saved.oocActive)
+        setSttActive(!!saved.sttActive)
+        setQuickSettings(saved.quickSettings || DEFAULT_QUICK_SETTINGS)
+        if (saved.personaId) {
+          const p = await getPersona(saved.personaId)
+          if (!cancelled) setSelectedPersona(p || null)
+        }
+      }
+      if (!saved?.personaId) {
+        if (defaultPersonaId) {
+          const p = await getPersona(defaultPersonaId)
+          if (!cancelled) setSelectedPersona(p || null)
+        } else {
+          const list = await getAllPersonas()
+          if (!cancelled && list.length > 0) setSelectedPersona(list[0])
+        }
+      }
+      if (!cancelled) {
+        setReady(true)
+        requestAnimationFrame(() => textareaRef.current && autoResize(textareaRef.current))
+      }
     }
-  }, [defaultPersonaId])
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [threadId])
 
+  // Save on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+      persistNow()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey])
+
+  // Debounced save when input changes
+  useEffect(() => {
+    if (!ready) return
+    schedulePersist()
+  }, [inputValue, ready, schedulePersist])
+
+  // Immediate save for toggles
+  useEffect(() => {
+    if (!ready) return
+    persistNow()
+  }, [oocActive, sttActive, selectedPersona, quickSettings]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Prompt history from promptHistory table
   useEffect(() => {
     if (!promptHistoryOpen || !threadId) return
-    db.messages
+    db.promptHistory
       .where('threadId')
       .equals(Number(threadId))
-      .filter((m) => m.role === 'user')
       .toArray()
-      .then((msgs) => {
-        msgs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        setPromptHistory(msgs)
+      .then((entries) => {
+        entries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        setPromptHistory(entries)
       })
   }, [promptHistoryOpen, threadId])
 
@@ -103,6 +180,7 @@ function ChatInputArea({ threadId, defaultPersonaId, onSend }) {
     onSend?.(text, selectedPersona?.id)
     setInputValue('')
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
+    persistNow({ inputValue: '' })
   }
 
   function handleKeyDown(e) {
@@ -129,13 +207,13 @@ function ChatInputArea({ threadId, defaultPersonaId, onSend }) {
                 {t('promptHistory.empty')}
               </p>
             ) : (
-              promptHistory.map((msg) => (
+              promptHistory.map((entry) => (
                 <button
-                  key={msg.id}
+                  key={entry.id}
                   type="button"
                   className="w-full text-left px-3 py-2 text-sm text-text hover:bg-surface-hover border-b border-border-light last:border-0 min-h-[44px]"
                   onClick={() => {
-                    setInputValue(msg.content)
+                    setInputValue(entry.content)
                     setPromptHistoryOpen(false)
                     requestAnimationFrame(() => {
                       textareaRef.current?.focus()
@@ -143,14 +221,15 @@ function ChatInputArea({ threadId, defaultPersonaId, onSend }) {
                     })
                   }}
                   onDoubleClick={() => {
-                    setInputValue(msg.content)
+                    setInputValue(entry.content)
                     setPromptHistoryOpen(false)
-                    onSend?.(msg.content, selectedPersona?.id)
+                    onSend?.(entry.content, selectedPersona?.id)
+                    persistNow({ inputValue: '' })
                   }}
                 >
-                  <span className="line-clamp-2 break-words">{msg.content}</span>
+                  <span className="line-clamp-2 break-words">{entry.content}</span>
                   <span className="text-xs text-tertiary mt-0.5 block">
-                    {new Date(msg.createdAt).toLocaleTimeString([], {
+                    {new Date(entry.createdAt).toLocaleTimeString([], {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}
