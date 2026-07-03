@@ -32,6 +32,7 @@ function ChatInputArea({ threadId, onSend }) {
   const quickPanelRef = useRef(null)
   const ellipsisRef = useRef(null)
   const saveTimerRef = useRef(null)
+  const initializedRef = useRef(false)
 
   const [inputValue, setInputValue] = useState('')
   const [oocActive, setOocActive] = useState(false)
@@ -70,6 +71,7 @@ function ChatInputArea({ threadId, onSend }) {
 
   // Load saved state on mount / thread change
   useEffect(() => {
+    initializedRef.current = false
     setReady(false)
     let cancelled = false
     async function load() {
@@ -98,6 +100,7 @@ function ChatInputArea({ threadId, onSend }) {
       }
       if (!cancelled) {
         setReady(true)
+        initializedRef.current = true
         requestAnimationFrame(() => textareaRef.current && autoResize(textareaRef.current))
       }
     }
@@ -107,6 +110,8 @@ function ChatInputArea({ threadId, onSend }) {
       if (saveTimerRef.current) {
         clearTimeout(saveTimerRef.current)
         saveTimerRef.current = null
+      }
+      if (initializedRef.current) {
         persistNow()
       }
     }
