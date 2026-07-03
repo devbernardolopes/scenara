@@ -20,6 +20,8 @@ import WritingInstructionManagementModal from './components/modals/WritingInstru
 import WritingInstructionFormModal from './components/modals/WritingInstructionFormModal'
 import ProfileManagementModal from './components/modals/ProfileManagementModal'
 import ProfileFormModal from './components/modals/ProfileFormModal'
+import InChatShortcutManagementModal from './components/modals/InChatShortcutManagementModal'
+import InChatShortcutFormModal from './components/modals/InChatShortcutFormModal'
 
 const SettingsModal = lazy(() => import('./components/modals/settings/SettingsModal'))
 
@@ -33,6 +35,8 @@ registerModal('writingInstructionManagement', WritingInstructionManagementModal)
 registerModal('writingInstructionForm', WritingInstructionFormModal)
 registerModal('profileManagement', ProfileManagementModal)
 registerModal('profileForm', ProfileFormModal)
+registerModal('inChatShortcutManagement', InChatShortcutManagementModal)
+registerModal('inChatShortcutForm', InChatShortcutFormModal)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

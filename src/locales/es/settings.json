@@ -285,6 +285,31 @@
     "exportNotImplemented": "Export is not yet implemented",
     "importNotImplemented": "Import is not yet implemented"
   },
+  "inChatShortcut": {
+    "title": "Atajos en el Chat",
+    "createShortcut": "Crear Conjunto de Atajos",
+    "noShortcuts": "Aún no hay conjuntos de atajos.",
+    "actions": {
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "duplicate": "Duplicar"
+    },
+    "confirmDelete": {
+      "title": "Eliminar Conjunto de Atajos",
+      "message": "¿Estás seguro de que deseas eliminar \"{{name}}\"?"
+    },
+    "form": {
+      "title": "Crear Conjunto de Atajos",
+      "editTitle": "Editar Conjunto de Atajos",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Nombre del conjunto de atajos",
+      "contentLabel": "Contenido",
+      "contentPlaceholder": "@name=\n@message=\n@insertionType=\n@autoSend=\n@clearAfterSend=",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "cancel": "Cancelar"
+    }
+  },
   "versionLabel": "Versión",
   "languageOptions": {
     "en": "English",

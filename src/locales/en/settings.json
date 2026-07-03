@@ -447,6 +447,31 @@
     "exportNotImplemented": "Export is not yet implemented",
     "importNotImplemented": "Import is not yet implemented"
   },
+  "inChatShortcut": {
+    "title": "In-Chat Shortcuts",
+    "createShortcut": "Create Shortcut Set",
+    "noShortcuts": "No shortcut sets yet.",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate"
+    },
+    "confirmDelete": {
+      "title": "Delete Shortcut Set",
+      "message": "Are you sure you want to delete \"{{name}}\"?"
+    },
+    "form": {
+      "title": "Create Shortcut Set",
+      "editTitle": "Edit Shortcut Set",
+      "nameLabel": "Name",
+      "namePlaceholder": "Shortcut set name",
+      "contentLabel": "Content",
+      "contentPlaceholder": "@name=\n@message=\n@insertionType=\n@autoSend=\n@clearAfterSend=",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    }
+  },
   "versionLabel": "Version",
   "languageOptions": {
     "en": "English",

@@ -285,6 +285,31 @@
     "exportNotImplemented": "Export is not yet implemented",
     "importNotImplemented": "Import is not yet implemented"
   },
+  "inChatShortcut": {
+    "title": "Atalhos no Chat",
+    "createShortcut": "Criar Conjunto de Atalhos",
+    "noShortcuts": "Nenhum conjunto de atalhos ainda.",
+    "actions": {
+      "edit": "Editar",
+      "delete": "Excluir",
+      "duplicate": "Duplicar"
+    },
+    "confirmDelete": {
+      "title": "Excluir Conjunto de Atalhos",
+      "message": "Tem certeza que deseja excluir \"{{name}}\"?"
+    },
+    "form": {
+      "title": "Criar Conjunto de Atalhos",
+      "editTitle": "Editar Conjunto de Atalhos",
+      "nameLabel": "Nome",
+      "namePlaceholder": "Nome do conjunto de atalhos",
+      "contentLabel": "Conteúdo",
+      "contentPlaceholder": "@name=\n@message=\n@insertionType=\n@autoSend=\n@clearAfterSend=",
+      "save": "Salvar",
+      "saving": "Salvando…",
+      "cancel": "Cancelar"
+    }
+  },
   "versionLabel": "Versão",
   "languageOptions": {
     "en": "English",

@@ -487,7 +487,10 @@ function Sidebar({ open, onClose }) {
             <SlidersHorizontal className="w-4 h-4" />
             {t('sidebar.connectionProfiles')}
           </button>
-          <button className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover">
+          <button
+            onClick={() => openModal('inChatShortcutManagement')}
+            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
+          >
             <Zap className="w-4 h-4" />
             {t('sidebar.inChatShortcuts')}
           </button>

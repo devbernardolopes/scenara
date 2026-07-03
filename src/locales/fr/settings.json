@@ -285,6 +285,31 @@
     "exportNotImplemented": "Export is not yet implemented",
     "importNotImplemented": "Import is not yet implemented"
   },
+  "inChatShortcut": {
+    "title": "Raccourcis dans le Chat",
+    "createShortcut": "Créer un Ensemble de Raccourcis",
+    "noShortcuts": "Aucun ensemble de raccourcis pour l'instant.",
+    "actions": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "duplicate": "Dupliquer"
+    },
+    "confirmDelete": {
+      "title": "Supprimer l'Ensemble de Raccourcis",
+      "message": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ?"
+    },
+    "form": {
+      "title": "Créer un Ensemble de Raccourcis",
+      "editTitle": "Modifier l'Ensemble de Raccourcis",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Nom de l'ensemble de raccourcis",
+      "contentLabel": "Contenu",
+      "contentPlaceholder": "@name=\n@message=\n@insertionType=\n@autoSend=\n@clearAfterSend=",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "cancel": "Annuler"
+    }
+  },
   "versionLabel": "Version",
   "languageOptions": {
     "en": "English",

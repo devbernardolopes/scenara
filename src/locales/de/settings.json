@@ -285,6 +285,31 @@
     "exportNotImplemented": "Export is not yet implemented",
     "importNotImplemented": "Import is not yet implemented"
   },
+  "inChatShortcut": {
+    "title": "In-Chat-Verknüpfungen",
+    "createShortcut": "Verknüpfungssatz erstellen",
+    "noShortcuts": "Noch keine Verknüpfungssätze.",
+    "actions": {
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "duplicate": "Duplizieren"
+    },
+    "confirmDelete": {
+      "title": "Verknüpfungssatz löschen",
+      "message": "Bist du sicher, dass du \"{{name}}\" löschen möchtest?"
+    },
+    "form": {
+      "title": "Verknüpfungssatz erstellen",
+      "editTitle": "Verknüpfungssatz bearbeiten",
+      "nameLabel": "Name",
+      "namePlaceholder": "Name des Verknüpfungssatzes",
+      "contentLabel": "Inhalt",
+      "contentPlaceholder": "@name=\n@message=\n@insertionType=\n@autoSend=\n@clearAfterSend=",
+      "save": "Speichern",
+      "saving": "Speichern…",
+      "cancel": "Abbrechen"
+    }
+  },
   "versionLabel": "Version",
   "languageOptions": {
     "en": "English",

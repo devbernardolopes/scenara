@@ -285,6 +285,31 @@
     "exportNotImplemented": "Export is not yet implemented",
     "importNotImplemented": "Import is not yet implemented"
   },
+  "inChatShortcut": {
+    "title": "Scorciatoie in Chat",
+    "createShortcut": "Crea Set di Scorciatoie",
+    "noShortcuts": "Ancora nessun set di scorciatoie.",
+    "actions": {
+      "edit": "Modifica",
+      "delete": "Elimina",
+      "duplicate": "Duplica"
+    },
+    "confirmDelete": {
+      "title": "Elimina Set di Scorciatoie",
+      "message": "Sei sicuro di voler eliminare \"{{name}}\"?"
+    },
+    "form": {
+      "title": "Crea Set di Scorciatoie",
+      "editTitle": "Modifica Set di Scorciatoie",
+      "nameLabel": "Nome",
+      "namePlaceholder": "Nome del set di scorciatoie",
+      "contentLabel": "Contenuto",
+      "contentPlaceholder": "@name=\n@message=\n@insertionType=\n@autoSend=\n@clearAfterSend=",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "cancel": "Annulla"
+    }
+  },
   "versionLabel": "Versione",
   "languageOptions": {
     "en": "English",
