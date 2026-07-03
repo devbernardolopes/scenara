@@ -188,6 +188,42 @@
     "personaInjectionTemplate": {
       "label": "Persona Injection Template",
       "desc": "Template for injecting persona context into prompts."
+    },
+    "oocMessageRole": {
+      "label": "OOC Message Role",
+      "desc": "Role assigned to out-of-character messages."
+    },
+    "oocMessageRoleOptions": {
+      "system": "SYSTEM",
+      "assistant": "ASSISTANT"
+    },
+    "systemRolePrefix": {
+      "label": "SYSTEM Role Prefix",
+      "desc": "Prefix for system messages."
+    },
+    "assistantRolePrefix": {
+      "label": "ASSISTANT Role Prefix",
+      "desc": "Prefix for assistant messages."
+    },
+    "userRolePrefix": {
+      "label": "USER Role Prefix",
+      "desc": "Prefix for user messages."
+    },
+    "userRolePrefixWithPersona": {
+      "label": "USER Role Prefix with Persona",
+      "desc": "Prefix for user messages when a persona is active."
+    },
+    "systemRolePrefixOoc": {
+      "label": "SYSTEM Role Prefix in OOC",
+      "desc": "Prefix for system messages in out-of-character mode."
+    },
+    "assistantRolePrefixOoc": {
+      "label": "ASSISTANT Role Prefix in OOC",
+      "desc": "Prefix for assistant messages in out-of-character mode."
+    },
+    "userRolePrefixOoc": {
+      "label": "USER Role Prefix in OOC",
+      "desc": "Prefix for user messages in out-of-character mode."
     }
   },
   "toastPositionOptions": {
