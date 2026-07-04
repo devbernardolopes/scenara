@@ -224,8 +224,7 @@ function ChatView() {
     setGenerating(true)
     startGenerating(threadId)
 
-    const isFirstMessage =
-      !character?.initialMessages?.length && !messages.some((m) => m.role === 'user')
+    const isFirstMessage = !character?.initialMessages?.length && messages.length === 0
 
     if (isFirstMessage && !text && !character?.firstMessage) {
       generatingRef.current = false
@@ -283,8 +282,7 @@ function ChatView() {
         chatPersona = await getPersona(thread.personaId)
       }
 
-      const isFirstMessage =
-        !character?.initialMessages?.length && !currentMsgs.some((m) => m.role === 'user')
+      const isFirstMessage = !character?.initialMessages?.length && currentMsgs.length === 0
 
       await doChatRequest(isFirstMessage, currentMsgs, chatPersona, null)
 
