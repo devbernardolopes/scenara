@@ -338,7 +338,7 @@ function ChatView() {
     }
   }
 
-  async function handleSend(text, personaId, isOOC) {
+  async function handleSend(text, personaId, isOOC, autoReply = true) {
     if (generatingRef.current) return
     generatingRef.current = true
     setGenerating(true)
@@ -379,6 +379,13 @@ function ChatView() {
         await createMessage(threadId, 'user', text, personaId, isOOC)
         currentMsgs = await getMessagesByThread(threadId)
         setMessages(currentMsgs)
+      }
+
+      if (text && !autoReply) {
+        generatingRef.current = false
+        setGenerating(false)
+        stopGenerating(threadId)
+        return
       }
 
       const currentPersona = personaId ? await getPersona(personaId) : null

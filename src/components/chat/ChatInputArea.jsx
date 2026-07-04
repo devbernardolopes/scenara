@@ -21,9 +21,12 @@ import { getUIState, setUIState } from '../../services/uiState'
 import db from '../../db'
 
 const QUICK_SETTING_KEYS = ['autoTTS', 'enterToSend', 'autoReply', 'autoSend']
-const DEFAULT_QUICK_SETTINGS = Object.fromEntries(
-  QUICK_SETTING_KEYS.map((k) => [k, k === 'enterToSend']),
-)
+const DEFAULT_QUICK_SETTINGS = {
+  autoTTS: false,
+  enterToSend: true,
+  autoReply: true,
+  autoSend: false,
+}
 const STORAGE_PREFIX = 'chatInput.'
 
 function ChatInputArea({ threadId, onSend, onCancel, generating }) {
@@ -204,7 +207,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
       return
     }
     const text = inputValue
-    onSend?.(text, selectedPersona?.id, oocActive)
+    onSend?.(text, selectedPersona?.id, oocActive, quickSettings.autoReply)
     setInputValue('')
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
     persistNow({ inputValue: '' })
@@ -250,7 +253,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
                   onDoubleClick={() => {
                     setInputValue(entry.content)
                     setPromptHistoryOpen(false)
-                    onSend?.(entry.content, selectedPersona?.id, oocActive)
+                    onSend?.(entry.content, selectedPersona?.id, oocActive, quickSettings.autoReply)
                     persistNow({ inputValue: '' })
                   }}
                 >
