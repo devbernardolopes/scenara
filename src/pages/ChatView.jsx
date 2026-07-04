@@ -46,6 +46,9 @@ function ChatView() {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [charAvatarScale, setCharAvatarScale] = useState('1x')
   const [personaAvatarScale, setPersonaAvatarScale] = useState('1x')
+  const [lastPayload, setLastPayload] = useState(null)
+  const [lastModel, setLastModel] = useState(null)
+  const [lastParams, setLastParams] = useState(null)
 
   async function loadPersonas() {
     const list = await getAllPersonas()
@@ -162,6 +165,10 @@ function ChatView() {
       settings,
       writingInstruction,
     })
+
+    setLastPayload(payload)
+    setLastModel(profile.model)
+    setLastParams(profile.params)
 
     const assistantMsgId = await createAssistantMessage(threadId, '')
     setStreamingMsgId(assistantMsgId)
@@ -387,7 +394,13 @@ function ChatView() {
               onFork={() => {}}
               onRegenerate={handleRegenerate}
               onSpeak={() => {}}
-              onShowPrompt={() => {}}
+              onShowPrompt={() =>
+                openModal('showPrompt', {
+                  payload: lastPayload,
+                  model: lastModel,
+                  params: lastParams,
+                })
+              }
             />
           ))
         )}

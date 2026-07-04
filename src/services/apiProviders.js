@@ -12,13 +12,23 @@ export const PROVIDERS = [
     trialKey: 'gsk_placeholder_trial_groq_key',
     params: [
       {
-        key: 'max_tokens',
+        key: 'max_completion_tokens',
         label: 'Max Tokens',
         type: 'range',
         min: 256,
         max: 8192,
         step: 256,
         default: 1024,
+      },
+      {
+        key: 'max_tokens',
+        label: 'Max Tokens (Deprecated)',
+        type: 'range',
+        min: 256,
+        max: 8192,
+        step: 256,
+        default: null,
+        deprecated: true,
       },
       {
         key: 'temperature',
@@ -63,13 +73,23 @@ export const PROVIDERS = [
     trialKey: 'sk-or-placeholder-trial-openrouter-key',
     params: [
       {
-        key: 'max_tokens',
+        key: 'max_completion_tokens',
         label: 'Max Tokens',
         type: 'range',
         min: 256,
         max: 8192,
         step: 256,
         default: 1024,
+      },
+      {
+        key: 'max_tokens',
+        label: 'Max Tokens (Deprecated)',
+        type: 'range',
+        min: 256,
+        max: 8192,
+        step: 256,
+        default: null,
+        deprecated: true,
       },
       {
         key: 'temperature',
@@ -115,13 +135,23 @@ export const PROVIDERS = [
     trialKey: 'placeholder-horde-trial-key',
     params: [
       {
-        key: 'max_tokens',
+        key: 'max_completion_tokens',
         label: 'Max Tokens',
         type: 'range',
         min: 256,
         max: 8192,
         step: 256,
         default: 1024,
+      },
+      {
+        key: 'max_tokens',
+        label: 'Max Tokens (Deprecated)',
+        type: 'range',
+        min: 256,
+        max: 8192,
+        step: 256,
+        default: null,
+        deprecated: true,
       },
       {
         key: 'temperature',
@@ -166,13 +196,23 @@ export const PROVIDERS = [
     trialKey: null,
     params: [
       {
-        key: 'max_tokens',
+        key: 'max_completion_tokens',
         label: 'Max Tokens',
         type: 'range',
         min: 256,
         max: 8192,
         step: 256,
         default: 1024,
+      },
+      {
+        key: 'max_tokens',
+        label: 'Max Tokens (Deprecated)',
+        type: 'range',
+        min: 256,
+        max: 8192,
+        step: 256,
+        default: null,
+        deprecated: true,
       },
       {
         key: 'temperature',

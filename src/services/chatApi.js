@@ -1,3 +1,5 @@
+import { PROVIDERS } from './apiProviders'
+
 const BASE_URLS = {
   groq: 'https://api.groq.com/openai/v1',
   openrouter: 'https://openrouter.ai/api/v1',
@@ -85,10 +87,18 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
   const headers = { 'Content-Type': 'application/json' }
   if (profile.key) headers['Authorization'] = `Bearer ${profile.key}`
 
+  const providerDef = PROVIDERS.find((p) => p.id === profile.providerId)
+  const deprecatedKeys = new Set(
+    (providerDef?.params || []).filter((p) => p.deprecated).map((p) => p.key),
+  )
+  const activeParams = Object.fromEntries(
+    Object.entries(profile.params || {}).filter(([key]) => !deprecatedKeys.has(key)),
+  )
+
   const body = {
     model: profile.model,
     messages,
-    ...profile.params,
+    ...activeParams,
   }
 
   if (profile.params.stream) {

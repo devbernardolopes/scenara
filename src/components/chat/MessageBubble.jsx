@@ -170,7 +170,7 @@ function MessageBubble({
               </button>
               <button
                 type="button"
-                onClick={() => onShowPrompt?.(message.id)}
+                onClick={() => onShowPrompt?.()}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
                 title={t('showPrompt')}
               >
