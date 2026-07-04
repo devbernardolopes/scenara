@@ -1,5 +1,6 @@
 {
   "title": "Charakter erstellen",
+  "titleFormat": "{{name}} erstellen",
   "placeholder": "Das Charaktererstellungsformular wird hier sein.",
   "personaTitle": "Persona bearbeiten",
   "personaPlaceholder": "Der Persona-Editor wird hier sein.",

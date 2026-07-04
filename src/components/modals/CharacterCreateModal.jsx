@@ -179,7 +179,9 @@ function CharacterCreateModal({ character: existing, initialData }) {
     <div className="flex flex-col min-h-0 flex-1">
       <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
         <h2 className="text-xl font-semibold text-text">
-          {isEditing ? t('editTitle') : t('title')}
+          {form.name.trim()
+            ? t(isEditing ? 'editTitleFormat' : 'titleFormat', { name: form.name.trim() })
+            : t(isEditing ? 'editTitle' : 'title')}
         </h2>
         <CloseButton onClick={isDirty ? handleCloseAttempt : closeModal} />
       </div>

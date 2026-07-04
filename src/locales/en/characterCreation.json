@@ -1,6 +1,8 @@
 {
   "title": "Create Character",
+  "titleFormat": "Create {{name}}",
   "editTitle": "Edit Character",
+  "editTitleFormat": "Edit {{name}}",
   "save": "Save",
   "saving": "Saving…",
   "cancel": "Cancel",

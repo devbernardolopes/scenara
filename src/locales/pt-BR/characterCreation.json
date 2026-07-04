@@ -1,5 +1,8 @@
 {
   "title": "Criar Personagem",
+  "titleFormat": "Criar {{name}}",
+  "editTitle": "Editar Personagem",
+  "editTitleFormat": "Editar {{name}}",
   "placeholder": "O formulário de criação de personagem ficará aqui.",
   "personaTitle": "Editar Persona",
   "personaPlaceholder": "O editor de persona ficará aqui.",
@@ -26,7 +29,6 @@
   "noPersonas": "Nenhuma persona ainda. Crie uma para definir como você aparece nos chats.",
   "confirmDelete": "Tem certeza que deseja excluir esta persona?",
   "confirmDeleteTitle": "Excluir Persona",
-  "editTitle": "Editar Personagem",
   "sectionInitialMessages": "Mensagens Iniciais",
   "addInitialMessage": "Adicionar Mensagem Inicial",
   "initialMessageLabel": "Mensagem Inicial",
