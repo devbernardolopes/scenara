@@ -14,6 +14,8 @@ import {
   importWritingInstructions,
 } from '../../services/writingInstructions'
 import { downloadJson } from '../../lib/download'
+import db from '../../db'
+import Avatar from '../shared/Avatar'
 import CloseButton from '../shared/CloseButton'
 import IconButton from '../shared/IconButton'
 import { Plus, Upload, Edit3, Copy, Download, Trash2 } from '../../lib/icons'
@@ -66,12 +68,36 @@ function WritingInstructionManagementModal() {
   }
 
   async function handleDeleteSingle(item) {
+    const linked = await db.characters.where('writingInstruction').equals(item.id).toArray()
+
     const ok = await confirm({
       title: t('writingInstruction.confirmDelete.title'),
       message: t('writingInstruction.confirmDelete.message', { name: item.name }),
       confirmLabel: t('writingInstruction.actions.delete'),
       cancelLabel: tc('cancel'),
       variant: 'danger',
+      children:
+        linked.length > 0 ? (
+          <div className="mb-6">
+            <p className="text-sm text-secondary mb-3">
+              {t('writingInstruction.confirmDelete.linkedCharacters', { count: linked.length })}
+            </p>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {linked.map((char) => (
+                <div
+                  key={char.id}
+                  className="flex items-center gap-3 p-2 rounded-md bg-surface-secondary"
+                >
+                  <Avatar src={char.avatar} size="md" />
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-sm font-medium text-text truncate">{char.name}</span>
+                    <span className="text-xs text-tertiary shrink-0">#{char.characterNumber}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null,
     })
     if (!ok) return
     await deleteWritingInstruction(item.id)

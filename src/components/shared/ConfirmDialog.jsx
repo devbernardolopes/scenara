@@ -1,6 +1,15 @@
 import { useEffect } from 'react'
 
-function ConfirmDialog({ title, message, confirmLabel, cancelLabel, variant = 'default', onConfirm, onCancel }) {
+function ConfirmDialog({
+  title,
+  message,
+  confirmLabel,
+  cancelLabel,
+  variant = 'default',
+  onConfirm,
+  onCancel,
+  children,
+}) {
   useEffect(() => {
     function handleKeyDown(e) {
       if (e.key === 'Escape') {
@@ -28,6 +37,7 @@ function ConfirmDialog({ title, message, confirmLabel, cancelLabel, variant = 'd
       >
         <h2 className="text-lg font-semibold text-text mb-2">{title}</h2>
         <p className="text-sm text-secondary mb-6">{message}</p>
+        {children}
         <div className="flex justify-end gap-3">
           <button
             type="button"

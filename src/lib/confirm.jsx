@@ -17,22 +17,27 @@ export function ConfirmProvider({ children }) {
     confirmLabel: 'Confirm',
     cancelLabel: 'Cancel',
     variant: 'default',
+    children: null,
   })
   const resolveRef = useRef(null)
 
-  const confirm = useCallback(({ title, message, confirmLabel, cancelLabel, variant } = {}) => {
-    return new Promise((resolve) => {
-      resolveRef.current = resolve
-      setState({
-        open: true,
-        title: title || 'Confirm',
-        message: message || 'Are you sure?',
-        confirmLabel: confirmLabel || 'Confirm',
-        cancelLabel: cancelLabel || 'Cancel',
-        variant: variant || 'default',
+  const confirm = useCallback(
+    ({ title, message, confirmLabel, cancelLabel, variant, children } = {}) => {
+      return new Promise((resolve) => {
+        resolveRef.current = resolve
+        setState({
+          open: true,
+          title: title || 'Confirm',
+          message: message || 'Are you sure?',
+          confirmLabel: confirmLabel || 'Confirm',
+          cancelLabel: cancelLabel || 'Cancel',
+          variant: variant || 'default',
+          children: children || null,
+        })
       })
-    })
-  }, [])
+    },
+    [],
+  )
 
   const handleConfirm = useCallback(() => {
     resolveRef.current?.(true)
@@ -56,7 +61,9 @@ export function ConfirmProvider({ children }) {
           variant={state.variant}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
-        />
+        >
+          {state.children}
+        </ConfirmDialog>
       )}
     </ConfirmContext.Provider>
   )
