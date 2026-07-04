@@ -65,7 +65,7 @@ export async function updateThread(id, data) {
 }
 
 export async function updateThreadTitle(id, title) {
-  const updated = await db.threads.update(Number(id), { title })
+  const updated = await db.threads.update(Number(id), { title, manualTitle: true })
   if (updated) {
     window.dispatchEvent(
       new CustomEvent('threads-changed', {

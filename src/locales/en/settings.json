@@ -81,6 +81,10 @@
       "label": "Thread Card Marquee",
       "desc": "Scroll thread titles when they overflow the card. Disable to truncate with ellipsis instead."
     },
+    "chatTitleMarquee": {
+      "label": "Chat Title Marquee",
+      "desc": "Scroll the chat title when it overflows the header. Disable to truncate with ellipsis instead."
+    },
     "chatFontFamily": {
       "label": "Chat Font Family",
       "desc": "Font used for chat message content."

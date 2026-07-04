@@ -24,6 +24,41 @@ import { sendChatCompletion, buildMessagesPayload, getActiveParams } from '../se
 import { getSetting } from '../services/settings'
 import { startGenerating, stopGenerating } from '../services/generatingState'
 
+function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
+  const wrapperRef = useRef(null)
+  const [overflows, setOverflows] = useState(false)
+
+  useLayoutEffect(() => {
+    const el = wrapperRef.current
+    if (el && chatTitleMarquee) {
+      setOverflows(el.scrollWidth > el.clientWidth)
+    } else {
+      setOverflows(false)
+    }
+  }, [title, chatTitleMarquee])
+
+  if (!chatTitleMarquee) {
+    return (
+      <span
+        className="text-sm text-secondary truncate cursor-pointer"
+        onDoubleClick={onDoubleClick}
+      >
+        {title}
+      </span>
+    )
+  }
+
+  return (
+    <span
+      ref={wrapperRef}
+      className={`text-sm text-secondary marquee-wrapper ${overflows ? 'marquee-animate' : ''} cursor-pointer`}
+      onDoubleClick={onDoubleClick}
+    >
+      <span className="marquee-text">{title}</span>
+    </span>
+  )
+}
+
 function ChatView() {
   const { threadId } = useParams()
   const { t } = useTranslation('chat')
@@ -50,6 +85,7 @@ function ChatView() {
   const [selectedInitialIndex, setSelectedInitialIndex] = useState(0)
   const [visibleStartIndex, setVisibleStartIndex] = useState(0)
   const [messageThreshold, setMessageThreshold] = useState(0)
+  const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const scrollHeightBeforeRef = useRef(null)
 
   async function loadPersonas() {
@@ -130,6 +166,19 @@ function ChatView() {
     window.addEventListener('settings-changed', onSettingsChanged)
     return () => window.removeEventListener('settings-changed', onSettingsChanged)
   }, [messages.length])
+
+  useEffect(() => {
+    getSetting('chatTitleMarquee').then((val) => {
+      setChatTitleMarquee(val !== false)
+    })
+    function onSettingsChanged(e) {
+      if (e.detail?.key === 'chatTitleMarquee') {
+        setChatTitleMarquee(e.detail.value !== false)
+      }
+    }
+    window.addEventListener('settings-changed', onSettingsChanged)
+    return () => window.removeEventListener('settings-changed', onSettingsChanged)
+  }, [])
 
   useEffect(() => {
     function onPersonasChanged() {
@@ -448,11 +497,15 @@ function ChatView() {
               }
             />
           )}
-          <h1 className="font-semibold text-text truncate">{character?.name || thread.title}</h1>
-          <span className="text-xs text-tertiary bg-surface-secondary px-2 py-0.5 rounded">
-            {t('characterTag')}
-          </span>
-          {generating && <RefreshCw className="w-4 h-4 text-primary animate-spin" />}
+          <div className="flex items-center gap-2 min-w-0">
+            {character && <h1 className="font-semibold text-text shrink-0">{character.name}</h1>}
+            <ChatTitle
+              title={thread.title}
+              chatTitleMarquee={chatTitleMarquee}
+              onDoubleClick={() => openModal('editThreadTitle', { thread })}
+            />
+          </div>
+          {generating && <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />}
         </div>
       </div>
 

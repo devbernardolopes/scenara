@@ -199,6 +199,14 @@ export const SETTINGS = [
     descKey: 'settings:appearance.threadCardMarquee.desc',
   },
   {
+    key: 'chatTitleMarquee',
+    category: 'appearance',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.chatTitleMarquee.label',
+    descKey: 'settings:appearance.chatTitleMarquee.desc',
+  },
+  {
     key: 'chatFontFamily',
     category: 'appearance',
     type: 'select',
