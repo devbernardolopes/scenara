@@ -80,6 +80,30 @@
     "threadCardMarquee": {
       "label": "Thread Card Marquee",
       "desc": "Scroll thread titles when they overflow the card. Disable to truncate with ellipsis instead."
+    },
+    "chatFontFamily": {
+      "label": "Chat Font Family",
+      "desc": "Font used for chat message content."
+    },
+    "chatFontFamilyOptions": {
+      "system": "System Default",
+      "inter": "Inter",
+      "atkinson": "Atkinson Hyperlegible",
+      "roboto": "Roboto",
+      "georgia": "Georgia",
+      "courier": "Courier New",
+      "trebuchet": "Trebuchet MS"
+    },
+    "chatFontSize": {
+      "label": "Chat Font Size",
+      "desc": "Font size for chat message content."
+    },
+    "chatFontSizeOptions": {
+      "xs": "Smaller",
+      "sm": "Small",
+      "base": "Regular",
+      "lg": "Large",
+      "xl": "Extra Large"
     }
   },
   "themeOptions": {

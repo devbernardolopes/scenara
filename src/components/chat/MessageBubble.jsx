@@ -35,6 +35,24 @@ const VISIBILITY_KEYS = [
 
 const AVATAR_SIZE_MAP = { '1x': 'sm', '2x': 'md', '3x': 'lg', '4x': 'xl' }
 
+const CHAT_FONTS = {
+  system: undefined,
+  inter: "'Inter', sans-serif",
+  atkinson: "'Atkinson Hyperlegible', sans-serif",
+  roboto: "'Roboto', sans-serif",
+  georgia: 'Georgia, serif',
+  courier: "'Courier New', monospace",
+  trebuchet: "'Trebuchet MS', sans-serif",
+}
+
+const CHAT_FONT_SIZES = {
+  xs: '0.75rem',
+  sm: '0.875rem',
+  base: '1rem',
+  lg: '1.125rem',
+  xl: '1.25rem',
+}
+
 function estimateTokens(text) {
   return Math.ceil((text || '').length / 4)
 }
@@ -70,6 +88,8 @@ function MessageBubble({
   const [visibility, setVisibility] = useState(
     Object.fromEntries(VISIBILITY_KEYS.map((k) => [k, true])),
   )
+  const [chatFontFamily, setChatFontFamily] = useState('system')
+  const [chatFontSize, setChatFontSize] = useState('sm')
 
   useEffect(() => {
     async function load() {
@@ -85,6 +105,24 @@ function MessageBubble({
         const v = await getSetting(k)
         setVisibility((prev) => ({ ...prev, [k]: v }))
       })
+    }
+    window.addEventListener('settings-changed', handler)
+    return () => window.removeEventListener('settings-changed', handler)
+  }, [])
+
+  useEffect(() => {
+    async function load() {
+      const [family, size] = await Promise.all([
+        getSetting('chatFontFamily'),
+        getSetting('chatFontSize'),
+      ])
+      setChatFontFamily(family || 'system')
+      setChatFontSize(size || 'sm')
+    }
+    load()
+    function handler(e) {
+      if (e.detail?.key === 'chatFontFamily') setChatFontFamily(e.detail.value || 'system')
+      if (e.detail?.key === 'chatFontSize') setChatFontSize(e.detail.value || 'sm')
     }
     window.addEventListener('settings-changed', handler)
     return () => window.removeEventListener('settings-changed', handler)
@@ -340,10 +378,20 @@ function MessageBubble({
                   ? `${userBgClass || 'bg-transparent'} text-on-primary border-white/20 focus:ring-white/40`
                   : 'bg-surface text-text border-border focus:ring-primary/40'
               }`}
-              style={isUser ? userBgStyle : undefined}
+              style={{
+                ...(isUser ? userBgStyle : undefined),
+                fontFamily: CHAT_FONTS[chatFontFamily],
+                fontSize: CHAT_FONT_SIZES[chatFontSize],
+              }}
             />
           ) : (
-            <div className="text-sm">
+            <div
+              className="text-sm"
+              style={{
+                fontFamily: CHAT_FONTS[chatFontFamily],
+                fontSize: CHAT_FONT_SIZES[chatFontSize],
+              }}
+            >
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeSanitize]}
