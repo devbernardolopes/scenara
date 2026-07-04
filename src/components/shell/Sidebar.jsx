@@ -226,6 +226,13 @@ function Sidebar({ open, onClose }) {
   }
 
   async function handleDuplicate(thread) {
+    const ok = await confirm({
+      title: t('sidebar.confirmDuplicateTitle'),
+      message: t('sidebar.confirmDuplicateMessage'),
+      confirmLabel: t('sidebar.duplicateThread'),
+      cancelLabel: t('cancel'),
+    })
+    if (!ok) return
     await duplicateThread(thread.id)
   }
 
