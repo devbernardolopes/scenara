@@ -15,6 +15,8 @@ import {
   Play,
   Terminal,
   MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
 } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
@@ -103,6 +105,9 @@ function MessageBubble({
   personaMap,
   nameLabel,
   streaming,
+  bundleMessages,
+  bundleIndex,
+  onBundleNavigate,
   onDeleteRequest,
   onEdit,
   onFork,
@@ -351,6 +356,38 @@ function MessageBubble({
             </span>
           )}
           <span className="text-xs font-medium text-tertiary">{`#${messageNumber}`}</span>
+          {bundleMessages && bundleMessages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  const newIdx = bundleIndex - 1
+                  if (newIdx >= 0) onBundleNavigate?.(message.id, bundleMessages[newIdx])
+                }}
+                disabled={bundleIndex <= 0}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+                title={t('previousInitialMessage')}
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <span className="text-xs text-tertiary whitespace-nowrap">
+                {bundleIndex + 1}/{bundleMessages.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  const newIdx = bundleIndex + 1
+                  if (newIdx < bundleMessages.length)
+                    onBundleNavigate?.(message.id, bundleMessages[newIdx])
+                }}
+                disabled={bundleIndex >= bundleMessages.length - 1}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+                title={t('nextInitialMessage')}
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </>
+          )}
           <div className="flex-1 min-w-0" />
           {headerButtons.map((key) => {
             const def = BUTTON_DEFS[key]

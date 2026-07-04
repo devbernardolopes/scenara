@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, ChevronLeft, ChevronRight, RefreshCw, X } from '../lib/icons'
+import { ChevronDown, RefreshCw } from '../lib/icons'
 import { useModal } from '../hooks/useModal'
 import { showToast } from '../lib/toast'
 import { useConfirm } from '../lib/confirm'
@@ -87,7 +87,6 @@ function ChatView() {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [charAvatarScale, setCharAvatarScale] = useState('1x')
   const [personaAvatarScale, setPersonaAvatarScale] = useState('1x')
-  const [selectedInitialIndex, setSelectedInitialIndex] = useState(0)
   const [visibleStartIndex, setVisibleStartIndex] = useState(0)
   const [messageThreshold, setMessageThreshold] = useState(0)
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
@@ -105,7 +104,17 @@ function ChatView() {
   async function loadData() {
     setLoading(true)
     try {
-      const [thr, msgs] = await Promise.all([getThread(threadId), getMessagesByThread(threadId)])
+      let [thr, msgs] = await Promise.all([getThread(threadId), getMessagesByThread(threadId)])
+
+      if (thr?.initialMessages?.length > 0 && msgs.length === 0) {
+        const contents = thr.initialMessages.map((m) => m.content)
+        const msgId = await createAssistantMessage(threadId, contents[0])
+        await updateMessage(msgId, { bundleMessages: JSON.stringify(contents) })
+        await updateThread(threadId, { initialMessages: null })
+        thr = await getThread(threadId)
+        msgs = await getMessagesByThread(threadId)
+      }
+
       setThread(thr)
       setMessages(msgs)
 
@@ -353,21 +362,7 @@ function ChatView() {
         chatPersona = await getPersona(thread.personaId)
       }
 
-      const hasInitialMessages = thread?.initialMessages?.length > 0 && messages.length === 0
-
-      if (hasInitialMessages) {
-        const selected = thread.initialMessages[selectedInitialIndex]
-        if (selected?.content) {
-          await createAssistantMessage(threadId, selected.content)
-        }
-        await updateThread(threadId, { initialMessages: null })
-        setThread((prev) => ({ ...prev, initialMessages: null }))
-        setSelectedInitialIndex(0)
-        currentMsgs = await getMessagesByThread(threadId)
-        setMessages(currentMsgs)
-      }
-
-      const isFirstMessage = messages.length === 0 && !hasInitialMessages
+      const isFirstMessage = messages.length === 0
 
       if (isFirstMessage && !text && !character?.firstMessage) {
         generatingRef.current = false
@@ -405,10 +400,9 @@ function ChatView() {
     handleSendRef.current = handleSend
   })
 
-  async function handleClearInitialMessages() {
-    await updateThread(threadId, { initialMessages: null })
-    setThread((prev) => ({ ...prev, initialMessages: null }))
-    setSelectedInitialIndex(0)
+  async function handleBundleNavigate(messageId, newContent) {
+    await updateMessage(messageId, { content: newContent })
+    setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, content: newContent } : m)))
   }
 
   async function handleRegenerate(messageId) {
@@ -444,7 +438,12 @@ function ChatView() {
   }
 
   async function handleEditMessage(id, content) {
-    await updateMessage(id, { content })
+    const msg = messages.find((m) => m.id === id)
+    const updates = { content }
+    if (msg?.bundleMessages) {
+      updates.bundleMessages = null
+    }
+    await updateMessage(id, updates)
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
     showToast(t('messageUpdated'), { type: 'success' })
@@ -452,6 +451,24 @@ function ChatView() {
 
   async function handleDeleteMessage(id) {
     setConfirmDeleteId(null)
+    const msg = messages.find((m) => m.id === id)
+    if (msg?.bundleMessages) {
+      const bundle = JSON.parse(msg.bundleMessages)
+      if (bundle.length > 1) {
+        const idx = bundle.indexOf(msg.content)
+        const removeIdx = idx !== -1 ? idx : 0
+        bundle.splice(removeIdx, 1)
+        const newIdx = Math.min(removeIdx, bundle.length - 1)
+        await updateMessage(id, {
+          bundleMessages: JSON.stringify(bundle),
+          content: bundle[newIdx],
+        })
+        const msgs = await getMessagesByThread(threadId)
+        setMessages(msgs)
+        showToast(t('messageDeleted'), { type: 'success' })
+        return
+      }
+    }
     await deleteMessagesFrom(id)
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
@@ -544,56 +561,7 @@ function ChatView() {
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto px-4 md:px-8 py-4 space-y-4 relative"
       >
-        {thread?.initialMessages?.length > 0 && messages.length === 0 && !generating ? (
-          <div className="bg-surface border border-border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-tertiary">
-                {t('initialMessage')}
-                {thread.initialMessages.length > 1 ? ` #${selectedInitialIndex + 1}` : ''}
-              </span>
-              <button
-                type="button"
-                onClick={handleClearInitialMessages}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text transition-colors"
-                aria-label={t('clearInitialMessages')}
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <p className="text-text whitespace-pre-wrap">
-              {thread.initialMessages[selectedInitialIndex]?.content}
-            </p>
-            {thread.initialMessages.length > 1 && (
-              <div className="flex items-center justify-center gap-3 mt-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedInitialIndex((i) => Math.max(0, i - 1))}
-                  disabled={selectedInitialIndex === 0}
-                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  aria-label={t('previousInitialMessage')}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <span className="text-xs text-tertiary">
-                  {selectedInitialIndex + 1}/{thread.initialMessages.length}
-                </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelectedInitialIndex((i) =>
-                      Math.min(thread.initialMessages.length - 1, i + 1),
-                    )
-                  }
-                  disabled={selectedInitialIndex === thread.initialMessages.length - 1}
-                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  aria-label={t('nextInitialMessage')}
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-            )}
-          </div>
-        ) : messages.length === 0 && !generating ? (
+        {messages.length === 0 && !generating ? (
           <p className="text-secondary text-sm text-center py-8">{t('placeholder')}</p>
         ) : (
           <>
@@ -610,24 +578,40 @@ function ChatView() {
                 </button>
               </div>
             )}
-            {messages.slice(visibleStartIndex).map((msg, idx) => (
-              <MessageBubble
-                key={msg.id}
-                message={msg}
-                messageNumber={visibleStartIndex + idx + 1}
-                avatarSrc={getAvatarSrc(msg)}
-                avatarScale={getAvatarScale(msg)}
-                role={msg.role}
-                personaMap={personaMap}
-                nameLabel={getMessageName(msg)}
-                streaming={msg.id === streamingMsgId}
-                onDeleteRequest={(id) => setConfirmDeleteId(id)}
-                onEdit={handleEditMessage}
-                onFork={handleForkMessage}
-                onRegenerate={handleRegenerate}
-                onSpeak={() => {}}
-              />
-            ))}
+            {messages.slice(visibleStartIndex).map((msg, idx) => {
+              let bundleMessages = null
+              let bundleIndex = 0
+              if (msg.bundleMessages) {
+                try {
+                  bundleMessages = JSON.parse(msg.bundleMessages)
+                  bundleIndex = bundleMessages.indexOf(msg.content)
+                  if (bundleIndex === -1) bundleIndex = 0
+                } catch {
+                  bundleMessages = null
+                }
+              }
+              return (
+                <MessageBubble
+                  key={msg.id}
+                  message={msg}
+                  messageNumber={visibleStartIndex + idx + 1}
+                  avatarSrc={getAvatarSrc(msg)}
+                  avatarScale={getAvatarScale(msg)}
+                  role={msg.role}
+                  personaMap={personaMap}
+                  nameLabel={getMessageName(msg)}
+                  streaming={msg.id === streamingMsgId}
+                  bundleMessages={bundleMessages}
+                  bundleIndex={bundleIndex}
+                  onBundleNavigate={handleBundleNavigate}
+                  onDeleteRequest={(id) => setConfirmDeleteId(id)}
+                  onEdit={handleEditMessage}
+                  onFork={handleForkMessage}
+                  onRegenerate={handleRegenerate}
+                  onSpeak={() => {}}
+                />
+              )
+            })}
           </>
         )}
         <div ref={messagesEndRef} />

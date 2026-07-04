@@ -31,13 +31,14 @@ export async function getNextThreadNumber() {
   })
 }
 
-export async function createThread({ characterId, personaId, title }) {
+export async function createThread({ characterId, personaId, title, initialMessages }) {
   const now = new Date()
   const threadNumber = await getNextThreadNumber()
   const id = await db.threads.add({
     characterId,
     personaId: personaId || null,
     title: title || 'New Chat',
+    initialMessages: initialMessages || null,
     createdAt: now,
     updatedAt: now,
     isFavorite: false,
