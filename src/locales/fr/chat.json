@@ -39,5 +39,6 @@
   "initialMessage": "Message Initial",
   "clearInitialMessages": "Supprimer les messages initiaux",
   "previousInitialMessage": "Message initial précédent",
-  "nextInitialMessage": "Message initial suivant"
+  "nextInitialMessage": "Message initial suivant",
+  "loadEarlierMessages": "Charger les messages précédents ({{count}} de plus)"
 }

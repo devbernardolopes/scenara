@@ -45,5 +45,6 @@
   "initialMessage": "Initial Message",
   "clearInitialMessages": "Remove initial messages",
   "previousInitialMessage": "Previous initial message",
-  "nextInitialMessage": "Next initial message"
+  "nextInitialMessage": "Next initial message",
+  "loadEarlierMessages": "Load earlier messages ({{count}} more)"
 }

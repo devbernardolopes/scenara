@@ -249,6 +249,15 @@ export const SETTINGS = [
     descKey: 'settings:defaults.includeOOC.desc',
   },
   {
+    key: 'defaultMessageThreshold',
+    category: 'defaults',
+    type: 'text',
+    default: 0,
+    props: { type: 'number', min: 0 },
+    labelKey: 'settings:defaults.messageThreshold.label',
+    descKey: 'settings:defaults.messageThreshold.desc',
+  },
+  {
     key: 'defaultPostProcessing',
     category: 'defaults',
     type: 'toggle',

@@ -429,6 +429,10 @@
       "label": "Include OOC",
       "desc": "Default state for the include OOC toggle."
     },
+    "messageThreshold": {
+      "label": "Message Threshold",
+      "desc": "Maximum visible messages per chat. Older messages are hidden from view but kept. 0 = unlimited."
+    },
     "postProcessing": {
       "label": "Post-processing",
       "desc": "Default state for the post-processing toggle."

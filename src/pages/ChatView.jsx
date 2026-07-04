@@ -48,6 +48,9 @@ function ChatView() {
   const [charAvatarScale, setCharAvatarScale] = useState('1x')
   const [personaAvatarScale, setPersonaAvatarScale] = useState('1x')
   const [selectedInitialIndex, setSelectedInitialIndex] = useState(0)
+  const [visibleStartIndex, setVisibleStartIndex] = useState(0)
+  const [messageThreshold, setMessageThreshold] = useState(0)
+  const scrollHeightBeforeRef = useRef(null)
 
   async function loadPersonas() {
     const list = await getAllPersonas()
@@ -64,6 +67,11 @@ function ChatView() {
       const [thr, msgs] = await Promise.all([getThread(threadId), getMessagesByThread(threadId)])
       setThread(thr)
       setMessages(msgs)
+
+      const threshold = Number(await getSetting('defaultMessageThreshold')) || 0
+      setMessageThreshold(threshold)
+      setVisibleStartIndex(threshold > 0 ? Math.max(0, msgs.length - threshold) : 0)
+
       let chr = null
       if (thr) {
         chr = await getCharacter(thr.characterId)
@@ -102,6 +110,26 @@ function ChatView() {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages])
+
+  useEffect(() => {
+    setVisibleStartIndex((prev) => Math.min(prev, messages.length))
+  }, [messages])
+
+  useEffect(() => {
+    function onSettingsChanged(e) {
+      if (e.detail?.key === 'defaultMessageThreshold') {
+        const newThreshold = Number(e.detail.value) || 0
+        setMessageThreshold(newThreshold)
+        setVisibleStartIndex((prev) => {
+          if (newThreshold === 0) return 0
+          const defaultStart = Math.max(0, messages.length - newThreshold)
+          return Math.min(prev, defaultStart)
+        })
+      }
+    }
+    window.addEventListener('settings-changed', onSettingsChanged)
+    return () => window.removeEventListener('settings-changed', onSettingsChanged)
+  }, [messages.length])
 
   useEffect(() => {
     function onPersonasChanged() {
@@ -149,6 +177,21 @@ function ChatView() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
     setShowScrollButton(false)
   }
+
+  function handleLoadEarlier() {
+    if (!scrollRef.current || visibleStartIndex <= 0) return
+    scrollHeightBeforeRef.current = scrollRef.current.scrollHeight
+    const chunkSize = messageThreshold || 50
+    setVisibleStartIndex((prev) => Math.max(0, prev - chunkSize))
+  }
+
+  useLayoutEffect(() => {
+    if (scrollHeightBeforeRef.current !== null && scrollRef.current) {
+      const el = scrollRef.current
+      el.scrollTop += el.scrollHeight - scrollHeightBeforeRef.current
+      scrollHeightBeforeRef.current = null
+    }
+  })
 
   async function handleCancel() {
     if (abortRef.current) {
@@ -470,23 +513,38 @@ function ChatView() {
         ) : messages.length === 0 && !generating ? (
           <p className="text-secondary text-sm text-center py-8">{t('placeholder')}</p>
         ) : (
-          messages.map((msg, idx) => (
-            <MessageBubble
-              key={msg.id}
-              message={msg}
-              messageNumber={idx + 1}
-              avatarSrc={getAvatarSrc(msg)}
-              avatarScale={getAvatarScale(msg)}
-              role={msg.role}
-              personaMap={personaMap}
-              streaming={msg.id === streamingMsgId}
-              onDeleteRequest={(id) => setConfirmDeleteId(id)}
-              onEdit={handleEditMessage}
-              onFork={() => {}}
-              onRegenerate={handleRegenerate}
-              onSpeak={() => {}}
-            />
-          ))
+          <>
+            {visibleStartIndex > 0 && (
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  onClick={handleLoadEarlier}
+                  className="min-h-[44px] px-4 py-2 text-sm text-secondary hover:text-text border border-border-light rounded-lg hover:border-border transition-colors"
+                >
+                  {t('loadEarlierMessages', {
+                    count: Math.min(visibleStartIndex, messageThreshold || 50),
+                  })}
+                </button>
+              </div>
+            )}
+            {messages.slice(visibleStartIndex).map((msg, idx) => (
+              <MessageBubble
+                key={msg.id}
+                message={msg}
+                messageNumber={visibleStartIndex + idx + 1}
+                avatarSrc={getAvatarSrc(msg)}
+                avatarScale={getAvatarScale(msg)}
+                role={msg.role}
+                personaMap={personaMap}
+                streaming={msg.id === streamingMsgId}
+                onDeleteRequest={(id) => setConfirmDeleteId(id)}
+                onEdit={handleEditMessage}
+                onFork={() => {}}
+                onRegenerate={handleRegenerate}
+                onSpeak={() => {}}
+              />
+            ))}
+          </>
         )}
         <div ref={messagesEndRef} />
 
