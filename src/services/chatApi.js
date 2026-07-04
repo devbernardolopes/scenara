@@ -47,12 +47,20 @@ export async function buildMessagesPayload({
   const extraPrompt = replaceVarsIn(character?.extraPrompt)
   if (isFirstMessage && extraPrompt) systemParts.push(extraPrompt)
 
-  if (writingInstruction?.content && character?.writingPlacement === 'endOfSystemPrompt') {
+  const writingTiming = character?.writingInjectionTiming || settings.writingInjectionTiming
+  const writingPlacement = character?.writingPlacement || settings.writingPlacement
+  if (
+    writingInstruction?.content &&
+    writingTiming === 'always' &&
+    writingPlacement === 'endOfSystemPrompt'
+  ) {
     systemParts.push(writingInstruction.content)
   }
 
+  const personaPlacement =
+    character?.personaInjectionPlacement || settings.personaInjectionPlacement
   const personaTemplate = replaceVarsWithDesc(settings.personaInjectionTemplate)
-  if (personaTemplate && character?.personaInjectionPlacement === 'endOfSystemPrompt') {
+  if (personaTemplate && personaPlacement === 'endOfSystemPrompt') {
     systemParts.push(personaTemplate)
   }
 

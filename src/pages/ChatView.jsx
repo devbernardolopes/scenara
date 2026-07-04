@@ -154,6 +154,9 @@ function ChatView() {
       continueRole: await getSetting('prompting.continueRole'),
       continuePrompt: await getSetting('prompting.continuePrompt'),
       personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
+      writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
+      writingPlacement: await getSetting('prompting.writingPlacement'),
+      personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
     }
 
     const payload = await buildMessagesPayload({
