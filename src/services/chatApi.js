@@ -3,7 +3,7 @@ import { PROVIDERS } from './apiProviders'
 const BASE_URLS = {
   groq: 'https://api.groq.com/openai/v1',
   openrouter: 'https://openrouter.ai/api/v1',
-  'ai-horde': 'https://oai.aihorde.net',
+  'ai-horde': 'https://oai.aihorde.net/v1',
 }
 
 export function getChatBaseUrl(providerId) {
