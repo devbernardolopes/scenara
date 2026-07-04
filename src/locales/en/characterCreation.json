@@ -57,6 +57,7 @@
   "userPersonaPrefix": "User Persona Prefix",
   "includeOOC": "Include OOC",
   "postProcessing": "Post-processing",
+  "systemAvatarScale": "SYSTEM Avatar Scale",
   "characterAvatarScale": "Character Avatar Scale",
   "userPersonaAvatarScale": "User Persona Avatar Scale",
   "writingInjectionTiming": "Writing Instructions Injection Timing",

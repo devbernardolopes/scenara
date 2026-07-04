@@ -487,6 +487,10 @@
       "label": "Post-processing",
       "desc": "Default state for the post-processing toggle."
     },
+    "systemAvatarScale": {
+      "label": "SYSTEM Avatar Scale",
+      "desc": "Default system avatar scale for new characters."
+    },
     "characterAvatarScale": {
       "label": "Character Avatar Scale",
       "desc": "Default character avatar scale for new characters."

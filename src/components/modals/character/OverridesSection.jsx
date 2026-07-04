@@ -7,8 +7,6 @@ const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
 const numberClass =
   'w-24 px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
-const selectClass =
-  'px-3 py-2 border border-border rounded-md bg-surface text-text text-sm min-w-[160px]'
 
 const AVATAR_SCALE_OPTIONS = ['1x', '2x', '3x', '4x']
 
@@ -35,6 +33,35 @@ const PERSONA_MESSAGE_ROLE_OPTIONS = [
   { value: 'system', labelKey: 'personaInjectionMessageRoleOptions.system' },
   { value: 'assistant', labelKey: 'personaInjectionMessageRoleOptions.assistant' },
 ]
+
+function ButtonGroup({ options, value, onChange, disabled }) {
+  const { t } = useTranslation('characterCreation')
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {options.map((opt) => {
+        const val = typeof opt === 'string' ? opt : opt.value
+        const label = typeof opt === 'string' ? opt : t(opt.labelKey)
+        return (
+          <button
+            key={val}
+            type="button"
+            onClick={() => !disabled && onChange(val)}
+            disabled={disabled}
+            className={`min-h-[44px] min-w-[44px] px-4 py-2 rounded-md text-sm font-medium border transition-colors ${
+              disabled
+                ? 'bg-surface text-tertiary border-border cursor-not-allowed'
+                : value === val
+                  ? 'bg-primary text-on-primary border-primary'
+                  : 'bg-surface text-secondary border-border hover:bg-surface-hover'
+            }`}
+          >
+            {label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
 function OverridesSection({ form, onChange, characterId }) {
   const { t } = useTranslation('characterCreation')
@@ -213,34 +240,31 @@ function OverridesSection({ form, onChange, characterId }) {
 
       <hr className="border-border" />
 
-      <div className="flex items-center gap-3 min-h-[44px]">
-        <label className="text-sm text-text shrink-0">{t('characterAvatarScale')}</label>
-        <select
-          value={form.characterAvatarScale}
-          onChange={(e) => onChange('characterAvatarScale', e.target.value)}
-          className={selectClass}
-        >
-          {AVATAR_SCALE_OPTIONS.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </select>
+      <div className="flex items-center gap-3">
+        <label className="text-sm text-text shrink-0">{t('systemAvatarScale')}</label>
+        <ButtonGroup
+          options={AVATAR_SCALE_OPTIONS}
+          value={form.systemAvatarScale}
+          onChange={(v) => onChange('systemAvatarScale', v)}
+        />
       </div>
 
-      <div className="flex items-center gap-3 min-h-[44px]">
+      <div className="flex items-center gap-3">
+        <label className="text-sm text-text shrink-0">{t('characterAvatarScale')}</label>
+        <ButtonGroup
+          options={AVATAR_SCALE_OPTIONS}
+          value={form.characterAvatarScale}
+          onChange={(v) => onChange('characterAvatarScale', v)}
+        />
+      </div>
+
+      <div className="flex items-center gap-3">
         <label className="text-sm text-text shrink-0">{t('userPersonaAvatarScale')}</label>
-        <select
+        <ButtonGroup
+          options={AVATAR_SCALE_OPTIONS}
           value={form.userPersonaAvatarScale}
-          onChange={(e) => onChange('userPersonaAvatarScale', e.target.value)}
-          className={selectClass}
-        >
-          {AVATAR_SCALE_OPTIONS.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </select>
+          onChange={(v) => onChange('userPersonaAvatarScale', v)}
+        />
       </div>
 
       <hr className="border-border" />
@@ -250,52 +274,34 @@ function OverridesSection({ form, onChange, characterId }) {
           {t('writingInjectionTiming')}
         </p>
 
-        <div className="flex items-center gap-3 min-h-[44px]">
+        <div className="flex items-center gap-3">
           <label className="text-sm text-text shrink-0">{t('writingInjectionTiming')}</label>
-          <select
+          <ButtonGroup
+            options={WRITING_INJECTION_TIMING_OPTIONS}
             value={form.writingInjectionTiming}
-            onChange={(e) => onChange('writingInjectionTiming', e.target.value)}
-            className={selectClass}
-          >
-            {WRITING_INJECTION_TIMING_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {t(opt.labelKey)}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => onChange('writingInjectionTiming', v)}
+          />
         </div>
 
-        <div className="flex items-center gap-3 min-h-[44px]">
+        <div className="flex items-center gap-3">
           <label className="text-sm text-text shrink-0">{t('writingPlacement')}</label>
-          <select
+          <ButtonGroup
+            options={WRITING_PLACEMENT_OPTIONS}
             value={form.writingPlacement}
-            onChange={(e) => onChange('writingPlacement', e.target.value)}
-            className={selectClass}
-          >
-            {WRITING_PLACEMENT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {t(opt.labelKey)}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => onChange('writingPlacement', v)}
+          />
         </div>
 
         <div
-          className={`flex items-center gap-3 min-h-[44px] ${disabledCls(form.writingPlacement !== 'endOfMessages')}`}
+          className={`flex items-center gap-3 ${disabledCls(form.writingPlacement !== 'endOfMessages')}`}
         >
           <label className="text-sm text-text shrink-0">{t('writingMessageRole')}</label>
-          <select
+          <ButtonGroup
+            options={WRITING_MESSAGE_ROLE_OPTIONS}
             value={form.writingMessageRole}
-            onChange={(e) => onChange('writingMessageRole', e.target.value)}
-            className={selectClass}
+            onChange={(v) => onChange('writingMessageRole', v)}
             disabled={form.writingPlacement !== 'endOfMessages'}
-          >
-            {WRITING_MESSAGE_ROLE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {t(opt.labelKey)}
-              </option>
-            ))}
-          </select>
+          />
         </div>
       </div>
 
@@ -306,37 +312,25 @@ function OverridesSection({ form, onChange, characterId }) {
           {t('personaInjectionPlacement')}
         </p>
 
-        <div className="flex items-center gap-3 min-h-[44px]">
+        <div className="flex items-center gap-3">
           <label className="text-sm text-text shrink-0">{t('personaInjectionPlacement')}</label>
-          <select
+          <ButtonGroup
+            options={PERSONA_PLACEMENT_OPTIONS}
             value={form.personaInjectionPlacement}
-            onChange={(e) => onChange('personaInjectionPlacement', e.target.value)}
-            className={selectClass}
-          >
-            {PERSONA_PLACEMENT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {t(opt.labelKey)}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => onChange('personaInjectionPlacement', v)}
+          />
         </div>
 
         <div
-          className={`flex items-center gap-3 min-h-[44px] ${disabledCls(form.personaInjectionPlacement !== 'endOfMessages')}`}
+          className={`flex items-center gap-3 ${disabledCls(form.personaInjectionPlacement !== 'endOfMessages')}`}
         >
           <label className="text-sm text-text shrink-0">{t('personaInjectionMessageRole')}</label>
-          <select
+          <ButtonGroup
+            options={PERSONA_MESSAGE_ROLE_OPTIONS}
             value={form.personaInjectionMessageRole}
-            onChange={(e) => onChange('personaInjectionMessageRole', e.target.value)}
-            className={selectClass}
+            onChange={(v) => onChange('personaInjectionMessageRole', v)}
             disabled={form.personaInjectionPlacement !== 'endOfMessages'}
-          >
-            {PERSONA_MESSAGE_ROLE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {t(opt.labelKey)}
-              </option>
-            ))}
-          </select>
+          />
         </div>
       </div>
     </div>
