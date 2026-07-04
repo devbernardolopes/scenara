@@ -107,6 +107,7 @@ function MessageBubble({
   streaming,
   bundleMessages,
   bundleIndex,
+  currentOrigin,
   onBundleNavigate,
   onDeleteRequest,
   onEdit,
@@ -504,8 +505,14 @@ function MessageBubble({
               minute: '2-digit',
             })}
           </span>
-          <span className="text-xs opacity-60">
-            {t('tokens', { count: formatTokenCount(tokenCount) })}
+          <span className="flex items-center gap-2">
+            {currentOrigin === 'initial' && (
+              <span className="text-xs opacity-60">{t('initialMessage')}</span>
+            )}
+            {currentOrigin === 'edit' && <span className="text-xs opacity-60">{t('edited')}</span>}
+            <span className="text-xs opacity-60">
+              {t('tokens', { count: formatTokenCount(tokenCount) })}
+            </span>
           </span>
         </div>
       </div>

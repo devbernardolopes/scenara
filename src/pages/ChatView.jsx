@@ -122,7 +122,11 @@ function ChatView() {
       let [thr, msgs] = await Promise.all([getThread(threadId), getMessagesByThread(threadId)])
 
       if (thr?.initialMessages?.length > 0 && msgs.length === 0) {
-        const entries = thr.initialMessages.map((m) => ({ content: m.content, promptData: null }))
+        const entries = thr.initialMessages.map((m) => ({
+          content: m.content,
+          promptData: null,
+          origin: 'initial',
+        }))
         const msgId = await createAssistantMessage(threadId, entries[0].content)
         await updateMessage(msgId, { bundleMessages: JSON.stringify(entries) })
         await updateThread(threadId, { initialMessages: null })
@@ -568,7 +572,7 @@ function ChatView() {
     if (!entries) {
       entries = [{ content: msg.content, promptData: msg.promptData || null }]
     }
-    entries.push({ content, promptData: null })
+    entries.push({ content, promptData: null, origin: 'edit' })
     await updateMessage(id, { bundleMessages: JSON.stringify(entries), content })
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
@@ -710,6 +714,10 @@ function ChatView() {
               const bundleMessages = entries ? entries.map((e) => e.content) : null
               const bundleIndex =
                 bundleMessages && msg.content ? Math.max(0, bundleMessages.indexOf(msg.content)) : 0
+              const currentOrigin =
+                entries && bundleIndex >= 0 && bundleIndex < entries.length
+                  ? entries[bundleIndex].origin || null
+                  : null
               return (
                 <MessageBubble
                   key={msg.id}
@@ -723,6 +731,7 @@ function ChatView() {
                   streaming={msg.id === streamingMsgId}
                   bundleMessages={bundleMessages}
                   bundleIndex={bundleIndex}
+                  currentOrigin={currentOrigin}
                   onBundleNavigate={handleBundleNavigate}
                   onDeleteRequest={(id) => setConfirmDeleteId(id)}
                   onEdit={handleEditMessage}
