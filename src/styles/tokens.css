@@ -334,8 +334,14 @@
   0% {
     transform: translateX(0);
   }
+  65% {
+    transform: translateX(var(--marquee-distance, -100%));
+  }
+  85% {
+    transform: translateX(var(--marquee-distance, -100%));
+  }
   100% {
-    transform: translateX(-100%);
+    transform: translateX(0);
   }
 }
 
@@ -349,7 +355,7 @@
 }
 
 .marquee-wrapper.marquee-animate .marquee-text {
-  animation: marquee 8s linear infinite;
+  animation: marquee 10s linear infinite;
   padding-right: 2rem;
 }
 

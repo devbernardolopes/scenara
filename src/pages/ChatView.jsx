@@ -31,7 +31,11 @@ function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
   useLayoutEffect(() => {
     const el = wrapperRef.current
     if (el && chatTitleMarquee) {
-      setOverflows(el.scrollWidth > el.clientWidth)
+      const overflows = el.scrollWidth > el.clientWidth
+      if (overflows) {
+        el.style.setProperty('--marquee-distance', `-${el.scrollWidth - el.clientWidth}px`)
+      }
+      setOverflows(overflows)
     } else {
       setOverflows(false)
     }
