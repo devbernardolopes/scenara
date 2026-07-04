@@ -33,6 +33,38 @@ const VISIBILITY_KEYS = [
   'showUserFork',
 ]
 
+const ORDER_KEYS = ['assistantButtonOrder', 'userButtonOrder']
+const DEFAULT_ASSISTANT_ORDER = ['delete', 'edit', 'copy', 'fork', 'regenerate', 'speak', 'prompt']
+const DEFAULT_USER_ORDER = ['delete', 'edit', 'copy', 'fork']
+
+const BUTTON_DEFS = {
+  delete: { icon: Trash2, placement: 'header', labelKey: 'delete' },
+  edit: { icon: Edit3, placement: 'header', labelKey: 'edit' },
+  copy: { icon: Copy, placement: 'header', labelKey: 'copy' },
+  fork: { icon: GitBranch, placement: 'header', labelKey: 'fork' },
+  regenerate: { icon: RefreshCw, placement: 'overflow', labelKey: 'regenerate' },
+  speak: { icon: Play, placement: 'overflow', labelKey: 'speak' },
+  prompt: { icon: Terminal, placement: 'overflow', labelKey: 'showPrompt' },
+}
+
+const VIS_KEY = {
+  user: {
+    delete: 'showUserDelete',
+    edit: 'showUserEdit',
+    copy: 'showUserCopy',
+    fork: 'showUserFork',
+  },
+  assistant: {
+    delete: 'showAssistantDelete',
+    edit: 'showAssistantEdit',
+    copy: 'showAssistantCopy',
+    fork: 'showAssistantFork',
+    regenerate: 'showAssistantRegenerate',
+    speak: 'showAssistantSpeak',
+    prompt: 'showAssistantPrompt',
+  },
+}
+
 const AVATAR_SIZE_MAP = { '1x': 'sm', '2x': 'md', '3x': 'lg', '4x': 'xl' }
 
 const CHAT_FONTS = {
@@ -90,11 +122,23 @@ function MessageBubble({
   )
   const [chatFontFamily, setChatFontFamily] = useState('system')
   const [chatFontSize, setChatFontSize] = useState('sm')
+  const [order, setOrder] = useState({ assistantButtonOrder: null, userButtonOrder: null })
 
   useEffect(() => {
     async function load() {
       const entries = await Promise.all(VISIBILITY_KEYS.map(async (k) => [k, await getSetting(k)]))
       setVisibility(Object.fromEntries(entries))
+    }
+    load()
+  }, [])
+
+  useEffect(() => {
+    async function load() {
+      const [assistantOrder, userOrder] = await Promise.all([
+        getSetting('assistantButtonOrder'),
+        getSetting('userButtonOrder'),
+      ])
+      setOrder({ assistantButtonOrder: assistantOrder, userButtonOrder: userOrder })
     }
     load()
   }, [])
@@ -123,6 +167,9 @@ function MessageBubble({
     function handler(e) {
       if (e.detail?.key === 'chatFontFamily') setChatFontFamily(e.detail.value || 'system')
       if (e.detail?.key === 'chatFontSize') setChatFontSize(e.detail.value || 'sm')
+      if (ORDER_KEYS.includes(e.detail?.key)) {
+        getSetting(e.detail.key).then((v) => setOrder((prev) => ({ ...prev, [e.detail.key]: v })))
+      }
     }
     window.addEventListener('settings-changed', handler)
     return () => window.removeEventListener('settings-changed', handler)
@@ -237,6 +284,46 @@ function MessageBubble({
     setOverflowOpen((prev) => !prev)
   }
 
+  function getButtonHandler(btnKey) {
+    switch (btnKey) {
+      case 'delete':
+        return () => onDeleteRequest?.(message.id)
+      case 'edit':
+        return handleStartEdit
+      case 'copy':
+        return handleCopy
+      case 'fork':
+        return () => onFork?.(message.id)
+      case 'regenerate':
+        return () => onRegenerate?.(message.id)
+      case 'speak':
+        return () => onSpeak?.(message.id)
+      case 'prompt':
+        return handleShowPrompt
+      default:
+        return () => {}
+    }
+  }
+
+  const buttonOrder = isUser
+    ? order.userButtonOrder || DEFAULT_USER_ORDER
+    : order.assistantButtonOrder || DEFAULT_ASSISTANT_ORDER
+
+  const visMap = isUser ? VIS_KEY.user : VIS_KEY.assistant
+
+  const headerButtons = []
+  const overflowButtons = []
+  for (const key of buttonOrder) {
+    const def = BUTTON_DEFS[key]
+    if (!def) continue
+    if (!visibility[visMap[key]]) continue
+    if (def.placement === 'header') {
+      headerButtons.push(key)
+    } else {
+      overflowButtons.push(key)
+    }
+  }
+
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
@@ -259,109 +346,62 @@ function MessageBubble({
           />
           <span className="text-xs font-medium text-tertiary">{`#${messageNumber}`}</span>
           <div className="flex-1 min-w-0" />
-          {visibility[isUser ? 'showUserDelete' : 'showAssistantDelete'] && (
-            <button
-              type="button"
-              onClick={() => onDeleteRequest?.(message.id)}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
-              title={t('delete')}
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          )}
-          {visibility[isUser ? 'showUserEdit' : 'showAssistantEdit'] && (
-            <button
-              type="button"
-              onClick={handleStartEdit}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
-              title={t('edit')}
-            >
-              <Edit3 className="w-3.5 h-3.5" />
-            </button>
-          )}
-          {visibility[isUser ? 'showUserCopy' : 'showAssistantCopy'] && (
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
-              title={t('copy')}
-            >
-              <Copy className="w-3.5 h-3.5" />
-            </button>
-          )}
-          {visibility[isUser ? 'showUserFork' : 'showAssistantFork'] && (
-            <button
-              type="button"
-              onClick={() => onFork?.(message.id)}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
-              title={t('fork')}
-            >
-              <GitBranch className="w-3.5 h-3.5" />
-            </button>
-          )}
-          {isAssistantOrSystem &&
-            (visibility.showAssistantRegenerate ||
-              visibility.showAssistantSpeak ||
-              visibility.showAssistantPrompt) && (
-              <div ref={overflowRef} className="relative flex-shrink-0">
-                <button
-                  ref={overflowBtnRef}
-                  type="button"
-                  onClick={handleOverflowClick}
-                  className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text"
-                  title={t('moreOptions')}
+          {headerButtons.map((key) => {
+            const def = BUTTON_DEFS[key]
+            if (!def) return null
+            const Icon = def.icon
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={getButtonHandler(key)}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+                title={t(def.labelKey)}
+              >
+                <Icon className="w-3.5 h-3.5" />
+              </button>
+            )
+          })}
+          {isAssistantOrSystem && overflowButtons.length > 0 && (
+            <div ref={overflowRef} className="relative flex-shrink-0">
+              <button
+                ref={overflowBtnRef}
+                type="button"
+                onClick={handleOverflowClick}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text"
+                title={t('moreOptions')}
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </button>
+              {overflowOpen && (
+                <div
+                  style={overflowMenuStyle}
+                  className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
                 >
-                  <MoreHorizontal className="w-4 h-4" />
-                </button>
-                {overflowOpen && (
-                  <div
-                    style={overflowMenuStyle}
-                    className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
-                  >
-                    {visibility.showAssistantRegenerate && (
+                  {overflowButtons.map((key) => {
+                    const def = BUTTON_DEFS[key]
+                    if (!def) return null
+                    const Icon = def.icon
+                    return (
                       <button
+                        key={key}
                         type="button"
                         onClick={() => {
-                          onRegenerate?.(message.id)
+                          getButtonHandler(key)()
                           setOverflowOpen(false)
                         }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
-                      >
-                        <RefreshCw className="w-4 h-4" />
-                        <span>{t('regenerate')}</span>
-                      </button>
-                    )}
-                    {visibility.showAssistantSpeak && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onSpeak?.(message.id)
-                          setOverflowOpen(false)
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
-                      >
-                        <Play className="w-4 h-4" />
-                        <span>{t('speak')}</span>
-                      </button>
-                    )}
-                    {visibility.showAssistantPrompt && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleShowPrompt()
-                          setOverflowOpen(false)
-                        }}
-                        disabled={!promptData}
+                        disabled={key === 'prompt' && !promptData}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] disabled:opacity-30 disabled:pointer-events-none"
                       >
-                        <Terminal className="w-4 h-4" />
-                        <span>{t('showPrompt')}</span>
+                        <Icon className="w-4 h-4" />
+                        <span>{t(def.labelKey)}</span>
                       </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Content */}

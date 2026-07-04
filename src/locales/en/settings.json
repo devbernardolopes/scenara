@@ -12,6 +12,10 @@
     "advanced": "Advanced",
     "database": "Database"
   },
+  "groups": {
+    "assistantButtons": "Assistant/System Message Bubbles Buttons",
+    "userButtons": "User Message Bubbles Buttons"
+  },
   "appearance": {
     "theme": {
       "label": "Theme",
@@ -101,6 +105,14 @@
     "chatFontSize": {
       "label": "Chat Font Size",
       "desc": "Font size for chat message content."
+    },
+    "assistantButtonOrder": {
+      "label": "Assistant/System button order",
+      "desc": "Arrange buttons shown on assistant and system message bubbles using the arrow buttons."
+    },
+    "userButtonOrder": {
+      "label": "User button order",
+      "desc": "Arrange buttons shown on user message bubbles using the arrow buttons."
     },
     "chatFontSizeOptions": {
       "xs": "Smaller",

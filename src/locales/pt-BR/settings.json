@@ -11,6 +11,10 @@
     "advanced": "Avançado",
     "database": "Database"
   },
+  "groups": {
+    "assistantButtons": "Assistant/System Message Bubbles Buttons",
+    "userButtons": "User Message Bubbles Buttons"
+  },
   "appearance": {
     "theme": {
       "label": "Tema",
@@ -75,6 +79,14 @@
     "showUserFork": {
       "label": "User – Fork",
       "desc": "Show the fork button on user message bubbles."
+    },
+    "assistantButtonOrder": {
+      "label": "Assistant/System button order",
+      "desc": "Arrange buttons shown on assistant and system message bubbles using the arrow buttons."
+    },
+    "userButtonOrder": {
+      "label": "User button order",
+      "desc": "Arrange buttons shown on user message bubbles using the arrow buttons."
     }
   },
   "themeOptions": {

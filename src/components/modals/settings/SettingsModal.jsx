@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../../hooks/useModal'
 import { usePersistedState } from '../../../hooks/usePersistedState'
-import { CATEGORIES, SETTINGS, setSetting } from '../../../services/settings'
+import { CATEGORIES, GROUPS, SETTINGS, setSetting } from '../../../services/settings'
 import SettingsSidebar from './SettingsSidebar'
 import SettingsSearch from './SettingsSearch'
 import SettingRow from './SettingRow'
+import CollapsibleSection from '../../shared/CollapsibleSection'
 import ApiSettingsPanel from './ApiSettingsPanel'
 import DatabaseSettingsPanel from './DatabaseSettingsPanel'
 import CloseButton from '../../shared/CloseButton'
@@ -30,6 +31,28 @@ function SettingsModal() {
   })
 
   const noResults = search && filtered.length === 0
+
+  function groupedSettings(settings) {
+    const result = []
+    let current = null
+    let currentGroup = null
+
+    for (const s of settings) {
+      if (s.group && s.group === currentGroup) {
+        current.push(s)
+      } else {
+        if (current) {
+          result.push({ group: currentGroup, items: current })
+        }
+        currentGroup = s.group || null
+        current = [s]
+      }
+    }
+    if (current) {
+      result.push({ group: currentGroup, items: current })
+    }
+    return result
+  }
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
@@ -73,13 +96,35 @@ function SettingsModal() {
             <DatabaseSettingsPanel />
           ) : (
             <div className="space-y-8">
-              {filtered.map((setting) => (
-                <SettingRow
-                  key={setting.key}
-                  setting={setting}
-                  onSave={(v) => setSetting(setting.key, v)}
-                />
-              ))}
+              {groupedSettings(filtered).map((g) => {
+                if (g.group) {
+                  const groupDef = GROUPS.find((grp) => grp.key === g.group)
+                  return (
+                    <CollapsibleSection
+                      key={g.group}
+                      label={groupDef ? t(groupDef.labelKey.replace('settings:', '')) : g.group}
+                      storageKey={`settings.group.${g.group}`}
+                    >
+                      <div className="space-y-4">
+                        {g.items.map((setting) => (
+                          <SettingRow
+                            key={setting.key}
+                            setting={setting}
+                            onSave={(v) => setSetting(setting.key, v)}
+                          />
+                        ))}
+                      </div>
+                    </CollapsibleSection>
+                  )
+                }
+                return g.items.map((setting) => (
+                  <SettingRow
+                    key={setting.key}
+                    setting={setting}
+                    onSave={(v) => setSetting(setting.key, v)}
+                  />
+                ))
+              })}
             </div>
           )}
         </div>
