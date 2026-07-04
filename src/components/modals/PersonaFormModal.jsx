@@ -173,7 +173,6 @@ function PersonaFormModal({ persona }) {
               onChange={update('name')}
               placeholder={t('persona.form.inChatNamePlaceholder')}
               required
-              autoFocus
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-tertiary">
               {estimateTokens(form.name)} tokens

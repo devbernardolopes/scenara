@@ -285,7 +285,6 @@ function ProfileFormModal({ profile }) {
             onChange={update('name')}
             placeholder={t('api.profile.form.namePlaceholder')}
             required
-            autoFocus
           />
         </div>
 

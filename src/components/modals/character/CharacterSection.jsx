@@ -54,7 +54,6 @@ function CharacterSection({ form, onChange, characterId }) {
             onChange={(e) => onChange('name', e.target.value)}
             placeholder={t('namePlaceholder')}
             required
-            autoFocus
           />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-tertiary">
             {estimateTokens(form.name)} tokens

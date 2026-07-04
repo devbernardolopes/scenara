@@ -8,6 +8,7 @@ function SettingSlider({ value, onChange, min = 0, max = 100, step = 1 }) {
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
+        onTouchEnd={(e) => e.stopPropagation()}
         className="w-32 accent-primary"
       />
       <span className="text-sm text-text font-medium w-14 text-right">
