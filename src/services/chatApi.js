@@ -130,6 +130,7 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
     const decoder = new TextDecoder()
     let buffer = ''
     let fullContent = ''
+    let contentStarted = false
 
     while (true) {
       const { done, value } = await reader.read()
@@ -149,8 +150,17 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
           const parsed = JSON.parse(data)
           const choice = parsed.choices?.[0]
           if (choice?.delta?.content) {
-            fullContent += choice.delta.content
-            onToken?.(fullContent)
+            if (!contentStarted) {
+              const clean = choice.delta.content.trimStart()
+              if (clean) {
+                contentStarted = true
+                fullContent += clean
+                onToken?.(fullContent)
+              }
+            } else {
+              fullContent += choice.delta.content
+              onToken?.(fullContent)
+            }
           }
           if (choice?.finish_reason) {
             // generation finished
@@ -178,5 +188,5 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
 
   const json = await res.json()
   const content = json.choices?.[0]?.message?.content || ''
-  return content
+  return content.trimStart()
 }
