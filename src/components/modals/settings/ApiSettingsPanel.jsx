@@ -12,6 +12,7 @@ const REQUEST_KINDS = [
   { id: 'chat', labelKey: 'settings:api.profileAssignment.chat' },
   { id: 'autoTitle', labelKey: 'settings:api.profileAssignment.autoTitle' },
   { id: 'summarization', labelKey: 'settings:api.profileAssignment.summarization' },
+  { id: 'ooc', labelKey: 'settings:api.profileAssignment.ooc' },
   { id: 'director', labelKey: 'settings:api.profileAssignment.director' },
 ]
 
@@ -68,7 +69,6 @@ function ApiSettingsPanel() {
   const [loading, setLoading] = useState(true)
   const [baseUrls, setBaseUrls] = useState({})
   const [profileAssignments, setProfileAssignments] = useState({})
-  const [useChatForAll, setUseChatForAll] = useState(true)
   const [selectedKind, setSelectedKind] = useState(null)
   const [cooldown, setCooldown] = useState(2)
 
@@ -90,16 +90,6 @@ function ApiSettingsPanel() {
       }
       setProfileAssignments(assignments)
 
-      const savedUseChatForAll = await getSetting('api.useChatForAll')
-      if (savedUseChatForAll !== null && savedUseChatForAll !== undefined) {
-        setUseChatForAll(savedUseChatForAll)
-      } else {
-        const allSame = REQUEST_KINDS.every(
-          (k) => assignments[k.id] === assignments.chat || !assignments[k.id],
-        )
-        setUseChatForAll(allSame)
-      }
-
       setCooldown(await getSetting('api.requestCooldown'))
 
       setLoading(false)
@@ -115,11 +105,6 @@ function ApiSettingsPanel() {
   async function handleAssign(kindId, profileId) {
     setProfileAssignments((prev) => ({ ...prev, [kindId]: profileId }))
     await setSetting(`requestKind.${kindId}.profileId`, profileId)
-  }
-
-  async function handleUseChatForAllChange(val) {
-    setUseChatForAll(val)
-    await setSetting('api.useChatForAll', val ? 1 : 0)
   }
 
   async function handleCooldownChange(val) {
@@ -139,35 +124,16 @@ function ApiSettingsPanel() {
     <div className="space-y-6">
       <div className="space-y-3">
         <h3 className="text-sm font-semibold text-text">{t('api.profileAssignment.title')}</h3>
-        <ProfileAssignmentRow
-          kind={REQUEST_KINDS.find((k) => k.id === 'chat')}
-          currentId={profileAssignments.chat}
-          onAssign={handleAssign}
-          open={selectedKind === 'chat'}
-          onToggle={() => setSelectedKind(selectedKind === 'chat' ? null : 'chat')}
-        />
-
-        <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">
-          <input
-            type="checkbox"
-            checked={useChatForAll}
-            onChange={(e) => handleUseChatForAllChange(e.target.checked)}
-            className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+        {REQUEST_KINDS.map((kind) => (
+          <ProfileAssignmentRow
+            key={kind.id}
+            kind={kind}
+            currentId={profileAssignments[kind.id]}
+            onAssign={handleAssign}
+            open={selectedKind === kind.id}
+            onToggle={() => setSelectedKind(selectedKind === kind.id ? null : kind.id)}
           />
-          <span className="text-sm text-text">{t('api.profileAssignment.useChatForAll')}</span>
-        </label>
-
-        {!useChatForAll &&
-          REQUEST_KINDS.filter((k) => k.id !== 'chat').map((kind) => (
-            <ProfileAssignmentRow
-              key={kind.id}
-              kind={kind}
-              currentId={profileAssignments[kind.id]}
-              onAssign={handleAssign}
-              open={selectedKind === kind.id}
-              onToggle={() => setSelectedKind(selectedKind === kind.id ? null : kind.id)}
-            />
-          ))}
+        ))}
       </div>
 
       <div className="border-t border-border pt-6">

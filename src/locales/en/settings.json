@@ -165,9 +165,9 @@
       "chat": "Chat",
       "autoTitle": "Auto-title",
       "summarization": "Summarization",
+      "ooc": "OOC",
       "director": "Director",
       "none": "Not assigned",
-      "useChatForAll": "Use chat profile for auto-title, summarization, and director",
       "requestCooldown": {
         "label": "API Request Cooldown",
         "desc": "Minimum waiting time (in seconds) between API requests to providers."
@@ -221,6 +221,10 @@
     "summarizationProfile": {
       "label": "Summarization profile",
       "desc": "Profile used for summarization requests."
+    },
+    "oocProfile": {
+      "label": "OOC profile",
+      "desc": "Profile used for out-of-character requests."
     },
     "directorProfile": {
       "label": "Director profile",

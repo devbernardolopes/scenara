@@ -2,7 +2,7 @@ import db from '../db'
 import { getSetting, setSetting } from './settings'
 import { getActiveKey, getActiveProvider, getModel, PROVIDERS } from './apiProviders'
 
-export const REQUEST_KINDS = ['chat', 'autoTitle', 'summarization', 'director']
+export const REQUEST_KINDS = ['chat', 'autoTitle', 'summarization', 'ooc', 'director']
 
 export async function getAllProfiles() {
   return db.connectionProfiles.orderBy('createdAt').toArray()
@@ -84,16 +84,8 @@ export async function usedByProfileCount(providerId, keyId) {
 }
 
 export async function getEffectiveProfileFor(requestKind) {
-  let profileId
-  if (requestKind !== 'chat') {
-    const useChatForAll = await getSetting('api.useChatForAll')
-    profileId = useChatForAll
-      ? await getSetting('requestKind.chat.profileId')
-      : await getSetting(`requestKind.${requestKind}.profileId`)
-    if (!profileId) {
-      profileId = await getSetting('requestKind.chat.profileId')
-    }
-  } else {
+  let profileId = await getSetting(`requestKind.${requestKind}.profileId`)
+  if (!profileId && requestKind !== 'chat') {
     profileId = await getSetting('requestKind.chat.profileId')
   }
   if (!profileId) return null

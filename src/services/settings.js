@@ -411,20 +411,20 @@ export const SETTINGS = [
     descKey: 'settings:api.summarizationProfile.desc',
   },
   {
+    key: 'requestKind.ooc.profileId',
+    category: 'api',
+    type: 'text',
+    default: null,
+    labelKey: 'settings:api.oocProfile.label',
+    descKey: 'settings:api.oocProfile.desc',
+  },
+  {
     key: 'requestKind.director.profileId',
     category: 'api',
     type: 'text',
     default: null,
     labelKey: 'settings:api.directorProfile.label',
     descKey: 'settings:api.directorProfile.desc',
-  },
-  {
-    key: 'api.useChatForAll',
-    category: 'api',
-    type: 'text',
-    default: null,
-    labelKey: 'settings:api.useChatForAll.label',
-    descKey: 'settings:api.useChatForAll.desc',
   },
   {
     key: 'api.requestCooldown',
