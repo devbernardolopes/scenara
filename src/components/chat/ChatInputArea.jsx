@@ -343,6 +343,46 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
                     </div>
                   </button>
                 ))}
+                <hr className="border-border mx-2 my-1" />
+                <button
+                  type="button"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] sm:hidden"
+                  onClick={() => setQuickSettingsOpen(false)}
+                >
+                  <Paperclip className="w-4 h-4" />
+                  <span>{t('attachFile')}</span>
+                </button>
+                <button
+                  type="button"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] md:hidden"
+                  onClick={() => setQuickSettingsOpen(false)}
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>{t('shortcuts')}</span>
+                </button>
+                <button
+                  type="button"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] md:hidden"
+                  onClick={() => setQuickSettingsOpen(false)}
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>{t('memories')}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm min-h-[44px] sm:hidden ${
+                    sttActive
+                      ? 'text-primary hover:bg-primary-subtle'
+                      : 'text-text hover:bg-surface-hover'
+                  }`}
+                  onClick={() => {
+                    setSttActive((prev) => !prev)
+                    setQuickSettingsOpen(false)
+                  }}
+                >
+                  <Mic className="w-4 h-4" />
+                  <span>{t('stt')}</span>
+                </button>
               </div>
             )}
           </div>
