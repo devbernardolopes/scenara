@@ -113,6 +113,7 @@ function MessageBubble({
   onFork,
   onRegenerate,
   onSpeak,
+  generating,
 }) {
   const { t } = useTranslation('chat')
   const { openModal } = useModal()
@@ -433,7 +434,9 @@ function MessageBubble({
                           getButtonHandler(key)()
                           setOverflowOpen(false)
                         }}
-                        disabled={key === 'prompt' && !promptData}
+                        disabled={
+                          (key === 'prompt' && !promptData) || (key === 'regenerate' && generating)
+                        }
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] disabled:opacity-30 disabled:pointer-events-none"
                       >
                         <Icon className="w-4 h-4" />

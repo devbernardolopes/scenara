@@ -24,6 +24,21 @@ import { getEffectiveProfileFor } from '../services/connectionProfiles'
 import { sendChatCompletion, buildMessagesPayload, getActiveParams } from '../services/chatApi'
 import { getSetting } from '../services/settings'
 import { startGenerating, stopGenerating } from '../services/generatingState'
+import db from '../db'
+
+function parseBundleEntries(bundleMessages) {
+  if (!bundleMessages) return null
+  try {
+    const parsed = JSON.parse(bundleMessages)
+    if (!Array.isArray(parsed) || parsed.length === 0) return null
+    if (typeof parsed[0] === 'string') {
+      return parsed.map((content) => ({ content, promptData: null }))
+    }
+    return parsed
+  } catch {
+    return null
+  }
+}
 
 function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
   const wrapperRef = useRef(null)
@@ -107,9 +122,9 @@ function ChatView() {
       let [thr, msgs] = await Promise.all([getThread(threadId), getMessagesByThread(threadId)])
 
       if (thr?.initialMessages?.length > 0 && msgs.length === 0) {
-        const contents = thr.initialMessages.map((m) => m.content)
-        const msgId = await createAssistantMessage(threadId, contents[0])
-        await updateMessage(msgId, { bundleMessages: JSON.stringify(contents) })
+        const entries = thr.initialMessages.map((m) => ({ content: m.content, promptData: null }))
+        const msgId = await createAssistantMessage(threadId, entries[0].content)
+        await updateMessage(msgId, { bundleMessages: JSON.stringify(entries) })
         await updateThread(threadId, { initialMessages: null })
         thr = await getThread(threadId)
         msgs = await getMessagesByThread(threadId)
@@ -401,8 +416,19 @@ function ChatView() {
   })
 
   async function handleBundleNavigate(messageId, newContent) {
-    await updateMessage(messageId, { content: newContent })
-    setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, content: newContent } : m)))
+    const msg = messages.find((m) => m.id === messageId)
+    const entries = parseBundleEntries(msg?.bundleMessages)
+    let newPromptData = null
+    if (entries) {
+      const entry = entries.find((e) => e.content === newContent)
+      if (entry) newPromptData = entry.promptData
+    }
+    await updateMessage(messageId, { content: newContent, promptData: newPromptData })
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === messageId ? { ...m, content: newContent, promptData: newPromptData } : m,
+      ),
+    )
   }
 
   async function handleRegenerate(messageId) {
@@ -415,10 +441,26 @@ function ChatView() {
       const idx = messages.findIndex((m) => m.id === messageId)
       if (idx === -1) return
 
-      await deleteMessagesFrom(messageId)
-      const currentMsgs = messages.slice(0, idx)
-      setMessages(currentMsgs)
+      const msg = messages[idx]
 
+      let entries = parseBundleEntries(msg.bundleMessages)
+      if (!entries) {
+        entries = [{ content: msg.content, promptData: msg.promptData || null }]
+      }
+
+      const slotIndex = entries.length
+      entries.push({ content: '', promptData: null })
+      const bundleJson = JSON.stringify(entries)
+
+      await updateMessage(messageId, { bundleMessages: bundleJson, content: '' })
+      setStreamingMsgId(messageId)
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageId ? { ...m, bundleMessages: bundleJson, content: '' } : m,
+        ),
+      )
+
+      const currentMsgs = messages.slice(0, idx)
       let chatPersona = null
       if (thread?.personaId) {
         chatPersona = await getPersona(thread.personaId)
@@ -426,24 +468,108 @@ function ChatView() {
 
       const isFirstMessage = currentMsgs.length === 0 && character?.firstMessage
 
-      await doChatRequest(isFirstMessage, currentMsgs, chatPersona, null)
+      const profile = await getEffectiveProfileFor('chat')
+      if (!profile?.model) {
+        showToast('No Chat profile configured or model selected.', { type: 'error' })
+        return
+      }
 
+      let writingInstruction = null
+      if (character?.writingInstruction) {
+        writingInstruction = await getWritingInstruction(Number(character.writingInstruction))
+      }
+
+      const settings = {
+        firstMessageRole: await getSetting('prompting.firstMessageRole'),
+        firstMessagePrompt: await getSetting('prompting.firstMessagePrompt'),
+        continueRole: await getSetting('prompting.continueRole'),
+        continuePrompt: await getSetting('prompting.continuePrompt'),
+        personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
+        writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
+        writingPlacement: await getSetting('prompting.writingPlacement'),
+        personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
+      }
+
+      const payload = await buildMessagesPayload({
+        character,
+        chatPersona,
+        currentPersona: null,
+        messages: currentMsgs,
+        isFirstMessage,
+        settings,
+        writingInstruction,
+      })
+
+      const activeParams = getActiveParams(profile)
+      const promptDataStr = JSON.stringify({ payload, model: profile.model, params: activeParams })
+
+      entries[slotIndex].promptData = promptDataStr
+      await updateMessage(messageId, {
+        bundleMessages: JSON.stringify(entries),
+        promptData: promptDataStr,
+      })
+
+      abortRef.current = new AbortController()
+
+      const content = await sendChatCompletion({
+        profile,
+        messages: payload,
+        signal: abortRef.current.signal,
+        onToken: (fullContent) => {
+          updateMessage(messageId, { content: fullContent })
+          setMessages((prev) =>
+            prev.map((m) => (m.id === messageId ? { ...m, content: fullContent } : m)),
+          )
+        },
+      })
+
+      const dbMsg = await db.messages.get(Number(messageId))
+      const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || entries
+      if (finalEntries[slotIndex]) {
+        finalEntries[slotIndex].content = content
+        finalEntries[slotIndex].promptData = promptDataStr
+      }
+      await updateMessage(messageId, {
+        bundleMessages: JSON.stringify(finalEntries),
+        content,
+        promptData: promptDataStr,
+      })
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageId
+            ? {
+                ...m,
+                content,
+                bundleMessages: JSON.stringify(finalEntries),
+                promptData: promptDataStr,
+              }
+            : m,
+        ),
+      )
+      showToast(t('messageUpdated'), { type: 'success' })
+    } catch (err) {
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
+      if (err.name !== 'AbortError') {
+        showToast(err.message, { type: 'error' })
+      }
     } finally {
+      setStreamingMsgId(null)
       generatingRef.current = false
       setGenerating(false)
       stopGenerating(threadId)
+      abortRef.current = null
     }
   }
 
   async function handleEditMessage(id, content) {
     const msg = messages.find((m) => m.id === id)
-    const updates = { content }
-    if (msg?.bundleMessages) {
-      updates.bundleMessages = null
+    let entries = parseBundleEntries(msg?.bundleMessages)
+    if (!entries) {
+      entries = [{ content: msg.content, promptData: msg.promptData || null }]
     }
-    await updateMessage(id, updates)
+    entries.push({ content, promptData: null })
+    await updateMessage(id, { bundleMessages: JSON.stringify(entries), content })
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
     showToast(t('messageUpdated'), { type: 'success' })
@@ -452,22 +578,23 @@ function ChatView() {
   async function handleDeleteMessage(id) {
     setConfirmDeleteId(null)
     const msg = messages.find((m) => m.id === id)
-    if (msg?.bundleMessages) {
-      const bundle = JSON.parse(msg.bundleMessages)
-      if (bundle.length > 1) {
-        const idx = bundle.indexOf(msg.content)
-        const removeIdx = idx !== -1 ? idx : 0
-        bundle.splice(removeIdx, 1)
-        const newIdx = Math.min(removeIdx, bundle.length - 1)
-        await updateMessage(id, {
-          bundleMessages: JSON.stringify(bundle),
-          content: bundle[newIdx],
-        })
-        const msgs = await getMessagesByThread(threadId)
-        setMessages(msgs)
-        showToast(t('messageDeleted'), { type: 'success' })
-        return
-      }
+    const entries = parseBundleEntries(msg?.bundleMessages)
+    if (entries && entries.length > 1) {
+      const idx = entries.findIndex((e) => e.content === msg.content)
+      const removeIdx = idx !== -1 ? idx : 0
+      entries.splice(removeIdx, 1)
+      const newIdx = Math.min(removeIdx, entries.length - 1)
+      const newContent = entries[newIdx].content
+      const newPromptData = entries[newIdx].promptData
+      await updateMessage(id, {
+        bundleMessages: JSON.stringify(entries),
+        content: newContent,
+        promptData: newPromptData,
+      })
+      const msgs = await getMessagesByThread(threadId)
+      setMessages(msgs)
+      showToast(t('messageDeleted'), { type: 'success' })
+      return
     }
     await deleteMessagesFrom(id)
     const msgs = await getMessagesByThread(threadId)
@@ -579,17 +706,10 @@ function ChatView() {
               </div>
             )}
             {messages.slice(visibleStartIndex).map((msg, idx) => {
-              let bundleMessages = null
-              let bundleIndex = 0
-              if (msg.bundleMessages) {
-                try {
-                  bundleMessages = JSON.parse(msg.bundleMessages)
-                  bundleIndex = bundleMessages.indexOf(msg.content)
-                  if (bundleIndex === -1) bundleIndex = 0
-                } catch {
-                  bundleMessages = null
-                }
-              }
+              const entries = parseBundleEntries(msg.bundleMessages)
+              const bundleMessages = entries ? entries.map((e) => e.content) : null
+              const bundleIndex =
+                bundleMessages && msg.content ? Math.max(0, bundleMessages.indexOf(msg.content)) : 0
               return (
                 <MessageBubble
                   key={msg.id}
@@ -609,6 +729,7 @@ function ChatView() {
                   onFork={handleForkMessage}
                   onRegenerate={handleRegenerate}
                   onSpeak={() => {}}
+                  generating={generating}
                 />
               )
             })}
