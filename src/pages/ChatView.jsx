@@ -34,6 +34,7 @@ function ChatView() {
   const generatingRef = useRef(false)
   const autoTriggeredRef = useRef(false)
   const handleSendRef = useRef(null)
+  const scrollInitialized = useRef(false)
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
@@ -85,11 +86,18 @@ function ChatView() {
   }
 
   useEffect(() => {
+    scrollInitialized.current = false
     loadData()
   }, [threadId])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messages.length === 0) return
+    if (!scrollInitialized.current) {
+      scrollInitialized.current = true
+      scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
+    } else {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [messages])
 
   useEffect(() => {
