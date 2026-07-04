@@ -7,6 +7,11 @@ function PersonaPicker({ open, onClose, onSelect }) {
   const { t } = useTranslation('common')
   const [personas, setPersonas] = useState([])
   const ref = useRef(null)
+  const onCloseRef = useRef(onClose)
+  const onSelectRef = useRef(onSelect)
+
+  onCloseRef.current = onClose
+  onSelectRef.current = onSelect
 
   useEffect(() => {
     if (open) {
@@ -16,23 +21,23 @@ function PersonaPicker({ open, onClose, onSelect }) {
 
   useEffect(() => {
     if (!open) return
-    function handleClick(e) {
+    function handleMousedown(e) {
       if (ref.current && !ref.current.contains(e.target)) {
-        onClose()
+        onCloseRef.current()
       }
     }
-    document.addEventListener('click', handleClick)
-    return () => document.removeEventListener('click', handleClick)
-  }, [open, onClose])
+    document.addEventListener('mousedown', handleMousedown)
+    return () => document.removeEventListener('mousedown', handleMousedown)
+  }, [open])
 
   useEffect(() => {
     if (!open) return
     function handleKey(e) {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') onCloseRef.current()
     }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
-  }, [open, onClose])
+  }, [open])
 
   if (!open) return null
 
@@ -51,7 +56,7 @@ function PersonaPicker({ open, onClose, onSelect }) {
           <button
             key={p.id}
             type="button"
-            onClick={() => onSelect(p)}
+            onClick={() => onSelectRef.current(p)}
             className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover text-left min-h-[44px]"
           >
             <Avatar src={p.avatar} size="sm" />
