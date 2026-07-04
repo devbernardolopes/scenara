@@ -68,7 +68,7 @@ function WritingInstructionManagementModal() {
   }
 
   async function handleDeleteSingle(item) {
-    const linked = await db.characters.where('writingInstruction').equals(item.id).toArray()
+    const linked = (await db.characters.toArray()).filter((c) => c.writingInstruction === item.id)
 
     const ok = await confirm({
       title: t('writingInstruction.confirmDelete.title'),
