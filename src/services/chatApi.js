@@ -54,7 +54,7 @@ export async function buildMessagesPayload({
     writingTiming === 'always' &&
     writingPlacement === 'endOfSystemPrompt'
   ) {
-    systemParts.push(writingInstruction.content)
+    systemParts.push(replaceVarsIn(writingInstruction.content))
   }
 
   const personaPlacement =
