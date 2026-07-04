@@ -6,10 +6,19 @@ import {
   getAllProfiles,
   deleteProfile,
   duplicateProfile,
+  updateConnectionProfileOrder,
 } from '../../../services/connectionProfiles'
 import { PROVIDERS } from '../../../services/apiProviders'
 import IconButton from '../../shared/IconButton'
-import { Plus, Copy, Trash2, Edit3, SlidersHorizontal } from '../../../lib/icons'
+import {
+  Plus,
+  Copy,
+  Trash2,
+  Edit3,
+  SlidersHorizontal,
+  ChevronUp,
+  ChevronDown,
+} from '../../../lib/icons'
 
 function ProfileSettingsPanel() {
   const { t } = useTranslation('settings')
@@ -58,6 +67,20 @@ function ProfileSettingsPanel() {
     await duplicateProfile(profile.id)
   }
 
+  async function handleMoveUp(index) {
+    if (index === 0) return
+    const next = profiles.map((p) => p.id)
+    ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
+    await updateConnectionProfileOrder(next)
+  }
+
+  async function handleMoveDown(index) {
+    if (index === profiles.length - 1) return
+    const next = profiles.map((p) => p.id)
+    ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
+    await updateConnectionProfileOrder(next)
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -82,7 +105,7 @@ function ProfileSettingsPanel() {
         <p className="text-sm text-secondary py-8 text-center">{t('api.profile.noProfiles')}</p>
       ) : (
         <div className="space-y-3">
-          {profiles.map((p) => {
+          {profiles.map((p, index) => {
             const provider = PROVIDERS.find((pr) => pr.id === p.providerId)
             return (
               <div
@@ -120,6 +143,20 @@ function ProfileSettingsPanel() {
                     label={t('api.profile.actions.delete')}
                     onClick={() => handleDelete(p)}
                   />
+                  <div className="ml-auto flex items-center gap-1">
+                    <IconButton
+                      icon={ChevronUp}
+                      label="Move up"
+                      onClick={() => handleMoveUp(index)}
+                      disabled={index === 0}
+                    />
+                    <IconButton
+                      icon={ChevronDown}
+                      label="Move down"
+                      onClick={() => handleMoveDown(index)}
+                      disabled={index === profiles.length - 1}
+                    />
+                  </div>
                 </div>
               </div>
             )

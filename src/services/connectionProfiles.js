@@ -4,8 +4,57 @@ import { getActiveKey, getActiveProvider, getModel, PROVIDERS } from './apiProvi
 
 export const REQUEST_KINDS = ['chat', 'autoTitle', 'summarization', 'ooc', 'director']
 
+async function getOrderIds(orderKey) {
+  let order = await getSetting(orderKey)
+  return order && Array.isArray(order) ? order : []
+}
+
+async function applyOrder(all, orderKey) {
+  let order = await getSetting(orderKey)
+  if (!order || !Array.isArray(order) || order.length === 0) {
+    order = all.map((p) => p.id)
+    await setSetting(orderKey, order)
+  }
+  const orderMap = new Map(order.map((id, i) => [id, i]))
+  all.sort((a, b) => {
+    const ia = orderMap.get(a.id)
+    const ib = orderMap.get(b.id)
+    return (ia === undefined ? 999 : ia) - (ib === undefined ? 999 : ib)
+  })
+  return all
+}
+
+async function appendToOrder(orderKey, id) {
+  const order = await getOrderIds(orderKey)
+  order.push(id)
+  await setSetting(orderKey, order)
+}
+
+async function insertAfterInOrder(orderKey, afterId, newId) {
+  const order = await getOrderIds(orderKey)
+  const idx = order.indexOf(afterId)
+  if (idx === -1) {
+    order.push(newId)
+  } else {
+    order.splice(idx + 1, 0, newId)
+  }
+  await setSetting(orderKey, order)
+}
+
+async function removeFromOrder(orderKey, id) {
+  let order = await getOrderIds(orderKey)
+  order = order.filter((oid) => oid !== id)
+  await setSetting(orderKey, order)
+}
+
+export async function updateConnectionProfileOrder(order) {
+  await setSetting('connectionProfileOrder', order)
+  window.dispatchEvent(new CustomEvent('connectionProfiles-changed'))
+}
+
 export async function getAllProfiles() {
-  return db.connectionProfiles.orderBy('createdAt').toArray()
+  const all = await db.connectionProfiles.orderBy('createdAt').toArray()
+  return applyOrder(all, 'connectionProfileOrder')
 }
 
 export async function getProfile(id) {
@@ -23,6 +72,7 @@ export async function createProfile(data) {
     createdAt: now,
     updatedAt: now,
   })
+  await appendToOrder('connectionProfileOrder', id)
   window.dispatchEvent(
     new CustomEvent('connectionProfiles-changed', {
       detail: { action: 'create', entityName: data.name },
@@ -44,6 +94,7 @@ export async function updateProfile(id, data) {
 export async function deleteProfile(id) {
   const profile = await db.connectionProfiles.get(id)
   await db.connectionProfiles.delete(id)
+  await removeFromOrder('connectionProfileOrder', id)
   for (const kind of REQUEST_KINDS) {
     const assigned = await getSetting(`requestKind.${kind}.profileId`)
     if (assigned === id) {
@@ -70,6 +121,7 @@ export async function duplicateProfile(id) {
     createdAt: now,
     updatedAt: now,
   })
+  await insertAfterInOrder('connectionProfileOrder', id, newId)
   window.dispatchEvent(
     new CustomEvent('connectionProfiles-changed', {
       detail: { action: 'duplicate', entityName: original.name },

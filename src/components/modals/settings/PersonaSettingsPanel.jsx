@@ -13,6 +13,7 @@ import {
   exportPersona,
   exportPersonas,
   importPersonas,
+  updatePersonaOrder,
 } from '../../../services/personas'
 import { downloadJson } from '../../../lib/download'
 import PersonaCard from '../../shared/PersonaCard'
@@ -145,6 +146,20 @@ function PersonaSettingsPanel() {
     }
   }
 
+  async function handleMoveUp(index) {
+    if (index === 0) return
+    const next = personas.map((p) => p.id)
+    ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
+    await updatePersonaOrder(next)
+  }
+
+  async function handleMoveDown(index) {
+    if (index === personas.length - 1) return
+    const next = personas.map((p) => p.id)
+    ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
+    await updatePersonaOrder(next)
+  }
+
   const multi = selectedIds.size > 0
 
   if (loading) {
@@ -186,7 +201,7 @@ function PersonaSettingsPanel() {
       ) : (
         <>
           <div className="space-y-3">
-            {personas.map((p) => (
+            {personas.map((p, index) => (
               <PersonaCard
                 key={p.id}
                 persona={p}
@@ -198,6 +213,10 @@ function PersonaSettingsPanel() {
                 onDuplicate={handleDuplicateSingle}
                 onExport={handleExportSingle}
                 isOnlyOne={personas.length <= 1}
+                onMoveUp={() => handleMoveUp(index)}
+                onMoveDown={() => handleMoveDown(index)}
+                isFirst={index === 0}
+                isLast={index === personas.length - 1}
               />
             ))}
           </div>

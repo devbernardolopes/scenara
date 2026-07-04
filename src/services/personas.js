@@ -1,7 +1,62 @@
 import db from '../db'
 import { showToast } from '../lib/toast'
 import i18n from '../lib/i18n'
-import { setSetting } from './settings'
+import { getSetting, setSetting } from './settings'
+
+async function applyOrder(all, orderKey) {
+  let order = await getSetting(orderKey)
+  if (!order || !Array.isArray(order) || order.length === 0) {
+    order = all.map((p) => p.id)
+    await setSetting(orderKey, order)
+  }
+  const orderMap = new Map(order.map((id, i) => [id, i]))
+  all.sort((a, b) => {
+    const ia = orderMap.get(a.id)
+    const ib = orderMap.get(b.id)
+    return (ia === undefined ? 999 : ia) - (ib === undefined ? 999 : ib)
+  })
+  return all
+}
+
+async function getOrderIds(orderKey) {
+  let order = await getSetting(orderKey)
+  return order && Array.isArray(order) ? order : []
+}
+
+async function appendToOrder(orderKey, id) {
+  const order = await getOrderIds(orderKey)
+  order.push(id)
+  await setSetting(orderKey, order)
+}
+
+async function insertAfterInOrder(orderKey, afterId, newId) {
+  const order = await getOrderIds(orderKey)
+  const idx = order.indexOf(afterId)
+  if (idx === -1) {
+    order.push(newId)
+  } else {
+    order.splice(idx + 1, 0, newId)
+  }
+  await setSetting(orderKey, order)
+}
+
+async function removeFromOrder(orderKey, id) {
+  let order = await getOrderIds(orderKey)
+  order = order.filter((oid) => oid !== id)
+  await setSetting(orderKey, order)
+}
+
+async function removeManyFromOrder(orderKey, ids) {
+  const removeSet = new Set(ids)
+  let order = await getOrderIds(orderKey)
+  order = order.filter((oid) => !removeSet.has(oid))
+  await setSetting(orderKey, order)
+}
+
+export async function updatePersonaOrder(order) {
+  await setSetting('personaOrder', order)
+  window.dispatchEvent(new CustomEvent('personas-changed'))
+}
 
 export async function getAllPersonas() {
   const all = await db.personas.orderBy('createdAt').toArray()
@@ -19,10 +74,11 @@ export async function getAllPersonas() {
       updatedAt: now,
     })
     await setSetting('defaultPersonaId', id)
+    await setSetting('personaOrder', [id])
     window.dispatchEvent(new CustomEvent('personas-changed'))
     return db.personas.orderBy('createdAt').toArray()
   }
-  return all
+  return applyOrder(all, 'personaOrder')
 }
 
 export async function getPersona(id) {
@@ -63,6 +119,7 @@ export async function createPersona(data) {
   if (data.isDefault) {
     await ensureSingleDefault(id, { isDefault: true })
   }
+  await appendToOrder('personaOrder', id)
   window.dispatchEvent(
     new CustomEvent('personas-changed', {
       detail: { action: 'create', entityName: data.name },
@@ -104,6 +161,7 @@ export async function deletePersona(id) {
   const target = all.find((p) => p.id === id)
   const wasDefault = target?.isDefault
   await db.personas.delete(id)
+  await removeFromOrder('personaOrder', id)
   if (wasDefault) {
     await reassignDefault()
   } else {
@@ -129,6 +187,7 @@ export async function deletePersonas(ids) {
   }
   const hadDefault = all.some((p) => ids.includes(p.id) && p.isDefault)
   await db.personas.bulkDelete(ids)
+  await removeManyFromOrder('personaOrder', ids)
   if (hadDefault) {
     await reassignDefault()
   } else {
@@ -159,6 +218,7 @@ export async function duplicatePersona(id) {
     createdAt: now,
     updatedAt: now,
   })
+  await insertAfterInOrder('personaOrder', id, newId)
   window.dispatchEvent(
     new CustomEvent('personas-changed', {
       detail: { action: 'duplicate', entityName: original.name },
@@ -229,6 +289,9 @@ export async function importPersonas(items) {
     added.push(id)
   }
   if (added.length > 0) {
+    const order = await getOrderIds('personaOrder')
+    order.push(...added)
+    await setSetting('personaOrder', order)
     window.dispatchEvent(
       new CustomEvent('personas-changed', {
         detail: { action: 'import', count: added.length },

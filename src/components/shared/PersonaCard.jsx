@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import IconButton from './IconButton'
 import Avatar from './Avatar'
-import { Edit3, Star, Copy, Download, Trash2 } from '../../lib/icons'
+import { Edit3, Star, Copy, Download, Trash2, ChevronUp, ChevronDown } from '../../lib/icons'
 
 function PersonaCard({
   persona,
@@ -14,6 +14,10 @@ function PersonaCard({
   onDuplicate,
   onExport,
   isOnlyOne,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast,
 }) {
   const { t } = useTranslation('settings')
   const { openModal } = useModal()
@@ -99,6 +103,10 @@ function PersonaCard({
           onClick={isOnlyOne ? undefined : () => onDelete(persona)}
           disabled={isOnlyOne}
         />
+        <div className="ml-auto flex items-center gap-1">
+          <IconButton icon={ChevronUp} label="Move up" onClick={onMoveUp} disabled={isFirst} />
+          <IconButton icon={ChevronDown} label="Move down" onClick={onMoveDown} disabled={isLast} />
+        </div>
       </div>
     </div>
   )

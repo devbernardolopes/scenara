@@ -1,9 +1,66 @@
 import db from '../db'
 import { showToast } from '../lib/toast'
 import i18n from '../lib/i18n'
+import { getSetting, setSetting } from './settings'
+
+async function getOrderIds(orderKey) {
+  let order = await getSetting(orderKey)
+  return order && Array.isArray(order) ? order : []
+}
+
+async function applyOrder(all, orderKey) {
+  let order = await getSetting(orderKey)
+  if (!order || !Array.isArray(order) || order.length === 0) {
+    order = all.map((p) => p.id)
+    await setSetting(orderKey, order)
+  }
+  const orderMap = new Map(order.map((id, i) => [id, i]))
+  all.sort((a, b) => {
+    const ia = orderMap.get(a.id)
+    const ib = orderMap.get(b.id)
+    return (ia === undefined ? 999 : ia) - (ib === undefined ? 999 : ib)
+  })
+  return all
+}
+
+async function appendToOrder(orderKey, id) {
+  const order = await getOrderIds(orderKey)
+  order.push(id)
+  await setSetting(orderKey, order)
+}
+
+async function insertAfterInOrder(orderKey, afterId, newId) {
+  const order = await getOrderIds(orderKey)
+  const idx = order.indexOf(afterId)
+  if (idx === -1) {
+    order.push(newId)
+  } else {
+    order.splice(idx + 1, 0, newId)
+  }
+  await setSetting(orderKey, order)
+}
+
+async function removeFromOrder(orderKey, id) {
+  let order = await getOrderIds(orderKey)
+  order = order.filter((oid) => oid !== id)
+  await setSetting(orderKey, order)
+}
+
+async function removeManyFromOrder(orderKey, ids) {
+  const removeSet = new Set(ids)
+  let order = await getOrderIds(orderKey)
+  order = order.filter((oid) => !removeSet.has(oid))
+  await setSetting(orderKey, order)
+}
+
+export async function updateWritingInstructionOrder(order) {
+  await setSetting('writingInstructionOrder', order)
+  window.dispatchEvent(new CustomEvent('writingInstructions-changed'))
+}
 
 export async function getAllWritingInstructions() {
-  return db.writingInstructions.orderBy('createdAt').toArray()
+  const all = await db.writingInstructions.orderBy('createdAt').toArray()
+  return applyOrder(all, 'writingInstructionOrder')
 }
 
 export async function getWritingInstruction(id) {
@@ -18,6 +75,7 @@ export async function createWritingInstruction(data) {
     createdAt: now,
     updatedAt: now,
   })
+  await appendToOrder('writingInstructionOrder', id)
   window.dispatchEvent(
     new CustomEvent('writingInstructions-changed', {
       detail: { action: 'create', entityName: data.name },
@@ -39,6 +97,7 @@ export async function updateWritingInstruction(id, data) {
 export async function deleteWritingInstruction(id) {
   const item = await db.writingInstructions.get(id)
   await db.writingInstructions.delete(id)
+  await removeFromOrder('writingInstructionOrder', id)
   window.dispatchEvent(
     new CustomEvent('writingInstructions-changed', {
       detail: { action: 'delete', entityName: item?.name || 'Unknown' },
@@ -48,6 +107,7 @@ export async function deleteWritingInstruction(id) {
 
 export async function deleteWritingInstructions(ids) {
   await db.writingInstructions.bulkDelete(ids)
+  await removeManyFromOrder('writingInstructionOrder', ids)
   window.dispatchEvent(
     new CustomEvent('writingInstructions-changed', {
       detail: { action: 'delete', count: ids.length },
@@ -65,6 +125,7 @@ export async function duplicateWritingInstruction(id) {
     createdAt: now,
     updatedAt: now,
   })
+  await insertAfterInOrder('writingInstructionOrder', id, newId)
   window.dispatchEvent(
     new CustomEvent('writingInstructions-changed', {
       detail: { action: 'duplicate', entityName: original.name },
@@ -119,6 +180,9 @@ export async function importWritingInstructions(items) {
     added.push(id)
   }
   if (added.length > 0) {
+    const order = await getOrderIds('writingInstructionOrder')
+    order.push(...added)
+    await setSetting('writingInstructionOrder', order)
     window.dispatchEvent(
       new CustomEvent('writingInstructions-changed', {
         detail: { action: 'import', count: added.length },

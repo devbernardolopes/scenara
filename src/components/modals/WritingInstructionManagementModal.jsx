@@ -12,13 +12,23 @@ import {
   exportWritingInstruction,
   exportWritingInstructions,
   importWritingInstructions,
+  updateWritingInstructionOrder,
 } from '../../services/writingInstructions'
 import { downloadJson } from '../../lib/download'
 import db from '../../db'
 import Avatar from '../shared/Avatar'
 import CloseButton from '../shared/CloseButton'
 import IconButton from '../shared/IconButton'
-import { Plus, Upload, Edit3, Copy, Download, Trash2 } from '../../lib/icons'
+import {
+  Plus,
+  Upload,
+  Edit3,
+  Copy,
+  Download,
+  Trash2,
+  ChevronUp,
+  ChevronDown,
+} from '../../lib/icons'
 
 function WritingInstructionManagementModal() {
   const { t } = useTranslation('settings')
@@ -162,6 +172,20 @@ function WritingInstructionManagementModal() {
     }
   }
 
+  async function handleMoveUp(index) {
+    if (index === 0) return
+    const next = items.map((item) => item.id)
+    ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
+    await updateWritingInstructionOrder(next)
+  }
+
+  async function handleMoveDown(index) {
+    if (index === items.length - 1) return
+    const next = items.map((item) => item.id)
+    ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
+    await updateWritingInstructionOrder(next)
+  }
+
   const multi = selectedIds.size > 0
 
   return (
@@ -207,7 +231,7 @@ function WritingInstructionManagementModal() {
           ) : (
             <>
               <div className="space-y-3">
-                {items.map((item) => (
+                {items.map((item, index) => (
                   <div
                     key={item.id}
                     className={`border rounded-lg p-3 bg-surface transition-shadow cursor-pointer ${
@@ -258,6 +282,20 @@ function WritingInstructionManagementModal() {
                         label={t('writingInstruction.actions.delete')}
                         onClick={() => handleDeleteSingle(item)}
                       />
+                      <div className="ml-auto flex items-center gap-1">
+                        <IconButton
+                          icon={ChevronUp}
+                          label="Move up"
+                          onClick={() => handleMoveUp(index)}
+                          disabled={index === 0}
+                        />
+                        <IconButton
+                          icon={ChevronDown}
+                          label="Move down"
+                          onClick={() => handleMoveDown(index)}
+                          disabled={index === items.length - 1}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
