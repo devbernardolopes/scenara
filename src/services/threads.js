@@ -140,11 +140,18 @@ export async function duplicateThread(id) {
   const messages = await db.messages.where('threadId').equals(Number(id)).toArray()
   if (messages.length > 0) {
     await db.messages.bulkAdd(
-      messages.map((m) => ({
+      messages.map(({ id: _id, ...rest }) => ({
+        ...rest,
         threadId: newId,
-        role: m.role,
-        content: m.content,
-        createdAt: m.createdAt,
+      })),
+    )
+  }
+  const promptEntries = await db.promptHistory.where('threadId').equals(Number(id)).toArray()
+  if (promptEntries.length > 0) {
+    await db.promptHistory.bulkAdd(
+      promptEntries.map(({ id: _id, ...rest }) => ({
+        ...rest,
+        threadId: newId,
       })),
     )
   }
