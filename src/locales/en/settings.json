@@ -76,6 +76,10 @@
     "showUserFork": {
       "label": "User – Fork",
       "desc": "Show the fork button on user message bubbles."
+    },
+    "threadCardMarquee": {
+      "label": "Thread Card Marquee",
+      "desc": "Scroll thread titles when they overflow the card. Disable to truncate with ellipsis instead."
     }
   },
   "themeOptions": {

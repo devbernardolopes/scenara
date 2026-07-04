@@ -191,6 +191,14 @@ export const SETTINGS = [
     descKey: 'settings:appearance.showUserFork.desc',
   },
   {
+    key: 'threadCardMarquee',
+    category: 'appearance',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.threadCardMarquee.label',
+    descKey: 'settings:appearance.threadCardMarquee.desc',
+  },
+  {
     key: 'defaultAutoTitle',
     category: 'defaults',
     type: 'toggle',

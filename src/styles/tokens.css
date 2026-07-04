@@ -329,6 +329,27 @@
   box-shadow: var(--shadow-lg);
 }
 
+/* Marquee animation for thread card titles */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.marquee-wrapper {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee-wrapper:hover .marquee-text {
+  display: inline-block;
+  animation: marquee 8s linear infinite;
+  padding-right: 2rem;
+}
+
 /* Hide scrollbars system-wide while keeping scrollable areas functional */
 * {
   scrollbar-width: none;

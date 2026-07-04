@@ -199,7 +199,7 @@ function CharacterDiscovery() {
 
     const threadId = await createThread({
       characterId: character.id,
-      title: character.name,
+      title: new Date().toLocaleString(),
       personaId: personaId || null,
       initialMessages,
     })

@@ -13,6 +13,7 @@ import { getCharacter, importCharacterFromFile } from '../../services/characters
 import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
 import { showToast } from '../../lib/toast'
+import { getSetting } from '../../services/settings'
 import CloseButton from '../shared/CloseButton'
 import Avatar from '../shared/Avatar'
 import {
@@ -63,6 +64,7 @@ function Sidebar({ open, onClose }) {
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [showImportMenu, setShowImportMenu] = useState(false)
   const [generatingSet, setGeneratingSet] = useState(() => getGeneratingThreads())
+  const [threadCardMarquee, setThreadCardMarquee] = useState(true)
   const fileInputRef = useRef(null)
 
   function handleAvatarClick(e, src) {
@@ -148,6 +150,19 @@ function Sidebar({ open, onClose }) {
     }
     window.addEventListener('generating-state-changed', handleChange)
     return () => window.removeEventListener('generating-state-changed', handleChange)
+  }, [])
+
+  useEffect(() => {
+    getSetting('threadCardMarquee').then((val) => {
+      setThreadCardMarquee(val !== false)
+    })
+    function onSettingsChanged(e) {
+      if (e.detail?.key === 'threadCardMarquee') {
+        setThreadCardMarquee(e.detail.value !== false)
+      }
+    }
+    window.addEventListener('settings-changed', onSettingsChanged)
+    return () => window.removeEventListener('settings-changed', onSettingsChanged)
   }, [])
 
   function handleEditTitle(thread) {
@@ -354,11 +369,19 @@ function Sidebar({ open, onClose }) {
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span
-                            className={`text-sm font-medium truncate ${isActive ? 'text-primary' : 'text-text'}`}
-                          >
-                            {thread.title}
-                          </span>
+                          {threadCardMarquee ? (
+                            <span
+                              className={`text-sm font-medium marquee-wrapper ${isActive ? 'text-primary' : 'text-text'}`}
+                            >
+                              <span className="marquee-text">{thread.title}</span>
+                            </span>
+                          ) : (
+                            <span
+                              className={`text-sm font-medium truncate ${isActive ? 'text-primary' : 'text-text'}`}
+                            >
+                              {thread.title}
+                            </span>
+                          )}
                           {generatingSet.has(thread.id) && (
                             <RefreshCw className="w-3.5 h-3.5 text-primary animate-spin shrink-0" />
                           )}
