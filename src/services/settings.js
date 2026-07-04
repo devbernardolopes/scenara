@@ -651,5 +651,5 @@ export async function setSetting(key, value) {
     await db.settings.add({ key, value })
   }
   SETTING_EFFECTS[key]?.(value)
-  window.dispatchEvent(new CustomEvent('settings-changed', { detail: { key } }))
+  window.dispatchEvent(new CustomEvent('settings-changed', { detail: { key, value } }))
 }
