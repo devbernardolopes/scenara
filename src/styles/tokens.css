@@ -344,8 +344,11 @@
   white-space: nowrap;
 }
 
-.marquee-wrapper:hover .marquee-text {
+.marquee-text {
   display: inline-block;
+}
+
+.marquee-wrapper.marquee-animate .marquee-text {
   animation: marquee 8s linear infinite;
   padding-right: 2rem;
 }

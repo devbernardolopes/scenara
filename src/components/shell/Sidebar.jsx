@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -50,6 +50,37 @@ const COLOR_PRESETS = [
   '#ec4899',
   '',
 ]
+
+function ThreadCardTitle({ title, isActive, threadCardMarquee }) {
+  const wrapperRef = useRef(null)
+  const [overflows, setOverflows] = useState(false)
+
+  useLayoutEffect(() => {
+    const el = wrapperRef.current
+    if (el && threadCardMarquee) {
+      setOverflows(el.scrollWidth > el.clientWidth)
+    } else {
+      setOverflows(false)
+    }
+  }, [title, threadCardMarquee])
+
+  if (!threadCardMarquee) {
+    return (
+      <span className={`text-sm font-medium truncate ${isActive ? 'text-primary' : 'text-text'}`}>
+        {title}
+      </span>
+    )
+  }
+
+  return (
+    <span
+      ref={wrapperRef}
+      className={`text-sm font-medium marquee-wrapper ${overflows ? 'marquee-animate' : ''} ${isActive ? 'text-primary' : 'text-text'}`}
+    >
+      <span className="marquee-text">{title}</span>
+    </span>
+  )
+}
 
 function Sidebar({ open, onClose }) {
   const { t } = useTranslation('common')
@@ -369,19 +400,11 @@ function Sidebar({ open, onClose }) {
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          {threadCardMarquee ? (
-                            <span
-                              className={`text-sm font-medium marquee-wrapper ${isActive ? 'text-primary' : 'text-text'}`}
-                            >
-                              <span className="marquee-text">{thread.title}</span>
-                            </span>
-                          ) : (
-                            <span
-                              className={`text-sm font-medium truncate ${isActive ? 'text-primary' : 'text-text'}`}
-                            >
-                              {thread.title}
-                            </span>
-                          )}
+                          <ThreadCardTitle
+                            title={thread.title}
+                            isActive={isActive}
+                            threadCardMarquee={threadCardMarquee}
+                          />
                           {generatingSet.has(thread.id) && (
                             <RefreshCw className="w-3.5 h-3.5 text-primary animate-spin shrink-0" />
                           )}
