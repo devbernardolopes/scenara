@@ -319,7 +319,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
             {quickSettingsOpen && (
               <div
                 ref={quickPanelRef}
-                className="absolute bottom-full right-0 mb-1 w-52 bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1"
+                className="absolute bottom-full left-0 mb-1 w-52 bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1"
               >
                 <p className="px-3 py-1.5 text-xs font-medium text-tertiary uppercase tracking-wider">
                   {t('moreOptions')}

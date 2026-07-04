@@ -1,8 +1,17 @@
-import { useState, useRef, memo } from 'react'
+import { useState, useRef, useEffect, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { showToast } from '../../lib/toast'
-import { Trash2, Edit3, Copy, GitBranch, RefreshCw, Play, Terminal } from '../../lib/icons'
+import {
+  Trash2,
+  Edit3,
+  Copy,
+  GitBranch,
+  RefreshCw,
+  Play,
+  Terminal,
+  MoreHorizontal,
+} from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 
@@ -36,6 +45,8 @@ function MessageBubble({
   const [editing, setEditing] = useState(false)
   const [editedContent, setEditedContent] = useState('')
   const editRef = useRef(null)
+  const [overflowOpen, setOverflowOpen] = useState(false)
+  const overflowRef = useRef(null)
 
   const isUser = role === 'user'
   const isSystem = role === 'system'
@@ -109,6 +120,26 @@ function MessageBubble({
     })
   }
 
+  useEffect(() => {
+    if (!overflowOpen) return
+    function handleClick(e) {
+      if (overflowRef.current && !overflowRef.current.contains(e.target)) {
+        setOverflowOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [overflowOpen])
+
+  useEffect(() => {
+    if (!overflowOpen) return
+    function handleKey(e) {
+      if (e.key === 'Escape') setOverflowOpen(false)
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [overflowOpen])
+
   return (
     <div
       className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
@@ -158,42 +189,66 @@ function MessageBubble({
           >
             <Copy className="w-3.5 h-3.5" />
           </button>
-          <button
-            type="button"
-            onClick={() => onFork?.(message.id)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
-            title={t('fork')}
-          >
-            <GitBranch className="w-3.5 h-3.5" />
-          </button>
           {isAssistantOrSystem && (
-            <>
+            <div ref={overflowRef} className="relative flex-shrink-0">
               <button
                 type="button"
-                onClick={() => onRegenerate?.(message.id)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
-                title={t('regenerate')}
+                onClick={() => setOverflowOpen((prev) => !prev)}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text"
+                title={t('moreOptions')}
               >
-                <RefreshCw className="w-3.5 h-3.5" />
+                <MoreHorizontal className="w-4 h-4" />
               </button>
-              <button
-                type="button"
-                onClick={() => onSpeak?.(message.id)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
-                title={t('speak')}
-              >
-                <Play className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={handleShowPrompt}
-                disabled={!promptData}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0 disabled:opacity-30 disabled:pointer-events-none"
-                title={t('showPrompt')}
-              >
-                <Terminal className="w-3.5 h-3.5" />
-              </button>
-            </>
+              {overflowOpen && (
+                <div className="absolute bottom-full right-0 mb-1 bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1 min-w-[160px]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onFork?.(message.id)
+                      setOverflowOpen(false)
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
+                  >
+                    <GitBranch className="w-4 h-4" />
+                    <span>{t('fork')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onRegenerate?.(message.id)
+                      setOverflowOpen(false)
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    <span>{t('regenerate')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onSpeak?.(message.id)
+                      setOverflowOpen(false)
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
+                  >
+                    <Play className="w-4 h-4" />
+                    <span>{t('speak')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleShowPrompt()
+                      setOverflowOpen(false)
+                    }}
+                    disabled={!promptData}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] disabled:opacity-30 disabled:pointer-events-none"
+                  >
+                    <Terminal className="w-4 h-4" />
+                    <span>{t('showPrompt')}</span>
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
