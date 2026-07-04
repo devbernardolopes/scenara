@@ -655,12 +655,13 @@ export const SETTINGS = [
     category: 'prompting',
     type: 'select',
     default: 'system',
-    options: ['system', 'assistant'],
+    options: ['system', 'assistant', 'user'],
     labelKey: 'settings:prompting.firstMessageRole.label',
     descKey: 'settings:prompting.firstMessageRole.desc',
     optionLabels: {
       system: 'settings:prompting.firstMessageRoleOptions.system',
       assistant: 'settings:prompting.firstMessageRoleOptions.assistant',
+      user: 'settings:prompting.firstMessageRoleOptions.user',
     },
   },
   {
