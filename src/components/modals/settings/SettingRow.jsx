@@ -7,6 +7,7 @@ import SettingSlider from './controls/SettingSlider'
 import SettingInput from './controls/SettingInput'
 import SettingTextarea from './controls/SettingTextarea'
 import SettingButtonOrder from './controls/SettingButtonOrder'
+import SettingAvatarPicker from './controls/SettingAvatarPicker'
 
 const CONTROL_MAP = {
   toggle: SettingToggle,
@@ -15,6 +16,7 @@ const CONTROL_MAP = {
   text: SettingInput,
   textarea: SettingTextarea,
   buttonOrder: SettingButtonOrder,
+  avatar: SettingAvatarPicker,
 }
 
 function SettingRow({ setting, onSave }) {

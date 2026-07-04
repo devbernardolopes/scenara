@@ -487,6 +487,11 @@
       "label": "Post-processing",
       "desc": "Default state for the post-processing toggle."
     },
+    "systemAvatar": {
+      "label": "SYSTEM Avatar",
+      "desc": "Default avatar for system messages.",
+      "placeholder": "URL, emoji, or upload an image"
+    },
     "systemAvatarScale": {
       "label": "SYSTEM Avatar Scale",
       "desc": "Default system avatar scale for new characters."

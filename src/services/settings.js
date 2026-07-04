@@ -369,6 +369,14 @@ export const SETTINGS = [
     descKey: 'settings:defaults.postProcessing.desc',
   },
   {
+    key: 'defaultSystemAvatar',
+    category: 'defaults',
+    type: 'avatar',
+    default: '',
+    labelKey: 'settings:defaults.systemAvatar.label',
+    descKey: 'settings:defaults.systemAvatar.desc',
+  },
+  {
     key: 'defaultSystemAvatarScale',
     category: 'defaults',
     type: 'select',
