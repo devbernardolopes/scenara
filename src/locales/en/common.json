@@ -75,7 +75,8 @@
       "desc": "Descending"
     },
     "filter": {
-      "title": "Filters & Sorting"
+      "title": "Filters & Sorting",
+      "active": "Active"
     },
     "confirmDelete": {
       "title": "Delete Character",

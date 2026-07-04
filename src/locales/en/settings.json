@@ -167,11 +167,11 @@
       "summarization": "Summarization",
       "ooc": "OOC",
       "director": "Director",
-      "none": "Not assigned",
-      "requestCooldown": {
-        "label": "API Request Cooldown",
-        "desc": "Minimum waiting time (in seconds) between API requests to providers."
-      }
+      "none": "Not assigned"
+    },
+    "requestCooldown": {
+      "label": "API Request Cooldown",
+      "desc": "Minimum waiting time (in seconds) between API requests to providers."
     },
     "profile": {
       "createProfile": "Create Profile",
