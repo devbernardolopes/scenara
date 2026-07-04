@@ -130,7 +130,9 @@ function CharacterSection({ form, onChange, characterId }) {
         <div className="flex items-center gap-2">
           <select
             value={form.writingInstruction || ''}
-            onChange={(e) => onChange('writingInstruction', e.target.value || null)}
+            onChange={(e) =>
+              onChange('writingInstruction', e.target.value ? Number(e.target.value) : null)
+            }
             className={`${inputClass} flex-1`}
           >
             <option value="">{t('noWritingInstructions')}</option>

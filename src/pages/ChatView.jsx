@@ -145,7 +145,7 @@ function ChatView() {
 
     let writingInstruction = null
     if (character?.writingInstruction) {
-      writingInstruction = await getWritingInstruction(character.writingInstruction)
+      writingInstruction = await getWritingInstruction(Number(character.writingInstruction))
     }
 
     const settings = {
