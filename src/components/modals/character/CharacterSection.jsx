@@ -25,6 +25,11 @@ function CharacterSection({ form, onChange, characterId }) {
     return () => window.removeEventListener('writingInstructions-changed', handler)
   }, [])
 
+  const hasWritingInstructions = writingInstructions.length > 0
+  const selectedWI = form.writingInstruction
+    ? writingInstructions.find((wi) => wi.id === form.writingInstruction)
+    : null
+
   function handleFileUpload(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -127,20 +132,33 @@ function CharacterSection({ form, onChange, characterId }) {
           {t('writingInstructionLabel')}
         </label>
         <div className="flex items-center gap-2">
-          <select
-            value={form.writingInstruction || ''}
-            onChange={(e) =>
-              onChange('writingInstruction', e.target.value ? Number(e.target.value) : null)
-            }
-            className={`${inputClass} flex-1`}
-          >
-            <option value="">{t('noWritingInstructions')}</option>
-            {writingInstructions.map((wi) => (
-              <option key={wi.id} value={wi.id}>
-                {wi.name}
-              </option>
-            ))}
-          </select>
+          {hasWritingInstructions ? (
+            <>
+              <select
+                value={form.writingInstruction || ''}
+                onChange={(e) =>
+                  onChange('writingInstruction', e.target.value ? Number(e.target.value) : null)
+                }
+                className={`${inputClass} flex-1`}
+              >
+                <option value="">{t('noneOption')}</option>
+                {writingInstructions.map((wi) => (
+                  <option key={wi.id} value={wi.id}>
+                    {wi.name}
+                  </option>
+                ))}
+              </select>
+              {selectedWI && (
+                <span className="text-xs text-tertiary whitespace-nowrap">
+                  {estimateTokens(selectedWI.content)} tokens
+                </span>
+              )}
+            </>
+          ) : (
+            <select disabled className={`${inputClass} flex-1 opacity-50 cursor-not-allowed`}>
+              <option value="">{t('noWritingInstructions')}</option>
+            </select>
+          )}
           <button
             type="button"
             onClick={() => openModal('writingInstructionManagement')}

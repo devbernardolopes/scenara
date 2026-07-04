@@ -81,7 +81,8 @@
     "system": "SYSTEM",
     "assistant": "ASSISTANT"
   },
-  "noWritingInstructions": "No writing instructions available. Create one in Settings.",
+  "noWritingInstructions": "No writing instructions available.",
+  "noneOption": "None",
   "manageWritingInstructions": "Manage Writing Instructions",
   "sectionInitialMessages": "Initial Messages",
   "addInitialMessage": "Add Initial Message",
