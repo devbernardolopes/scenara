@@ -63,18 +63,22 @@ function ChatView() {
       const [thr, msgs] = await Promise.all([getThread(threadId), getMessagesByThread(threadId)])
       setThread(thr)
       setMessages(msgs)
+      let chr = null
       if (thr) {
-        const chr = await getCharacter(thr.characterId)
+        chr = await getCharacter(thr.characterId)
         setCharacter(chr)
       }
       const chatProfileId = await getSetting('requestKind.chat.profileId')
       setNoChatProfile(!chatProfileId)
 
-      await Promise.all([
-        loadPersonas(),
-        getSetting('defaultCharacterAvatarScale').then((v) => setCharAvatarScale(v || '1x')),
-        getSetting('defaultUserPersonaAvatarScale').then((v) => setPersonaAvatarScale(v || '1x')),
+      const [charScaleDefault, personaScaleDefault] = await Promise.all([
+        getSetting('defaultCharacterAvatarScale'),
+        getSetting('defaultUserPersonaAvatarScale'),
       ])
+      setCharAvatarScale(chr?.characterAvatarScale || charScaleDefault || '1x')
+      setPersonaAvatarScale(chr?.userPersonaAvatarScale || personaScaleDefault || '1x')
+
+      await loadPersonas()
     } finally {
       setLoading(false)
     }
@@ -92,8 +96,16 @@ function ChatView() {
     function onPersonasChanged() {
       loadPersonas()
     }
-    function onCharactersChanged() {
-      if (thread) getCharacter(thread.characterId).then(setCharacter)
+    async function onCharactersChanged() {
+      if (!thread) return
+      const chr = await getCharacter(thread.characterId)
+      setCharacter(chr)
+      const [charScaleDefault, personaScaleDefault] = await Promise.all([
+        getSetting('defaultCharacterAvatarScale'),
+        getSetting('defaultUserPersonaAvatarScale'),
+      ])
+      setCharAvatarScale(chr?.characterAvatarScale || charScaleDefault || '1x')
+      setPersonaAvatarScale(chr?.userPersonaAvatarScale || personaScaleDefault || '1x')
     }
     window.addEventListener('personas-changed', onPersonasChanged)
     window.addEventListener('characters-changed', onCharactersChanged)
