@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronLeft, ChevronRight, RefreshCw, X } from '../lib/icons'
 import { useModal } from '../hooks/useModal'
 import { showToast } from '../lib/toast'
+import { useConfirm } from '../lib/confirm'
 import Avatar from '../components/shared/Avatar'
 import ChatInputArea from '../components/chat/ChatInputArea'
 import MessageBubble from '../components/chat/MessageBubble'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
-import { getThread, updateThread } from '../services/threads'
+import { getThread, updateThread, forkThread } from '../services/threads'
 import { getCharacter } from '../services/characters'
 import { getAllPersonas, getPersona } from '../services/personas'
 import {
@@ -457,6 +458,19 @@ function ChatView() {
     showToast(t('messageDeleted'), { type: 'success' })
   }
 
+  const { confirm } = useConfirm()
+
+  async function handleForkMessage(messageId) {
+    const ok = await confirm({
+      title: t('forkConfirmTitle'),
+      message: t('forkConfirmMessage'),
+      confirmLabel: t('fork'),
+      cancelLabel: t('cancel'),
+    })
+    if (!ok) return
+    await forkThread(threadId, messageId)
+  }
+
   function getAvatarSrc(msg) {
     if (msg.role === 'user') return personaMap[msg.personaId]?.avatar || null
     return character?.avatar || null
@@ -609,7 +623,7 @@ function ChatView() {
                 streaming={msg.id === streamingMsgId}
                 onDeleteRequest={(id) => setConfirmDeleteId(id)}
                 onEdit={handleEditMessage}
-                onFork={() => {}}
+                onFork={handleForkMessage}
                 onRegenerate={handleRegenerate}
                 onSpeak={() => {}}
               />

@@ -29,6 +29,8 @@
   "edit": "Edit",
   "copy": "Copy",
   "fork": "Fork",
+  "forkConfirmTitle": "Fork Thread",
+  "forkConfirmMessage": "Create a new thread from this message and all previous messages?",
   "regenerate": "Regenerate",
   "speak": "Speak",
   "stop": "Stop",

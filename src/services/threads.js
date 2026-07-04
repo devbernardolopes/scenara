@@ -167,3 +167,58 @@ export async function duplicateThread(id) {
   )
   return newId
 }
+
+export async function forkThread(id, messageId) {
+  const original = await db.threads.get(Number(id))
+  if (!original) throw new Error('Thread not found')
+  const now = new Date()
+  const threadNumber = await getNextThreadNumber()
+  const newTitle = `${original.title} (Fork)`
+  const newId = await db.threads.add({
+    characterId: original.characterId,
+    personaId: original.personaId,
+    title: newTitle,
+    createdAt: now,
+    updatedAt: now,
+    isFavorite: false,
+    color: '',
+    threadNumber,
+  })
+
+  const allMessages = await db.messages.where('threadId').equals(Number(id)).sortBy('createdAt')
+  const msgIdx = allMessages.findIndex((m) => m.id === Number(messageId))
+  if (msgIdx === -1) throw new Error('Message not found')
+  const messagesToCopy = allMessages.slice(0, msgIdx + 1)
+  if (messagesToCopy.length > 0) {
+    await db.messages.bulkAdd(
+      messagesToCopy.map(({ id: _id, ...rest }) => ({
+        ...rest,
+        threadId: newId,
+      })),
+    )
+  }
+
+  const allPrompts = await db.promptHistory.where('threadId').equals(Number(id)).sortBy('createdAt')
+  const copiedUserCount = messagesToCopy.filter((m) => m.role === 'user').length
+  const promptsToCopy = allPrompts.slice(0, copiedUserCount)
+  if (promptsToCopy.length > 0) {
+    await db.promptHistory.bulkAdd(
+      promptsToCopy.map(({ id: _id, ...rest }) => ({
+        ...rest,
+        threadId: newId,
+      })),
+    )
+  }
+
+  const uiStateEntry = await db.uiState.where('key').equals(`chatInput.${id}`).first()
+  if (uiStateEntry) {
+    await setUIState(`chatInput.${newId}`, uiStateEntry.value)
+  }
+
+  window.dispatchEvent(
+    new CustomEvent('threads-changed', {
+      detail: { action: 'duplicate', entityName: newTitle },
+    }),
+  )
+  return newId
+}
