@@ -40,5 +40,9 @@
   "edited": "(editado)",
   "messageCopied": "Mensagem copiada",
   "messageUpdated": "Mensagem atualizada",
-  "messageDeleted": "Mensagem excluída"
+  "messageDeleted": "Mensagem excluída",
+  "initialMessage": "Mensagem Inicial",
+  "clearInitialMessages": "Remover mensagens iniciais",
+  "previousInitialMessage": "Mensagem inicial anterior",
+  "nextInitialMessage": "Próxima mensagem inicial"
 }

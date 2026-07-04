@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, RefreshCw } from '../lib/icons'
+import { ChevronDown, ChevronLeft, ChevronRight, RefreshCw, X } from '../lib/icons'
 import { useModal } from '../hooks/useModal'
 import { showToast } from '../lib/toast'
 import Avatar from '../components/shared/Avatar'
 import ChatInputArea from '../components/chat/ChatInputArea'
 import MessageBubble from '../components/chat/MessageBubble'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
-import { getThread } from '../services/threads'
+import { getThread, updateThread } from '../services/threads'
 import { getCharacter } from '../services/characters'
 import { getAllPersonas, getPersona } from '../services/personas'
 import {
@@ -46,6 +46,7 @@ function ChatView() {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [charAvatarScale, setCharAvatarScale] = useState('1x')
   const [personaAvatarScale, setPersonaAvatarScale] = useState('1x')
+  const [selectedInitialIndex, setSelectedInitialIndex] = useState(0)
 
   async function loadPersonas() {
     const list = await getAllPersonas()
@@ -107,13 +108,13 @@ function ChatView() {
     if (
       !autoTriggeredRef.current &&
       messages.length === 0 &&
-      !character.initialMessages?.length &&
+      !thread?.initialMessages?.length &&
       character.firstMessage
     ) {
       autoTriggeredRef.current = true
       handleSendRef.current?.('', null, false)
     }
-  }, [loading, character, noChatProfile])
+  }, [loading, character, noChatProfile, thread?.initialMessages])
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current
@@ -224,21 +225,35 @@ function ChatView() {
     setGenerating(true)
     startGenerating(threadId)
 
-    const isFirstMessage = !character?.initialMessages?.length && messages.length === 0
-
-    if (isFirstMessage && !text && !character?.firstMessage) {
-      generatingRef.current = false
-      setGenerating(false)
-      stopGenerating(threadId)
-      return
-    }
-
     try {
       let currentMsgs = messages
       let chatPersona = null
 
       if (thread?.personaId) {
         chatPersona = await getPersona(thread.personaId)
+      }
+
+      const hasInitialMessages = thread?.initialMessages?.length > 0 && messages.length === 0
+
+      if (hasInitialMessages) {
+        const selected = thread.initialMessages[selectedInitialIndex]
+        if (selected?.content) {
+          await createAssistantMessage(threadId, selected.content)
+        }
+        await updateThread(threadId, { initialMessages: null })
+        setThread((prev) => ({ ...prev, initialMessages: null }))
+        setSelectedInitialIndex(0)
+        currentMsgs = await getMessagesByThread(threadId)
+        setMessages(currentMsgs)
+      }
+
+      const isFirstMessage = messages.length === 0 && !hasInitialMessages
+
+      if (isFirstMessage && !text && !character?.firstMessage) {
+        generatingRef.current = false
+        setGenerating(false)
+        stopGenerating(threadId)
+        return
       }
 
       if (text) {
@@ -263,6 +278,12 @@ function ChatView() {
     handleSendRef.current = handleSend
   })
 
+  async function handleClearInitialMessages() {
+    await updateThread(threadId, { initialMessages: null })
+    setThread((prev) => ({ ...prev, initialMessages: null }))
+    setSelectedInitialIndex(0)
+  }
+
   async function handleRegenerate(messageId) {
     if (generatingRef.current) return
     generatingRef.current = true
@@ -282,7 +303,7 @@ function ChatView() {
         chatPersona = await getPersona(thread.personaId)
       }
 
-      const isFirstMessage = !character?.initialMessages?.length && currentMsgs.length === 0
+      const isFirstMessage = currentMsgs.length === 0 && character?.firstMessage
 
       await doChatRequest(isFirstMessage, currentMsgs, chatPersona, null)
 
@@ -374,7 +395,56 @@ function ChatView() {
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto px-4 md:px-8 py-4 space-y-4 relative"
       >
-        {messages.length === 0 && !generating ? (
+        {thread?.initialMessages?.length > 0 && messages.length === 0 && !generating ? (
+          <div className="bg-surface border border-border rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-tertiary">
+                {t('initialMessage')}
+                {thread.initialMessages.length > 1 ? ` #${selectedInitialIndex + 1}` : ''}
+              </span>
+              <button
+                type="button"
+                onClick={handleClearInitialMessages}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text transition-colors"
+                aria-label={t('clearInitialMessages')}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-text whitespace-pre-wrap">
+              {thread.initialMessages[selectedInitialIndex]?.content}
+            </p>
+            {thread.initialMessages.length > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedInitialIndex((i) => Math.max(0, i - 1))}
+                  disabled={selectedInitialIndex === 0}
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  aria-label={t('previousInitialMessage')}
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <span className="text-xs text-tertiary">
+                  {selectedInitialIndex + 1}/{thread.initialMessages.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSelectedInitialIndex((i) =>
+                      Math.min(thread.initialMessages.length - 1, i + 1),
+                    )
+                  }
+                  disabled={selectedInitialIndex === thread.initialMessages.length - 1}
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  aria-label={t('nextInitialMessage')}
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
+        ) : messages.length === 0 && !generating ? (
           <p className="text-secondary text-sm text-center py-8">{t('placeholder')}</p>
         ) : (
           messages.map((msg, idx) => (

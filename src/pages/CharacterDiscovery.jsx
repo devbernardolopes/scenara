@@ -195,12 +195,16 @@ function CharacterDiscovery() {
       return
     }
     const personaId = persona?.id || (await getSetting('defaultPersonaId'))
+    const initialMessages = character.initialMessages?.length ? character.initialMessages : null
+
     const threadId = await createThread({
       characterId: character.id,
       title: character.name,
       personaId: personaId || null,
+      initialMessages,
     })
-    if (character.greeting) {
+
+    if (!initialMessages && character.greeting) {
       await createMessage(threadId, 'assistant', character.greeting)
     }
     navigate(`/chat/${threadId}`)
