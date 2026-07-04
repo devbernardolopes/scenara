@@ -108,6 +108,20 @@ function ProfileFormModal({ profile }) {
   const selectedProvider = PROVIDERS.find((p) => p.id === form.providerId)
   const paramDefs = selectedProvider?.params || []
 
+  useEffect(() => {
+    if (selectedProvider) {
+      setForm((prev) => {
+        const merged = { ...prev.params }
+        for (const def of selectedProvider.params) {
+          if (!(def.key in merged) && def.default !== undefined && def.default !== null) {
+            merged[def.key] = def.default
+          }
+        }
+        return { ...prev, params: merged }
+      })
+    }
+  }, [selectedProvider])
+
   const isDirty = Object.keys(initialRef.current).some((key) => {
     if (key === 'params')
       return JSON.stringify(form.params) !== JSON.stringify(initialRef.current.params)
