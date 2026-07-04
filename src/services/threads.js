@@ -1,4 +1,5 @@
 import db from '../db'
+import { setUIState } from './uiState'
 
 export async function getAllThreads() {
   const all = await db.threads.toArray()
@@ -154,6 +155,10 @@ export async function duplicateThread(id) {
         threadId: newId,
       })),
     )
+  }
+  const uiStateEntry = await db.uiState.where('key').equals(`chatInput.${id}`).first()
+  if (uiStateEntry) {
+    await setUIState(`chatInput.${newId}`, uiStateEntry.value)
   }
   window.dispatchEvent(
     new CustomEvent('threads-changed', {
