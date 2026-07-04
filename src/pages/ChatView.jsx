@@ -459,6 +459,11 @@ function ChatView() {
     return msg.role === 'user' ? personaAvatarScale : charAvatarScale
   }
 
+  function getMessageName(msg) {
+    if (msg.role === 'user') return personaMap[msg.personaId]?.name || null
+    return character?.name || null
+  }
+
   const deletedMsgNumber = confirmDeleteId
     ? messages.findIndex((m) => m.id === confirmDeleteId) + 1
     : null
@@ -593,6 +598,7 @@ function ChatView() {
                 avatarScale={getAvatarScale(msg)}
                 role={msg.role}
                 personaMap={personaMap}
+                nameLabel={getMessageName(msg)}
                 streaming={msg.id === streamingMsgId}
                 onDeleteRequest={(id) => setConfirmDeleteId(id)}
                 onEdit={handleEditMessage}

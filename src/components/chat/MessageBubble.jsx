@@ -101,6 +101,7 @@ function MessageBubble({
   avatarScale,
   role,
   personaMap,
+  nameLabel,
   streaming,
   onDeleteRequest,
   onEdit,
@@ -344,6 +345,11 @@ function MessageBubble({
             className="flex-shrink-0"
             onClick={handleAvatarClick}
           />
+          {nameLabel && (
+            <span className="text-xs font-medium text-text truncate max-w-[100px]">
+              {nameLabel}
+            </span>
+          )}
           <span className="text-xs font-medium text-tertiary">{`#${messageNumber}`}</span>
           <div className="flex-1 min-w-0" />
           {headerButtons.map((key) => {
