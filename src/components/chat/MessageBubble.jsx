@@ -62,6 +62,8 @@ function MessageBubble({
   const editRef = useRef(null)
   const [overflowOpen, setOverflowOpen] = useState(false)
   const overflowRef = useRef(null)
+  const overflowBtnRef = useRef(null)
+  const [overflowMenuStyle, setOverflowMenuStyle] = useState(null)
   const [visibility, setVisibility] = useState(
     Object.fromEntries(VISIBILITY_KEYS.map((k) => [k, true])),
   )
@@ -162,6 +164,7 @@ function MessageBubble({
     function handleClick(e) {
       if (overflowRef.current && !overflowRef.current.contains(e.target)) {
         setOverflowOpen(false)
+        setOverflowMenuStyle(null)
       }
     }
     document.addEventListener('mousedown', handleClick)
@@ -171,17 +174,30 @@ function MessageBubble({
   useEffect(() => {
     if (!overflowOpen) return
     function handleKey(e) {
-      if (e.key === 'Escape') setOverflowOpen(false)
+      if (e.key === 'Escape') {
+        setOverflowOpen(false)
+        setOverflowMenuStyle(null)
+      }
     }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
   }, [overflowOpen])
 
+  function handleOverflowClick() {
+    if (overflowBtnRef.current) {
+      const rect = overflowBtnRef.current.getBoundingClientRect()
+      setOverflowMenuStyle({
+        position: 'fixed',
+        top: rect.top - 4,
+        right: window.innerWidth - rect.right,
+        zIndex: 9999,
+      })
+    }
+    setOverflowOpen((prev) => !prev)
+  }
+
   return (
-    <div
-      className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
-      style={{ contentVisibility: 'auto' }}
-    >
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
         className={`max-w-[80%] md:max-w-[65%] rounded-lg ${
           isUser
@@ -248,15 +264,19 @@ function MessageBubble({
               visibility.showAssistantPrompt) && (
               <div ref={overflowRef} className="relative flex-shrink-0">
                 <button
+                  ref={overflowBtnRef}
                   type="button"
-                  onClick={() => setOverflowOpen((prev) => !prev)}
+                  onClick={handleOverflowClick}
                   className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text"
                   title={t('moreOptions')}
                 >
                   <MoreHorizontal className="w-4 h-4" />
                 </button>
                 {overflowOpen && (
-                  <div className="absolute bottom-full right-0 mb-1 bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1 min-w-[160px]">
+                  <div
+                    style={overflowMenuStyle}
+                    className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
+                  >
                     {visibility.showAssistantRegenerate && (
                       <button
                         type="button"
