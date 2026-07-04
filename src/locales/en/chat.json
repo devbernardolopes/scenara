@@ -46,7 +46,7 @@
   "noChatProfile": "No Chat profile assigned. Please configure one in Settings > API before continuing.",
   "initialMessage": "Initial Message",
   "clearInitialMessages": "Remove initial messages",
-  "previousInitialMessage": "Previous initial message",
-  "nextInitialMessage": "Next initial message",
+  "previousInitialMessage": "Previous",
+  "nextInitialMessage": "Next",
   "loadEarlierMessages": "Load earlier messages ({{count}} more)"
 }

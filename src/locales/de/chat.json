@@ -38,7 +38,7 @@
   "messageDeleted": "Nachricht gelöscht",
   "initialMessage": "Erste Nachricht",
   "clearInitialMessages": "Erste Nachrichten entfernen",
-  "previousInitialMessage": "Vorherige erste Nachricht",
-  "nextInitialMessage": "Nächste erste Nachricht",
+  "previousInitialMessage": "Vorherige",
+  "nextInitialMessage": "Nächste",
   "loadEarlierMessages": "Frühere Nachrichten laden ({{count}} mehr)"
 }

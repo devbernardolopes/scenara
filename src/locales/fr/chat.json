@@ -38,7 +38,7 @@
   "messageDeleted": "Message supprimé",
   "initialMessage": "Message Initial",
   "clearInitialMessages": "Supprimer les messages initiaux",
-  "previousInitialMessage": "Message initial précédent",
-  "nextInitialMessage": "Message initial suivant",
+  "previousInitialMessage": "Précédent",
+  "nextInitialMessage": "Suivant",
   "loadEarlierMessages": "Charger les messages précédents ({{count}} de plus)"
 }
