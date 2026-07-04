@@ -23,10 +23,17 @@ function StringListInput({ value, onChange, maxItems }) {
   const items = Array.isArray(value) ? value : []
 
   function handleAdd() {
-    const trimmed = input.trim()
-    if (!trimmed) return
-    if (maxItems && items.length >= maxItems) return
-    onChange([...items, trimmed])
+    const raw = input.trim()
+    if (!raw) return
+    const parts = raw
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    if (parts.length === 0) return
+    const available = maxItems ? maxItems - items.length : Infinity
+    const toAdd = parts.slice(0, available)
+    if (toAdd.length === 0) return
+    onChange([...items, ...toAdd])
     setInput('')
   }
 

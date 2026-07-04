@@ -106,6 +106,7 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
   if (profile.key) headers['Authorization'] = `Bearer ${profile.key}`
 
   const activeParams = getActiveParams(profile)
+  if (activeParams.top_p === 0) delete activeParams.top_p
 
   const body = {
     model: profile.model,
