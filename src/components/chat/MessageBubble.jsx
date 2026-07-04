@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { showToast } from '../../lib/toast'
+import { getSetting } from '../../services/settings'
 import {
   Trash2,
   Edit3,
@@ -14,6 +15,20 @@ import {
 } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
+
+const VISIBILITY_KEYS = [
+  'showAssistantDelete',
+  'showAssistantEdit',
+  'showAssistantCopy',
+  'showAssistantFork',
+  'showAssistantRegenerate',
+  'showAssistantSpeak',
+  'showAssistantPrompt',
+  'showUserDelete',
+  'showUserEdit',
+  'showUserCopy',
+  'showUserFork',
+]
 
 const AVATAR_SIZE_MAP = { '1x': 'sm', '2x': 'md', '3x': 'lg', '4x': 'xl' }
 
@@ -47,6 +62,28 @@ function MessageBubble({
   const editRef = useRef(null)
   const [overflowOpen, setOverflowOpen] = useState(false)
   const overflowRef = useRef(null)
+  const [visibility, setVisibility] = useState(
+    Object.fromEntries(VISIBILITY_KEYS.map((k) => [k, true])),
+  )
+
+  useEffect(() => {
+    async function load() {
+      const entries = await Promise.all(VISIBILITY_KEYS.map(async (k) => [k, await getSetting(k)]))
+      setVisibility(Object.fromEntries(entries))
+    }
+    load()
+  }, [])
+
+  useEffect(() => {
+    function handler() {
+      VISIBILITY_KEYS.forEach(async (k) => {
+        const v = await getSetting(k)
+        setVisibility((prev) => ({ ...prev, [k]: v }))
+      })
+    }
+    window.addEventListener('settings-changed', handler)
+    return () => window.removeEventListener('settings-changed', handler)
+  }, [])
 
   const isUser = role === 'user'
   const isSystem = role === 'system'
@@ -165,91 +202,105 @@ function MessageBubble({
           />
           <span className="text-xs font-medium text-tertiary">{`#${messageNumber}`}</span>
           <div className="flex-1 min-w-0" />
-          <button
-            type="button"
-            onClick={() => onDeleteRequest?.(message.id)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
-            title={t('delete')}
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={handleStartEdit}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
-            title={t('edit')}
-          >
-            <Edit3 className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
-            title={t('copy')}
-          >
-            <Copy className="w-3.5 h-3.5" />
-          </button>
-          {isAssistantOrSystem && (
-            <div ref={overflowRef} className="relative flex-shrink-0">
-              <button
-                type="button"
-                onClick={() => setOverflowOpen((prev) => !prev)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text"
-                title={t('moreOptions')}
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-              {overflowOpen && (
-                <div className="absolute bottom-full right-0 mb-1 bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1 min-w-[160px]">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onFork?.(message.id)
-                      setOverflowOpen(false)
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
-                  >
-                    <GitBranch className="w-4 h-4" />
-                    <span>{t('fork')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onRegenerate?.(message.id)
-                      setOverflowOpen(false)
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    <span>{t('regenerate')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onSpeak?.(message.id)
-                      setOverflowOpen(false)
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
-                  >
-                    <Play className="w-4 h-4" />
-                    <span>{t('speak')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      handleShowPrompt()
-                      setOverflowOpen(false)
-                    }}
-                    disabled={!promptData}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] disabled:opacity-30 disabled:pointer-events-none"
-                  >
-                    <Terminal className="w-4 h-4" />
-                    <span>{t('showPrompt')}</span>
-                  </button>
-                </div>
-              )}
-            </div>
+          {visibility[isUser ? 'showUserDelete' : 'showAssistantDelete'] && (
+            <button
+              type="button"
+              onClick={() => onDeleteRequest?.(message.id)}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+              title={t('delete')}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
           )}
+          {visibility[isUser ? 'showUserEdit' : 'showAssistantEdit'] && (
+            <button
+              type="button"
+              onClick={handleStartEdit}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+              title={t('edit')}
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {visibility[isUser ? 'showUserCopy' : 'showAssistantCopy'] && (
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+              title={t('copy')}
+            >
+              <Copy className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {visibility[isUser ? 'showUserFork' : 'showAssistantFork'] && (
+            <button
+              type="button"
+              onClick={() => onFork?.(message.id)}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+              title={t('fork')}
+            >
+              <GitBranch className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {isAssistantOrSystem &&
+            (visibility.showAssistantRegenerate ||
+              visibility.showAssistantSpeak ||
+              visibility.showAssistantPrompt) && (
+              <div ref={overflowRef} className="relative flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setOverflowOpen((prev) => !prev)}
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text"
+                  title={t('moreOptions')}
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+                {overflowOpen && (
+                  <div className="absolute bottom-full right-0 mb-1 bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1 min-w-[160px]">
+                    {visibility.showAssistantRegenerate && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onRegenerate?.(message.id)
+                          setOverflowOpen(false)
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        <span>{t('regenerate')}</span>
+                      </button>
+                    )}
+                    {visibility.showAssistantSpeak && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSpeak?.(message.id)
+                          setOverflowOpen(false)
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
+                      >
+                        <Play className="w-4 h-4" />
+                        <span>{t('speak')}</span>
+                      </button>
+                    )}
+                    {visibility.showAssistantPrompt && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleShowPrompt()
+                          setOverflowOpen(false)
+                        }}
+                        disabled={!promptData}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] disabled:opacity-30 disabled:pointer-events-none"
+                      >
+                        <Terminal className="w-4 h-4" />
+                        <span>{t('showPrompt')}</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
         </div>
 
         {/* Content */}

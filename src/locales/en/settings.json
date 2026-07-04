@@ -32,6 +32,50 @@
     "toastDuration": {
       "label": "Toast Duration",
       "desc": "How long toast messages stay visible (in seconds)."
+    },
+    "showAssistantDelete": {
+      "label": "Assistant/System – Delete",
+      "desc": "Show the delete button on assistant and system message bubbles."
+    },
+    "showAssistantEdit": {
+      "label": "Assistant/System – Edit",
+      "desc": "Show the edit button on assistant and system message bubbles."
+    },
+    "showAssistantCopy": {
+      "label": "Assistant/System – Copy",
+      "desc": "Show the copy button on assistant and system message bubbles."
+    },
+    "showAssistantFork": {
+      "label": "Assistant/System – Fork",
+      "desc": "Show the fork button on assistant and system message bubbles."
+    },
+    "showAssistantRegenerate": {
+      "label": "Assistant/System – Regenerate",
+      "desc": "Show the regenerate button on assistant and system message bubbles."
+    },
+    "showAssistantSpeak": {
+      "label": "Assistant/System – Speak/Stop",
+      "desc": "Show the speak/stop button on assistant and system message bubbles."
+    },
+    "showAssistantPrompt": {
+      "label": "Assistant/System – Prompt",
+      "desc": "Show the prompt button on assistant and system message bubbles."
+    },
+    "showUserDelete": {
+      "label": "User – Delete",
+      "desc": "Show the delete button on user message bubbles."
+    },
+    "showUserEdit": {
+      "label": "User – Edit",
+      "desc": "Show the edit button on user message bubbles."
+    },
+    "showUserCopy": {
+      "label": "User – Copy",
+      "desc": "Show the copy button on user message bubbles."
+    },
+    "showUserFork": {
+      "label": "User – Fork",
+      "desc": "Show the fork button on user message bubbles."
     }
   },
   "themeOptions": {
