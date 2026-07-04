@@ -126,7 +126,11 @@ function Sidebar({ open, onClose }) {
   useEffect(() => {
     loadData()
     window.addEventListener('threads-changed', loadData)
-    return () => window.removeEventListener('threads-changed', loadData)
+    window.addEventListener('characters-changed', loadData)
+    return () => {
+      window.removeEventListener('threads-changed', loadData)
+      window.removeEventListener('characters-changed', loadData)
+    }
   }, [loadData])
 
   useEffect(() => {
