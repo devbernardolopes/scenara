@@ -20,7 +20,7 @@ import {
 } from '../services/messages'
 import { getWritingInstruction } from '../services/writingInstructions'
 import { getEffectiveProfileFor } from '../services/connectionProfiles'
-import { sendChatCompletion, buildMessagesPayload } from '../services/chatApi'
+import { sendChatCompletion, buildMessagesPayload, getActiveParams } from '../services/chatApi'
 import { getSetting } from '../services/settings'
 import { startGenerating, stopGenerating } from '../services/generatingState'
 
@@ -46,9 +46,6 @@ function ChatView() {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [charAvatarScale, setCharAvatarScale] = useState('1x')
   const [personaAvatarScale, setPersonaAvatarScale] = useState('1x')
-  const [lastPayload, setLastPayload] = useState(null)
-  const [lastModel, setLastModel] = useState(null)
-  const [lastParams, setLastParams] = useState(null)
 
   async function loadPersonas() {
     const list = await getAllPersonas()
@@ -169,11 +166,11 @@ function ChatView() {
       writingInstruction,
     })
 
-    setLastPayload(payload)
-    setLastModel(profile.model)
-    setLastParams(profile.params)
+    const activeParams = getActiveParams(profile)
+    const promptData = JSON.stringify({ payload, model: profile.model, params: activeParams })
 
     const assistantMsgId = await createAssistantMessage(threadId, '')
+    await updateMessage(assistantMsgId, { promptData })
     setStreamingMsgId(assistantMsgId)
     setMessages((prev) => [
       ...prev,
@@ -397,13 +394,6 @@ function ChatView() {
               onFork={() => {}}
               onRegenerate={handleRegenerate}
               onSpeak={() => {}}
-              onShowPrompt={() =>
-                openModal('showPrompt', {
-                  payload: lastPayload,
-                  model: lastModel,
-                  params: lastParams,
-                })
-              }
             />
           ))
         )}

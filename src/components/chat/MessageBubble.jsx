@@ -4,6 +4,7 @@ import { useModal } from '../../hooks/useModal'
 import { showToast } from '../../lib/toast'
 import { Trash2, Edit3, Copy, GitBranch, RefreshCw, Play, Terminal } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
+import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 
 const AVATAR_SIZE_MAP = { '1x': 'sm', '2x': 'md', '3x': 'lg', '4x': 'xl' }
 
@@ -29,7 +30,6 @@ function MessageBubble({
   onFork,
   onRegenerate,
   onSpeak,
-  onShowPrompt,
 }) {
   const { t } = useTranslation('chat')
   const { openModal } = useModal()
@@ -45,6 +45,13 @@ function MessageBubble({
   const persona = personaMap?.[message.personaId]
   const personaColor = persona?.color
   const isOOC = message.isOOC
+
+  let promptData = null
+  try {
+    promptData = message.promptData ? JSON.parse(message.promptData) : null
+  } catch {
+    promptData = null
+  }
 
   let userBgClass = 'bg-primary'
   let userBgStyle = null
@@ -91,6 +98,15 @@ function MessageBubble({
     if (e.key === 'Escape') {
       handleCancelEdit()
     }
+  }
+
+  function handleShowPrompt() {
+    if (!promptData) return
+    openModal('showPrompt', {
+      payload: promptData.payload,
+      model: promptData.model,
+      params: promptData.params,
+    })
   }
 
   return (
@@ -170,8 +186,9 @@ function MessageBubble({
               </button>
               <button
                 type="button"
-                onClick={() => onShowPrompt?.()}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+                onClick={handleShowPrompt}
+                disabled={!promptData}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0 disabled:opacity-30 disabled:pointer-events-none"
                 title={t('showPrompt')}
               >
                 <Terminal className="w-3.5 h-3.5" />
@@ -183,14 +200,13 @@ function MessageBubble({
         {/* Content */}
         <div onDoubleClick={handleStartEdit} className="px-3 py-2">
           {editing ? (
-            <textarea
-              ref={editRef}
+            <AutoResizeTextarea
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
               onBlur={handleSaveEdit}
               onKeyDown={handleEditKeyDown}
               autoFocus
-              className={`w-full resize-none rounded border p-2 text-sm min-h-[60px] focus:outline-none focus:ring-1 ${
+              className={`w-full resize-none rounded border p-2 text-sm focus:outline-none focus:ring-1 ${
                 isUser
                   ? `${userBgClass || 'bg-transparent'} text-on-primary border-white/20 focus:ring-white/40`
                   : 'bg-surface text-text border-border focus:ring-primary/40'

@@ -1,4 +1,5 @@
 import CollapsibleSection from '../../../shared/CollapsibleSection'
+import AutoResizeTextarea from '../../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../../services/tokenEstimator'
 
 function computeSummary(value, mode) {
@@ -24,11 +25,10 @@ function SettingTextarea({
   storageKey,
 }) {
   const content = (
-    <textarea
+    <AutoResizeTextarea
       value={value ?? ''}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      rows={rows}
       className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm resize-y"
     />
   )

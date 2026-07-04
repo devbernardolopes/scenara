@@ -4,6 +4,7 @@ import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
 import CollapsibleSection from '../shared/CollapsibleSection'
+import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import {
   createWritingInstruction,
   updateWritingInstruction,
@@ -135,9 +136,8 @@ function WritingInstructionFormModal({ writingInstruction }) {
           storageKey="writingInstructionContent"
           defaultExpanded={true}
         >
-          <textarea
+          <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}
-            rows={10}
             value={form.content}
             onChange={update('content')}
             placeholder={t('writingInstruction.form.contentPlaceholder')}

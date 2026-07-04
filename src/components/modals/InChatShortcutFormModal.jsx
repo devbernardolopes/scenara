@@ -4,6 +4,7 @@ import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
 import CollapsibleSection from '../shared/CollapsibleSection'
+import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { createInChatShortcut, updateInChatShortcut } from '../../services/inChatShortcuts'
 import { estimateTokens } from '../../services/tokenEstimator'
 
@@ -132,9 +133,8 @@ function InChatShortcutFormModal({ inChatShortcut }) {
           storageKey="inChatShortcutContent"
           defaultExpanded={true}
         >
-          <textarea
+          <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}
-            rows={14}
             value={form.content}
             onChange={update('content')}
             placeholder={t('inChatShortcut.form.contentPlaceholder')}

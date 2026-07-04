@@ -88,6 +88,16 @@ export async function buildMessagesPayload({
   return result
 }
 
+export function getActiveParams(profile) {
+  const providerDef = PROVIDERS.find((p) => p.id === profile.providerId)
+  const deprecatedKeys = new Set(
+    (providerDef?.params || []).filter((p) => p.deprecated).map((p) => p.key),
+  )
+  return Object.fromEntries(
+    Object.entries(profile.params || {}).filter(([key]) => !deprecatedKeys.has(key)),
+  )
+}
+
 export async function sendChatCompletion({ profile, messages, signal, onToken }) {
   const baseUrl = getChatBaseUrl(profile.providerId)
   if (!baseUrl) throw new Error(`No base URL for provider "${profile.providerId}"`)
@@ -95,13 +105,7 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
   const headers = { 'Content-Type': 'application/json' }
   if (profile.key) headers['Authorization'] = `Bearer ${profile.key}`
 
-  const providerDef = PROVIDERS.find((p) => p.id === profile.providerId)
-  const deprecatedKeys = new Set(
-    (providerDef?.params || []).filter((p) => p.deprecated).map((p) => p.key),
-  )
-  const activeParams = Object.fromEntries(
-    Object.entries(profile.params || {}).filter(([key]) => !deprecatedKeys.has(key)),
-  )
+  const activeParams = getActiveParams(profile)
 
   const body = {
     model: profile.model,

@@ -5,6 +5,7 @@ import { useConfirm } from '../../lib/confirm'
 import db from '../../db'
 import CloseButton from '../shared/CloseButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
+import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../services/tokenEstimator'
 import Avatar from '../shared/Avatar'
 import { Plus } from '../../lib/icons'
@@ -129,9 +130,8 @@ function PersonaEditorModal() {
               storageKey="personaEditorDescription"
               defaultExpanded={true}
             >
-              <textarea
+              <AutoResizeTextarea
                 className={`${inputClass} resize-none mt-2`}
-                rows={4}
                 value={form.description}
                 onChange={update('description')}
                 placeholder={t('personaDescriptionPlaceholder')}

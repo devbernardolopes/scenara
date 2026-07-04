@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../../hooks/useModal'
 import CollapsibleSection from '../../shared/CollapsibleSection'
+import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { getAllWritingInstructions } from '../../../services/writingInstructions'
 import Avatar from '../../shared/Avatar'
@@ -99,9 +100,8 @@ function CharacterSection({ form, onChange, characterId }) {
 
       <div>
         <label className="block text-sm font-medium text-text mb-1">{t('taglineLabel')}</label>
-        <textarea
+        <AutoResizeTextarea
           className={`${inputClass} resize-none`}
-          rows={2}
           value={form.tagline || ''}
           onChange={(e) => onChange('tagline', e.target.value)}
           placeholder={t('taglinePlaceholder')}
@@ -114,9 +114,8 @@ function CharacterSection({ form, onChange, characterId }) {
         storageKey={characterId ? `charSection.prompt.${characterId}` : undefined}
         defaultExpanded={true}
       >
-        <textarea
+        <AutoResizeTextarea
           className={`${inputClass} resize-none mt-2`}
-          rows={6}
           value={form.prompt || ''}
           onChange={(e) => onChange('prompt', e.target.value)}
           placeholder={t('promptPlaceholder')}
@@ -160,9 +159,8 @@ function CharacterSection({ form, onChange, characterId }) {
         storageKey={characterId ? `charSection.extraPrompt.${characterId}` : undefined}
         defaultExpanded={false}
       >
-        <textarea
+        <AutoResizeTextarea
           className={`${inputClass} resize-none mt-2`}
-          rows={4}
           value={form.extraPrompt || ''}
           onChange={(e) => onChange('extraPrompt', e.target.value)}
           placeholder={t('extraPromptPlaceholder')}

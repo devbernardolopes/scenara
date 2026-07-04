@@ -273,6 +273,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
         {/* Textarea */}
         <textarea
           ref={textareaRef}
+          data-no-autoresize
           rows={2}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}

@@ -4,6 +4,7 @@ import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
 import CollapsibleSection from '../shared/CollapsibleSection'
+import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import Avatar from '../shared/Avatar'
 import { createPersona, updatePersona, getAllPersonas } from '../../services/personas'
 import { estimateTokens } from '../../services/tokenEstimator'
@@ -243,9 +244,8 @@ function PersonaFormModal({ persona }) {
           storageKey="personaFormDescription"
           defaultExpanded={true}
         >
-          <textarea
+          <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}
-            rows={4}
             value={form.description}
             onChange={update('description')}
             placeholder={t('persona.form.descriptionPlaceholder')}

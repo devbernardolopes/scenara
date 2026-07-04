@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import ModalShell from '../shared/ModalShell'
+import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../services/tokenEstimator'
+import { ChevronDown } from '../../lib/icons'
 
 function formatTokenCount(count) {
   if (count >= 1000) return `${(count / 1000).toFixed(1)}K`
@@ -11,6 +14,7 @@ function formatTokenCount(count) {
 function ShowPromptModal({ payload, model, params }) {
   const { t } = useTranslation('chat')
   const { closeModal } = useModal()
+  const [expandedIdx, setExpandedIdx] = useState(null)
 
   const totalTokens = (payload || []).reduce(
     (sum, msg) => sum + estimateTokens(msg.content || ''),
@@ -47,26 +51,38 @@ function ShowPromptModal({ payload, model, params }) {
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-2">
           {(payload || []).map((msg, idx) => {
             const tokenCount = estimateTokens(msg.content || '')
+            const isOpen = expandedIdx === idx
             return (
-              <div key={idx}>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-xs font-medium text-text">#{idx + 1}</span>
-                  <span className="text-xs font-medium text-secondary">
-                    {msg.role.toUpperCase()}
+              <div key={idx} className="border border-border rounded-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setExpandedIdx(isOpen ? null : idx)}
+                  className="w-full flex items-center gap-2 px-4 py-3 min-h-[44px] text-left hover:bg-surface-hover transition-colors"
+                >
+                  <span className="text-xs font-medium text-text shrink-0">#{idx + 1}</span>
+                  <span className="text-xs font-medium text-secondary shrink-0 uppercase">
+                    {msg.role}
                   </span>
-                  <span className="text-xs text-tertiary">
+                  <span className="text-xs text-tertiary shrink-0">
                     ~{formatTokenCount(tokenCount)} {t('tokens', { count: tokenCount })}
                   </span>
-                </div>
-                <textarea
-                  readOnly
-                  value={msg.content || ''}
-                  className="w-full min-h-[60px] p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none cursor-default"
-                  rows={Math.max(3, Math.ceil((msg.content || '').length / 120))}
-                />
+                  <div className="flex-1" />
+                  <ChevronDown
+                    className={`w-4 h-4 text-tertiary transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {isOpen && (
+                  <div className="px-4 pb-3">
+                    <AutoResizeTextarea
+                      readOnly
+                      value={msg.content || ''}
+                      className="w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none cursor-default"
+                    />
+                  </div>
+                )}
               </div>
             )
           })}

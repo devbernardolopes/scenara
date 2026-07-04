@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import CollapsibleSection from '../../shared/CollapsibleSection'
+import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
 
 const inputClass =
@@ -75,9 +76,8 @@ function OverridesSection({ form, onChange, characterId }) {
           storageKey={characterId ? `charSection.autoTitleSystem.${characterId}` : undefined}
           defaultExpanded={false}
         >
-          <textarea
+          <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}
-            rows={5}
             value={form.autoTitleSystemInstructions}
             onChange={(e) => onChange('autoTitleSystemInstructions', e.target.value)}
             placeholder={t('autoTitleSystemInstructionsPlaceholder')}
@@ -95,9 +95,8 @@ function OverridesSection({ form, onChange, characterId }) {
           storageKey={characterId ? `charSection.autoTitleUser.${characterId}` : undefined}
           defaultExpanded={false}
         >
-          <textarea
+          <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}
-            rows={5}
             value={form.autoTitleUserInstructions}
             onChange={(e) => onChange('autoTitleUserInstructions', e.target.value)}
             placeholder={t('autoTitleUserInstructionsPlaceholder')}
@@ -141,9 +140,8 @@ function OverridesSection({ form, onChange, characterId }) {
           storageKey={characterId ? `charSection.summarizationSystem.${characterId}` : undefined}
           defaultExpanded={false}
         >
-          <textarea
+          <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}
-            rows={5}
             value={form.summarizationSystemInstructions}
             onChange={(e) => onChange('summarizationSystemInstructions', e.target.value)}
             placeholder={t('summarizationSystemInstructionsPlaceholder')}
@@ -161,9 +159,8 @@ function OverridesSection({ form, onChange, characterId }) {
           storageKey={characterId ? `charSection.summarizationUser.${characterId}` : undefined}
           defaultExpanded={false}
         >
-          <textarea
+          <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}
-            rows={5}
             value={form.summarizationUserInstructions}
             onChange={(e) => onChange('summarizationUserInstructions', e.target.value)}
             placeholder={t('summarizationUserInstructionsPlaceholder')}

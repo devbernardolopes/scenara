@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useConfirm } from '../../../lib/confirm'
 import CollapsibleSection from '../../shared/CollapsibleSection'
+import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { Plus, Trash2 } from '../../../lib/icons'
 
@@ -73,9 +74,8 @@ function InitialMessagesSection({ form, onChange, characterId }) {
             defaultExpanded={!msg.content}
           >
             <div className="relative mt-2">
-              <textarea
+              <AutoResizeTextarea
                 className={`${inputClass} resize-none pr-10`}
-                rows={4}
                 value={msg.content}
                 onChange={(e) => handleContentChange(msg.id, e.target.value)}
                 placeholder={t('initialMessagePlaceholder')}
