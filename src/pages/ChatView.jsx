@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronLeft, ChevronRight, RefreshCw, X } from '../lib/icons'
@@ -34,7 +34,7 @@ function ChatView() {
   const generatingRef = useRef(false)
   const autoTriggeredRef = useRef(false)
   const handleSendRef = useRef(null)
-  const scrollInitialized = useRef(false)
+  const scrollCommits = useRef(0)
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
@@ -86,16 +86,19 @@ function ChatView() {
   }
 
   useEffect(() => {
-    scrollInitialized.current = false
+    scrollCommits.current = 0
     loadData()
   }, [threadId])
 
-  useEffect(() => {
-    if (messages.length === 0) return
-    if (!scrollInitialized.current) {
-      scrollInitialized.current = true
+  useLayoutEffect(() => {
+    scrollCommits.current++
+    if (messages.length > 0 && scrollCommits.current === 1) {
       scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
-    } else {
+    }
+  }, [messages])
+
+  useEffect(() => {
+    if (messages.length > 0 && scrollCommits.current > 1) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages])
