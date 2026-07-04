@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeSanitize from 'rehype-sanitize'
 import {
   Trash2,
   Edit3,
@@ -340,12 +343,22 @@ function MessageBubble({
               style={isUser ? userBgStyle : undefined}
             />
           ) : (
-            <p className="text-sm whitespace-pre-wrap">
-              {message.content}
+            <div className="text-sm">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeSanitize]}
+                components={{
+                  p: ({ children }) => (
+                    <p className="mb-2 last:mb-0 whitespace-pre-wrap">{children}</p>
+                  ),
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
               {streaming && (
                 <span className="inline-block w-0.5 h-4 bg-current ml-0.5 animate-pulse align-text-bottom" />
               )}
-            </p>
+            </div>
           )}
         </div>
 
