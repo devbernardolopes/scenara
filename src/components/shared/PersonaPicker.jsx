@@ -21,13 +21,13 @@ function PersonaPicker({ open, onClose, onSelect }) {
 
   useEffect(() => {
     if (!open) return
-    function handleMousedown(e) {
+    function handleClick(e) {
       if (ref.current && !ref.current.contains(e.target)) {
         onCloseRef.current()
       }
     }
-    document.addEventListener('mousedown', handleMousedown)
-    return () => document.removeEventListener('mousedown', handleMousedown)
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
   }, [open])
 
   useEffect(() => {
