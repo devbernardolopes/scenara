@@ -91,6 +91,7 @@
   "save": "Save",
   "cancel": "Cancel",
   "confirm": "Confirm",
+  "ok": "OK",
   "toast": {
     "dismiss": "Dismiss",
     "paused": "Paused",

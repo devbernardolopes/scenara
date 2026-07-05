@@ -129,6 +129,7 @@
     "empty": "Nenhuma persona ainda",
     "default": "Padrão"
   },
+  "ok": "OK",
   "saveDialog": {
     "title": "Alterações não salvas",
     "message": "Você tem alterações não salvas. O que deseja fazer?",

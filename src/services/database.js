@@ -9,6 +9,9 @@ export async function resetDatabase() {
   await db.uiState.clear()
   await db.messages.clear()
   await db.writingInstructions.clear()
+  await db.connectionProfiles.clear()
+  await db.inChatShortcuts.clear()
+  await db.promptHistory.clear()
 
   for (const setting of SETTINGS) {
     await db.settings.add({ key: setting.key, value: setting.default })
@@ -39,4 +42,8 @@ export async function resetDatabase() {
   window.dispatchEvent(
     new CustomEvent('writingInstructions-changed', { detail: { action: 'reset' } }),
   )
+  window.dispatchEvent(
+    new CustomEvent('connectionProfiles-changed', { detail: { action: 'reset' } }),
+  )
+  window.dispatchEvent(new CustomEvent('inChatShortcuts-changed', { detail: { action: 'reset' } }))
 }

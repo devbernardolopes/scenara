@@ -107,5 +107,6 @@
       "invalidFormat": "Ungültiges Dateiformat",
       "fileError": "Fehler beim Lesen der Datei"
     }
-  }
+  },
+  "ok": "OK"
 }

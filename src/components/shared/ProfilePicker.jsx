@@ -10,7 +10,14 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
   const ref = useRef(null)
 
   useEffect(() => {
-    getAllProfiles().then(setProfiles)
+    getAllProfiles().then((all) => {
+      setProfiles(
+        all.filter((p) => {
+          const provider = PROVIDERS.find((pr) => pr.id === p.providerId)
+          return !provider?.needsKey || p.keyId
+        }),
+      )
+    })
   }, [])
 
   useEffect(() => {
@@ -20,8 +27,8 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
         onClose()
       }
     }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
   }, [open, onClose])
 
   useEffect(() => {

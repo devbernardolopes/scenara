@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
+import { useConfirm } from '../../lib/confirm'
 import ModalShell from '../shared/ModalShell'
 import {
   PROVIDERS,
@@ -93,6 +94,7 @@ function ProfileFormModal({ profile }) {
   const { t } = useTranslation('settings')
   const { closeModal, setCloseGuard } = useModal()
   const { promptSave } = useSaveConfirm()
+  const { confirm } = useConfirm()
   const editing = Boolean(profile)
 
   const initialRef = useRef({
@@ -212,6 +214,14 @@ function ProfileFormModal({ profile }) {
 
   async function handleSave() {
     if (!form.name.trim() || !form.providerId || saving) return
+    if (selectedProvider?.needsKey && !form.keyId) {
+      await confirm({
+        title: t('api.profile.form.noKeyWarning.title'),
+        message: t('api.profile.form.noKeyWarning.message'),
+        confirmLabel: 'OK',
+        cancelLabel: t('cancel', { ns: 'common' }),
+      })
+    }
     await saveProfile()
     closeModal()
   }
