@@ -172,8 +172,9 @@ function ChatView() {
   }, [thread?.title])
 
   useLayoutEffect(() => {
+    if (messages.length === 0) return
     scrollCommits.current++
-    if (messages.length > 0 && scrollCommits.current === 1) {
+    if (scrollCommits.current === 1) {
       scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
     }
   }, [messages])
