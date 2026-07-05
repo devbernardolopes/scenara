@@ -167,6 +167,10 @@ function ChatView() {
     loadData()
   }, [threadId])
 
+  useEffect(() => {
+    document.title = thread?.title ? `Scenara - ${thread.title}` : 'Scenara'
+  }, [thread?.title])
+
   useLayoutEffect(() => {
     scrollCommits.current++
     if (messages.length > 0 && scrollCommits.current === 1) {
