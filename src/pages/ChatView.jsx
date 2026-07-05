@@ -90,6 +90,7 @@ function ChatView() {
   const autoTriggeredRef = useRef(false)
   const handleSendRef = useRef(null)
   const scrollCommits = useRef(0)
+  const scrollStickyCleanupRef = useRef(null)
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
@@ -163,6 +164,8 @@ function ChatView() {
   }
 
   useEffect(() => {
+    scrollStickyCleanupRef.current?.()
+    scrollStickyCleanupRef.current = null
     scrollCommits.current = 0
     loadData()
   }, [threadId])
@@ -175,7 +178,37 @@ function ChatView() {
     if (messages.length === 0) return
     scrollCommits.current++
     if (scrollCommits.current === 1) {
-      scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
+      const el = scrollRef.current
+      if (!el) return
+      el.scrollTo({ top: el.scrollHeight })
+
+      let sticking = true
+
+      const observer = new ResizeObserver(() => {
+        if (sticking) {
+          el.scrollTop = el.scrollHeight
+        }
+      })
+      observer.observe(el)
+
+      const settleTimer = setTimeout(() => {
+        sticking = false
+      }, 800)
+
+      function onUserScroll() {
+        sticking = false
+      }
+
+      el.addEventListener('wheel', onUserScroll, { passive: true })
+      el.addEventListener('touchmove', onUserScroll, { passive: true })
+
+      scrollStickyCleanupRef.current = () => {
+        sticking = false
+        observer.disconnect()
+        clearTimeout(settleTimer)
+        el.removeEventListener('wheel', onUserScroll)
+        el.removeEventListener('touchmove', onUserScroll)
+      }
     }
   }, [messages])
 
@@ -184,39 +217,6 @@ function ChatView() {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages])
-
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
-
-    let sticking = true
-
-    const observer = new ResizeObserver(() => {
-      if (sticking) {
-        el.scrollTop = el.scrollHeight
-      }
-    })
-    observer.observe(el)
-
-    const settleTimer = setTimeout(() => {
-      sticking = false
-    }, 800)
-
-    function onUserScroll() {
-      sticking = false
-    }
-
-    el.addEventListener('wheel', onUserScroll, { passive: true })
-    el.addEventListener('touchmove', onUserScroll, { passive: true })
-
-    return () => {
-      sticking = false
-      observer.disconnect()
-      clearTimeout(settleTimer)
-      el.removeEventListener('wheel', onUserScroll)
-      el.removeEventListener('touchmove', onUserScroll)
-    }
-  }, [threadId])
 
   useEffect(() => {
     setVisibleStartIndex((prev) => Math.min(prev, messages.length))
