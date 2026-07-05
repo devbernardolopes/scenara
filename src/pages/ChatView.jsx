@@ -383,13 +383,6 @@ function ChatView() {
 
       const isFirstMessage = messages.length === 0
 
-      if (isFirstMessage && !text && !character?.firstMessage) {
-        generatingRef.current = false
-        setGenerating(false)
-        stopGenerating(threadId)
-        return
-      }
-
       if (text) {
         await createMessage(threadId, 'user', text, personaId, isOOC)
         currentMsgs = await getMessagesByThread(threadId)
