@@ -74,6 +74,7 @@ function StartChatButton({ character, onStart }) {
 function CharacterDiscovery() {
   const { t } = useTranslation('common')
   const navigate = useNavigate()
+  const { openModal } = useModal()
 
   useEffect(() => {
     document.title = 'Scenara'
