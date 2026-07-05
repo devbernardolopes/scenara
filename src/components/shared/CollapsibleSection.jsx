@@ -2,7 +2,14 @@ import { useState, useEffect, useRef } from 'react'
 import { getUIState, setUIState } from '../../services/uiState'
 import { ChevronDown } from '../../lib/icons'
 
-function CollapsibleSection({ label, summary, hasContent, storageKey, defaultExpanded = true, children }) {
+function CollapsibleSection({
+  label,
+  summary,
+  hasContent,
+  storageKey,
+  defaultExpanded = true,
+  children,
+}) {
   const [open, setOpen] = useState(defaultExpanded)
   const contentRef = useRef(null)
   const [contentHeight, setContentHeight] = useState(0)
@@ -42,12 +49,14 @@ function CollapsibleSection({ label, summary, hasContent, storageKey, defaultExp
         onClick={toggle}
         className="w-full flex items-center justify-between min-h-[44px] px-3 py-2 rounded-md hover:bg-surface-hover gap-2"
       >
-        <span className={`text-sm font-medium ${hasContent ? 'text-primary' : 'text-text'}`}>
+        <span className={`text-sm font-medium ${hasContent ? 'text-highlight' : 'text-text'}`}>
           {label}
         </span>
         <span className="flex items-center gap-2">
           {summary && <span className="text-xs text-tertiary">{summary}</span>}
-          <ChevronDown className={`w-4 h-4 text-tertiary transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown
+            className={`w-4 h-4 text-tertiary transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          />
         </span>
       </button>
       <div
