@@ -732,6 +732,8 @@ function ChatView() {
                   onRegenerate={handleRegenerate}
                   onSpeak={() => {}}
                   generating={generating}
+                  charName={character?.name || ''}
+                  personaName={personaMap[thread?.personaId]?.name || ''}
                 />
               )
             })}

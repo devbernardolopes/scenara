@@ -149,10 +149,14 @@ function CharacterCreateModal({ character: existing, initialData }) {
   async function saveCharacter() {
     setSaving(true)
     try {
+      const data = {
+        ...form,
+        initialMessages: (form.initialMessages || []).filter((m) => m.content?.trim()),
+      }
       if (isEditing) {
-        await updateCharacter(existing.id, form)
+        await updateCharacter(existing.id, data)
       } else {
-        await createCharacter(form)
+        await createCharacter(data)
       }
     } finally {
       setSaving(false)

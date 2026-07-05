@@ -115,7 +115,13 @@ function MessageBubble({
   onRegenerate,
   onSpeak,
   generating,
+  charName,
+  personaName,
 }) {
+  function renderContent(text) {
+    if (!text) return text
+    return text.replace(/{{char}}/g, charName || '').replace(/{{user}}/g, personaName || '')
+  }
   const { t } = useTranslation('chat')
   const { openModal } = useModal()
   const [editing, setEditing] = useState(false)
@@ -187,7 +193,7 @@ function MessageBubble({
   const isSystem = role === 'system'
   const isAssistantOrSystem = role === 'assistant' || role === 'system'
   const avatarSize = AVATAR_SIZE_MAP[avatarScale] || 'sm'
-  const tokenCount = estimateTokens(message.content)
+  const tokenCount = estimateTokens(displayContent)
   const persona = personaMap?.[message.personaId]
   const personaColor = persona?.color
   const isOOC = message.isOOC
@@ -212,9 +218,11 @@ function MessageBubble({
     if (avatarSrc) openModal('imageViewer', { src: avatarSrc, modalSize: 'fullscreen' })
   }
 
+  const displayContent = renderContent(message.content)
+
   function handleCopy() {
     navigator.clipboard
-      .writeText(message.content)
+      .writeText(displayContent)
       .then(() => showToast(t('messageCopied'), { type: 'success' }))
       .catch(() => {})
   }
@@ -488,7 +496,7 @@ function MessageBubble({
                   ),
                 }}
               >
-                {message.content}
+                {displayContent}
               </ReactMarkdown>
               {streaming && (
                 <span className="inline-block w-0.5 h-4 bg-current ml-0.5 animate-pulse align-text-bottom" />

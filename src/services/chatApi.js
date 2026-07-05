@@ -74,7 +74,7 @@ export async function buildMessagesPayload({
     }
   } else {
     for (const msg of messages) {
-      result.push({ role: msg.role, content: msg.content })
+      result.push({ role: msg.role, content: replaceVarsIn(msg.content) })
     }
 
     const lastMsg = messages[messages.length - 1]
