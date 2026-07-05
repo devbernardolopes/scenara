@@ -186,6 +186,39 @@ function ChatView() {
   }, [messages])
 
   useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    let sticking = true
+
+    const observer = new ResizeObserver(() => {
+      if (sticking) {
+        el.scrollTop = el.scrollHeight
+      }
+    })
+    observer.observe(el)
+
+    const settleTimer = setTimeout(() => {
+      sticking = false
+    }, 800)
+
+    function onUserScroll() {
+      sticking = false
+    }
+
+    el.addEventListener('wheel', onUserScroll, { passive: true })
+    el.addEventListener('touchmove', onUserScroll, { passive: true })
+
+    return () => {
+      sticking = false
+      observer.disconnect()
+      clearTimeout(settleTimer)
+      el.removeEventListener('wheel', onUserScroll)
+      el.removeEventListener('touchmove', onUserScroll)
+    }
+  }, [threadId])
+
+  useEffect(() => {
     setVisibleStartIndex((prev) => Math.min(prev, messages.length))
   }, [messages])
 
