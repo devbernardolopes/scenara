@@ -38,7 +38,15 @@ export const SETTINGS = [
     category: 'appearance',
     type: 'select',
     default: 'light',
-    options: ['light', 'dark', 'sepia', 'pastel', 'high-contrast'],
+    options: [
+      'light',
+      'dark',
+      'sepia',
+      'pastel',
+      'high-contrast',
+      'high-contrast-dark',
+      'terminal',
+    ],
     labelKey: 'settings:appearance.theme.label',
     descKey: 'settings:appearance.theme.desc',
     optionLabels: {
@@ -47,6 +55,8 @@ export const SETTINGS = [
       sepia: 'settings:themeOptions.sepia',
       pastel: 'settings:themeOptions.pastel',
       'high-contrast': 'settings:themeOptions.highContrast',
+      'high-contrast-dark': 'settings:themeOptions.highContrastDark',
+      terminal: 'settings:themeOptions.terminal',
     },
   },
   {

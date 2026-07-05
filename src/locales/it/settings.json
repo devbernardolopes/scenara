@@ -95,7 +95,9 @@
     "dark": "Scuro",
     "sepia": "Seppia",
     "pastel": "Pastello",
-    "highContrast": "Alto Contrasto"
+    "highContrast": "Alto Contrasto",
+    "highContrastDark": "Alto Contrasto Scuro",
+    "terminal": "Terminale"
   },
   "api": {
     "activeProvider": {

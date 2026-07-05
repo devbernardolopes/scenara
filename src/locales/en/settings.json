@@ -128,7 +128,9 @@
     "dark": "Dark",
     "sepia": "Sepia",
     "pastel": "Pastel",
-    "highContrast": "High Contrast"
+    "highContrast": "High Contrast",
+    "highContrastDark": "High Contrast Dark",
+    "terminal": "Terminal"
   },
   "api": {
     "activeProvider": {
