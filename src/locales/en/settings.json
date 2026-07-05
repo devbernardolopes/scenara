@@ -14,7 +14,8 @@
   },
   "groups": {
     "assistantButtons": "Assistant/System Message Bubbles Buttons",
-    "userButtons": "User Message Bubbles Buttons"
+    "userButtons": "User Message Bubbles Buttons",
+    "apiRequestSectionHeaders": "API Request Section Headers"
   },
   "appearance": {
     "theme": {
@@ -356,6 +357,23 @@
     "continuePrompt": {
       "label": "CONTINUE Prompt",
       "desc": "Prompt template for continue generation."
+    },
+    "apiRequestSectionHeaders": {
+      "characterPrompt": {
+        "label": "Character Prompt"
+      },
+      "messages": {
+        "label": "Messages"
+      },
+      "memories": {
+        "label": "Memories"
+      },
+      "memoryEntry": {
+        "label": "Memory Entry"
+      },
+      "loreContext": {
+        "label": "Lore Context"
+      }
     }
   },
   "toastPositionOptions": {

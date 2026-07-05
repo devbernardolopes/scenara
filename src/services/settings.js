@@ -29,6 +29,7 @@ export const CATEGORIES = [
 export const GROUPS = [
   { key: 'assistantButtons', labelKey: 'settings:groups.assistantButtons' },
   { key: 'userButtons', labelKey: 'settings:groups.userButtons' },
+  { key: 'apiRequestSectionHeaders', labelKey: 'settings:groups.apiRequestSectionHeaders' },
 ]
 
 export const SETTINGS = [
@@ -705,6 +706,46 @@ export const SETTINGS = [
     props: { rows: 6, collapsible: true, summary: 'tokens' },
     labelKey: 'settings:prompting.continuePrompt.label',
     descKey: 'settings:prompting.continuePrompt.desc',
+  },
+  {
+    key: 'prompting.apiRequestSectionHeaders.characterPrompt',
+    category: 'prompting',
+    type: 'text',
+    default: 'Description:',
+    group: 'apiRequestSectionHeaders',
+    labelKey: 'settings:prompting.apiRequestSectionHeaders.characterPrompt.label',
+  },
+  {
+    key: 'prompting.apiRequestSectionHeaders.messages',
+    category: 'prompting',
+    type: 'text',
+    default: 'Messages:',
+    group: 'apiRequestSectionHeaders',
+    labelKey: 'settings:prompting.apiRequestSectionHeaders.messages.label',
+  },
+  {
+    key: 'prompting.apiRequestSectionHeaders.memories',
+    category: 'prompting',
+    type: 'text',
+    default: 'Memories:',
+    group: 'apiRequestSectionHeaders',
+    labelKey: 'settings:prompting.apiRequestSectionHeaders.memories.label',
+  },
+  {
+    key: 'prompting.apiRequestSectionHeaders.memoryEntry',
+    category: 'prompting',
+    type: 'text',
+    default: 'Memory Level {{level}} Entry {{slot}}:',
+    group: 'apiRequestSectionHeaders',
+    labelKey: 'settings:prompting.apiRequestSectionHeaders.memoryEntry.label',
+  },
+  {
+    key: 'prompting.apiRequestSectionHeaders.loreContext',
+    category: 'prompting',
+    type: 'text',
+    default: 'Lore:',
+    group: 'apiRequestSectionHeaders',
+    labelKey: 'settings:prompting.apiRequestSectionHeaders.loreContext.label',
   },
 ]
 
