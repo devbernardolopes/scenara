@@ -169,6 +169,7 @@ function ChatView() {
     scrollStickyCleanupRef.current = null
     prevMessagesLengthRef.current = 0
     scrollCommits.current = 0
+    setShowScrollButton(false)
     loadData()
   }, [threadId])
 
