@@ -30,7 +30,7 @@
   "showPrompt": "Afficher le prompt",
   "cancel": "Annuler",
   "messageDeleteTitle": "Supprimer le message",
-  "messageDeleteConfirm": "Supprimer le message #{{number}} et tous les messages suivants ?",
+  "messageDeleteConfirm": "Supprimer le message #{{number}} ?",
   "tokens": "~{{count}} tokens",
   "edited": "(modifié)",
   "messageCopied": "Message copié",

@@ -35,7 +35,7 @@
   "showPrompt": "Mostrar prompt",
   "cancel": "Cancelar",
   "messageDeleteTitle": "Excluir mensagem",
-  "messageDeleteConfirm": "Excluir mensagem #{{number}} e todas as mensagens seguintes?",
+  "messageDeleteConfirm": "Excluir mensagem #{{number}}?",
   "tokens": "~{{count}} tokens",
   "edited": "(editado)",
   "messageCopied": "Mensagem copiada",

@@ -37,7 +37,7 @@
   "showPrompt": "Show prompt",
   "cancel": "Cancel",
   "messageDeleteTitle": "Delete message",
-  "messageDeleteConfirm": "Delete message #{{number}} and all messages after it?",
+  "messageDeleteConfirm": "Delete message #{{number}}?",
   "tokens": "~{{count}} tokens",
   "edited": "(edited)",
   "messageCopied": "Message copied",

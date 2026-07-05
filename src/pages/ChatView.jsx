@@ -17,7 +17,7 @@ import {
   createMessage,
   createAssistantMessage,
   updateMessage,
-  deleteMessagesFrom,
+  deleteMessage,
 } from '../services/messages'
 import { getWritingInstruction } from '../services/writingInstructions'
 import { getEffectiveProfileFor } from '../services/connectionProfiles'
@@ -640,7 +640,7 @@ function ChatView() {
       showToast(t('messageDeleted'), { type: 'success' })
       return
     }
-    await deleteMessagesFrom(id)
+    await deleteMessage(id)
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
     showToast(t('messageDeleted'), { type: 'success' })
