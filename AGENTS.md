@@ -54,15 +54,20 @@ registerModal('personaEditor', PersonaEditorModal)
 All data lives in the browser via IndexedDB. Dexie.js is the only persistence layer — no backend.
 
 - `src/db.js` — single `new Dexie('scenara')` instance
-- Schema (version 1):
+- Schema (version 10):
 
-| Table        | Primary Key | Indexes                             |
-|--------------|-------------|-------------------------------------|
-| `threads`    | `++id`      | `title`, `characterId`, `updatedAt` |
-| `characters` | `++id`      | `name`, `createdAt`                 |
-| `personas`   | `++id`      | `name`, `createdAt`                 |
-| `settings`   | `++id`      | `key`                               |
-| `uiState`    | `++id`      | `key`                               |
+| Table                 | Primary Key | Indexes                                                                        |
+| --------------------- | ----------- | ------------------------------------------------------------------------------ |
+| `threads`             | `++id`      | `title`, `characterId`, `personaId`, `updatedAt`, `isFavorite`, `threadNumber` |
+| `characters`          | `++id`      | `name`, `createdAt`, `updatedAt`, `characterNumber`                            |
+| `personas`            | `++id`      | `name`, `title`, `createdAt`, `isDefault`                                      |
+| `settings`            | `++id`      | `key`                                                                          |
+| `uiState`             | `++id`      | `key`                                                                          |
+| `messages`            | `++id`      | `threadId`, `role`, `personaId`, `createdAt`                                   |
+| `writingInstructions` | `++id`      | `name`, `createdAt`                                                            |
+| `connectionProfiles`  | `++id`      | `name`, `createdAt`                                                            |
+| `inChatShortcuts`     | `++id`      | `name`, `createdAt`                                                            |
+| `promptHistory`       | `++id`      | `threadId`, `createdAt`                                                        |
 
 - **`settings`** — user preferences (theme, language, API config). Persistent, import/exportable.
 - **`uiState`** — transient UI state (collapse/expand, scroll positions). Never exported. Queried via `src/services/uiState.js`.
@@ -77,16 +82,13 @@ src/
     shared/       — CollapsibleSection, future reusable primitives
     shell/        — ShellLayout, Sidebar, TopBar
     modals/
-      settings/   — SettingsModal, SettingsSidebar, SettingRow, controls
-      SettingsModal.jsx, CharacterCreateModal.jsx, PersonaEditorModal.jsx
+      settings/   — feature subfolder for modals with multiple sub-components (SettingsSidebar, SettingRow, controls)
+      character/  — feature subfolder for character creation sub-panels (CharacterSection, CharacterSidebar, etc.)
+      *.jsx       — flat modal components, one file per modal
   pages/          — CharacterDiscovery, ChatView (route-level, no business logic)
-  lib/
-    i18n.js       — i18next initialization with static JSON imports
-    modal.jsx     — ModalContext, ModalProvider, registerModal
-  services/
-    settings.js   — SETTINGS + CATEGORIES config, getSetting, setSetting (with effects)
-    uiState.js    — getUIState / setUIState for transient UI persistence
-  hooks/          — useModal, useTheme, useLocale
+  lib/            — shared utilities: modal context, i18n init, icons, toast, confirm, download. No JSX components with state.
+  services/       — one file per domain concern: chat API calls, message CRUD, settings, threads, characters, personas, etc. No business logic outside this folder.
+  hooks/          — React hooks (useModal, useTheme, useLocale, usePersistedState).
   locales/
     en/           — common.json, chat.json, settings.json, characterCreation.json
     pt-BR/        — same namespaces (EFIGS + pt-BR supported)
@@ -103,37 +105,37 @@ All visual properties are defined as CSS custom properties in `src/styles/tokens
 
 ### Available utility classes
 
-| Token                    | Utility class                    |
-|--------------------------|----------------------------------|
-| Primary background       | `bg-primary`                     |
-| Primary hover            | `hover:bg-primary-hover`         |
-| Primary subtle bg        | `bg-primary-subtle`              |
-| Primary text             | `text-primary`                   |
-| Text on primary bg       | `text-on-primary`                |
-| Surface background       | `bg-surface`                     |
-| Surface secondary bg     | `bg-surface-secondary`           |
-| Surface hover            | `hover:bg-surface-hover`         |
-| Primary text             | `text-text`                      |
-| Secondary text           | `text-secondary`                 |
-| Tertiary text            | `text-tertiary`                  |
-| Default border           | `border-border`                  |
-| Light border             | `border-border-light`            |
-| Backdrop overlay         | `bg-overlay`                     |
-| Success / Warning / Error| `text-success`, `bg-warning` etc.|
-| Accent                   | `text-accent`, `bg-accent`       |
-| Theme-aware shadows      | `shadow-surface-sm/md/lg`        |
+| Token                     | Utility class                     |
+| ------------------------- | --------------------------------- |
+| Primary background        | `bg-primary`                      |
+| Primary hover             | `hover:bg-primary-hover`          |
+| Primary subtle bg         | `bg-primary-subtle`               |
+| Primary text              | `text-primary`                    |
+| Text on primary bg        | `text-on-primary`                 |
+| Surface background        | `bg-surface`                      |
+| Surface secondary bg      | `bg-surface-secondary`            |
+| Surface hover             | `hover:bg-surface-hover`          |
+| Primary text              | `text-text`                       |
+| Secondary text            | `text-secondary`                  |
+| Tertiary text             | `text-tertiary`                   |
+| Default border            | `border-border`                   |
+| Light border              | `border-border-light`             |
+| Backdrop overlay          | `bg-overlay`                      |
+| Success / Warning / Error | `text-success`, `bg-warning` etc. |
+| Accent                    | `text-accent`, `bg-accent`        |
+| Theme-aware shadows       | `shadow-surface-sm/md/lg`         |
 
 Spacing, typography, and radius use Tailwind's built-in classes (`p-4`, `text-sm`, `rounded-lg`). Do not create custom tokens for these.
 
 ### Available themes
 
-| Class                  | Description    |
-|------------------------|----------------|
-| (none, default)        | Light          |
-| `theme-dark`           | Dark           |
-| `theme-sepia`          | Sepia          |
-| `theme-pastel`         | Pastel         |
-| `theme-high-contrast`  | High Contrast  |
+| Class                 | Description   |
+| --------------------- | ------------- |
+| (none, default)       | Light         |
+| `theme-dark`          | Dark          |
+| `theme-sepia`         | Sepia         |
+| `theme-pastel`        | Pastel        |
+| `theme-high-contrast` | High Contrast |
 
 Switch themes via `useTheme()`:
 
@@ -159,12 +161,12 @@ setTheme('dark')
 
 All UI strings live in `src/locales/{lang}/{namespace}.json`. Each language has the same set of namespaces:
 
-| Namespace          | Scope                                                   |
-|--------------------|---------------------------------------------------------|
-| `common`           | Sidebar, TopBar, Discovery, modals, shared labels       |
-| `settings`         | Settings modal, categories, setting labels/descriptions |
-| `chat`             | Chat view, message UI                                   |
-| `characterCreation`| Character and persona creation forms                    |
+| Namespace           | Scope                                                   |
+| ------------------- | ------------------------------------------------------- |
+| `common`            | Sidebar, TopBar, Discovery, modals, shared labels       |
+| `settings`          | Settings modal, categories, setting labels/descriptions |
+| `chat`              | Chat view, message UI                                   |
+| `characterCreation` | Character and persona creation forms                    |
 
 **Usage in components:**
 
@@ -205,13 +207,13 @@ Effects ensure that persistence and application are always paired — whether th
 
 The settings modal (`components/modals/settings/`) renders from these config arrays — no JSX duplication per setting. The control type is driven by `setting.type`:
 
-| `type`     | Component          | Props passthrough                               |
-|------------|--------------------|-------------------------------------------------|
-| `select`   | `SettingSelect`    | `options`, `optionLabels`                       |
-| `toggle`   | `SettingToggle`    | —                                               |
-| `slider`   | `SettingSlider`    | `min`, `max`, `step`                            |
-| `text`     | `SettingInput`     | `placeholder`, `type`                           |
-| `textarea` | `SettingTextarea`  | `rows`, `placeholder`, `collapsible`, `summary` |
+| `type`     | Component         | Props passthrough                               |
+| ---------- | ----------------- | ----------------------------------------------- |
+| `select`   | `SettingSelect`   | `options`, `optionLabels`                       |
+| `toggle`   | `SettingToggle`   | —                                               |
+| `slider`   | `SettingSlider`   | `min`, `max`, `step`                            |
+| `text`     | `SettingInput`    | `placeholder`, `type`                           |
+| `textarea` | `SettingTextarea` | `rows`, `placeholder`, `collapsible`, `summary` |
 
 The `props` field on a setting config is spread onto the control component. This keeps controls generic and the config declarative.
 
@@ -305,13 +307,3 @@ The `ModalProvider` wraps every modal in `<Suspense>`, so no additional setup is
 ## Commit Convention
 
 When there are changes to commit, AI agents should suggest a commit message at the end of their response following conventional commit format: `type(scope): description`. Use types like `feat`, `fix`, `refactor`, `docs`, `chore` and keep descriptions concise but descriptive — focus on the "why" rather than the "what".
-
-## Deployment
-
-`vercel.json` rewrites all routes to `/index.html` for SPA client-side routing:
-
-```json
-{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
-```
-
-Build command: `npm run build` → outputs to `dist/`.
