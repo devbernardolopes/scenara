@@ -491,6 +491,14 @@ export const SETTINGS = [
     descKey: 'settings:prompting.summarizationUser.desc',
   },
   {
+    key: 'prompting.oocDelimiters',
+    category: 'prompting',
+    type: 'oocDelimiters',
+    default: { enabled: false, left: '((OOC: ', right: '))' },
+    labelKey: 'settings:prompting.oocDelimiters.label',
+    descKey: 'settings:prompting.oocDelimiters.desc',
+  },
+  {
     key: 'prompting.oocSystem',
     category: 'prompting',
     type: 'textarea',
@@ -498,6 +506,19 @@ export const SETTINGS = [
     props: { rows: 6, collapsible: true, summary: 'tokens' },
     labelKey: 'settings:prompting.oocSystem.label',
     descKey: 'settings:prompting.oocSystem.desc',
+  },
+  {
+    key: 'prompting.oocMessageRole',
+    category: 'prompting',
+    type: 'select',
+    default: 'system',
+    options: ['system', 'assistant'],
+    labelKey: 'settings:prompting.oocMessageRole.label',
+    descKey: 'settings:prompting.oocMessageRole.desc',
+    optionLabels: {
+      system: 'settings:prompting.oocMessageRoleOptions.system',
+      assistant: 'settings:prompting.oocMessageRoleOptions.assistant',
+    },
   },
   {
     key: 'prompting.oocUser',
@@ -516,19 +537,6 @@ export const SETTINGS = [
     props: { rows: 6, collapsible: true, summary: 'tokens' },
     labelKey: 'settings:prompting.personaInjectionTemplate.label',
     descKey: 'settings:prompting.personaInjectionTemplate.desc',
-  },
-  {
-    key: 'prompting.oocMessageRole',
-    category: 'prompting',
-    type: 'select',
-    default: 'system',
-    options: ['system', 'assistant'],
-    labelKey: 'settings:prompting.oocMessageRole.label',
-    descKey: 'settings:prompting.oocMessageRole.desc',
-    optionLabels: {
-      system: 'settings:prompting.oocMessageRoleOptions.system',
-      assistant: 'settings:prompting.oocMessageRoleOptions.assistant',
-    },
   },
   {
     key: 'prompting.systemRolePrefix',

@@ -273,9 +273,14 @@
       "label": "USER Summarization Instructions",
       "desc": "User prompt for summarization."
     },
+    "oocDelimiters": {
+      "label": "Use OOC Delimiters",
+      "desc": "Enable custom delimiters to mark out-of-character messages.",
+      "contentLabel": "OOC Content"
+    },
     "oocSystem": {
-      "label": "SYSTEM OOC Instructions",
-      "desc": "System prompt for out-of-character responses."
+      "label": "AI OOC Instructions",
+      "desc": "Instructions for the AI on how to handle out-of-character requests."
     },
     "oocUser": {
       "label": "USER OOC Instructions",
@@ -286,7 +291,7 @@
       "desc": "Template for injecting persona context into prompts."
     },
     "oocMessageRole": {
-      "label": "OOC Message Role",
+      "label": "AI OOC Message Role",
       "desc": "Role assigned to out-of-character messages."
     },
     "oocMessageRoleOptions": {
