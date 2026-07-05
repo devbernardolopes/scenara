@@ -54,6 +54,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
   const [quickSettings, setQuickSettings] = useState(DEFAULT_QUICK_SETTINGS)
   const [promptHistoryOpen, setPromptHistoryOpen] = useState(false)
   const [promptHistory, setPromptHistory] = useState([])
+  const [personaColorMap, setPersonaColorMap] = useState({})
   const [ready, setReady] = useState(false)
 
   const storageKey = `${STORAGE_PREFIX}${threadId}`
@@ -166,6 +167,23 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
   }, [promptHistoryOpen, threadId])
 
   useEffect(() => {
+    async function load() {
+      const all = await getAllPersonas()
+      const map = {}
+      all.forEach((p) => {
+        map[p.id] = p.color
+      })
+      setPersonaColorMap(map)
+    }
+    load()
+    function handler() {
+      load()
+    }
+    window.addEventListener('personas-changed', handler)
+    return () => window.removeEventListener('personas-changed', handler)
+  }, [])
+
+  useEffect(() => {
     if (!promptHistoryOpen && !quickSettingsOpen) return
     function handleClick(e) {
       if (promptHistoryOpen) {
@@ -207,7 +225,25 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
       return
     }
     const text = inputValue
-    onSend?.(text, selectedPersona?.id, oocActive, quickSettings.autoReply)
+    const trimmed = text.trim()
+    const lower = trimmed.toLowerCase()
+    const isCommand = ['/ai', '/mem', '/ooc', '/image'].includes(lower)
+
+    if (isCommand) {
+      db.promptHistory.add({
+        threadId: Number(threadId),
+        content: text,
+        personaId: selectedPersona?.id || null,
+        isCommand: true,
+        createdAt: new Date(),
+      })
+      if (lower === '/ai') {
+        onSend?.('', selectedPersona?.id, oocActive, quickSettings.autoReply)
+      }
+    } else {
+      onSend?.(text, selectedPersona?.id, oocActive, quickSettings.autoReply)
+    }
+
     setInputValue('')
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
     persistNow({ inputValue: '' })
@@ -237,35 +273,51 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
                 {t('promptHistory.empty')}
               </p>
             ) : (
-              promptHistory.map((entry) => (
-                <button
-                  key={entry.id}
-                  type="button"
-                  className="w-full text-left px-3 py-2 text-sm text-text hover:bg-surface-hover border-b border-border-light last:border-0 min-h-[44px]"
-                  onClick={() => {
-                    setInputValue(entry.content)
-                    setPromptHistoryOpen(false)
-                    requestAnimationFrame(() => {
-                      textareaRef.current?.focus()
-                      if (textareaRef.current) autoResize(textareaRef.current)
-                    })
-                  }}
-                  onDoubleClick={() => {
-                    setInputValue(entry.content)
-                    setPromptHistoryOpen(false)
-                    onSend?.(entry.content, selectedPersona?.id, oocActive, quickSettings.autoReply)
-                    persistNow({ inputValue: '' })
-                  }}
-                >
-                  <span className="line-clamp-2 break-words">{entry.content}</span>
-                  <span className="text-xs text-tertiary mt-0.5 block">
-                    {new Date(entry.createdAt).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
-                </button>
-              ))
+              promptHistory.map((entry) => {
+                const pc =
+                  !entry.isCommand && entry.personaId ? personaColorMap[entry.personaId] : null
+                return (
+                  <button
+                    key={entry.id}
+                    type="button"
+                    className={`w-full text-left px-3 py-2 text-sm text-text border-b border-border-light last:border-0 min-h-[44px] ${
+                      entry.isCommand ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-surface-hover'
+                    }`}
+                    style={pc ? { backgroundColor: pc + '18' } : undefined}
+                    onClick={() => {
+                      setInputValue(entry.content)
+                      setPromptHistoryOpen(false)
+                      requestAnimationFrame(() => {
+                        textareaRef.current?.focus()
+                        if (textareaRef.current) autoResize(textareaRef.current)
+                      })
+                    }}
+                    onDoubleClick={() => {
+                      setInputValue(entry.content)
+                      setPromptHistoryOpen(false)
+                      if (entry.isCommand && entry.content.trim().toLowerCase() === '/ai') {
+                        onSend?.('', selectedPersona?.id, oocActive, quickSettings.autoReply)
+                      } else {
+                        onSend?.(
+                          entry.content,
+                          selectedPersona?.id,
+                          oocActive,
+                          quickSettings.autoReply,
+                        )
+                      }
+                      persistNow({ inputValue: '' })
+                    }}
+                  >
+                    <span className="line-clamp-2 break-words">{entry.content}</span>
+                    <span className="text-xs text-tertiary mt-0.5 block">
+                      {new Date(entry.createdAt).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </button>
+                )
+              })
             )}
             <p className="px-3 py-1.5 text-xs text-tertiary text-center border-t border-border sticky bottom-0 bg-surface">
               {t('promptHistory.hint')}

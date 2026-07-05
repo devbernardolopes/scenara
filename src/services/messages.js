@@ -18,6 +18,7 @@ export async function createMessage(threadId, role, content, personaId, isOOC = 
     await db.promptHistory.add({
       threadId: Number(threadId),
       content,
+      personaId: personaId || null,
       createdAt: new Date(),
     })
   }
