@@ -91,6 +91,7 @@ function ChatView() {
   const handleSendRef = useRef(null)
   const scrollCommits = useRef(0)
   const scrollStickyCleanupRef = useRef(null)
+  const prevMessagesLengthRef = useRef(0)
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
@@ -166,6 +167,7 @@ function ChatView() {
   useEffect(() => {
     scrollStickyCleanupRef.current?.()
     scrollStickyCleanupRef.current = null
+    prevMessagesLengthRef.current = 0
     scrollCommits.current = 0
     loadData()
   }, [threadId])
@@ -176,6 +178,12 @@ function ChatView() {
 
   useLayoutEffect(() => {
     if (messages.length === 0) return
+
+    const grew = messages.length > prevMessagesLengthRef.current
+    prevMessagesLengthRef.current = messages.length
+
+    if (!grew && scrollCommits.current > 0) return
+
     scrollCommits.current++
     if (scrollCommits.current === 1) {
       const el = scrollRef.current
