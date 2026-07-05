@@ -162,6 +162,7 @@ function ApiSettingsPanel() {
             key={provider.id}
             label={t(provider.nameKey.replace('settings:', ''))}
             summary={t(provider.descKey.replace('settings:', ''))}
+            hasContent={false}
             storageKey={`apiSection.${provider.id}`}
           >
             <div className="space-y-4 pt-2">

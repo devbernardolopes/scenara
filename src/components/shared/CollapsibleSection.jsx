@@ -49,7 +49,9 @@ function CollapsibleSection({
         onClick={toggle}
         className="w-full flex items-center justify-between min-h-[44px] px-3 py-2 rounded-md hover:bg-surface-hover gap-2"
       >
-        <span className={`text-sm font-medium ${hasContent ? 'text-highlight' : 'text-text'}`}>
+        <span
+          className={`text-sm font-medium ${(hasContent ?? !!summary) ? 'text-highlight' : 'text-text'}`}
+        >
           {label}
         </span>
         <span className="flex items-center gap-2">
