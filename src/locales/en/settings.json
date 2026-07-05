@@ -204,12 +204,11 @@
       },
       "add": "Add",
       "maxStopItems": "Limit reached",
-        "addStopItem": "Type and press Enter"
-      },
-      "noKeyWarning": {
-        "title": "No API Key",
-        "message": "This profile won't be able to be assigned to any chat request type while an API key is not provided."
-      }
+      "addStopItem": "Type and press Enter"
+    },
+    "noKeyWarning": {
+      "title": "No API Key",
+      "message": "This profile won't be able to be assigned to any chat request type while an API key is not provided."
     },
     "deleteKeyConfirm": {
       "title": "Delete API Key",
