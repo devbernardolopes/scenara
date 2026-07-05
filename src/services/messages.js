@@ -26,13 +26,13 @@ export async function createMessage(threadId, role, content, personaId, isOOC = 
   return id
 }
 
-export async function createAssistantMessage(threadId, content, createdAt) {
+export async function createAssistantMessage(threadId, content, createdAt, isOOC = false) {
   const id = await db.messages.add({
     threadId: Number(threadId),
     role: 'assistant',
     content,
     personaId: null,
-    isOOC: false,
+    isOOC: !!isOOC,
     createdAt: createdAt || new Date(),
   })
   await updateThreadTimestamp(threadId)

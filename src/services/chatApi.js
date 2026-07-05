@@ -98,6 +98,155 @@ export function getActiveParams(profile) {
   )
 }
 
+export function buildTranscript({
+  messages,
+  personaName,
+  currentPersonaName,
+  includeOOCOverride,
+  userPersonaPrefixOverride,
+  personaMap,
+  rolePrefixes,
+}) {
+  const {
+    systemRolePrefix,
+    assistantRolePrefix,
+    userRolePrefix,
+    userRolePrefixWithPersona,
+    systemRolePrefixOoc,
+    assistantRolePrefixOoc,
+    userRolePrefixOoc,
+  } = rolePrefixes
+
+  const lines = []
+
+  for (const msg of messages) {
+    if (msg.isOOC && !includeOOCOverride) continue
+
+    let prefix = ''
+
+    if (msg.isOOC) {
+      switch (msg.role) {
+        case 'system':
+          prefix = systemRolePrefixOoc || '[SYSTEM in OOC]:'
+          break
+        case 'assistant':
+          prefix = assistantRolePrefixOoc || '[ASSISTANT in OOC]:'
+          break
+        case 'user':
+          prefix = userRolePrefixOoc || '[USER in OOC]:'
+          break
+      }
+    } else {
+      switch (msg.role) {
+        case 'system':
+          prefix = systemRolePrefix || '[SYSTEM]:'
+          break
+        case 'assistant':
+          prefix = assistantRolePrefix || '[ASSISTANT]:'
+          break
+        case 'user':
+          if (userPersonaPrefixOverride && msg.personaId) {
+            const pName = personaMap?.[msg.personaId]?.name || currentPersonaName || personaName
+            prefix = (userRolePrefixWithPersona || '[USER as {{name}}]:')
+              .replace(/{{name}}/g, pName)
+              .replace(/{{persona_name}}/g, pName)
+          } else {
+            prefix = userRolePrefix || '[USER]:'
+          }
+          break
+      }
+    }
+
+    if (prefix && !prefix.endsWith(' ')) prefix += ' '
+
+    lines.push(prefix + (msg.content || ''))
+  }
+
+  return lines.join('\n\n')
+}
+
+export async function buildOOCMessagesPayload({
+  character,
+  chatPersona,
+  currentPersona,
+  messages,
+  oocSettings,
+  userMessage,
+  personaMap,
+}) {
+  const charName = character?.name || ''
+  const personaName = chatPersona?.name || ''
+  const currentPersonaName = currentPersona?.name || personaName
+  const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
+
+  const systemParts = []
+
+  const oocSystemInstr = oocSettings.oocSystemInstructions
+  if (oocSystemInstr) {
+    systemParts.push(replaceVarsIn(oocSystemInstr))
+  }
+
+  const prompt = replaceVarsIn(character?.prompt)
+  if (prompt) {
+    const charPromptHeader = oocSettings.characterPromptHeader
+    if (charPromptHeader) {
+      systemParts.push(replaceVarsIn(charPromptHeader) + '\n\n' + prompt)
+    } else {
+      systemParts.push(prompt)
+    }
+  }
+
+  const includeOOCOverride = character?.includeOOC === false ? false : true
+  const userPersonaPrefixOverride = character?.userPersonaPrefix === false ? false : true
+
+  if (messages.length > 0) {
+    const messagesHeader = oocSettings.messagesHeader
+    const transcript = buildTranscript({
+      messages,
+      personaName,
+      currentPersonaName,
+      includeOOCOverride,
+      userPersonaPrefixOverride,
+      personaMap,
+      rolePrefixes: {
+        systemRolePrefix: oocSettings.systemRolePrefix,
+        assistantRolePrefix: oocSettings.assistantRolePrefix,
+        userRolePrefix: oocSettings.userRolePrefix,
+        userRolePrefixWithPersona: oocSettings.userRolePrefixWithPersona,
+        systemRolePrefixOoc: oocSettings.systemRolePrefixOoc,
+        assistantRolePrefixOoc: oocSettings.assistantRolePrefixOoc,
+        userRolePrefixOoc: oocSettings.userRolePrefixOoc,
+      },
+    })
+
+    if (messagesHeader) {
+      systemParts.push(replaceVarsIn(messagesHeader) + '\n\n' + transcript)
+    } else {
+      systemParts.push(transcript)
+    }
+  }
+
+  const result = [{ role: 'system', content: systemParts.join('\n\n') }]
+
+  if (userMessage) {
+    const oocUserInstr = oocSettings.oocUserInstructions
+    if (oocUserInstr) {
+      if (oocUserInstr.includes('{content}')) {
+        result.push({
+          role: 'user',
+          content: replaceVarsIn(oocUserInstr).replace(/\{content\}/g, userMessage),
+        })
+      } else {
+        result.push({ role: 'user', content: replaceVarsIn(oocUserInstr) + '\n\n' + userMessage })
+      }
+    } else {
+      result.push({ role: 'user', content: userMessage })
+    }
+  }
+
+  return result
+}
+
 export async function sendChatCompletion({ profile, messages, signal, onToken }) {
   const baseUrl = getChatBaseUrl(profile.providerId)
   if (!baseUrl) throw new Error(`No base URL for provider "${profile.providerId}"`)

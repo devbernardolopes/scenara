@@ -21,7 +21,12 @@ import {
 } from '../services/messages'
 import { getWritingInstruction } from '../services/writingInstructions'
 import { getEffectiveProfileFor } from '../services/connectionProfiles'
-import { sendChatCompletion, buildMessagesPayload, getActiveParams } from '../services/chatApi'
+import {
+  sendChatCompletion,
+  buildMessagesPayload,
+  buildOOCMessagesPayload,
+  getActiveParams,
+} from '../services/chatApi'
 import { getSetting } from '../services/settings'
 import { startGenerating, stopGenerating } from '../services/generatingState'
 import db from '../db'
@@ -329,43 +334,96 @@ function ChatView() {
     }
   }
 
-  async function doChatRequest(isFirstMessage, currentMsgs, chatPersona, currentPersona) {
-    const profile = await getEffectiveProfileFor('chat')
+  async function doChatRequest(
+    isFirstMessage,
+    currentMsgs,
+    chatPersona,
+    currentPersona,
+    isOOC = false,
+  ) {
+    const profile = isOOC
+      ? await getEffectiveProfileFor('ooc')
+      : await getEffectiveProfileFor('chat')
     if (!profile?.model) {
       showToast('No Chat profile configured or model selected.', { type: 'error' })
       return
     }
 
-    let writingInstruction = null
-    if (character?.writingInstruction) {
-      writingInstruction = await getWritingInstruction(Number(character.writingInstruction))
-    }
+    let payload
+    if (isOOC) {
+      const oocSystemInstructions = await getSetting('prompting.oocSystem')
+      const oocUserInstructions = await getSetting('prompting.oocUser')
+      const characterPromptHeader = await getSetting(
+        'prompting.apiRequestSectionHeaders.characterPrompt',
+      )
+      const messagesHeader = await getSetting('prompting.apiRequestSectionHeaders.messages')
+      const systemRolePrefix = await getSetting('prompting.systemRolePrefix')
+      const assistantRolePrefix = await getSetting('prompting.assistantRolePrefix')
+      const userRolePrefix = await getSetting('prompting.userRolePrefix')
+      const userRolePrefixWithPersona = await getSetting('prompting.userRolePrefixWithPersona')
+      const systemRolePrefixOoc = await getSetting('prompting.systemRolePrefixOoc')
+      const assistantRolePrefixOoc = await getSetting('prompting.assistantRolePrefixOoc')
+      const userRolePrefixOoc = await getSetting('prompting.userRolePrefixOoc')
 
-    const settings = {
-      firstMessageRole: await getSetting('prompting.firstMessageRole'),
-      firstMessagePrompt: await getSetting('prompting.firstMessagePrompt'),
-      continueRole: await getSetting('prompting.continueRole'),
-      continuePrompt: await getSetting('prompting.continuePrompt'),
-      personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
-      writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
-      writingPlacement: await getSetting('prompting.writingPlacement'),
-      personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
-    }
+      const lastUserMsg =
+        currentMsgs.length > 0 && currentMsgs[currentMsgs.length - 1].role === 'user'
+          ? currentMsgs[currentMsgs.length - 1].content
+          : ''
+      const transcriptMsgs = currentMsgs.slice(0, -1)
 
-    const payload = await buildMessagesPayload({
-      character,
-      chatPersona,
-      currentPersona,
-      messages: currentMsgs,
-      isFirstMessage,
-      settings,
-      writingInstruction,
-    })
+      payload = await buildOOCMessagesPayload({
+        character,
+        chatPersona,
+        currentPersona,
+        messages: transcriptMsgs,
+        userMessage: lastUserMsg,
+        personaMap,
+        oocSettings: {
+          oocSystemInstructions,
+          oocUserInstructions,
+          characterPromptHeader,
+          messagesHeader,
+          systemRolePrefix,
+          assistantRolePrefix,
+          userRolePrefix,
+          userRolePrefixWithPersona,
+          systemRolePrefixOoc,
+          assistantRolePrefixOoc,
+          userRolePrefixOoc,
+        },
+      })
+    } else {
+      let writingInstruction = null
+      if (character?.writingInstruction) {
+        writingInstruction = await getWritingInstruction(Number(character.writingInstruction))
+      }
+
+      const settings = {
+        firstMessageRole: await getSetting('prompting.firstMessageRole'),
+        firstMessagePrompt: await getSetting('prompting.firstMessagePrompt'),
+        continueRole: await getSetting('prompting.continueRole'),
+        continuePrompt: await getSetting('prompting.continuePrompt'),
+        personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
+        writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
+        writingPlacement: await getSetting('prompting.writingPlacement'),
+        personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
+      }
+
+      payload = await buildMessagesPayload({
+        character,
+        chatPersona,
+        currentPersona,
+        messages: currentMsgs,
+        isFirstMessage,
+        settings,
+        writingInstruction,
+      })
+    }
 
     const activeParams = getActiveParams(profile)
     const promptData = JSON.stringify({ payload, model: profile.model, params: activeParams })
 
-    const assistantMsgId = await createAssistantMessage(threadId, '')
+    const assistantMsgId = await createAssistantMessage(threadId, '', null, isOOC)
     await updateMessage(assistantMsgId, { promptData })
     setStreamingMsgId(assistantMsgId)
     setMessages((prev) => [
@@ -375,6 +433,7 @@ function ChatView() {
         threadId: Number(threadId),
         role: 'assistant',
         content: '',
+        isOOC,
         createdAt: new Date(),
       },
     ])
@@ -444,7 +503,7 @@ function ChatView() {
       }
 
       const currentPersona = personaId ? await getPersona(personaId) : null
-      await doChatRequest(isFirstMessage, currentMsgs, chatPersona, currentPersona)
+      await doChatRequest(isFirstMessage, currentMsgs, chatPersona, currentPersona, isOOC)
 
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
@@ -511,41 +570,85 @@ function ChatView() {
       }
 
       const isFirstMessage = currentMsgs.length === 0 && character?.firstMessage
+      const isOOCRegen = !!msg.isOOC
 
-      const profile = await getEffectiveProfileFor('chat')
+      const profile = isOOCRegen
+        ? await getEffectiveProfileFor('ooc')
+        : await getEffectiveProfileFor('chat')
       if (!profile?.model) {
         showToast('No Chat profile configured or model selected.', { type: 'error' })
         return
       }
 
-      let writingInstruction = null
-      if (character?.writingInstruction) {
-        writingInstruction = await getWritingInstruction(Number(character.writingInstruction))
-      }
+      let payload
+      let promptDataStr
 
-      const settings = {
-        firstMessageRole: await getSetting('prompting.firstMessageRole'),
-        firstMessagePrompt: await getSetting('prompting.firstMessagePrompt'),
-        continueRole: await getSetting('prompting.continueRole'),
-        continuePrompt: await getSetting('prompting.continuePrompt'),
-        personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
-        writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
-        writingPlacement: await getSetting('prompting.writingPlacement'),
-        personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
-      }
+      if (isOOCRegen) {
+        const oocSystemInstructions = await getSetting('prompting.oocSystem')
+        const oocUserInstructions = await getSetting('prompting.oocUser')
+        const characterPromptHeader = await getSetting(
+          'prompting.apiRequestSectionHeaders.characterPrompt',
+        )
+        const messagesHeader = await getSetting('prompting.apiRequestSectionHeaders.messages')
+        const systemRolePrefix = await getSetting('prompting.systemRolePrefix')
+        const assistantRolePrefix = await getSetting('prompting.assistantRolePrefix')
+        const userRolePrefix = await getSetting('prompting.userRolePrefix')
+        const userRolePrefixWithPersona = await getSetting('prompting.userRolePrefixWithPersona')
+        const systemRolePrefixOoc = await getSetting('prompting.systemRolePrefixOoc')
+        const assistantRolePrefixOoc = await getSetting('prompting.assistantRolePrefixOoc')
+        const userRolePrefixOoc = await getSetting('prompting.userRolePrefixOoc')
 
-      const payload = await buildMessagesPayload({
-        character,
-        chatPersona,
-        currentPersona: null,
-        messages: currentMsgs,
-        isFirstMessage,
-        settings,
-        writingInstruction,
-      })
+        payload = await buildOOCMessagesPayload({
+          character,
+          chatPersona,
+          currentPersona: null,
+          messages: currentMsgs,
+          userMessage: '',
+          personaMap,
+          oocSettings: {
+            oocSystemInstructions,
+            oocUserInstructions,
+            characterPromptHeader,
+            messagesHeader,
+            systemRolePrefix,
+            assistantRolePrefix,
+            userRolePrefix,
+            userRolePrefixWithPersona,
+            systemRolePrefixOoc,
+            assistantRolePrefixOoc,
+            userRolePrefixOoc,
+          },
+        })
+      } else {
+        let writingInstruction = null
+        if (character?.writingInstruction) {
+          writingInstruction = await getWritingInstruction(Number(character.writingInstruction))
+        }
+
+        const settings = {
+          firstMessageRole: await getSetting('prompting.firstMessageRole'),
+          firstMessagePrompt: await getSetting('prompting.firstMessagePrompt'),
+          continueRole: await getSetting('prompting.continueRole'),
+          continuePrompt: await getSetting('prompting.continuePrompt'),
+          personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
+          writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
+          writingPlacement: await getSetting('prompting.writingPlacement'),
+          personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
+        }
+
+        payload = await buildMessagesPayload({
+          character,
+          chatPersona,
+          currentPersona: null,
+          messages: currentMsgs,
+          isFirstMessage,
+          settings,
+          writingInstruction,
+        })
+      }
 
       const activeParams = getActiveParams(profile)
-      const promptDataStr = JSON.stringify({ payload, model: profile.model, params: activeParams })
+      promptDataStr = JSON.stringify({ payload, model: profile.model, params: activeParams })
 
       entries[slotIndex].promptData = promptDataStr
       await updateMessage(messageId, {
@@ -660,6 +763,7 @@ function ChatView() {
   }
 
   function getAvatarSrc(msg) {
+    if (msg.isOOC && msg.role === 'user') return '👤'
     if (msg.role === 'user') return personaMap[msg.personaId]?.avatar || null
     return character?.avatar || null
   }
@@ -669,6 +773,7 @@ function ChatView() {
   }
 
   function getMessageName(msg) {
+    if (msg.isOOC && msg.role === 'user') return 'OOC'
     if (msg.role === 'user') return personaMap[msg.personaId]?.name || null
     return character?.name || null
   }
