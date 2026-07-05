@@ -450,6 +450,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
             <button
               type="button"
               onClick={() => setPersonaPickerOpen((prev) => !prev)}
+              onMouseDown={(e) => e.nativeEvent.stopPropagation()}
               className="flex items-center gap-1.5 min-h-[44px] px-2 rounded-md hover:bg-surface-hover text-text text-sm"
               title={t('personaSelector')}
             >
