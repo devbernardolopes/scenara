@@ -16,7 +16,7 @@ const REQUEST_KINDS = [
   { id: 'director', labelKey: 'settings:api.profileAssignment.director' },
 ]
 
-function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle }) {
+function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle, onClose }) {
   const { t } = useTranslation('settings')
   const [profiles, setProfiles] = useState([])
   const [currentProfileName, setCurrentProfileName] = useState('')
@@ -54,7 +54,7 @@ function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle }) {
         </button>
         <ProfilePicker
           open={open}
-          onClose={onToggle}
+          onClose={onClose}
           onSelect={handleSelect}
           currentId={currentId}
         />
@@ -132,6 +132,7 @@ function ApiSettingsPanel() {
             onAssign={handleAssign}
             open={selectedKind === kind.id}
             onToggle={() => setSelectedKind(selectedKind === kind.id ? null : kind.id)}
+            onClose={() => setSelectedKind(null)}
           />
         ))}
       </div>
