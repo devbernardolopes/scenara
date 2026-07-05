@@ -192,6 +192,8 @@ function MessageBubble({
   const isUser = role === 'user'
   const isSystem = role === 'system'
   const isAssistantOrSystem = role === 'assistant' || role === 'system'
+  const displayContent = renderContent(message.content)
+
   const avatarSize = AVATAR_SIZE_MAP[avatarScale] || 'sm'
   const tokenCount = estimateTokens(displayContent)
   const persona = personaMap?.[message.personaId]
@@ -217,8 +219,6 @@ function MessageBubble({
   function handleAvatarClick() {
     if (avatarSrc) openModal('imageViewer', { src: avatarSrc, modalSize: 'fullscreen' })
   }
-
-  const displayContent = renderContent(message.content)
 
   function handleCopy() {
     navigator.clipboard
