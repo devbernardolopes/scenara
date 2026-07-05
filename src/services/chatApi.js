@@ -107,6 +107,8 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
 
   const activeParams = getActiveParams(profile)
   if (activeParams.top_p === 0) delete activeParams.top_p
+  if (activeParams.frequency_penalty === 0) delete activeParams.frequency_penalty
+  if (activeParams.presence_penalty === 0) delete activeParams.presence_penalty
 
   const body = {
     model: profile.model,
