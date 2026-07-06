@@ -14,20 +14,30 @@ export function isAwayFromThread(threadId) {
   return false
 }
 
-export async function addUnread(threadId) {
-  await db.transaction('rw', db.threads, async () => {
+export async function addUnread(threadId, messageId) {
+  await db.transaction('rw', db.threads, db.messages, async () => {
     const thread = await db.threads.get(Number(threadId))
     if (!thread) return
     await db.threads.update(Number(threadId), {
       unreadCount: (thread.unreadCount || 0) + 1,
     })
+    if (messageId) {
+      await db.messages.update(Number(messageId), { isUnread: true })
+    }
   })
   window.dispatchEvent(new CustomEvent('threads-changed'))
   broadcastChannel.postMessage({ type: 'unread-updated', threadId: Number(threadId) })
 }
 
 export async function clearUnread(threadId) {
-  await db.threads.update(Number(threadId), { unreadCount: 0 })
+  await db.transaction('rw', db.threads, db.messages, async () => {
+    await db.threads.update(Number(threadId), { unreadCount: 0 })
+    const msgs = await db.messages.where('threadId').equals(Number(threadId)).toArray()
+    const unreadIds = msgs.filter((m) => m.isUnread).map((m) => m.id)
+    if (unreadIds.length > 0) {
+      await Promise.all(unreadIds.map((id) => db.messages.update(id, { isUnread: false })))
+    }
+  })
   window.dispatchEvent(new CustomEvent('threads-changed'))
   broadcastChannel.postMessage({ type: 'unread-updated', threadId: Number(threadId) })
 }

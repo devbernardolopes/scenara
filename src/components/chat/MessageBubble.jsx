@@ -117,6 +117,7 @@ function MessageBubble({
   generating,
   charName,
   personaName,
+  isUnread,
 }) {
   function renderContent(text) {
     if (!text) return text
@@ -193,6 +194,7 @@ function MessageBubble({
   const isSystem = role === 'system'
   const isAssistantOrSystem = role === 'assistant' || role === 'system'
   const displayContent = renderContent(message.content)
+  const unreadClass = isUnread ? 'ring-1 ring-primary/40' : ''
 
   const avatarSize = AVATAR_SIZE_MAP[avatarScale] || 'sm'
   const tokenCount = estimateTokens(displayContent)
@@ -343,7 +345,7 @@ function MessageBubble({
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[80%] md:max-w-[65%] rounded-lg ${
+        className={`max-w-[80%] md:max-w-[65%] rounded-lg ${unreadClass} ${
           isUser
             ? `${userBgClass} text-on-primary`
             : isSystem

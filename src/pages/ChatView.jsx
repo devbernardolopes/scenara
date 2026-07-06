@@ -329,7 +329,27 @@ function ChatView() {
     isAtBottomRef.current = atBottom
     if (atBottom) {
       clearUnread(threadId)
+      setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
     }
+  }, [threadId])
+
+  useEffect(() => {
+    const sentinel = messagesEndRef.current
+    const container = scrollRef.current
+    if (!sentinel || !container) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          clearUnread(threadId)
+          setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
+        }
+      },
+      { root: container, threshold: 0.1 },
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
   }, [threadId])
 
   function scrollToBottom() {
@@ -505,7 +525,10 @@ function ChatView() {
         try {
           const away = isAwayFromThread(threadId) || !isAtBottomRef.current
           if (away) {
-            await addUnread(threadId)
+            await addUnread(threadId, assistantMsgId)
+            setMessages((prev) =>
+              prev.map((m) => (m.id === assistantMsgId ? { ...m, isUnread: true } : m)),
+            )
             const soundEnabled = await getSetting('unreadSound')
             if (soundEnabled) playNotificationSound()
           }
@@ -778,7 +801,10 @@ function ChatView() {
         try {
           const away = isAwayFromThread(threadId) || !isAtBottomRef.current
           if (away) {
-            await addUnread(threadId)
+            await addUnread(threadId, messageId)
+            setMessages((prev) =>
+              prev.map((m) => (m.id === messageId ? { ...m, isUnread: true } : m)),
+            )
             const soundEnabled = await getSetting('unreadSound')
             if (soundEnabled) playNotificationSound()
           }
@@ -965,6 +991,7 @@ function ChatView() {
                   onRegenerate={handleRegenerate}
                   onSpeak={() => {}}
                   generating={generating}
+                  isUnread={msg.isUnread || false}
                   charName={character?.name || ''}
                   personaName={personaMap[thread?.personaId]?.name || ''}
                 />
