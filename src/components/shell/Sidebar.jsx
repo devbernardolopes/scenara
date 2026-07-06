@@ -404,22 +404,6 @@ function Sidebar({ open, onClose }) {
                 >
                   <Link to={`/chat/${thread.id}`} onClick={onClose} className="block p-3">
                     <div className="flex items-start gap-3">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          toggleSelect(thread.id)
-                        }}
-                        className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover flex-shrink-0"
-                        aria-label={t('sidebar.selectThreads')}
-                      >
-                        {selectedIds.has(thread.id) ? (
-                          <CheckSquare className="w-4 h-4" />
-                        ) : (
-                          <Square className="w-4 h-4" />
-                        )}
-                      </button>
                       <Avatar
                         src={character?.avatar}
                         size="sm"
@@ -433,6 +417,19 @@ function Sidebar({ open, onClose }) {
                             isActive={isActive}
                             threadCardMarquee={threadCardMarquee}
                           />
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleEditTitle(thread)
+                            }}
+                            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                            aria-label={t('editThreadTitle.title')}
+                            title={t('editThreadTitle.title')}
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
                           {unreadBadges && (thread.unreadCount || 0) > 0 && (
                             <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-red-500 rounded-full shrink-0">
                               {thread.unreadCount > 99 ? '99+' : thread.unreadCount}
@@ -445,67 +442,73 @@ function Sidebar({ open, onClose }) {
                             #{thread.threadNumber}
                           </span>
                         </div>
-                        <p className="text-xs text-secondary truncate mt-0.5">
-                          {character?.name || t('sidebar.unknownCharacter')}
-                        </p>
+                        <div className="flex items-center justify-between mt-0.5">
+                          <p className="text-xs text-secondary truncate">
+                            {character?.name || t('sidebar.unknownCharacter')}
+                          </p>
+                          <div className="relative shrink-0">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                setColorPickerId(colorPickerId === thread.id ? null : thread.id)
+                              }}
+                              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                              aria-label={t('sidebar.color')}
+                              title={t('sidebar.color')}
+                            >
+                              <Palette className="w-3.5 h-3.5" />
+                            </button>
+                            {colorPickerId === thread.id && (
+                              <div
+                                ref={colorPickerRef}
+                                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 flex gap-1 p-1.5 bg-surface border border-border rounded-md shadow-surface-md z-10"
+                              >
+                                {COLOR_PRESETS.map((c, i) => (
+                                  <button
+                                    key={i}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleColorSelect(thread, c)
+                                    }}
+                                    className={`w-5 h-5 rounded-full border ${c ? 'border-border' : 'border-border'} ${thread.color === c ? 'ring-2 ring-primary' : ''}`}
+                                    style={c ? { backgroundColor: c } : undefined}
+                                    aria-label={c || t('sidebar.colorNone')}
+                                    title={c || t('sidebar.colorNone')}
+                                  >
+                                    {!c && (
+                                      <span className="flex items-center justify-center text-[10px] text-tertiary leading-none">
+                                        /
+                                      </span>
+                                    )}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </Link>
                   <div className="flex items-center gap-1 px-3 pb-2">
-                    <div className="relative">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          setColorPickerId(colorPickerId === thread.id ? null : thread.id)
-                        }}
-                        className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
-                        aria-label={t('sidebar.color')}
-                        title={t('sidebar.color')}
-                      >
-                        <Palette className="w-3.5 h-3.5" />
-                      </button>
-                      {colorPickerId === thread.id && (
-                        <div
-                          ref={colorPickerRef}
-                          className="absolute bottom-full left-0 mb-1 flex gap-1 p-1.5 bg-surface border border-border rounded-md shadow-surface-md z-10"
-                        >
-                          {COLOR_PRESETS.map((c, i) => (
-                            <button
-                              key={i}
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleColorSelect(thread, c)
-                              }}
-                              className={`w-5 h-5 rounded-full border ${c ? 'border-border' : 'border-border'} ${thread.color === c ? 'ring-2 ring-primary' : ''}`}
-                              style={c ? { backgroundColor: c } : undefined}
-                              aria-label={c || t('sidebar.colorNone')}
-                              title={c || t('sidebar.colorNone')}
-                            >
-                              {!c && (
-                                <span className="flex items-center justify-center text-[10px] text-tertiary leading-none">
-                                  /
-                                </span>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
                     <button
                       type="button"
                       onClick={(e) => {
                         e.preventDefault()
-                        handleEditTitle(thread)
+                        e.stopPropagation()
+                        toggleSelect(thread.id)
                       }}
-                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
-                      aria-label={t('editThreadTitle.title')}
-                      title={t('editThreadTitle.title')}
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover flex-shrink-0"
+                      aria-label={t('sidebar.selectThreads')}
                     >
-                      <Edit3 className="w-3.5 h-3.5" />
+                      {selectedIds.has(thread.id) ? (
+                        <CheckSquare className="w-4 h-4" />
+                      ) : (
+                        <Square className="w-4 h-4" />
+                      )}
                     </button>
-                    <div className="flex-1" />
                     <button
                       type="button"
                       onClick={(e) => {
