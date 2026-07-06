@@ -76,7 +76,7 @@ function SettingRow({ setting, onSave }) {
         <label className="block text-sm font-medium text-text">{t(labelPath)}</label>
         {descPath && <p className="text-xs text-secondary mt-0.5">{t(descPath)}</p>}
       </div>
-      <div className="w-full sm:w-auto sm:shrink-0 min-w-0">
+      <div className="w-full sm:max-w-sm min-w-0">
         <Control
           value={value}
           onChange={handleChange}
