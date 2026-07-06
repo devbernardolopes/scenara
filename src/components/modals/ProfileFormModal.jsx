@@ -61,7 +61,11 @@ function StringListInput({ value, onChange, maxItems }) {
             className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full bg-primary-subtle text-primary"
           >
             {item}
-            <button type="button" onClick={() => handleRemove(idx)} className="hover:text-error">
+            <button
+              type="button"
+              onClick={() => handleRemove(idx)}
+              className="hover:bg-delete-hover hover:text-on-delete rounded-sm px-0.5"
+            >
               &times;
             </button>
           </span>

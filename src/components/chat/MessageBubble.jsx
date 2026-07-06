@@ -403,12 +403,17 @@ function MessageBubble({
             const def = BUTTON_DEFS[key]
             if (!def) return null
             const Icon = def.icon
+            const isDelete = key === 'delete'
             return (
               <button
                 key={key}
                 type="button"
                 onClick={getButtonHandler(key)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+                className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                  isDelete
+                    ? 'bg-delete text-on-delete hover:bg-delete-hover'
+                    : 'hover:bg-black/10 text-tertiary hover:text-text'
+                }`}
                 title={t(def.labelKey)}
               >
                 <Icon className="w-3.5 h-3.5" />

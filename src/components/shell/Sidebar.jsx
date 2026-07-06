@@ -490,7 +490,7 @@ function Sidebar({ open, onClose }) {
                         e.preventDefault()
                         handleDelete(thread)
                       }}
-                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-error hover:bg-surface-hover"
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-delete text-on-delete hover:bg-delete-hover"
                       aria-label={t('sidebar.deleteThread')}
                       title={t('sidebar.deleteThread')}
                     >
@@ -552,7 +552,7 @@ function Sidebar({ open, onClose }) {
             <button
               type="button"
               onClick={handleBatchDelete}
-              className="min-h-[44px] px-4 rounded-md text-sm font-medium text-on-primary bg-error hover:opacity-90 flex items-center gap-2"
+              className="min-h-[44px] px-4 rounded-md text-sm font-medium text-on-delete bg-delete hover:bg-delete-hover flex items-center gap-2"
             >
               <Trash2 className="w-4 h-4" />
               {t('sidebar.deleteSelected')}

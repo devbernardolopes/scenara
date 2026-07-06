@@ -229,7 +229,7 @@ function PersonaSettingsPanel() {
               <button
                 type="button"
                 onClick={handleDeleteSelected}
-                className="min-h-[44px] px-3 text-sm text-error hover:opacity-80"
+                className="min-h-[44px] px-3 text-sm text-on-delete bg-delete hover:bg-delete-hover rounded-md"
               >
                 {t('persona.batch.delete', { count: selectedIds.size })}
               </button>

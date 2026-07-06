@@ -112,6 +112,7 @@ function InChatShortcutManagementModal() {
                       icon={Trash2}
                       label={t('inChatShortcut.actions.delete')}
                       onClick={() => handleDelete(item)}
+                      className="bg-delete text-on-delete hover:bg-delete-hover"
                     />
                   </div>
                 </div>

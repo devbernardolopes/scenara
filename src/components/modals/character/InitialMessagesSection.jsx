@@ -85,7 +85,7 @@ function InitialMessagesSection({ form, onChange, characterId }) {
               <button
                 type="button"
                 onClick={(e) => handleDelete(msg, e)}
-                className="absolute top-2 right-2 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md text-tertiary hover:text-error hover:bg-surface-hover transition-colors"
+                className="absolute top-2 right-2 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-delete text-on-delete hover:bg-delete-hover transition-colors"
                 aria-label={t('deleteInitialMessage')}
                 title={t('deleteInitialMessage')}
               >

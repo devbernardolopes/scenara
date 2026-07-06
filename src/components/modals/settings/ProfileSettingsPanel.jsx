@@ -142,6 +142,7 @@ function ProfileSettingsPanel() {
                     icon={Trash2}
                     label={t('api.profile.actions.delete')}
                     onClick={() => handleDelete(p)}
+                    className="bg-delete text-on-delete hover:bg-delete-hover"
                   />
                   <div className="ml-auto flex items-center gap-1">
                     <IconButton

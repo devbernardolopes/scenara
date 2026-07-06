@@ -390,6 +390,7 @@ function CharacterDiscovery() {
                     icon={Trash2}
                     label={t('discovery.actions.delete')}
                     onClick={() => handleDelete(char)}
+                    className="bg-delete text-on-delete hover:bg-delete-hover"
                   />
                   <IconButton
                     icon={Heart}

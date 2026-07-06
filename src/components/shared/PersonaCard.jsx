@@ -102,6 +102,7 @@ function PersonaCard({
           label={t('persona.actions.delete')}
           onClick={isOnlyOne ? undefined : () => onDelete(persona)}
           disabled={isOnlyOne}
+          className="bg-delete text-on-delete hover:bg-delete-hover"
         />
         <div className="ml-auto flex items-center gap-1">
           <IconButton

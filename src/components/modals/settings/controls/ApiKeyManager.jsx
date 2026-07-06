@@ -131,7 +131,7 @@ function ApiKeyManager({ providerId }) {
               <button
                 type="button"
                 onClick={() => handleDelete(key.id)}
-                className="shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-error"
+                className="shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md bg-delete text-on-delete hover:bg-delete-hover"
                 aria-label={t('api.deleteKey')}
               >
                 <Trash2 className="w-4 h-4" />

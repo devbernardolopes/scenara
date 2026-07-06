@@ -281,6 +281,7 @@ function WritingInstructionManagementModal() {
                         icon={Trash2}
                         label={t('writingInstruction.actions.delete')}
                         onClick={() => handleDeleteSingle(item)}
+                        className="bg-delete text-on-delete hover:bg-delete-hover"
                       />
                       <div className="ml-auto flex items-center gap-1">
                         <IconButton
@@ -309,7 +310,7 @@ function WritingInstructionManagementModal() {
                   <button
                     type="button"
                     onClick={handleDeleteSelected}
-                    className="min-h-[44px] px-3 text-sm text-error hover:opacity-80"
+                    className="min-h-[44px] px-3 text-sm text-on-delete bg-delete hover:bg-delete-hover rounded-md"
                   >
                     {t('writingInstruction.batch.delete', { count: selectedIds.size })}
                   </button>
