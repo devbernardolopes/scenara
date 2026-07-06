@@ -29,6 +29,7 @@ import {
   Download,
   UserPlus,
   Search,
+  X,
   ArrowUpDown,
   SlidersHorizontal,
 } from '../lib/icons'
@@ -313,20 +314,7 @@ function CharacterDiscovery() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="shrink-0 px-4 md:px-8 pt-4 md:pt-8 pb-3 border-b border-border">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => persistSearchQuery(e.target.value)}
-            placeholder={t('discovery.search.placeholder')}
-            className="w-full min-h-[44px] pl-10 pr-4 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-      </div>
-
-      <div className="shrink-0 px-4 md:px-8 pt-2 pb-1">
+      <div className="shrink-0 px-4 md:px-8 pt-4 md:pt-8 pb-1">
         <CollapsibleSection
           label={
             <span className="flex items-center gap-2">
@@ -342,7 +330,29 @@ function CharacterDiscovery() {
           storageKey="discoveryFilters"
           defaultExpanded={false}
         >
-          <div className="pt-1 pb-2">{filterControl}</div>
+          <div className="pt-1 pb-2 space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => persistSearchQuery(e.target.value)}
+                placeholder={t('discovery.search.placeholder')}
+                className="w-full min-h-[44px] pl-10 pr-10 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => persistSearchQuery('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
+                  aria-label={t('discovery.search.clear')}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            {filterControl}
+          </div>
         </CollapsibleSection>
       </div>
 
