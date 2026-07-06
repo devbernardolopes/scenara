@@ -209,10 +209,8 @@ function MessageBubble({
 
   let userBgClass = 'bg-primary'
   let userBgStyle = null
-  if (isOOC && isUser) {
+  if (isOOC) {
     userBgClass = 'bg-red-50 text-red-900 border border-red-200'
-  } else if (isOOC) {
-    userBgClass = 'bg-red-50 text-text border border-red-200'
   } else if (personaColor) {
     userBgStyle = { backgroundColor: personaColor }
     userBgClass = ''
