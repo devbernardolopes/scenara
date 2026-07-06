@@ -225,14 +225,13 @@ function ChatView() {
         if (sticking) {
           el.scrollTop = el.scrollHeight
         }
+        const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
+        setShowScrollButton(!atBottom)
       })
       observer.observe(el)
 
       const settleTimer = setTimeout(() => {
         sticking = false
-        if (el.scrollHeight - el.scrollTop - el.clientHeight > 100) {
-          setShowScrollButton(true)
-        }
       }, 800)
 
       function onUserScroll() {
