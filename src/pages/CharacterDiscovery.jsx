@@ -385,31 +385,30 @@ function CharacterDiscovery() {
                   </p>
                 )}
 
-                <div className="flex items-center gap-2 mb-3">
-                  <IconButton
-                    icon={Trash2}
-                    label={t('discovery.actions.delete')}
-                    onClick={() => handleDelete(char)}
-                    className="bg-delete text-on-delete hover:bg-delete-hover"
-                  />
-                  <IconButton
-                    icon={Heart}
-                    label={t('discovery.actions.favorite')}
-                    onClick={() => handleFavorite(char)}
-                  />
-                  <IconButton
-                    icon={Copy}
-                    label={t('discovery.actions.duplicate')}
-                    onClick={() => handleDuplicate(char)}
-                  />
-                  <IconButton
-                    icon={Download}
-                    label={t('discovery.actions.export')}
-                    onClick={() => handleExport(char)}
-                  />
-                </div>
-
-                <div className="mt-auto">
+                <div className="mt-auto space-y-3">
+                  <div className="flex items-center gap-2">
+                    <IconButton
+                      icon={Trash2}
+                      label={t('discovery.actions.delete')}
+                      onClick={() => handleDelete(char)}
+                      className="bg-delete text-on-delete hover:bg-delete-hover"
+                    />
+                    <IconButton
+                      icon={Heart}
+                      label={t('discovery.actions.favorite')}
+                      onClick={() => handleFavorite(char)}
+                    />
+                    <IconButton
+                      icon={Copy}
+                      label={t('discovery.actions.duplicate')}
+                      onClick={() => handleDuplicate(char)}
+                    />
+                    <IconButton
+                      icon={Download}
+                      label={t('discovery.actions.export')}
+                      onClick={() => handleExport(char)}
+                    />
+                  </div>
                   <StartChatButton character={char} onStart={handleSelectCharacter} />
                 </div>
               </div>
