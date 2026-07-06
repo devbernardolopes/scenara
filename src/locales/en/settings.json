@@ -38,6 +38,10 @@
       "label": "Toast Duration",
       "desc": "How long toast messages stay visible (in seconds)."
     },
+    "sidebarTogglePosition": {
+      "label": "Sidebar Toggle Position",
+      "desc": "Where the sidebar toggle button appears on small screens."
+    },
     "showAssistantDelete": {
       "label": "Assistant/System – Delete",
       "desc": "Show the delete button on assistant and system message bubbles."
@@ -384,6 +388,14 @@
     "bottom-right": "Bottom Right",
     "bottom-left": "Bottom Left",
     "bottom-center": "Bottom Center"
+  },
+  "sidebarTogglePositionOptions": {
+    "bottom-left": "Bottom Left",
+    "bottom-right": "Bottom Right",
+    "bottom-center": "Bottom Center",
+    "top-left": "Top Left",
+    "top-right": "Top Right",
+    "top-center": "Top Center"
   },
   "persona": {
     "title": "Personas",
