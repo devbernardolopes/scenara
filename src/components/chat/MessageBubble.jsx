@@ -471,9 +471,11 @@ function MessageBubble({
               onKeyDown={handleEditKeyDown}
               autoFocus
               className={`w-full resize-none rounded border p-2 text-sm focus:outline-none focus:ring-1 ${
-                isUser
-                  ? `${userBgClass || 'bg-transparent'} text-on-primary border-white/20 focus:ring-white/40`
-                  : 'bg-surface text-text border-border focus:ring-primary/40'
+                isOOC
+                  ? 'bg-red-50 text-red-900 border-red-200 focus:ring-red-300'
+                  : isUser
+                    ? `${userBgClass || 'bg-transparent'} text-on-primary border-white/20 focus:ring-white/40`
+                    : 'bg-surface text-text border-border focus:ring-primary/40'
               }`}
               style={{
                 ...(isUser ? userBgStyle : undefined),

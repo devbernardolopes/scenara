@@ -112,6 +112,8 @@ function ChatView() {
   const [visibleStartIndex, setVisibleStartIndex] = useState(0)
   const [messageThreshold, setMessageThreshold] = useState(0)
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
+  const [systemAvatar, setSystemAvatar] = useState('')
+  const [oocMessageRole, setOocMessageRole] = useState('system')
   const scrollHeightBeforeRef = useRef(null)
 
   async function loadPersonas() {
@@ -162,6 +164,13 @@ function ChatView() {
       ])
       setCharAvatarScale(chr?.characterAvatarScale || charScaleDefault || '1x')
       setPersonaAvatarScale(chr?.userPersonaAvatarScale || personaScaleDefault || '1x')
+
+      const [sysAvatar, oocRole] = await Promise.all([
+        getSetting('defaultSystemAvatar'),
+        getSetting('prompting.oocMessageRole'),
+      ])
+      setSystemAvatar(sysAvatar || '')
+      setOocMessageRole(oocRole || 'system')
 
       await loadPersonas()
     } finally {
@@ -764,6 +773,7 @@ function ChatView() {
 
   function getAvatarSrc(msg) {
     if (msg.isOOC && msg.role === 'user') return '👤'
+    if (msg.isOOC) return systemAvatar || null
     if (msg.role === 'user') return personaMap[msg.personaId]?.avatar || null
     return character?.avatar || null
   }
@@ -774,6 +784,7 @@ function ChatView() {
 
   function getMessageName(msg) {
     if (msg.isOOC && msg.role === 'user') return t('oocLabel')
+    if (msg.isOOC) return oocMessageRole.toUpperCase()
     if (msg.role === 'user') return personaMap[msg.personaId]?.name || null
     return character?.name || null
   }
