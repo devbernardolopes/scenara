@@ -29,6 +29,7 @@ import {
 } from '../services/chatApi'
 import { getSetting } from '../services/settings'
 import { startGenerating, stopGenerating } from '../services/generatingState'
+import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import db from '../db'
 
 function parseBundleEntries(bundleMessages) {
@@ -91,6 +92,7 @@ function ChatView() {
   const messagesEndRef = useRef(null)
   const scrollRef = useRef(null)
   const abortRef = useRef(null)
+  const autoTitleAbortRef = useRef(null)
   const generatingRef = useRef(false)
   const autoTriggeredRef = useRef(false)
   const handleSendRef = useRef(null)
@@ -342,7 +344,10 @@ function ChatView() {
   })
 
   async function handleCancel() {
-    if (abortRef.current) {
+    if (autoTitleAbortRef.current) {
+      autoTitleAbortRef.current.abort()
+      autoTitleAbortRef.current = null
+    } else if (abortRef.current) {
       abortRef.current.abort()
       abortRef.current = null
     }
@@ -521,6 +526,30 @@ function ChatView() {
 
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
+
+      const thr = await getThread(threadId)
+      const chr = await getCharacter(thr.characterId)
+      if (await shouldAutoTitle(thr, chr, msgs)) {
+        showToast(t('autoTitleGenerating'), { type: 'info' })
+        autoTitleAbortRef.current = new AbortController()
+        try {
+          const title = await triggerAutoTitle({
+            thread: thr,
+            character: chr,
+            messages: msgs,
+            personaMap,
+            signal: autoTitleAbortRef.current.signal,
+          })
+          setThread((prev) => ({ ...prev, title, autoTitleGenerated: true }))
+          showToast(t('autoTitleGenerated'), { type: 'success' })
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            showToast(err.message, { type: 'error' })
+          }
+        } finally {
+          autoTitleAbortRef.current = null
+        }
+      }
     } finally {
       generatingRef.current = false
       setGenerating(false)

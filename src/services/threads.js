@@ -67,7 +67,7 @@ export async function updateThread(id, data) {
 }
 
 export async function updateThreadTitle(id, title) {
-  const updated = await db.threads.update(Number(id), { title, manualTitle: true })
+  const updated = await db.threads.update(Number(id), { title, titleEdited: true })
   if (updated) {
     window.dispatchEvent(
       new CustomEvent('threads-changed', {
@@ -89,6 +89,10 @@ export async function toggleFavorite(id) {
   if (!thread) throw new Error('Thread not found')
   await db.threads.update(Number(id), { isFavorite: !thread.isFavorite })
   window.dispatchEvent(new CustomEvent('threads-changed'))
+}
+
+export async function markAutoTitleGenerated(id) {
+  await db.threads.update(Number(id), { autoTitleGenerated: true })
 }
 
 export async function updateThreadColor(id, color) {
@@ -138,6 +142,8 @@ export async function duplicateThread(id) {
     isFavorite: false,
     color: '',
     threadNumber,
+    titleEdited: original.titleEdited || false,
+    autoTitleGenerated: original.autoTitleGenerated || false,
   })
   const messages = await db.messages.where('threadId').equals(Number(id)).toArray()
   if (messages.length > 0) {
@@ -184,6 +190,8 @@ export async function forkThread(id, messageId) {
     isFavorite: false,
     color: '',
     threadNumber,
+    titleEdited: original.titleEdited || false,
+    autoTitleGenerated: original.autoTitleGenerated || false,
   })
 
   const allMessages = await db.messages.where('threadId').equals(Number(id)).sortBy('createdAt')
