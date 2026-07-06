@@ -31,7 +31,13 @@ import { getSetting } from '../services/settings'
 import { startGenerating, stopGenerating } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import { setBaseTitle } from '../services/titleManager'
-import { isAwayFromThread, addUnread, clearUnread, playNotificationSound } from '../services/unread'
+import {
+  isAwayFromThread,
+  addUnread,
+  clearUnread,
+  markMessageRead,
+  playNotificationSound,
+} from '../services/unread'
 import db from '../db'
 
 function parseBundleEntries(bundleMessages) {
@@ -334,23 +340,29 @@ function ChatView() {
   }, [threadId])
 
   useEffect(() => {
-    const sentinel = messagesEndRef.current
     const container = scrollRef.current
-    if (!sentinel || !container) return
+    if (!container || messages.length === 0) return
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          clearUnread(threadId)
-          setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
-        }
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          const el = entry.target
+          const msgId = Number(el.dataset.messageId)
+          if (!msgId) return
+          observer.unobserve(el)
+          markMessageRead(msgId, threadId)
+          setMessages((prev) => prev.map((m) => (m.id === msgId ? { ...m, isUnread: false } : m)))
+        })
       },
-      { root: container, threshold: 0.1 },
+      { root: container, threshold: 0.3 },
     )
 
-    observer.observe(sentinel)
+    const elements = container.querySelectorAll('[data-message-id][data-unread="true"]')
+    elements.forEach((el) => observer.observe(el))
+
     return () => observer.disconnect()
-  }, [threadId])
+  }, [messages, threadId])
 
   function scrollToBottom() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -971,30 +983,35 @@ function ChatView() {
                   ? entries[bundleIndex].origin || null
                   : null
               return (
-                <MessageBubble
+                <div
                   key={msg.id}
-                  message={msg}
-                  messageNumber={visibleStartIndex + idx + 1}
-                  avatarSrc={getAvatarSrc(msg)}
-                  avatarScale={getAvatarScale(msg)}
-                  role={msg.role}
-                  personaMap={personaMap}
-                  nameLabel={getMessageName(msg)}
-                  streaming={msg.id === streamingMsgId}
-                  bundleMessages={bundleMessages}
-                  bundleIndex={bundleIndex}
-                  currentOrigin={currentOrigin}
-                  onBundleNavigate={handleBundleNavigate}
-                  onDeleteRequest={(id) => setConfirmDeleteId(id)}
-                  onEdit={handleEditMessage}
-                  onFork={handleForkMessage}
-                  onRegenerate={handleRegenerate}
-                  onSpeak={() => {}}
-                  generating={generating}
-                  isUnread={msg.isUnread || false}
-                  charName={character?.name || ''}
-                  personaName={personaMap[thread?.personaId]?.name || ''}
-                />
+                  data-message-id={msg.id}
+                  data-unread={msg.isUnread ? 'true' : 'false'}
+                >
+                  <MessageBubble
+                    message={msg}
+                    messageNumber={visibleStartIndex + idx + 1}
+                    avatarSrc={getAvatarSrc(msg)}
+                    avatarScale={getAvatarScale(msg)}
+                    role={msg.role}
+                    personaMap={personaMap}
+                    nameLabel={getMessageName(msg)}
+                    streaming={msg.id === streamingMsgId}
+                    bundleMessages={bundleMessages}
+                    bundleIndex={bundleIndex}
+                    currentOrigin={currentOrigin}
+                    onBundleNavigate={handleBundleNavigate}
+                    onDeleteRequest={(id) => setConfirmDeleteId(id)}
+                    onEdit={handleEditMessage}
+                    onFork={handleForkMessage}
+                    onRegenerate={handleRegenerate}
+                    onSpeak={() => {}}
+                    generating={generating}
+                    isUnread={msg.isUnread || false}
+                    charName={character?.name || ''}
+                    personaName={personaMap[thread?.personaId]?.name || ''}
+                  />
+                </div>
               )
             })}
           </>

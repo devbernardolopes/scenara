@@ -29,6 +29,20 @@ export async function addUnread(threadId, messageId) {
   broadcastChannel.postMessage({ type: 'unread-updated', threadId: Number(threadId) })
 }
 
+export async function markMessageRead(messageId, threadId) {
+  await db.transaction('rw', db.messages, db.threads, async () => {
+    const msg = await db.messages.get(Number(messageId))
+    if (!msg || !msg.isUnread) return
+    await db.messages.update(Number(messageId), { isUnread: false })
+    const thread = await db.threads.get(Number(threadId))
+    if (!thread) return
+    const newCount = Math.max(0, (thread.unreadCount || 0) - 1)
+    await db.threads.update(Number(threadId), { unreadCount: newCount })
+  })
+  window.dispatchEvent(new CustomEvent('threads-changed'))
+  broadcastChannel.postMessage({ type: 'unread-updated', threadId: Number(threadId) })
+}
+
 export async function clearUnread(threadId) {
   await db.transaction('rw', db.threads, db.messages, async () => {
     await db.threads.update(Number(threadId), { unreadCount: 0 })
