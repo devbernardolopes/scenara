@@ -132,7 +132,9 @@ function WritingInstructionFormModal({ writingInstruction }) {
 
         <CollapsibleSection
           label={t('writingInstruction.form.contentLabel')}
-          summary={form.content ? `${estimateTokens(form.content)} tokens` : null}
+          summary={
+            form.content ? t('common:tokenCount', { count: estimateTokens(form.content) }) : null
+          }
           storageKey="writingInstructionContent"
           defaultExpanded={true}
         >

@@ -218,7 +218,7 @@ function ProfileFormModal({ profile }) {
       await confirm({
         title: t('api.profile.form.noKeyWarning.title'),
         message: t('api.profile.form.noKeyWarning.message'),
-        confirmLabel: 'OK',
+        confirmLabel: t('ok', { ns: 'common' }),
         cancelLabel: t('cancel', { ns: 'common' }),
       })
     }

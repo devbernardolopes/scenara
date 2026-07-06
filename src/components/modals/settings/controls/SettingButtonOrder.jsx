@@ -41,7 +41,7 @@ function SettingButtonOrder({ value = [], onChange, disabled, buttons = [] }) {
             onClick={() => moveUp(index)}
             disabled={disabled || index === 0}
             className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-surface-hover text-tertiary hover:text-text disabled:opacity-30 disabled:pointer-events-none"
-            aria-label="Move up"
+            aria-label={t('moveUp', { ns: 'common' })}
           >
             <ChevronUp className="w-4 h-4" />
           </button>
@@ -50,7 +50,7 @@ function SettingButtonOrder({ value = [], onChange, disabled, buttons = [] }) {
             onClick={() => moveDown(index)}
             disabled={disabled || index === ordered.length - 1}
             className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-surface-hover text-tertiary hover:text-text disabled:opacity-30 disabled:pointer-events-none"
-            aria-label="Move down"
+            aria-label={t('moveDown', { ns: 'common' })}
           >
             <ChevronDown className="w-4 h-4" />
           </button>

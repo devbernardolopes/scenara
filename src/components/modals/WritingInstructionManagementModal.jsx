@@ -285,13 +285,13 @@ function WritingInstructionManagementModal() {
                       <div className="ml-auto flex items-center gap-1">
                         <IconButton
                           icon={ChevronUp}
-                          label="Move up"
+                          label={tc('moveUp')}
                           onClick={() => handleMoveUp(index)}
                           disabled={index === 0}
                         />
                         <IconButton
                           icon={ChevronDown}
-                          label="Move down"
+                          label={tc('moveDown')}
                           onClick={() => handleMoveDown(index)}
                           disabled={index === items.length - 1}
                         />

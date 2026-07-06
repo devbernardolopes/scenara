@@ -1,8 +1,10 @@
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
+import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { Download, X } from '../../lib/icons'
 
 function ImageViewerModal({ src, alt }) {
+  const { t } = useTranslation('common')
   const { closeModal } = useModal()
 
   const handleDownload = () => {
@@ -42,8 +44,8 @@ function ImageViewerModal({ src, alt }) {
           type="button"
           onClick={handleDownload}
           className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md bg-black/40 text-white hover:bg-black/60"
-          aria-label="Download image"
-          title="Download image"
+          aria-label={t('downloadImage')}
+          title={t('downloadImage')}
         >
           <Download className="w-5 h-5" />
         </button>
@@ -51,8 +53,8 @@ function ImageViewerModal({ src, alt }) {
           type="button"
           onClick={closeModal}
           className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md bg-black/40 text-white hover:bg-black/60"
-          aria-label="Close"
-          title="Close"
+          aria-label={t('close')}
+          title={t('close')}
         >
           <X className="w-5 h-5" />
         </button>

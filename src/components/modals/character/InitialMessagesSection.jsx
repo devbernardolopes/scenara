@@ -68,7 +68,9 @@ function InitialMessagesSection({ form, onChange, characterId }) {
         <div key={msg.id} className="border border-border rounded-md">
           <CollapsibleSection
             label={`${t('initialMessageLabel')} #${idx + 1}`}
-            summary={msg.content ? `${estimateTokens(msg.content)} tokens` : null}
+            summary={
+              msg.content ? t('common:tokenCount', { count: estimateTokens(msg.content) }) : null
+            }
             hasContent={!!msg.content}
             storageKey={characterId ? `charSection.initialMsg.${characterId}.${msg.id}` : undefined}
             defaultExpanded={!msg.content}

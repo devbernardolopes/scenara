@@ -56,7 +56,7 @@ function CharacterSection({ form, onChange, characterId }) {
             required
           />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-tertiary">
-            {estimateTokens(form.name)} tokens
+            {t('common:tokenCount', { count: estimateTokens(form.name) })}
           </span>
         </div>
       </div>
@@ -80,8 +80,8 @@ function CharacterSection({ form, onChange, characterId }) {
             type="button"
             onClick={() => fileRef.current?.click()}
             className="min-h-[44px] min-w-[44px] flex items-center justify-center border border-border rounded-md text-secondary hover:text-text hover:bg-surface-hover shrink-0"
-            aria-label="Upload image"
-            title="Upload image"
+            aria-label={t('uploadImage', { ns: 'common' })}
+            title={t('uploadImage', { ns: 'common' })}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -114,7 +114,9 @@ function CharacterSection({ form, onChange, characterId }) {
 
       <CollapsibleSection
         label={t('promptLabel')}
-        summary={form.prompt ? `${estimateTokens(form.prompt)} tokens` : null}
+        summary={
+          form.prompt ? t('common:tokenCount', { count: estimateTokens(form.prompt) }) : null
+        }
         storageKey={characterId ? `charSection.prompt.${characterId}` : undefined}
         defaultExpanded={true}
       >
@@ -149,7 +151,7 @@ function CharacterSection({ form, onChange, characterId }) {
               </select>
               {selectedWI && (
                 <span className="text-xs text-tertiary whitespace-nowrap">
-                  {estimateTokens(selectedWI.content)} tokens
+                  {t('common:tokenCount', { count: estimateTokens(selectedWI.content) })}
                 </span>
               )}
             </>
@@ -172,7 +174,11 @@ function CharacterSection({ form, onChange, characterId }) {
 
       <CollapsibleSection
         label={t('extraPromptLabel')}
-        summary={form.extraPrompt ? `${estimateTokens(form.extraPrompt)} tokens` : null}
+        summary={
+          form.extraPrompt
+            ? t('common:tokenCount', { count: estimateTokens(form.extraPrompt) })
+            : null
+        }
         storageKey={characterId ? `charSection.extraPrompt.${characterId}` : undefined}
         defaultExpanded={false}
       >

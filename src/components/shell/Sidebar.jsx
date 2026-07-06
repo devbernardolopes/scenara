@@ -438,8 +438,8 @@ function Sidebar({ open, onClose }) {
                           setColorPickerId(colorPickerId === thread.id ? null : thread.id)
                         }}
                         className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
-                        aria-label="Color"
-                        title="Color"
+                        aria-label={t('sidebar.color')}
+                        title={t('sidebar.color')}
                       >
                         <Palette className="w-3.5 h-3.5" />
                       </button>
@@ -458,8 +458,8 @@ function Sidebar({ open, onClose }) {
                               }}
                               className={`w-5 h-5 rounded-full border ${c ? 'border-border' : 'border-border'} ${thread.color === c ? 'ring-2 ring-primary' : ''}`}
                               style={c ? { backgroundColor: c } : undefined}
-                              aria-label={c || 'None'}
-                              title={c || 'None'}
+                              aria-label={c || t('sidebar.colorNone')}
+                              title={c || t('sidebar.colorNone')}
                             >
                               {!c && (
                                 <span className="flex items-center justify-center text-[10px] text-tertiary leading-none">

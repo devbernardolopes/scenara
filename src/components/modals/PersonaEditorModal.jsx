@@ -107,7 +107,7 @@ function PersonaEditorModal() {
                   autoFocus
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-tertiary">
-                  {estimateTokens(form.name)} tokens
+                  {t('common:tokenCount', { count: estimateTokens(form.name) })}
                 </span>
               </div>
             </div>
@@ -126,7 +126,11 @@ function PersonaEditorModal() {
 
             <CollapsibleSection
               label={t('personaDescriptionLabel')}
-              summary={form.description ? `${estimateTokens(form.description)} tokens` : null}
+              summary={
+                form.description
+                  ? t('common:tokenCount', { count: estimateTokens(form.description) })
+                  : null
+              }
               storageKey="personaEditorDescription"
               defaultExpanded={true}
             >

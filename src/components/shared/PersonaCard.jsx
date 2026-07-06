@@ -104,8 +104,18 @@ function PersonaCard({
           disabled={isOnlyOne}
         />
         <div className="ml-auto flex items-center gap-1">
-          <IconButton icon={ChevronUp} label="Move up" onClick={onMoveUp} disabled={isFirst} />
-          <IconButton icon={ChevronDown} label="Move down" onClick={onMoveDown} disabled={isLast} />
+          <IconButton
+            icon={ChevronUp}
+            label={t('moveUp', { ns: 'common' })}
+            onClick={onMoveUp}
+            disabled={isFirst}
+          />
+          <IconButton
+            icon={ChevronDown}
+            label={t('moveDown', { ns: 'common' })}
+            onClick={onMoveDown}
+            disabled={isLast}
+          />
         </div>
       </div>
     </div>

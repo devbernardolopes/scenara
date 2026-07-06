@@ -146,13 +146,13 @@ function ProfileSettingsPanel() {
                   <div className="ml-auto flex items-center gap-1">
                     <IconButton
                       icon={ChevronUp}
-                      label="Move up"
+                      label={t('moveUp', { ns: 'common' })}
                       onClick={() => handleMoveUp(index)}
                       disabled={index === 0}
                     />
                     <IconButton
                       icon={ChevronDown}
-                      label="Move down"
+                      label={t('moveDown', { ns: 'common' })}
                       onClick={() => handleMoveDown(index)}
                       disabled={index === profiles.length - 1}
                     />

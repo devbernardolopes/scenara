@@ -34,7 +34,9 @@
     "importFromUrl": "From URL",
     "importFromFile": "From file",
     "importUrlPrompt": "Enter the character URL to import:",
-    "importUrlComingSoon": "URL import is not yet implemented"
+    "importUrlComingSoon": "URL import is not yet implemented",
+    "color": "Color",
+    "colorNone": "None"
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",
@@ -91,7 +93,21 @@
   "save": "Save",
   "cancel": "Cancel",
   "confirm": "Confirm",
+  "confirmDefaultMessage": "Are you sure?",
   "ok": "OK",
+  "close": "Close",
+  "moveUp": "Move up",
+  "moveDown": "Move down",
+  "uploadImage": "Upload image",
+  "downloadImage": "Download image",
+  "tokenCount": "{{count}} tokens",
+  "pagination": {
+    "firstPage": "First page",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "lastPage": "Last page",
+    "page": "Page {{page}}"
+  },
   "toast": {
     "dismiss": "Dismiss",
     "paused": "Paused",

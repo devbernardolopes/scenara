@@ -1,4 +1,5 @@
 import { createContext, useState, useCallback, useRef, useContext } from 'react'
+import { useTranslation } from 'react-i18next'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
 
 const ConfirmContext = createContext(null)
@@ -10,12 +11,13 @@ export function useConfirm() {
 }
 
 export function ConfirmProvider({ children }) {
+  const { t } = useTranslation('common')
   const [state, setState] = useState({
     open: false,
     title: '',
     message: '',
-    confirmLabel: 'Confirm',
-    cancelLabel: 'Cancel',
+    confirmLabel: t('confirm'),
+    cancelLabel: t('cancel'),
     variant: 'default',
     children: null,
   })
@@ -27,16 +29,16 @@ export function ConfirmProvider({ children }) {
         resolveRef.current = resolve
         setState({
           open: true,
-          title: title || 'Confirm',
-          message: message || 'Are you sure?',
-          confirmLabel: confirmLabel || 'Confirm',
-          cancelLabel: cancelLabel || 'Cancel',
+          title: title || t('confirm'),
+          message: message || t('confirmDefaultMessage'),
+          confirmLabel: confirmLabel || t('confirm'),
+          cancelLabel: cancelLabel || t('cancel'),
           variant: variant || 'default',
           children: children || null,
         })
       })
     },
-    [],
+    [t],
   )
 
   const handleConfirm = useCallback(() => {

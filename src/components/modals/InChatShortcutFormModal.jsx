@@ -129,7 +129,9 @@ function InChatShortcutFormModal({ inChatShortcut }) {
 
         <CollapsibleSection
           label={t('inChatShortcut.form.contentLabel')}
-          summary={form.content ? `${estimateTokens(form.content)} tokens` : null}
+          summary={
+            form.content ? t('common:tokenCount', { count: estimateTokens(form.content) }) : null
+          }
           storageKey="inChatShortcutContent"
           defaultExpanded={true}
         >

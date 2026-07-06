@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from '../../lib/icons'
 
 function getPageRange(current, total) {
@@ -15,10 +16,10 @@ function getPageRange(current, total) {
 }
 
 function Pagination({ currentPage, totalPages, onPageChange }) {
+  const { t } = useTranslation('common')
   if (totalPages <= 1) return null
 
-  const baseBtn =
-    'min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-sm'
+  const baseBtn = 'min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-sm'
 
   return (
     <div className="flex items-center justify-center gap-1">
@@ -27,7 +28,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
         onClick={() => onPageChange(1)}
         disabled={currentPage === 1}
         className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
-        aria-label="First page"
+        aria-label={t('pagination.firstPage')}
       >
         <ChevronsLeft className="w-4 h-4" />
       </button>
@@ -36,16 +37,19 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
-        aria-label="Previous page"
+        aria-label={t('pagination.previousPage')}
       >
         <ChevronLeft className="w-4 h-4" />
       </button>
 
       {getPageRange(currentPage, totalPages).map((item, i) =>
         item === '...' ? (
-          <span key={`gap-${i}`} className="min-w-[44px] text-center text-sm text-tertiary select-none">
+          <span
+            key={`gap-${i}`}
+            className="min-w-[44px] text-center text-sm text-tertiary select-none"
+          >
             …
-        </span>
+          </span>
         ) : (
           <button
             key={item}
@@ -56,7 +60,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
                 ? 'bg-primary-subtle text-primary font-medium'
                 : 'text-secondary hover:bg-surface-hover'
             }`}
-            aria-label={`Page ${item}`}
+            aria-label={t('pagination.page', { page: item })}
             aria-current={item === currentPage ? 'page' : undefined}
           >
             {item}
@@ -69,7 +73,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
-        aria-label="Next page"
+        aria-label={t('pagination.nextPage')}
       >
         <ChevronRight className="w-4 h-4" />
       </button>
@@ -78,7 +82,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
         onClick={() => onPageChange(totalPages)}
         disabled={currentPage === totalPages}
         className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
-        aria-label="Last page"
+        aria-label={t('pagination.lastPage')}
       >
         <ChevronsRight className="w-4 h-4" />
       </button>

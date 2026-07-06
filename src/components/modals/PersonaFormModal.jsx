@@ -239,7 +239,11 @@ function PersonaFormModal({ persona }) {
 
         <CollapsibleSection
           label={t('persona.form.descriptionLabel')}
-          summary={form.description ? `${estimateTokens(form.description)} tokens` : null}
+          summary={
+            form.description
+              ? t('common:tokenCount', { count: estimateTokens(form.description) })
+              : null
+          }
           storageKey="personaFormDescription"
           defaultExpanded={true}
         >

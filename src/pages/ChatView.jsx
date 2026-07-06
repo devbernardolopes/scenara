@@ -345,7 +345,7 @@ function ChatView() {
       ? await getEffectiveProfileFor('ooc')
       : await getEffectiveProfileFor('chat')
     if (!profile?.model) {
-      showToast('No Chat profile configured or model selected.', { type: 'error' })
+      showToast(t('noProfileModel'), { type: 'error' })
       return
     }
 
@@ -576,7 +576,7 @@ function ChatView() {
         ? await getEffectiveProfileFor('ooc')
         : await getEffectiveProfileFor('chat')
       if (!profile?.model) {
-        showToast('No Chat profile configured or model selected.', { type: 'error' })
+        showToast(t('noProfileModel'), { type: 'error' })
         return
       }
 
@@ -773,7 +773,7 @@ function ChatView() {
   }
 
   function getMessageName(msg) {
-    if (msg.isOOC && msg.role === 'user') return 'OOC'
+    if (msg.isOOC && msg.role === 'user') return t('oocLabel')
     if (msg.role === 'user') return personaMap[msg.personaId]?.name || null
     return character?.name || null
   }
@@ -898,7 +898,7 @@ function ChatView() {
             type="button"
             onClick={scrollToBottom}
             className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center bg-primary text-on-primary rounded-full shadow-surface-lg hover:bg-primary-hover transition-all duration-200"
-            aria-label="Scroll to bottom"
+            aria-label={t('scrollToBottom')}
           >
             <ChevronDown className="w-5 h-5" />
           </button>

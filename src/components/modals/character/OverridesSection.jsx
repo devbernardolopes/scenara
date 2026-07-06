@@ -97,7 +97,7 @@ function OverridesSection({ form, onChange, characterId }) {
           label={t('autoTitleSystemInstructions')}
           summary={
             form.autoTitleSystemInstructions
-              ? `${estimateTokens(form.autoTitleSystemInstructions)} tokens`
+              ? t('common:tokenCount', { count: estimateTokens(form.autoTitleSystemInstructions) })
               : null
           }
           storageKey={characterId ? `charSection.autoTitleSystem.${characterId}` : undefined}
@@ -116,7 +116,7 @@ function OverridesSection({ form, onChange, characterId }) {
           label={t('autoTitleUserInstructions')}
           summary={
             form.autoTitleUserInstructions
-              ? `${estimateTokens(form.autoTitleUserInstructions)} tokens`
+              ? t('common:tokenCount', { count: estimateTokens(form.autoTitleUserInstructions) })
               : null
           }
           storageKey={characterId ? `charSection.autoTitleUser.${characterId}` : undefined}
@@ -161,7 +161,9 @@ function OverridesSection({ form, onChange, characterId }) {
           label={t('summarizationSystemInstructions')}
           summary={
             form.summarizationSystemInstructions
-              ? `${estimateTokens(form.summarizationSystemInstructions)} tokens`
+              ? t('common:tokenCount', {
+                  count: estimateTokens(form.summarizationSystemInstructions),
+                })
               : null
           }
           storageKey={characterId ? `charSection.summarizationSystem.${characterId}` : undefined}
@@ -180,7 +182,9 @@ function OverridesSection({ form, onChange, characterId }) {
           label={t('summarizationUserInstructions')}
           summary={
             form.summarizationUserInstructions
-              ? `${estimateTokens(form.summarizationUserInstructions)} tokens`
+              ? t('common:tokenCount', {
+                  count: estimateTokens(form.summarizationUserInstructions),
+                })
               : null
           }
           storageKey={characterId ? `charSection.summarizationUser.${characterId}` : undefined}

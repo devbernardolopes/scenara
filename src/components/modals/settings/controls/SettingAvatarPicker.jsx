@@ -37,8 +37,8 @@ function SettingAvatarPicker({ value, onChange, disabled }) {
         onClick={() => fileRef.current?.click()}
         disabled={disabled}
         className="min-h-[44px] min-w-[44px] flex items-center justify-center border border-border rounded-md text-secondary hover:text-text hover:bg-surface-hover shrink-0 disabled:opacity-40 disabled:pointer-events-none"
-        aria-label="Upload image"
-        title="Upload image"
+        aria-label={t('uploadImage', { ns: 'common' })}
+        title={t('uploadImage', { ns: 'common' })}
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
