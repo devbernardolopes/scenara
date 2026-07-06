@@ -22,7 +22,8 @@ function ShowPromptModal({ payload, model, params }) {
   )
 
   const paramEntries = Object.entries(params || {}).filter(
-    ([, v]) => v !== '' && v !== null && v !== undefined && !(Array.isArray(v) && v.length === 0),
+    ([, v]) =>
+      v !== '' && v !== null && v !== undefined && v !== 0 && !(Array.isArray(v) && v.length === 0),
   )
 
   return (
