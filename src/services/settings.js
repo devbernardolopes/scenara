@@ -19,10 +19,9 @@ export function applySettingEffect(key, value) {
 export const CATEGORIES = [
   { id: 'appearance', labelKey: 'settings:categories.appearance' },
   { id: 'api', labelKey: 'settings:categories.api' },
-  { id: 'defaults', labelKey: 'settings:categories.defaults' },
   { id: 'prompting', labelKey: 'settings:categories.prompting' },
+  { id: 'defaults', labelKey: 'settings:categories.defaults' },
   { id: 'tts', labelKey: 'settings:categories.tts' },
-  { id: 'advanced', labelKey: 'settings:categories.advanced' },
   { id: 'database', labelKey: 'settings:categories.database' },
 ]
 

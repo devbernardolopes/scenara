@@ -62,7 +62,6 @@ function SettingsModal() {
       </div>
 
       <div className="px-6 pt-4 pb-2 shrink-0 space-y-2">
-        <SettingsSearch value={search} onChange={setSearch} />
         {!search && (
           <select
             value={activeCategory}
