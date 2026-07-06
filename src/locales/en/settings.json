@@ -98,6 +98,14 @@
       "label": "Chat Title Marquee",
       "desc": "Scroll the chat title when it overflows the header. Disable to truncate with ellipsis instead."
     },
+    "unreadBadges": {
+      "label": "Unread Message Badges",
+      "desc": "Show unread message count on thread cards and browser tab title."
+    },
+    "unreadSound": {
+      "label": "Notification Sound",
+      "desc": "Play a sound when a new message arrives while you are away."
+    },
     "chatFontFamily": {
       "label": "Chat Font Family",
       "desc": "Font used for chat message content."

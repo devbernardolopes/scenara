@@ -30,6 +30,8 @@ import {
 import { getSetting } from '../services/settings'
 import { startGenerating, stopGenerating } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
+import { setBaseTitle } from '../services/titleManager'
+import { isAwayFromThread, addUnread, clearUnread, playNotificationSound } from '../services/unread'
 import db from '../db'
 
 function parseBundleEntries(bundleMessages) {
@@ -95,6 +97,7 @@ function ChatView() {
   const abortRef = useRef(null)
   const autoTitleAbortRef = useRef(null)
   const generatingRef = useRef(false)
+  const isAtBottomRef = useRef(true)
   const autoTriggeredRef = useRef(false)
   const handleSendRef = useRef(null)
   const scrollCommits = useRef(0)
@@ -192,7 +195,7 @@ function ChatView() {
   }, [threadId])
 
   useEffect(() => {
-    document.title = thread?.title ? `Scenara - ${thread.title}` : 'Scenara'
+    setBaseTitle(thread?.title ? `Scenara - ${thread.title}` : 'Scenara')
   }, [thread?.title])
 
   useLayoutEffect(() => {
@@ -321,8 +324,13 @@ function ChatView() {
   const handleScroll = useCallback(() => {
     const el = scrollRef.current
     if (!el) return
-    setShowScrollButton(el.scrollHeight - el.scrollTop - el.clientHeight > 100)
-  }, [])
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
+    setShowScrollButton(!atBottom)
+    isAtBottomRef.current = atBottom
+    if (atBottom) {
+      clearUnread(threadId)
+    }
+  }, [threadId])
 
   function scrollToBottom() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -459,6 +467,7 @@ function ChatView() {
     ])
 
     abortRef.current = new AbortController()
+    let completedNormally = false
 
     try {
       const content = await sendChatCompletion({
@@ -476,6 +485,7 @@ function ChatView() {
       await updateMessage(assistantMsgId, { content })
       setMessages((prev) => prev.map((m) => (m.id === assistantMsgId ? { ...m, content } : m)))
       showToast(t('messageUpdated'), { type: 'success' })
+      completedNormally = true
     } catch (err) {
       if (err.name === 'AbortError') {
         await updateMessage(assistantMsgId, { content: '' })
@@ -486,10 +496,21 @@ function ChatView() {
         const msgs = await getMessagesByThread(threadId)
         setMessages(msgs)
         showToast(err.message, { type: 'error' })
+        completedNormally = true
       }
     } finally {
       setStreamingMsgId(null)
       abortRef.current = null
+      if (completedNormally) {
+        try {
+          const away = isAwayFromThread(threadId) || !isAtBottomRef.current
+          if (away) {
+            await addUnread(threadId)
+            const soundEnabled = await getSetting('unreadSound')
+            if (soundEnabled) playNotificationSound()
+          }
+        } catch {}
+      }
     }
   }
 
@@ -584,6 +605,7 @@ function ChatView() {
     setGenerating(true)
     startGenerating(threadId)
 
+    let completedNormally = false
     try {
       const idx = messages.findIndex((m) => m.id === messageId)
       if (idx === -1) return
@@ -738,11 +760,13 @@ function ChatView() {
         ),
       )
       showToast(t('messageUpdated'), { type: 'success' })
+      completedNormally = true
     } catch (err) {
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
       if (err.name !== 'AbortError') {
         showToast(err.message, { type: 'error' })
+        completedNormally = true
       }
     } finally {
       setStreamingMsgId(null)
@@ -750,6 +774,16 @@ function ChatView() {
       setGenerating(false)
       stopGenerating(threadId)
       abortRef.current = null
+      if (completedNormally) {
+        try {
+          const away = isAwayFromThread(threadId) || !isAtBottomRef.current
+          if (away) {
+            await addUnread(threadId)
+            const soundEnabled = await getSetting('unreadSound')
+            if (soundEnabled) playNotificationSound()
+          }
+        } catch {}
+      }
     }
   }
 

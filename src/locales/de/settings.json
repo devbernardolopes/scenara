@@ -88,6 +88,14 @@
     "userButtonOrder": {
       "label": "User button order",
       "desc": "Arrange buttons shown on user message bubbles using the arrow buttons."
+    },
+    "unreadBadges": {
+      "label": "Ungelesene Nachrichten-Anzeige",
+      "desc": "Zeigt die Anzahl ungelesener Nachrichten auf Chat-Karten und im Browser-Tab an."
+    },
+    "unreadSound": {
+      "label": "Benachrichtigungston",
+      "desc": "Spiele einen Ton ab, wenn eine neue Nachricht eintrifft, während du abwesend bist."
     }
   },
   "themeOptions": {

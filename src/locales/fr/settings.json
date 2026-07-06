@@ -88,6 +88,14 @@
     "userButtonOrder": {
       "label": "User button order",
       "desc": "Arrange buttons shown on user message bubbles using the arrow buttons."
+    },
+    "unreadBadges": {
+      "label": "Badges de Messages Non Lus",
+      "desc": "Afficher le nombre de messages non lus sur les cartes de discussion et l'onglet du navigateur."
+    },
+    "unreadSound": {
+      "label": "Son de Notification",
+      "desc": "Jouer un son lorsqu'un nouveau message arrive pendant votre absence."
     }
   },
   "themeOptions": {

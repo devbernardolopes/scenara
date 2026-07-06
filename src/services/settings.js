@@ -303,6 +303,22 @@ export const SETTINGS = [
     descKey: 'settings:appearance.chatTitleMarquee.desc',
   },
   {
+    key: 'unreadBadges',
+    category: 'appearance',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.unreadBadges.label',
+    descKey: 'settings:appearance.unreadBadges.desc',
+  },
+  {
+    key: 'unreadSound',
+    category: 'appearance',
+    type: 'toggle',
+    default: false,
+    labelKey: 'settings:appearance.unreadSound.label',
+    descKey: 'settings:appearance.unreadSound.desc',
+  },
+  {
     key: 'chatFontFamily',
     category: 'appearance',
     type: 'select',

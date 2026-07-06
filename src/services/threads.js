@@ -4,6 +4,10 @@ import { setUIState } from './uiState'
 export async function getAllThreads() {
   const all = await db.threads.toArray()
   all.sort((a, b) => {
+    const aUnread = (a.unreadCount || 0) > 0
+    const bUnread = (b.unreadCount || 0) > 0
+    if (aUnread && !bUnread) return -1
+    if (!aUnread && bUnread) return 1
     if (a.isFavorite && !b.isFavorite) return -1
     if (!a.isFavorite && b.isFavorite) return 1
     return new Date(b.updatedAt) - new Date(a.updatedAt)

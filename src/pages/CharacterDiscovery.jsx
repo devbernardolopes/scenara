@@ -16,6 +16,7 @@ import { getSetting } from '../services/settings'
 import { getUIState, setUIState } from '../services/uiState'
 import { createThread } from '../services/threads'
 import { createMessage } from '../services/messages'
+import { setBaseTitle } from '../services/titleManager'
 import CollapsibleSection from '../components/shared/CollapsibleSection'
 import IconButton from '../components/shared/IconButton'
 import Avatar from '../components/shared/Avatar'
@@ -109,7 +110,7 @@ function CharacterDiscovery() {
   const { openModal } = useModal()
 
   useEffect(() => {
-    document.title = 'Scenara'
+    setBaseTitle('Scenara')
   }, [])
   const { confirm } = useConfirm()
   const [characters, setCharacters] = useState([])

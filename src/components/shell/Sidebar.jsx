@@ -38,6 +38,7 @@ import {
   RefreshCw,
 } from '../../lib/icons'
 import { getGeneratingThreads } from '../../services/generatingState'
+import { useUnread } from '../../hooks/useUnread'
 
 const COLOR_PRESETS = [
   '#ef4444',
@@ -100,7 +101,9 @@ function Sidebar({ open, onClose }) {
   const [showImportMenu, setShowImportMenu] = useState(false)
   const [generatingSet, setGeneratingSet] = useState(() => getGeneratingThreads())
   const [threadCardMarquee, setThreadCardMarquee] = useState(true)
+  const [unreadBadges, setUnreadBadges] = useState(true)
   const fileInputRef = useRef(null)
+  useUnread()
 
   function handleAvatarClick(e, src) {
     e.preventDefault()
@@ -194,6 +197,19 @@ function Sidebar({ open, onClose }) {
     function onSettingsChanged(e) {
       if (e.detail?.key === 'threadCardMarquee') {
         setThreadCardMarquee(e.detail.value !== false)
+      }
+    }
+    window.addEventListener('settings-changed', onSettingsChanged)
+    return () => window.removeEventListener('settings-changed', onSettingsChanged)
+  }, [])
+
+  useEffect(() => {
+    getSetting('unreadBadges').then((val) => {
+      setUnreadBadges(val !== false)
+    })
+    function onSettingsChanged(e) {
+      if (e.detail?.key === 'unreadBadges') {
+        setUnreadBadges(e.detail.value !== false)
       }
     }
     window.addEventListener('settings-changed', onSettingsChanged)
@@ -417,6 +433,11 @@ function Sidebar({ open, onClose }) {
                             isActive={isActive}
                             threadCardMarquee={threadCardMarquee}
                           />
+                          {unreadBadges && (thread.unreadCount || 0) > 0 && (
+                            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-red-500 rounded-full shrink-0">
+                              {thread.unreadCount > 99 ? '99+' : thread.unreadCount}
+                            </span>
+                          )}
                           {generatingSet.has(thread.id) && (
                             <RefreshCw className="w-3.5 h-3.5 text-primary animate-spin shrink-0" />
                           )}
