@@ -216,6 +216,9 @@ function ChatView() {
 
       const settleTimer = setTimeout(() => {
         sticking = false
+        if (el.scrollHeight - el.scrollTop - el.clientHeight > 100) {
+          setShowScrollButton(true)
+        }
       }, 800)
 
       function onUserScroll() {
