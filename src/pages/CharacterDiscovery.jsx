@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../hooks/useModal'
@@ -72,6 +72,37 @@ function StartChatButton({ character, onStart }) {
   )
 }
 
+function CharacterNameCell({ name, characterCardMarquee }) {
+  const wrapperRef = useRef(null)
+  const [overflows, setOverflows] = useState(false)
+
+  useLayoutEffect(() => {
+    const el = wrapperRef.current
+    if (el && characterCardMarquee) {
+      const overflows = el.scrollWidth > el.clientWidth
+      if (overflows) {
+        el.style.setProperty('--marquee-distance', `-${el.scrollWidth - el.clientWidth}px`)
+      }
+      setOverflows(overflows)
+    } else {
+      setOverflows(false)
+    }
+  }, [name, characterCardMarquee])
+
+  if (!characterCardMarquee) {
+    return <span className="font-semibold text-text truncate">{name}</span>
+  }
+
+  return (
+    <span
+      ref={wrapperRef}
+      className={`font-semibold text-text marquee-wrapper ${overflows ? 'marquee-animate' : ''}`}
+    >
+      <span className="marquee-text">{name}</span>
+    </span>
+  )
+}
+
 function CharacterDiscovery() {
   const { t } = useTranslation('common')
   const navigate = useNavigate()
@@ -83,6 +114,7 @@ function CharacterDiscovery() {
   const { confirm } = useConfirm()
   const [characters, setCharacters] = useState([])
   const [loading, setLoading] = useState(true)
+  const [characterCardMarquee, setCharacterCardMarquee] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [cardsPerPage, setCardsPerPage] = useState(10)
   const [searchQuery, setSearchQuery] = useState('')
@@ -149,6 +181,7 @@ function CharacterDiscovery() {
   useEffect(() => {
     loadCharacters()
     getSetting('cardsPerPage').then((val) => setCardsPerPage(val || 10))
+    getSetting('characterCardMarquee').then((val) => setCharacterCardMarquee(val !== false))
     getUIState('discovery.sortBy').then((val) => val && setSortBy(val))
     getUIState('discovery.sortOrder').then((val) => val && setSortOrder(val))
     getUIState('discovery.searchQuery').then((val) => val && setSearchQuery(val))
@@ -160,6 +193,9 @@ function CharacterDiscovery() {
     function handleSettingsChanged(e) {
       if (e.detail?.key === 'cardsPerPage') {
         getSetting('cardsPerPage').then(setCardsPerPage)
+      }
+      if (e.detail?.key === 'characterCardMarquee') {
+        setCharacterCardMarquee(e.detail.value !== false)
       }
     }
     window.addEventListener('settings-changed', handleSettingsChanged)
@@ -336,7 +372,10 @@ function CharacterDiscovery() {
                     onClick={() => handleImageClick(char.avatar)}
                   />
                   <div className="flex items-center gap-2 min-w-0">
-                    <h3 className="font-semibold text-text truncate">{char.name}</h3>
+                    <CharacterNameCell
+                      name={char.name}
+                      characterCardMarquee={characterCardMarquee}
+                    />
                     <span className="text-xs text-tertiary shrink-0">#{char.characterNumber}</span>
                   </div>
                 </div>

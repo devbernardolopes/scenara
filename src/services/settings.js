@@ -279,6 +279,14 @@ export const SETTINGS = [
     },
   },
   {
+    key: 'characterCardMarquee',
+    category: 'appearance',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.characterCardMarquee.label',
+    descKey: 'settings:appearance.characterCardMarquee.desc',
+  },
+  {
     key: 'threadCardMarquee',
     category: 'appearance',
     type: 'toggle',

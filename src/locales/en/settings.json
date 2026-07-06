@@ -86,6 +86,10 @@
       "label": "User – Fork",
       "desc": "Show the fork button on user message bubbles."
     },
+    "characterCardMarquee": {
+      "label": "Character Card Marquee",
+      "desc": "Scroll character names when they overflow the card. Disable to truncate with ellipsis instead."
+    },
     "threadCardMarquee": {
       "label": "Thread Card Marquee",
       "desc": "Scroll thread titles when they overflow the card. Disable to truncate with ellipsis instead."
