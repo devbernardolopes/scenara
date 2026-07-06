@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, RefreshCw } from '../lib/icons'
 import { useModal } from '../hooks/useModal'
@@ -87,6 +87,7 @@ function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
 
 function ChatView() {
   const { threadId } = useParams()
+  const navigate = useNavigate()
   const { t } = useTranslation('chat')
   const { openModal } = useModal()
   const messagesEndRef = useRef(null)
@@ -802,7 +803,8 @@ function ChatView() {
       cancelLabel: t('cancel'),
     })
     if (!ok) return
-    await forkThread(threadId, messageId)
+    const newId = await forkThread(threadId, messageId)
+    navigate(`/chat/${newId}`)
   }
 
   function getAvatarSrc(msg) {

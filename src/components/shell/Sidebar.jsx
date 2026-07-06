@@ -233,7 +233,8 @@ function Sidebar({ open, onClose }) {
       cancelLabel: t('cancel'),
     })
     if (!ok) return
-    await duplicateThread(thread.id)
+    const newId = await duplicateThread(thread.id)
+    navigate(`/chat/${newId}`)
   }
 
   async function handleToggleFavorite(thread) {
