@@ -97,6 +97,7 @@ function ChatView() {
   const scrollCommits = useRef(0)
   const scrollStickyCleanupRef = useRef(null)
   const prevMessagesLengthRef = useRef(0)
+  const messagesGrewRef = useRef(false)
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
@@ -195,6 +196,7 @@ function ChatView() {
     if (messages.length === 0) return
 
     const grew = messages.length > prevMessagesLengthRef.current
+    messagesGrewRef.current = grew
     prevMessagesLengthRef.current = messages.length
 
     if (!grew && scrollCommits.current > 0) return
@@ -239,7 +241,7 @@ function ChatView() {
   }, [messages])
 
   useEffect(() => {
-    if (messages.length > 0 && scrollCommits.current > 1) {
+    if (messages.length > 0 && scrollCommits.current > 1 && messagesGrewRef.current) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages])
