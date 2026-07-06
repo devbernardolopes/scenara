@@ -327,7 +327,7 @@ function CharacterDiscovery() {
                   if (e.target.closest('button') || e.target.closest('[data-avatar]')) return
                   handleEditCharacter(char)
                 }}
-                className="border border-border rounded-lg p-4 bg-surface hover:shadow-surface-md transition-shadow cursor-pointer"
+                className="border border-border rounded-lg p-4 bg-surface hover:shadow-surface-md transition-shadow cursor-pointer flex flex-col"
               >
                 <div className="flex items-center gap-3 mb-2">
                   <Avatar
@@ -340,9 +340,11 @@ function CharacterDiscovery() {
                     <span className="text-xs text-tertiary shrink-0">#{char.characterNumber}</span>
                   </div>
                 </div>
-                <p className="text-sm text-secondary line-clamp-2 mb-3">
-                  {char.tagline || char.description || t('discovery.characterDesc')}
-                </p>
+                {(char.tagline || char.description) && (
+                  <p className="text-sm text-secondary line-clamp-2 mb-3">
+                    {char.tagline || char.description}
+                  </p>
+                )}
 
                 <div className="flex items-center gap-2 mb-3">
                   <IconButton
@@ -367,7 +369,9 @@ function CharacterDiscovery() {
                   />
                 </div>
 
-                <StartChatButton character={char} onStart={handleSelectCharacter} />
+                <div className="mt-auto">
+                  <StartChatButton character={char} onStart={handleSelectCharacter} />
+                </div>
               </div>
             ))}
           </div>
