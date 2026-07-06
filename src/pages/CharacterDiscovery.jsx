@@ -158,10 +158,15 @@ function CharacterDiscovery() {
     return list
   }, [filteredCharacters, sortBy, sortOrder, chatCounts])
 
-  const totalPages = Math.max(1, Math.ceil(sortedCharacters.length / cardsPerPage))
-  const safePage = Math.min(currentPage, totalPages)
-  const start = (safePage - 1) * cardsPerPage
-  const visibleCharacters = sortedCharacters.slice(start, start + cardsPerPage)
+  const isUnlimited = cardsPerPage === Infinity
+  const totalPages = isUnlimited
+    ? 1
+    : Math.max(1, Math.ceil(sortedCharacters.length / cardsPerPage))
+  const safePage = isUnlimited ? 1 : Math.min(currentPage, totalPages)
+  const start = isUnlimited ? 0 : (safePage - 1) * cardsPerPage
+  const visibleCharacters = isUnlimited
+    ? sortedCharacters
+    : sortedCharacters.slice(start, start + cardsPerPage)
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -427,7 +432,7 @@ function CharacterDiscovery() {
           </div>
         )}
       </div>
-      {sortedCharacters.length > 0 && (
+      {!isUnlimited && sortedCharacters.length > 0 && (
         <div className="shrink-0 px-4 md:px-8 pb-4 md:pb-8 pt-4 bg-surface border-t border-border">
           <Pagination
             currentPage={safePage}

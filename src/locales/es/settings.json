@@ -29,6 +29,9 @@
       "label": "Cards per page",
       "desc": "Number of character cards shown per page in the discovery view."
     },
+    "cardsPerPageOptions": {
+      "infinity": "∞"
+    },
     "toastPosition": {
       "label": "Toast Position",
       "desc": "Where toast notifications appear on screen."

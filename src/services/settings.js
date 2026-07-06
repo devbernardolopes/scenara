@@ -64,9 +64,12 @@ export const SETTINGS = [
     category: 'appearance',
     type: 'select',
     default: 10,
-    options: [5, 10, 25, 50],
+    options: [5, 10, 25, 50, Infinity],
     labelKey: 'settings:appearance.cardsPerPage.label',
     descKey: 'settings:appearance.cardsPerPage.desc',
+    optionLabels: {
+      Infinity: 'settings:appearance.cardsPerPageOptions.infinity',
+    },
   },
   {
     key: 'language',
