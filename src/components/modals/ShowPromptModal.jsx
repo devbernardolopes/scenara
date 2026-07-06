@@ -67,7 +67,7 @@ function ShowPromptModal({ payload, model, params }) {
                     {msg.role}
                   </span>
                   <span className="text-xs text-tertiary shrink-0">
-                    ~{formatTokenCount(tokenCount)} {t('tokens', { count: tokenCount })}
+                    {t('tokens', { count: formatTokenCount(tokenCount) })}
                   </span>
                   <div className="flex-1" />
                   <ChevronDown
