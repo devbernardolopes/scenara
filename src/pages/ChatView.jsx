@@ -150,6 +150,7 @@ function ChatView() {
           content: m.content,
           promptData: null,
           origin: 'initial',
+          createdAt: new Date().toISOString(),
         }))
         const msgId = await createAssistantMessage(threadId, entries[0].content)
         await updateMessage(msgId, { bundleMessages: JSON.stringify(entries) })
@@ -668,7 +669,7 @@ function ChatView() {
       }
 
       const slotIndex = entries.length
-      entries.push({ content: '', promptData: null })
+      entries.push({ content: '', promptData: null, createdAt: new Date().toISOString() })
       const bundleJson = JSON.stringify(entries)
 
       await updateMessage(messageId, { bundleMessages: bundleJson, content: '' })
@@ -848,7 +849,7 @@ function ChatView() {
     if (!entries) {
       entries = [{ content: msg.content, promptData: msg.promptData || null }]
     }
-    entries.push({ content, promptData: null, origin: 'edit' })
+    entries.push({ content, promptData: null, origin: 'edit', createdAt: new Date().toISOString() })
     await updateMessage(id, { bundleMessages: JSON.stringify(entries), content })
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
@@ -1014,6 +1015,7 @@ function ChatView() {
                 entries && bundleIndex >= 0 && bundleIndex < entries.length
                   ? entries[bundleIndex].origin || null
                   : null
+              const slotCreatedAt = entries?.[bundleIndex]?.createdAt || msg.createdAt
               return (
                 <div
                   key={msg.id}
@@ -1032,6 +1034,7 @@ function ChatView() {
                     bundleMessages={bundleMessages}
                     bundleIndex={bundleIndex}
                     currentOrigin={currentOrigin}
+                    slotCreatedAt={slotCreatedAt}
                     onBundleNavigate={handleBundleNavigate}
                     onDeleteRequest={(id) => setConfirmDeleteId(id)}
                     onEdit={handleEditMessage}

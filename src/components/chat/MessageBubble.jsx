@@ -118,6 +118,7 @@ function MessageBubble({
   charName,
   personaName,
   isUnread,
+  slotCreatedAt,
 }) {
   function renderContent(text) {
     if (!text) return text
@@ -367,7 +368,6 @@ function MessageBubble({
               {nameLabel}
             </span>
           )}
-          <span className="text-xs font-medium text-tertiary">{`#${messageNumber}`}</span>
           {bundleMessages && bundleMessages.length > 1 && (
             <>
               <button
@@ -513,11 +513,14 @@ function MessageBubble({
 
         {/* Footer */}
         <div className="flex items-center justify-between px-3 pb-2">
-          <span className="text-xs opacity-60">
-            {new Date(message.createdAt).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
+          <span className="flex items-center gap-2">
+            <span className="text-xs font-medium text-tertiary">{`#${messageNumber}`}</span>
+            <span className="text-xs opacity-60">
+              {new Date(slotCreatedAt || message.createdAt).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </span>
           </span>
           <span className="flex items-center gap-2">
             {currentOrigin === 'initial' && (
