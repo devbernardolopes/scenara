@@ -373,11 +373,10 @@ function MessageBubble({
               <button
                 type="button"
                 onClick={() => {
-                  const newIdx = bundleIndex - 1
-                  if (newIdx >= 0) onBundleNavigate?.(message.id, bundleMessages[newIdx])
+                  const newIdx = (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
+                  onBundleNavigate?.(message.id, newIdx)
                 }}
-                disabled={bundleIndex <= 0}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
                 title={t('previousInitialMessage')}
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
@@ -388,12 +387,10 @@ function MessageBubble({
               <button
                 type="button"
                 onClick={() => {
-                  const newIdx = bundleIndex + 1
-                  if (newIdx < bundleMessages.length)
-                    onBundleNavigate?.(message.id, bundleMessages[newIdx])
+                  const newIdx = (bundleIndex + 1) % bundleMessages.length
+                  onBundleNavigate?.(message.id, newIdx)
                 }}
-                disabled={bundleIndex >= bundleMessages.length - 1}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
                 title={t('nextInitialMessage')}
               >
                 <ChevronRight className="w-3.5 h-3.5" />

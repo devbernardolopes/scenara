@@ -110,6 +110,7 @@ function ChatView() {
   const scrollStickyCleanupRef = useRef(null)
   const prevMessagesLengthRef = useRef(0)
   const messagesGrewRef = useRef(false)
+  const bundleSlotRef = useRef({})
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
@@ -124,6 +125,7 @@ function ChatView() {
   const [personaAvatarScale, setPersonaAvatarScale] = useState('1x')
   const [visibleStartIndex, setVisibleStartIndex] = useState(0)
   const [messageThreshold, setMessageThreshold] = useState(0)
+  const [activeSlotIndices, setActiveSlotIndices] = useState({})
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const [systemAvatar, setSystemAvatar] = useState('')
   const [oocMessageRole, setOocMessageRole] = useState('system')
@@ -629,20 +631,18 @@ function ChatView() {
     handleSendRef.current = handleSend
   })
 
-  async function handleBundleNavigate(messageId, newContent) {
+  async function handleBundleNavigate(messageId, slotIndex) {
     const msg = messages.find((m) => m.id === messageId)
     const entries = parseBundleEntries(msg?.bundleMessages)
-    let newPromptData = null
-    if (entries) {
-      const entry = entries.find((e) => e.content === newContent)
-      if (entry) newPromptData = entry.promptData
-    }
-    await updateMessage(messageId, { content: newContent, promptData: newPromptData })
+    if (!entries || slotIndex < 0 || slotIndex >= entries.length) return
+    const entry = entries[slotIndex]
+    await updateMessage(messageId, { content: entry.content, promptData: entry.promptData })
     setMessages((prev) =>
       prev.map((m) =>
-        m.id === messageId ? { ...m, content: newContent, promptData: newPromptData } : m,
+        m.id === messageId ? { ...m, content: entry.content, promptData: entry.promptData } : m,
       ),
     )
+    setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
   }
 
   async function handleRegenerate(messageId) {
@@ -805,6 +805,7 @@ function ChatView() {
             : m,
         ),
       )
+      setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
       showToast(t('messageUpdated'), { type: 'success' })
       completedNormally = true
     } catch (err) {
@@ -846,6 +847,7 @@ function ChatView() {
     await updateMessage(id, { bundleMessages: JSON.stringify(entries), content })
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
+    setActiveSlotIndices((prev) => ({ ...prev, [id]: entries.length - 1 }))
     showToast(t('messageUpdated'), { type: 'success' })
   }
 
@@ -854,7 +856,10 @@ function ChatView() {
     const msg = messages.find((m) => m.id === id)
     const entries = parseBundleEntries(msg?.bundleMessages)
     if (entries && entries.length > 1) {
-      const idx = entries.findIndex((e) => e.content === msg.content)
+      const idx =
+        activeSlotIndices[id] !== undefined
+          ? activeSlotIndices[id]
+          : entries.findIndex((e) => e.content === msg.content)
       const removeIdx = idx !== -1 ? idx : 0
       entries.splice(removeIdx, 1)
       const newIdx = Math.min(removeIdx, entries.length - 1)
@@ -865,11 +870,17 @@ function ChatView() {
         content: newContent,
         promptData: newPromptData,
       })
+      setActiveSlotIndices((prev) => ({ ...prev, [id]: newIdx }))
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
       showToast(t('messageDeleted'), { type: 'success' })
       return
     }
+    setActiveSlotIndices((prev) => {
+      const next = { ...prev }
+      delete next[id]
+      return next
+    })
     await deleteMessage(id)
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
@@ -987,8 +998,13 @@ function ChatView() {
             {messages.slice(visibleStartIndex).map((msg, idx) => {
               const entries = parseBundleEntries(msg.bundleMessages)
               const bundleMessages = entries ? entries.map((e) => e.content) : null
+              const trackIdx = activeSlotIndices[msg.id]
               const bundleIndex =
-                bundleMessages && msg.content ? Math.max(0, bundleMessages.indexOf(msg.content)) : 0
+                trackIdx !== undefined && bundleMessages
+                  ? Math.min(trackIdx, bundleMessages.length - 1)
+                  : bundleMessages && msg.content
+                    ? Math.max(0, bundleMessages.indexOf(msg.content))
+                    : 0
               const currentOrigin =
                 entries && bundleIndex >= 0 && bundleIndex < entries.length
                   ? entries[bundleIndex].origin || null
