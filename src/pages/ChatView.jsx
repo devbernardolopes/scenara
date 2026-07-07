@@ -955,114 +955,112 @@ function ChatView() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-4 md:px-8 py-3 border-b border-border">
-        <div className="flex items-center gap-2 min-w-0">
-          {character && (
-            <Avatar
-              src={character.avatar}
-              size="sm"
-              className="flex-shrink-0"
-              onClick={() =>
-                openModal('imageViewer', { src: character.avatar, modalSize: 'fullscreen' })
-              }
-            />
-          )}
+      <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto relative">
+        <div className="sticky top-0 z-10 bg-surface flex items-center justify-between px-4 md:px-8 py-3 border-b border-border">
           <div className="flex items-center gap-2 min-w-0">
-            {character && <h1 className="font-semibold text-text shrink-0">{character.name}</h1>}
-            <ChatTitle
-              title={thread.title}
-              chatTitleMarquee={chatTitleMarquee}
-              onDoubleClick={() => openModal('editThreadTitle', { thread })}
-            />
-          </div>
-          {generating && <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />}
-        </div>
-      </div>
-
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-4 md:px-8 py-4 space-y-4 relative"
-      >
-        {messages.length === 0 && !generating ? (
-          <p className="text-secondary text-sm text-center py-8">{t('placeholder')}</p>
-        ) : (
-          <>
-            {visibleStartIndex > 0 && (
-              <div className="flex justify-center">
-                <button
-                  type="button"
-                  onClick={handleLoadEarlier}
-                  className="min-h-[44px] px-4 py-2 text-sm text-secondary hover:text-text border border-border-light rounded-lg hover:border-border transition-colors"
-                >
-                  {t('loadEarlierMessages', {
-                    count: Math.min(visibleStartIndex, messageThreshold || 50),
-                  })}
-                </button>
-              </div>
+            {character && (
+              <Avatar
+                src={character.avatar}
+                size="sm"
+                className="flex-shrink-0"
+                onClick={() =>
+                  openModal('imageViewer', { src: character.avatar, modalSize: 'fullscreen' })
+                }
+              />
             )}
-            {messages.slice(visibleStartIndex).map((msg, idx) => {
-              const entries = parseBundleEntries(msg.bundleMessages)
-              const bundleMessages = entries ? entries.map((e) => e.content) : null
-              const trackIdx = activeSlotIndices[msg.id]
-              const bundleIndex =
-                trackIdx !== undefined && bundleMessages
-                  ? Math.min(trackIdx, bundleMessages.length - 1)
-                  : bundleMessages && msg.content
-                    ? Math.max(0, bundleMessages.indexOf(msg.content))
-                    : 0
-              const currentOrigin =
-                entries && bundleIndex >= 0 && bundleIndex < entries.length
-                  ? entries[bundleIndex].origin || null
-                  : null
-              const slotCreatedAt = entries?.[bundleIndex]?.createdAt || msg.createdAt
-              return (
-                <div
-                  key={msg.id}
-                  data-message-id={msg.id}
-                  data-unread={msg.isUnread ? 'true' : 'false'}
-                >
-                  <MessageBubble
-                    message={msg}
-                    messageNumber={visibleStartIndex + idx + 1}
-                    avatarSrc={getAvatarSrc(msg)}
-                    avatarScale={getAvatarScale(msg)}
-                    role={msg.role}
-                    personaMap={personaMap}
-                    nameLabel={getMessageName(msg)}
-                    streaming={msg.id === streamingMsgId}
-                    bundleMessages={bundleMessages}
-                    bundleIndex={bundleIndex}
-                    currentOrigin={currentOrigin}
-                    slotCreatedAt={slotCreatedAt}
-                    onBundleNavigate={handleBundleNavigate}
-                    onDeleteRequest={(id) => setConfirmDeleteId(id)}
-                    onEdit={handleEditMessage}
-                    onFork={handleForkMessage}
-                    onRegenerate={handleRegenerate}
-                    onSpeak={() => {}}
-                    generating={generating}
-                    isUnread={msg.isUnread || false}
-                    charName={character?.name || ''}
-                    personaName={personaMap[thread?.personaId]?.name || ''}
-                  />
-                </div>
-              )
-            })}
-          </>
-        )}
-        <div ref={messagesEndRef} />
+            <div className="flex items-center gap-2 min-w-0">
+              {character && <h1 className="font-semibold text-text shrink-0">{character.name}</h1>}
+              <ChatTitle
+                title={thread.title}
+                chatTitleMarquee={chatTitleMarquee}
+                onDoubleClick={() => openModal('editThreadTitle', { thread })}
+              />
+            </div>
+            {generating && <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />}
+          </div>
+        </div>
 
-        {showScrollButton && (
-          <button
-            type="button"
-            onClick={scrollToBottom}
-            className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center bg-primary text-on-primary rounded-full shadow-surface-lg hover:bg-primary-hover transition-all duration-200"
-            aria-label={t('scrollToBottom')}
-          >
-            <ChevronDown className="w-5 h-5" />
-          </button>
-        )}
+        <div className="px-4 md:px-8 py-4 space-y-4">
+          {messages.length === 0 && !generating ? (
+            <p className="text-secondary text-sm text-center py-8">{t('placeholder')}</p>
+          ) : (
+            <>
+              {visibleStartIndex > 0 && (
+                <div className="flex justify-center">
+                  <button
+                    type="button"
+                    onClick={handleLoadEarlier}
+                    className="min-h-[44px] px-4 py-2 text-sm text-secondary hover:text-text border border-border-light rounded-lg hover:border-border transition-colors"
+                  >
+                    {t('loadEarlierMessages', {
+                      count: Math.min(visibleStartIndex, messageThreshold || 50),
+                    })}
+                  </button>
+                </div>
+              )}
+              {messages.slice(visibleStartIndex).map((msg, idx) => {
+                const entries = parseBundleEntries(msg.bundleMessages)
+                const bundleMessages = entries ? entries.map((e) => e.content) : null
+                const trackIdx = activeSlotIndices[msg.id]
+                const bundleIndex =
+                  trackIdx !== undefined && bundleMessages
+                    ? Math.min(trackIdx, bundleMessages.length - 1)
+                    : bundleMessages && msg.content
+                      ? Math.max(0, bundleMessages.indexOf(msg.content))
+                      : 0
+                const currentOrigin =
+                  entries && bundleIndex >= 0 && bundleIndex < entries.length
+                    ? entries[bundleIndex].origin || null
+                    : null
+                const slotCreatedAt = entries?.[bundleIndex]?.createdAt || msg.createdAt
+                return (
+                  <div
+                    key={msg.id}
+                    data-message-id={msg.id}
+                    data-unread={msg.isUnread ? 'true' : 'false'}
+                  >
+                    <MessageBubble
+                      message={msg}
+                      messageNumber={visibleStartIndex + idx + 1}
+                      avatarSrc={getAvatarSrc(msg)}
+                      avatarScale={getAvatarScale(msg)}
+                      role={msg.role}
+                      personaMap={personaMap}
+                      nameLabel={getMessageName(msg)}
+                      streaming={msg.id === streamingMsgId}
+                      bundleMessages={bundleMessages}
+                      bundleIndex={bundleIndex}
+                      currentOrigin={currentOrigin}
+                      slotCreatedAt={slotCreatedAt}
+                      onBundleNavigate={handleBundleNavigate}
+                      onDeleteRequest={(id) => setConfirmDeleteId(id)}
+                      onEdit={handleEditMessage}
+                      onFork={handleForkMessage}
+                      onRegenerate={handleRegenerate}
+                      onSpeak={() => {}}
+                      generating={generating}
+                      isUnread={msg.isUnread || false}
+                      charName={character?.name || ''}
+                      personaName={personaMap[thread?.personaId]?.name || ''}
+                    />
+                  </div>
+                )
+              })}
+            </>
+          )}
+          <div ref={messagesEndRef} />
+
+          {showScrollButton && (
+            <button
+              type="button"
+              onClick={scrollToBottom}
+              className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center bg-primary text-on-primary rounded-full shadow-surface-lg hover:bg-primary-hover transition-all duration-200"
+              aria-label={t('scrollToBottom')}
+            >
+              <ChevronDown className="w-5 h-5" />
+            </button>
+          )}
+        </div>
       </div>
 
       <ChatInputArea
