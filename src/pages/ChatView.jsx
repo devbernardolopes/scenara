@@ -592,7 +592,7 @@ function ChatView() {
   }
 
   async function handleSummarization(currentMessages = messages) {
-    if (generatingRef.current || summarizing) return
+    if (summarizing) return
     if (!thread || !character) return
     if (!(await shouldTriggerSummarization({
       character,
@@ -668,6 +668,9 @@ function ChatView() {
 
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
+      generatingRef.current = false
+      setGenerating(false)
+      stopGenerating(threadId)
 
       if (
         character &&
