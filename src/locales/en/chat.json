@@ -26,6 +26,7 @@
     "autoReply": "Auto-reply",
     "autoSend": "Auto-send"
   },
+  "delete": "Delete",
   "edit": "Edit",
   "copy": "Copy",
   "fork": "Fork",

@@ -140,6 +140,10 @@
       "base": "Regular",
       "lg": "Large",
       "xl": "Extra Large"
+    },
+    "highlightDeleteButtons": {
+      "label": "Highlight Delete Buttons",
+      "desc": "Show delete buttons with a distinct red background for emphasis."
     }
   },
   "themeOptions": {

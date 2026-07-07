@@ -12,6 +12,9 @@ export function ThemeProvider({ children }) {
       setThemeState(resolved)
       applySettingEffect('theme', resolved)
     })
+    getSetting('highlightDeleteButtons').then((val) => {
+      applySettingEffect('highlightDeleteButtons', val ?? false)
+    })
   }, [])
 
   const setTheme = useCallback((val) => {

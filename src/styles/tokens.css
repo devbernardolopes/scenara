@@ -483,3 +483,10 @@
 *::-webkit-scrollbar {
   display: none;
 }
+
+/* Delete highlight toggle — when class is absent, delete buttons blend into neutral */
+html:not(.show-delete-highlight) {
+  --color-delete: transparent;
+  --color-on-delete: var(--color-text-tertiary);
+  --color-delete-hover: var(--color-surface-hover);
+}

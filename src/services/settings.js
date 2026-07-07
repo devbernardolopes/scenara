@@ -313,6 +313,14 @@ export const SETTINGS = [
     descKey: 'settings:appearance.unreadBadges.desc',
   },
   {
+    key: 'highlightDeleteButtons',
+    category: 'appearance',
+    type: 'toggle',
+    default: false,
+    labelKey: 'settings:appearance.highlightDeleteButtons.label',
+    descKey: 'settings:appearance.highlightDeleteButtons.desc',
+  },
+  {
     key: 'unreadSound',
     category: 'appearance',
     type: 'toggle',
@@ -834,6 +842,9 @@ export const SETTINGS = [
 const SETTING_EFFECTS = {
   theme: (value) => applyThemeClass(value),
   language: (value) => i18n.changeLanguage(value),
+  highlightDeleteButtons: (value) => {
+    document.documentElement.classList.toggle('show-delete-highlight', !!value)
+  },
 }
 
 export async function getSetting(key) {
