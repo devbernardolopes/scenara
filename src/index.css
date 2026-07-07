@@ -3,4 +3,12 @@
 
 body {
   margin: 0;
+  /* Disable pull-to-refresh / overscroll */
+  overscroll-behavior: none; /* Modern browsers */
+  overscroll-behavior-y: none;
+}
+
+/* For the scrollable chat area */
+.overflow-y-auto {
+  overscroll-behavior-y: contain; /* Prevents chain to page refresh */
 }

@@ -203,6 +203,23 @@ function ChatView() {
   }
 
   useEffect(() => {
+    const preventPullToRefresh = (e) => {
+      if (e.touches && e.touches.length > 1) return; // Allow multi-touch
+      // Optional: only prevent near top
+      const scrollEl = scrollRef.current;
+      if (scrollEl && scrollEl.scrollTop <= 0) {
+        e.preventDefault();
+      }
+    };
+
+    const chatContainer = scrollRef.current;
+    if (chatContainer) {
+      chatContainer.addEventListener('touchstart', preventPullToRefresh, { passive: false });
+      return () => chatContainer.removeEventListener('touchstart', preventPullToRefresh);
+    }
+  }, []);
+
+  useEffect(() => {
     scrollStickyCleanupRef.current?.()
     scrollStickyCleanupRef.current = null
     prevMessagesLengthRef.current = 0

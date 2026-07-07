@@ -448,6 +448,17 @@
   border-radius: 0;
 }
 
+/* Safe area handling for iOS/Android dynamic toolbars */
+html, body, #root {
+  height: 100%;
+  height: 100dvh; /* Dynamic viewport height — best for mobile */
+}
+
+.chat-container, /* or your main chat wrapper */
+main {
+  padding-bottom: env(safe-area-inset-bottom); /* iOS notch/home indicator */
+}
+
 /* Toast animations */
 @keyframes toast-enter-top {
   from {
