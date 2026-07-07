@@ -13,6 +13,7 @@ export async function createMessage(threadId, role, content, personaId, isOOC = 
     personaId: personaId || null,
     isOOC: !!isOOC,
     createdAt: new Date(),
+    summarizedAt: null,
   })
   if (role === 'user') {
     await db.promptHistory.add({
@@ -34,6 +35,7 @@ export async function createAssistantMessage(threadId, content, createdAt, isOOC
     personaId: null,
     isOOC: !!isOOC,
     createdAt: createdAt || new Date(),
+    summarizedAt: null,
   })
   await updateThreadTimestamp(threadId)
   return id

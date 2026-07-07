@@ -48,6 +48,8 @@ export async function createThread({ characterId, personaId, title, initialMessa
     isFavorite: false,
     color: '',
     threadNumber,
+    memory: null,
+    lastSummarizationAt: null,
   })
   window.dispatchEvent(
     new CustomEvent('threads-changed', {
@@ -150,6 +152,8 @@ export async function duplicateThread(id) {
     threadNumber,
     titleEdited: original.titleEdited || false,
     autoTitleGenerated: original.autoTitleGenerated || false,
+    memory: original.memory || null,
+    lastSummarizationAt: original.lastSummarizationAt || null,
   })
   const messages = await db.messages.where('threadId').equals(Number(id)).toArray()
   if (messages.length > 0) {
@@ -198,6 +202,8 @@ export async function forkThread(id, messageId) {
     threadNumber,
     titleEdited: original.titleEdited || false,
     autoTitleGenerated: original.autoTitleGenerated || false,
+    memory: original.memory || null,
+    lastSummarizationAt: original.lastSummarizationAt || null,
   })
 
   const allMessages = await db.messages.where('threadId').equals(Number(id)).sortBy('createdAt')

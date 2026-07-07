@@ -29,7 +29,7 @@ const DEFAULT_QUICK_SETTINGS = {
 }
 const STORAGE_PREFIX = 'chatInput.'
 
-function ChatInputArea({ threadId, onSend, onCancel, generating }) {
+function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing }) {
   const { t } = useTranslation('chat')
   const textareaRef = useRef(null)
   const promptPanelRef = useRef(null)
@@ -220,7 +220,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
   }, [])
 
   function handleSend() {
-    if (generating) {
+    if (generating || summarizing) {
       onCancel?.()
       return
     }
@@ -332,6 +332,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
           rows={2}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
+          disabled={summarizing}
           onInput={(e) => autoResize(e.target)}
           onDoubleClick={() => setPromptHistoryOpen((prev) => !prev)}
           onKeyDown={handleKeyDown}
@@ -472,12 +473,12 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
             type="button"
             onClick={handleSend}
             className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-sm flex-shrink-0 ${
-              generating
+              generating || summarizing
                 ? 'bg-error text-on-primary hover:opacity-90'
                 : 'bg-primary text-on-primary hover:bg-primary-hover'
             }`}
           >
-            {generating ? <Square className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+            {generating || summarizing ? <Square className="w-4 h-4" /> : <Send className="w-4 h-4" />}
           </button>
         </div>
       </div>

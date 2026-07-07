@@ -1,6 +1,6 @@
 import db from '../db'
 import { getEffectiveProfileFor } from './connectionProfiles'
-import { sendChatCompletion, replaceVars, buildTranscript } from './chatApi'
+import { sendChatCompletion, replaceVars, buildTranscript, appendMemoryToPayload } from './chatApi'
 import { getSetting } from './settings'
 import { updateThread } from './threads'
 
@@ -72,12 +72,14 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
   systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/g, transcript)
 
   const payload = [{ role: 'system', content: systemContent }]
+  const memoryHeader = await getSetting('prompting.apiRequestSectionHeaders.memories')
+  const payloadWithMemory = appendMemoryToPayload(payload, thread?.memory, memoryHeader)
 
   if (userContent) {
     userContent = replaceVarsIn(userContent).replace(/{{transcript}}/g, transcript)
-    payload.push({ role: 'user', content: userContent })
+    payloadWithMemory.push({ role: 'user', content: userContent })
   } else {
-    payload.push({ role: 'user', content: transcript })
+    payloadWithMemory.push({ role: 'user', content: transcript })
   }
 
   const profile = await getEffectiveProfileFor('autoTitle')
@@ -85,7 +87,7 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
     throw new Error('No auto-title profile configured')
   }
 
-  const title = await sendChatCompletion({ profile, messages: payload, signal })
+  const title = await sendChatCompletion({ profile, messages: payloadWithMemory, signal })
 
   if (!title?.trim()) throw new Error('Empty title generated')
 

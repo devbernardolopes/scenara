@@ -30,6 +30,12 @@ import {
 import { getSetting } from '../services/settings'
 import { startGenerating, stopGenerating } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
+import {
+  shouldTriggerSummarization,
+  triggerSummarization,
+  getUnsummarizedMessages,
+  getMessagesForApiRequest,
+} from '../services/summarization'
 import { setBaseTitle } from '../services/titleManager'
 import {
   isAwayFromThread,
@@ -102,6 +108,7 @@ function ChatView() {
   const scrollRef = useRef(null)
   const abortRef = useRef(null)
   const autoTitleAbortRef = useRef(null)
+  const summarizationAbortRef = useRef(null)
   const generatingRef = useRef(false)
   const isAtBottomRef = useRef(true)
   const autoTriggeredRef = useRef(false)
@@ -117,6 +124,7 @@ function ChatView() {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
+  const [summarizing, setSummarizing] = useState(false)
   const [streamingMsgId, setStreamingMsgId] = useState(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [noChatProfile, setNoChatProfile] = useState(false)
@@ -402,7 +410,10 @@ function ChatView() {
   })
 
   async function handleCancel() {
-    if (autoTitleAbortRef.current) {
+    if (summarizationAbortRef.current) {
+      summarizationAbortRef.current.abort()
+      summarizationAbortRef.current = null
+    } else if (autoTitleAbortRef.current) {
       autoTitleAbortRef.current.abort()
       autoTitleAbortRef.current = null
     } else if (abortRef.current) {
@@ -425,6 +436,15 @@ function ChatView() {
       showToast(t('noProfileModel'), { type: 'error' })
       return
     }
+
+    const includeOOC = character?.includeOOC !== false
+    const keepMessages = Number(character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0)
+    const apiMessages = getMessagesForApiRequest(currentMsgs, {
+      includeOOC,
+      keepMessages,
+    })
+    const memoryHeader = await getSetting('prompting.apiRequestSectionHeaders.memories')
+    const memoryText = thread?.memory || ''
 
     let payload
     if (isOOC) {
@@ -452,9 +472,11 @@ function ChatView() {
         character,
         chatPersona,
         currentPersona,
-        messages: transcriptMsgs,
+        messages: apiMessages.slice(0, -1),
         userMessage: lastUserMsg,
         personaMap,
+        memoryText,
+        memoryHeader,
         oocSettings: {
           oocSystemInstructions,
           oocUserInstructions,
@@ -491,10 +513,12 @@ function ChatView() {
         character,
         chatPersona,
         currentPersona,
-        messages: currentMsgs,
+        messages: apiMessages,
         isFirstMessage,
         settings,
         writingInstruction,
+        memoryText,
+        memoryHeader,
       })
     }
 
@@ -567,8 +591,47 @@ function ChatView() {
     }
   }
 
+  async function handleSummarization(currentMessages = messages) {
+    if (generatingRef.current || summarizing) return
+    if (!thread || !character) return
+    if (!shouldTriggerSummarization({ character, messages: currentMessages, includeOOC: character.includeOOC !== false })) {
+      return
+    }
+
+    const unsummarizedMessages = getUnsummarizedMessages(currentMessages, {
+      includeOOC: character.includeOOC !== false,
+    })
+    if (unsummarizedMessages.length === 0) return
+
+    const currentPersona = null
+    setSummarizing(true)
+    showToast('Generating summary', { type: 'info' })
+
+    summarizationAbortRef.current = new AbortController()
+    try {
+      const summary = await triggerSummarization({
+        thread,
+        character,
+        messages,
+        personaMap,
+        signal: summarizationAbortRef.current.signal,
+        currentPersona,
+      })
+      if (summary) {
+        showToast('Summary generated', { type: 'success' })
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        showToast(err.message || 'Summarization failed', { type: 'error' })
+      }
+    } finally {
+      summarizationAbortRef.current = null
+      setSummarizing(false)
+    }
+  }
+
   async function handleSend(text, personaId, isOOC, autoReply = true) {
-    if (generatingRef.current) return
+    if (generatingRef.current || summarizing) return
     generatingRef.current = true
     setGenerating(true)
     startGenerating(threadId)
@@ -601,6 +664,10 @@ function ChatView() {
 
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
+
+      if (character && shouldTriggerSummarization({ character, messages: msgs, includeOOC: character.includeOOC !== false })) {
+        await handleSummarization(msgs)
+      }
 
       const thr = await getThread(threadId)
       const chr = await getCharacter(thr.characterId)
@@ -715,13 +782,24 @@ function ChatView() {
         const assistantRolePrefixOoc = await getSetting('prompting.assistantRolePrefixOoc')
         const userRolePrefixOoc = await getSetting('prompting.userRolePrefixOoc')
 
+        const includeOOCRegen = character?.includeOOC !== false
+        const keepMessagesRegen = Number(character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0)
+        const apiMessagesRegen = getMessagesForApiRequest(currentMsgs, {
+          includeOOC: includeOOCRegen,
+          keepMessages: keepMessagesRegen,
+        })
+        const memoryHeaderRegen = await getSetting('prompting.apiRequestSectionHeaders.memories')
+        const memoryTextRegen = thread?.memory || ''
+
         payload = await buildOOCMessagesPayload({
           character,
           chatPersona,
           currentPersona: null,
-          messages: currentMsgs,
+          messages: apiMessagesRegen,
           userMessage: '',
           personaMap,
+          memoryText: memoryTextRegen,
+          memoryHeader: memoryHeaderRegen,
           oocSettings: {
             oocSystemInstructions,
             oocUserInstructions,
@@ -754,14 +832,25 @@ function ChatView() {
           personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
         }
 
+        const includeOOCRegen = character?.includeOOC !== false
+        const keepMessagesRegen = Number(character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0)
+        const apiMessagesRegen = getMessagesForApiRequest(currentMsgs, {
+          includeOOC: includeOOCRegen,
+          keepMessages: keepMessagesRegen,
+        })
+        const memoryHeaderRegen = await getSetting('prompting.apiRequestSectionHeaders.memories')
+        const memoryTextRegen = thread?.memory || ''
+
         payload = await buildMessagesPayload({
           character,
           chatPersona,
           currentPersona: null,
-          messages: currentMsgs,
+          messages: apiMessagesRegen,
           isFirstMessage,
           settings,
           writingInstruction,
+          memoryText: memoryTextRegen,
+          memoryHeader: memoryHeaderRegen,
         })
       }
 
@@ -1068,6 +1157,7 @@ function ChatView() {
         onSend={handleSend}
         onCancel={handleCancel}
         generating={generating}
+        summarizing={summarizing}
       />
 
       {confirmDeleteId && (

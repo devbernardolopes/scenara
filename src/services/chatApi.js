@@ -18,6 +18,19 @@ export function replaceVars(text, { charName, personaName, currentPersonaName })
     .replace(/{{name}}/g, currentPersonaName || personaName || '')
 }
 
+export function appendMemoryToPayload(payload, memoryText, memoryHeader) {
+  if (!Array.isArray(payload) || payload.length === 0) return payload
+  if (!memoryText) return payload
+
+  const systemEntry = payload.find((entry) => entry?.role === 'system')
+  if (!systemEntry) return payload
+
+  const section = memoryHeader ? `${memoryHeader}\n\n${memoryText}` : memoryText
+  const content = `${systemEntry.content || ''}${systemEntry.content ? '\n\n' : ''}${section}`
+
+  return payload.map((entry) => (entry === systemEntry ? { ...entry, content } : entry))
+}
+
 export async function buildMessagesPayload({
   character,
   chatPersona,
@@ -26,6 +39,8 @@ export async function buildMessagesPayload({
   isFirstMessage,
   settings,
   writingInstruction,
+  memoryText,
+  memoryHeader,
 }) {
   const systemParts = []
 
@@ -174,6 +189,8 @@ export async function buildOOCMessagesPayload({
   oocSettings,
   userMessage,
   personaMap,
+  memoryText,
+  memoryHeader,
 }) {
   const charName = character?.name || ''
   const personaName = chatPersona?.name || ''
@@ -243,6 +260,10 @@ export async function buildOOCMessagesPayload({
     } else {
       result.push({ role: 'user', content: userMessage })
     }
+  }
+
+  if (memoryText) {
+    return appendMemoryToPayload(result, memoryText, memoryHeader)
   }
 
   return result
