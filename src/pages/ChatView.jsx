@@ -594,7 +594,11 @@ function ChatView() {
   async function handleSummarization(currentMessages = messages) {
     if (generatingRef.current || summarizing) return
     if (!thread || !character) return
-    if (!shouldTriggerSummarization({ character, messages: currentMessages, includeOOC: character.includeOOC !== false })) {
+    if (!(await shouldTriggerSummarization({
+      character,
+      messages: currentMessages,
+      includeOOC: character.includeOOC !== false,
+    }))) {
       return
     }
 
@@ -612,7 +616,7 @@ function ChatView() {
       const summary = await triggerSummarization({
         thread,
         character,
-        messages,
+        messages: currentMessages,
         personaMap,
         signal: summarizationAbortRef.current.signal,
         currentPersona,
@@ -665,7 +669,14 @@ function ChatView() {
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
 
-      if (character && shouldTriggerSummarization({ character, messages: msgs, includeOOC: character.includeOOC !== false })) {
+      if (
+        character &&
+        (await shouldTriggerSummarization({
+          character,
+          messages: msgs,
+          includeOOC: character.includeOOC !== false,
+        }))
+      ) {
         await handleSummarization(msgs)
       }
 

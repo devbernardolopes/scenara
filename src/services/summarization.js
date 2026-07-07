@@ -26,18 +26,25 @@ export function getMessagesForApiRequest(messages, { includeOOC = true, keepMess
   return eligible.filter((message, index) => !message?.summarizedAt || index >= cutoff)
 }
 
-export function shouldTriggerSummarization({ character, messages, includeOOC = true }) {
-  if (!character || character.memory === 'never') return false
+export async function shouldTriggerSummarization({ character, messages, includeOOC = true }) {
+  if (!character) return false
+
+  const resolvedMemory = character.memory ?? (await getSetting('defaultMemory')) ?? 'messages'
+  if (resolvedMemory === 'never') return false
 
   const unsummarizedMessages = getUnsummarizedMessages(messages, { includeOOC })
   const count = unsummarizedMessages.length
-  if (character.memory === 'messages') {
-    const threshold = Number(character.messagesThreshold ?? 7)
+  if (resolvedMemory === 'messages') {
+    const threshold = Number(
+      character.messagesThreshold ?? (await getSetting('defaultMessagesThreshold')) ?? 7,
+    )
     return count >= threshold
   }
 
-  if (character.memory === 'contextWindow') {
-    const threshold = Number(character.contextWindowThreshold ?? 1024)
+  if (resolvedMemory === 'contextWindow') {
+    const threshold = Number(
+      character.contextWindowThreshold ?? (await getSetting('defaultContextWindowThreshold')) ?? 1024,
+    )
     const tokenCount = unsummarizedMessages.reduce(
       (total, message) => total + estimateTokens(message?.content || ''),
       0,
