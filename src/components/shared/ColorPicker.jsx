@@ -15,7 +15,10 @@ export default function ColorPicker({ value, onChange, theme: explicitTheme }) {
           <button
             key={slot}
             type="button"
-            onClick={() => onChange(isSelected ? '' : c)}
+            onClick={(e) => {
+              e.stopPropagation()
+              onChange(isSelected ? '' : c)
+            }}
             className={`w-7 h-7 rounded-full border-2 transition-all ${
               isSelected ? 'border-text scale-110' : 'border-transparent'
             }`}
