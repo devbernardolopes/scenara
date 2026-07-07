@@ -57,5 +57,6 @@
   "scrollToBottom": "Scroll to bottom",
   "noProfileModel": "No Chat profile configured or model selected.",
   "autoTitleGenerating": "Generating title",
-  "autoTitleGenerated": "Title generated"
+  "autoTitleGenerated": "Title generated",
+  "memoryEntry": "Entry #{{number}}"
 }
