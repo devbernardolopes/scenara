@@ -164,6 +164,15 @@ export async function duplicateThread(id) {
       })),
     )
   }
+  const memories = await db.threadMemories.where('threadId').equals(Number(id)).toArray()
+  if (memories.length > 0) {
+    await db.threadMemories.bulkAdd(
+      memories.map(({ id: _id, ...rest }) => ({
+        ...rest,
+        threadId: newId,
+      })),
+    )
+  }
   const promptEntries = await db.promptHistory.where('threadId').equals(Number(id)).toArray()
   if (promptEntries.length > 0) {
     await db.promptHistory.bulkAdd(
@@ -213,6 +222,17 @@ export async function forkThread(id, messageId) {
   if (messagesToCopy.length > 0) {
     await db.messages.bulkAdd(
       messagesToCopy.map(({ id: _id, ...rest }) => ({
+        ...rest,
+        threadId: newId,
+      })),
+    )
+  }
+
+  const memories = await db.threadMemories.where('threadId').equals(Number(id)).toArray()
+  const memoriesToCopy = memories.filter((entry) => !entry.createdAt || new Date(entry.createdAt) <= new Date(allMessages[msgIdx].createdAt))
+  if (memoriesToCopy.length > 0) {
+    await db.threadMemories.bulkAdd(
+      memoriesToCopy.map(({ id: _id, ...rest }) => ({
         ...rest,
         threadId: newId,
       })),
