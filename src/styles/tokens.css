@@ -38,6 +38,12 @@
   --color-delete-hover: #b91c1c;
   --color-on-delete: #ffffff;
 
+  --color-ooc-bg: #991b1b;
+  --color-ooc-text: #fef2f2;
+  --color-ooc-border: #b91c1c;
+  --color-ooc-muted: rgba(254, 242, 242, 0.65);
+  --color-ooc-placeholder: rgba(254, 242, 242, 0.45);
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -384,6 +390,34 @@
 }
 .text-delete {
   color: var(--color-delete);
+}
+
+/* Placeholder (theme-aware — Tailwind v4 doesn't generate placeholder-tertiary natively) */
+.placeholder-tertiary::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* OOC (out-of-character) mode — consistent deep red across all themes */
+.bg-ooc {
+  background-color: var(--color-ooc-bg);
+}
+.text-ooc {
+  color: var(--color-ooc-text);
+}
+.border-ooc {
+  border-color: var(--color-ooc-border);
+}
+.text-ooc-muted {
+  color: var(--color-ooc-muted);
+}
+.placeholder-ooc::placeholder {
+  color: var(--color-ooc-placeholder);
+}
+.focus\:ring-ooc:focus {
+  --tw-ring-color: var(--color-ooc-border);
+}
+.hover\:bg-ooc-hover:hover {
+  background-color: rgba(254, 242, 242, 0.1);
 }
 
 /* Toast animations */

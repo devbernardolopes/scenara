@@ -215,6 +215,9 @@ function MessageBubble({
       userMutedClass = 'text-on-primary-muted'
       userHoverBg = 'hover:bg-white/10'
     }
+  } else if (isUser && isOOC) {
+    userMutedClass = 'text-ooc-muted'
+    userHoverBg = 'hover:bg-ooc-hover'
   }
 
   let promptData = null
@@ -227,7 +230,7 @@ function MessageBubble({
   let userBgClass = 'bg-primary'
   let userBgStyle = null
   if (isOOC) {
-    userBgClass = 'bg-red-50 text-red-900 border border-red-200'
+    userBgClass = 'bg-ooc text-ooc border border-ooc'
   } else if (personaColor) {
     userBgStyle = { backgroundColor: personaColor }
     userBgClass = ''
@@ -412,9 +415,11 @@ function MessageBubble({
         className={`max-w-[80%] md:max-w-[65%] rounded-lg ${unreadClass} ${
           isUser
             ? `${userBgClass} text-on-primary`
-            : isSystem
-              ? 'bg-surface-secondary text-secondary text-sm italic'
-              : 'bg-surface-secondary text-text'
+            : isOOC
+              ? 'bg-ooc text-ooc border border-ooc'
+              : isSystem
+                ? 'bg-surface-secondary text-secondary text-sm italic'
+                : 'bg-surface-secondary text-text'
         }`}
         style={isUser ? userBgStyle : undefined}
       >
@@ -428,7 +433,13 @@ function MessageBubble({
           />
           {nameLabel && (
             <span
-              className={`text-xs font-medium truncate max-w-[100px] ${isUser ? userMutedClass || 'text-on-primary-muted' : 'text-text'}`}
+              className={`text-xs font-medium truncate max-w-[100px] ${
+                isUser
+                  ? userMutedClass || 'text-on-primary-muted'
+                  : isOOC
+                    ? 'text-ooc'
+                    : 'text-text'
+              }`}
               style={isUser ? userMutedStyle : undefined}
             >
               {nameLabel}
@@ -445,7 +456,9 @@ function MessageBubble({
                 className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                   isUser
                     ? `${userHoverBg} ${userMutedClass}`
-                    : 'hover:bg-black/10 text-tertiary hover:text-text'
+                    : isOOC
+                      ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                      : 'hover:bg-black/10 text-tertiary hover:text-text'
                 }`}
                 style={isUser ? userMutedStyle : undefined}
                 title={t('previousInitialMessage')}
@@ -453,7 +466,7 @@ function MessageBubble({
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <span
-                className={`text-xs whitespace-nowrap ${isUser ? userMutedClass || '' : 'text-tertiary'}`}
+                className={`text-xs whitespace-nowrap ${isUser ? userMutedClass || '' : isOOC ? 'text-ooc-muted' : 'text-tertiary'}`}
                 style={isUser ? userMutedStyle : undefined}
               >
                 {bundleIndex + 1}/{bundleMessages.length}
@@ -467,7 +480,9 @@ function MessageBubble({
                 className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                   isUser
                     ? `${userHoverBg} ${userMutedClass}`
-                    : 'hover:bg-black/10 text-tertiary hover:text-text'
+                    : isOOC
+                      ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                      : 'hover:bg-black/10 text-tertiary hover:text-text'
                 }`}
                 style={isUser ? userMutedStyle : undefined}
                 title={t('nextInitialMessage')}
@@ -492,7 +507,9 @@ function MessageBubble({
                     className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                       isDelete
                         ? 'bg-delete text-on-delete hover:bg-delete-hover'
-                        : 'hover:bg-black/10 text-tertiary hover:text-text'
+                        : isOOC
+                          ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                          : 'hover:bg-black/10 text-tertiary hover:text-text'
                     }`}
                     title={t(def.labelKey)}
                   >
@@ -506,7 +523,11 @@ function MessageBubble({
                     ref={overflowBtnRef}
                     type="button"
                     onClick={handleOverflowClick}
-                    className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text"
+                    className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded ${
+                      isOOC
+                        ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                        : 'hover:bg-black/10 text-tertiary hover:text-text'
+                    }`}
                     title={t('moreOptions')}
                   >
                     <MoreHorizontal className="w-4 h-4" />
@@ -583,7 +604,7 @@ function MessageBubble({
               autoFocus
               className={`w-full resize-none rounded border p-2 text-sm focus:outline-none focus:ring-1 ${
                 isOOC
-                  ? 'bg-red-50 text-red-900 border-red-200 focus:ring-red-300'
+                  ? 'bg-ooc text-ooc border-ooc focus:ring-ooc'
                   : isUser
                     ? `${userBgClass || 'bg-transparent'} text-on-primary border-white/20 focus:ring-white/40`
                     : 'bg-surface text-text border-border focus:ring-primary/40'
@@ -627,7 +648,7 @@ function MessageBubble({
         >
           <span className="flex items-center gap-2">
             <span
-              className={`text-xs font-medium ${isUser ? '' : 'text-tertiary'}`}
+              className={`text-xs font-medium ${isUser ? '' : isOOC ? 'text-ooc-muted' : 'text-tertiary'}`}
             >{`#${messageNumber}`}</span>
             <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
               {new Date(slotCreatedAt || message.createdAt).toLocaleTimeString([], {

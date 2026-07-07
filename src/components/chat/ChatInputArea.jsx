@@ -338,7 +338,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
           placeholder={t('inputPlaceholder')}
           className={`w-full resize-none rounded-lg border px-4 py-3 pr-12 text-sm leading-relaxed transition-colors duration-150 min-h-[56px] max-h-48 focus:outline-none focus:ring-2 focus:ring-primary/30 ${
             oocActive
-              ? 'bg-red-50 border-red-200 text-red-900 placeholder-red-400'
+              ? 'bg-ooc text-ooc border-ooc placeholder-ooc'
               : 'bg-surface border-border text-text placeholder-tertiary'
           }`}
         />
@@ -351,7 +351,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating }) {
               icon={MessageSquare}
               label={t('ooc')}
               onClick={() => setOocActive((prev) => !prev)}
-              className={oocActive ? '!text-red-500 !bg-red-50 hover:!bg-red-100' : ''}
+              className={oocActive ? '!text-ooc !bg-ooc hover:!bg-ooc-hover' : ''}
             />
             <IconButton icon={Paperclip} label={t('attachFile')} className="hidden sm:flex" />
             <IconButton icon={Zap} label={t('shortcuts')} className="hidden md:flex" />
