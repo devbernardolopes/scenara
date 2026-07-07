@@ -1077,7 +1077,7 @@ function ChatView() {
 
   return (
     <div className="flex flex-col h-full">
-      <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto relative">
+      <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto relative pb-4">
         <div className="sticky top-0 z-10 bg-surface flex items-center justify-between px-4 md:px-8 py-3 border-b border-border">
           <div className="flex items-center gap-2 min-w-0">
             {character && (
@@ -1185,13 +1185,15 @@ function ChatView() {
         </div>
       </div>
 
-      <ChatInputArea
-        threadId={threadId}
-        onSend={handleSend}
-        onCancel={handleCancel}
-        generating={generating}
-        summarizing={summarizing}
-      />
+      <div className="flex-shrink-0 border-t border-border bg-surface">   {/* Wrap input for better control */}
+        <ChatInputArea
+          threadId={threadId}
+          onSend={handleSend}
+          onCancel={handleCancel}
+          generating={generating}
+          summarizing={summarizing}
+        />
+      </div>
 
       {confirmDeleteId && (
         <ConfirmDialog
