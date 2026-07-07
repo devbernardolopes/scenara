@@ -54,6 +54,7 @@ function StartChatButton({ character, onStart }) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
+          onMouseDown={(e) => e.stopPropagation()}
           className="min-h-[44px] min-w-[44px] flex items-center justify-center text-secondary hover:text-text hover:bg-surface-hover"
           aria-label={t('discovery.actions.selectPersona')}
           title={t('discovery.actions.selectPersona')}
