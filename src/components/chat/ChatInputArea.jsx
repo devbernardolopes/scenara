@@ -429,7 +429,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing }) 
                 <button
                   type="button"
                   className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] md:hidden"
-                  onClick={() => setQuickSettingsOpen(false)}
+                  onClick={() => openModal('memory', { threadId })}
                 >
                   <BookOpen className="w-4 h-4" />
                   <span>{t('memories')}</span>
@@ -488,7 +488,11 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing }) 
                 : 'bg-primary text-on-primary hover:bg-primary-hover'
             }`}
           >
-            {generating || summarizing ? <Square className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+            {generating || summarizing ? (
+              <Square className="w-4 h-4" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </button>
         </div>
       </div>
