@@ -14,6 +14,9 @@ import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
+import { findColorSlot } from '../../config/colorPalettes'
+import { useTheme } from '../../hooks/useTheme'
+import ColorPicker from '../shared/ColorPicker'
 import CloseButton from '../shared/CloseButton'
 import Avatar from '../shared/Avatar'
 import {
@@ -39,18 +42,6 @@ import {
 } from '../../lib/icons'
 import { getGeneratingThreads } from '../../services/generatingState'
 import { useUnread } from '../../hooks/useUnread'
-
-const COLOR_PRESETS = [
-  '#ef4444',
-  '#f97316',
-  '#eab308',
-  '#22c55e',
-  '#14b8a6',
-  '#3b82f6',
-  '#a855f7',
-  '#ec4899',
-  '',
-]
 
 function ThreadCardTitle({ title, isActive, threadCardMarquee }) {
   const wrapperRef = useRef(null)
@@ -93,6 +84,7 @@ function Sidebar({ open, onClose }) {
   const navigate = useNavigate()
   const { openModal } = useModal()
   const { confirm } = useConfirm()
+  const { theme } = useTheme()
   const [threads, setThreads] = useState([])
   const [characters, setCharacters] = useState({})
   const [colorPickerId, setColorPickerId] = useState(null)
@@ -258,7 +250,8 @@ function Sidebar({ open, onClose }) {
   }
 
   async function handleColorSelect(thread, color) {
-    await updateThreadColor(thread.id, color)
+    const colorSlot = color ? findColorSlot(color, theme) : -1
+    await updateThreadColor(thread.id, color, colorSlot)
     setColorPickerId(null)
   }
 
@@ -463,29 +456,14 @@ function Sidebar({ open, onClose }) {
                             {colorPickerId === thread.id && (
                               <div
                                 ref={colorPickerRef}
-                                className="absolute bottom-full right-0 mb-1 flex gap-1 p-1.5 bg-surface border border-border rounded-md shadow-surface-md z-10"
+                                className="absolute bottom-full right-0 mb-1 bg-surface border border-border rounded-md shadow-surface-md z-10 p-1.5"
                               >
-                                {COLOR_PRESETS.map((c, i) => (
-                                  <button
-                                    key={i}
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.preventDefault()
-                                      e.stopPropagation()
-                                      handleColorSelect(thread, c)
-                                    }}
-                                    className={`w-5 h-5 rounded-full border ${c ? 'border-border' : 'border-border'} ${thread.color === c ? 'ring-2 ring-primary' : ''}`}
-                                    style={c ? { backgroundColor: c } : undefined}
-                                    aria-label={c || t('sidebar.colorNone')}
-                                    title={c || t('sidebar.colorNone')}
-                                  >
-                                    {!c && (
-                                      <span className="flex items-center justify-center text-[10px] text-tertiary leading-none">
-                                        /
-                                      </span>
-                                    )}
-                                  </button>
-                                ))}
+                                <ColorPicker
+                                  value={thread.color || ''}
+                                  onChange={(c) => {
+                                    handleColorSelect(thread, c)
+                                  }}
+                                />
                               </div>
                             )}
                           </div>

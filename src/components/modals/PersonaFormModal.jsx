@@ -8,24 +8,17 @@ import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import Avatar from '../shared/Avatar'
 import { createPersona, updatePersona, getAllPersonas } from '../../services/personas'
 import { estimateTokens } from '../../services/tokenEstimator'
-
-const COLOR_PRESETS = [
-  '#ef4444',
-  '#f97316',
-  '#eab308',
-  '#22c55e',
-  '#14b8a6',
-  '#3b82f6',
-  '#a855f7',
-  '#ec4899',
-]
+import { findColorSlot } from '../../config/colorPalettes'
+import { useTheme } from '../../hooks/useTheme'
+import ColorPicker from '../shared/ColorPicker'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
 
 function PersonaFormModal({ persona }) {
   const { t } = useTranslation('settings')
-  const { closeModal, setCloseGuard } = useModal()
+  const { closeModal, setCloseGuard, openModal } = useModal()
+  const { theme } = useTheme()
   const { promptSave } = useSaveConfirm()
   const editing = Boolean(persona)
 
@@ -35,6 +28,7 @@ function PersonaFormModal({ persona }) {
     avatar: persona?.avatar || '',
     description: persona?.description || '',
     color: persona?.color || '',
+    colorSlot: persona?.colorSlot ?? (persona?.color ? findColorSlot(persona.color, 'light') : -1),
     isDefault: Boolean(persona?.isDefault),
   })
 
@@ -104,6 +98,7 @@ function PersonaFormModal({ persona }) {
           avatar: form.avatar,
           description: form.description.trim(),
           color: form.color,
+          colorSlot: form.colorSlot,
           isDefault: form.isDefault,
         })
       } else {
@@ -113,6 +108,7 @@ function PersonaFormModal({ persona }) {
           avatar: form.avatar,
           description: form.description.trim(),
           color: form.color,
+          colorSlot: form.colorSlot,
           isDefault: form.isDefault,
         })
       }
@@ -259,27 +255,14 @@ function PersonaFormModal({ persona }) {
           <label className="block text-sm font-medium text-text mb-2">
             {t('persona.form.colorLabel')}
           </label>
-          <div className="flex items-center gap-2 flex-wrap">
-            {COLOR_PRESETS.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setForm((prev) => ({ ...prev, color: prev.color === c ? '' : c }))}
-                className={`w-7 h-7 rounded-full border-2 transition-all ${
-                  form.color === c ? 'border-text scale-110' : 'border-transparent'
-                }`}
-                style={{ backgroundColor: c }}
-                aria-label={c}
-              />
-            ))}
-            <input
-              type="text"
-              value={form.color}
-              onChange={(e) => setForm((prev) => ({ ...prev, color: e.target.value }))}
-              placeholder="#"
-              className="w-20 px-2 py-1 border border-border rounded-md bg-surface text-text text-xs"
-            />
-          </div>
+          <ColorPicker
+            value={form.color}
+            onChange={(c) => {
+              const slot = c ? findColorSlot(c, theme) : -1
+              setForm((prev) => ({ ...prev, color: c, colorSlot: slot }))
+            }}
+            theme={theme}
+          />
         </div>
 
         <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">

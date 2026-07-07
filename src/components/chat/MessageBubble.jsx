@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
+import { getContrastColor, isLightColor } from '../../lib/color'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSanitize from 'rehype-sanitize'
@@ -202,6 +203,19 @@ function MessageBubble({
   const persona = personaMap?.[message.personaId]
   const personaColor = persona?.color
   const isOOC = message.isOOC
+
+  let userMutedClass = 'text-tertiary'
+  let userMutedStyle = undefined
+  let userHoverBg = 'hover:bg-black/10'
+  if (isUser && !isOOC) {
+    if (personaColor) {
+      userMutedStyle = { color: getContrastColor(personaColor) }
+      userHoverBg = isLightColor(personaColor) ? 'hover:bg-black/10' : 'hover:bg-white/10'
+    } else {
+      userMutedClass = 'text-on-primary-muted'
+      userHoverBg = 'hover:bg-white/10'
+    }
+  }
 
   let promptData = null
   try {
@@ -413,7 +427,10 @@ function MessageBubble({
             onClick={handleAvatarClick}
           />
           {nameLabel && (
-            <span className="text-xs font-medium text-text truncate max-w-[100px]">
+            <span
+              className={`text-xs font-medium truncate max-w-[100px] ${isUser ? userMutedClass || 'text-on-primary-muted' : 'text-text'}`}
+              style={isUser ? userMutedStyle : undefined}
+            >
               {nameLabel}
             </span>
           )}
@@ -425,12 +442,20 @@ function MessageBubble({
                   const newIdx = (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
                   onBundleNavigate?.(message.id, newIdx)
                 }}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+                className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                  isUser
+                    ? `${userHoverBg} ${userMutedClass}`
+                    : 'hover:bg-black/10 text-tertiary hover:text-text'
+                }`}
+                style={isUser ? userMutedStyle : undefined}
                 title={t('previousInitialMessage')}
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
-              <span className="text-xs text-tertiary whitespace-nowrap">
+              <span
+                className={`text-xs whitespace-nowrap ${isUser ? userMutedClass || '' : 'text-tertiary'}`}
+                style={isUser ? userMutedStyle : undefined}
+              >
                 {bundleIndex + 1}/{bundleMessages.length}
               </span>
               <button
@@ -439,7 +464,12 @@ function MessageBubble({
                   const newIdx = (bundleIndex + 1) % bundleMessages.length
                   onBundleNavigate?.(message.id, newIdx)
                 }}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text flex-shrink-0"
+                className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                  isUser
+                    ? `${userHoverBg} ${userMutedClass}`
+                    : 'hover:bg-black/10 text-tertiary hover:text-text'
+                }`}
+                style={isUser ? userMutedStyle : undefined}
                 title={t('nextInitialMessage')}
               >
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -528,8 +558,11 @@ function MessageBubble({
                   className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                     isDelete
                       ? 'bg-delete text-on-delete hover:bg-delete-hover'
-                      : 'hover:bg-black/10 text-tertiary hover:text-text'
+                      : userMutedClass
+                        ? `${userHoverBg} ${userMutedClass}`
+                        : userHoverBg
                   }`}
+                  style={isDelete || !userMutedStyle ? undefined : userMutedStyle}
                   title={t(def.labelKey)}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -588,10 +621,15 @@ function MessageBubble({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-3 pb-2">
+        <div
+          className={`flex items-center justify-between px-3 pb-2 ${isUser ? userMutedClass || '' : ''}`}
+          style={isUser && userMutedStyle ? userMutedStyle : undefined}
+        >
           <span className="flex items-center gap-2">
-            <span className="text-xs font-medium text-tertiary">{`#${messageNumber}`}</span>
-            <span className="text-xs opacity-60">
+            <span
+              className={`text-xs font-medium ${isUser ? '' : 'text-tertiary'}`}
+            >{`#${messageNumber}`}</span>
+            <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
               {new Date(slotCreatedAt || message.createdAt).toLocaleTimeString([], {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -600,10 +638,12 @@ function MessageBubble({
           </span>
           <span className="flex items-center gap-2">
             {currentOrigin === 'initial' && (
-              <span className="text-xs opacity-60">{t('initialMessage')}</span>
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>{t('initialMessage')}</span>
             )}
-            {currentOrigin === 'edit' && <span className="text-xs opacity-60">{t('edited')}</span>}
-            <span className="text-xs opacity-60">
+            {currentOrigin === 'edit' && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>{t('edited')}</span>
+            )}
+            <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
               {t('tokens', { count: formatTokenCount(tokenCount) })}
             </span>
           </span>

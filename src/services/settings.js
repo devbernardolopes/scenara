@@ -1,5 +1,26 @@
 import i18n from '../lib/i18n'
 import db from '../db'
+import { COLOR_SLOTS, getPalette } from '../config/colorPalettes'
+
+async function migrateColorsOnThemeChange(newTheme) {
+  const palette = getPalette(newTheme)
+
+  const personas = await db.personas.where('colorSlot').above(-1).toArray()
+  for (const p of personas) {
+    const slot = COLOR_SLOTS[p.colorSlot]
+    if (slot && palette[slot]) {
+      await db.personas.update(p.id, { color: palette[slot] })
+    }
+  }
+
+  const threads = await db.threads.where('colorSlot').above(-1).toArray()
+  for (const t of threads) {
+    const slot = COLOR_SLOTS[t.colorSlot]
+    if (slot && palette[slot]) {
+      await db.threads.update(t.id, { color: palette[slot] })
+    }
+  }
+}
 
 function applyThemeClass(theme) {
   const html = document.documentElement
@@ -840,7 +861,10 @@ export const SETTINGS = [
 ]
 
 const SETTING_EFFECTS = {
-  theme: (value) => applyThemeClass(value),
+  theme: (value) => {
+    applyThemeClass(value)
+    migrateColorsOnThemeChange(value)
+  },
   language: (value) => i18n.changeLanguage(value),
   highlightDeleteButtons: (value) => {
     document.documentElement.classList.toggle('show-delete-highlight', !!value)

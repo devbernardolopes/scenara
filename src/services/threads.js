@@ -99,8 +99,10 @@ export async function markAutoTitleGenerated(id) {
   await db.threads.update(Number(id), { autoTitleGenerated: true })
 }
 
-export async function updateThreadColor(id, color) {
-  const updated = await db.threads.update(Number(id), { color })
+export async function updateThreadColor(id, color, colorSlot) {
+  const data = { color }
+  if (colorSlot !== undefined) data.colorSlot = colorSlot
+  const updated = await db.threads.update(Number(id), data)
   if (updated) {
     window.dispatchEvent(new CustomEvent('threads-changed'))
     return id

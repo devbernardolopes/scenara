@@ -69,6 +69,7 @@ export async function getAllPersonas() {
       description: '',
       context: '',
       color: '',
+      colorSlot: -1,
       isDefault: 1,
       createdAt: now,
       updatedAt: now,
@@ -112,6 +113,7 @@ export async function createPersona(data) {
     description: data.description || '',
     context: data.context || '',
     color: data.color || '',
+    colorSlot: data.colorSlot ?? -1,
     isDefault: data.isDefault ? 1 : 0,
     createdAt: now,
     updatedAt: now,
@@ -214,6 +216,7 @@ export async function duplicatePersona(id) {
     description: original.description,
     context: original.context,
     color: original.color,
+    colorSlot: original.colorSlot ?? -1,
     isDefault: 0,
     createdAt: now,
     updatedAt: now,
@@ -256,6 +259,7 @@ export async function exportPersona(id) {
     description: p.description,
     context: p.context,
     color: p.color,
+    colorSlot: p.colorSlot ?? -1,
   }
 }
 
@@ -282,6 +286,7 @@ export async function importPersonas(items) {
       description: item.description || '',
       context: item.context || '',
       color: item.color || '',
+      colorSlot: item.colorSlot ?? -1,
       isDefault: 0,
       createdAt: now,
       updatedAt: now,
