@@ -175,5 +175,38 @@
     "save": "Save",
     "discard": "Discard",
     "cancel": "Cancel"
+  },
+  "tags": {
+    "title": "Tags",
+    "add": "Add",
+    "update": "Update",
+    "placeholder": "Enter tag name...",
+    "cancelEdit": "Cancel editing",
+    "noTags": "No tags yet. Create one above!",
+    "noResults": "No tags match your search.",
+    "searchPlaceholder": "Search tags...",
+    "searchClear": "Clear search",
+    "delete": "Delete {{name}}",
+    "filter": {
+      "title": "Filters & Sorting",
+      "active": "Active"
+    },
+    "sort": {
+      "label": "Sort by",
+      "name": "Name",
+      "createdAt": "Created"
+    },
+    "order": {
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "confirmDelete": {
+      "title": "Delete Tag",
+      "message": "Delete tag \"{{name}}\"?",
+      "messageWithChars": "Delete tag \"{{name}}\"? It is used by {{count}} character(s) and will be removed from them.",
+      "confirm": "Delete"
+    },
+    "duplicate": "Tag \"{{name}}\" already exists",
+    "emptyName": "Tag name cannot be empty"
   }
 }

@@ -108,5 +108,38 @@
       "fileError": "Impossibile leggere il file"
     }
   },
-  "ok": "OK"
+  "ok": "OK",
+  "tags": {
+    "title": "Tag",
+    "add": "Aggiungi",
+    "update": "Aggiorna",
+    "placeholder": "Inserisci il nome del tag...",
+    "cancelEdit": "Annulla modifica",
+    "noTags": "Ancora nessun tag. Creane uno sopra!",
+    "noResults": "Nessun tag corrisponde alla tua ricerca.",
+    "searchPlaceholder": "Cerca tag...",
+    "searchClear": "Cancella ricerca",
+    "delete": "Elimina {{name}}",
+    "filter": {
+      "title": "Filtri & Ordinamento",
+      "active": "Attivo"
+    },
+    "sort": {
+      "label": "Ordina per",
+      "name": "Nome",
+      "createdAt": "Creazione"
+    },
+    "order": {
+      "asc": "Crescente",
+      "desc": "Decrescente"
+    },
+    "confirmDelete": {
+      "title": "Elimina Tag",
+      "message": "Eliminare il tag \"{{name}}\"?",
+      "messageWithChars": "Eliminare il tag \"{{name}}\"? È usato da {{count}} personaggio(i) e verrà rimosso da essi.",
+      "confirm": "Elimina"
+    },
+    "duplicate": "Il tag \"{{name}}\" esiste già",
+    "emptyName": "Il nome del tag non può essere vuoto"
+  }
 }

@@ -108,5 +108,38 @@
       "fileError": "Error al leer el archivo"
     }
   },
-  "ok": "OK"
+  "ok": "OK",
+  "tags": {
+    "title": "Tags",
+    "add": "Añadir",
+    "update": "Actualizar",
+    "placeholder": "Introduce el nombre de la etiqueta...",
+    "cancelEdit": "Cancelar edición",
+    "noTags": "Aún no hay etiquetas. ¡Crea una arriba!",
+    "noResults": "Ninguna etiqueta coincide con tu búsqueda.",
+    "searchPlaceholder": "Buscar etiquetas...",
+    "searchClear": "Limpiar búsqueda",
+    "delete": "Eliminar {{name}}",
+    "filter": {
+      "title": "Filtros & Ordenación",
+      "active": "Activo"
+    },
+    "sort": {
+      "label": "Ordenar por",
+      "name": "Nombre",
+      "createdAt": "Creación"
+    },
+    "order": {
+      "asc": "Ascendente",
+      "desc": "Descendente"
+    },
+    "confirmDelete": {
+      "title": "Eliminar Etiqueta",
+      "message": "¿Eliminar la etiqueta \"{{name}}\"?",
+      "messageWithChars": "¿Eliminar la etiqueta \"{{name}}\"? Es utilizada por {{count}} personaje(s) y será eliminada de ellos.",
+      "confirm": "Eliminar"
+    },
+    "duplicate": "La etiqueta \"{{name}}\" ya existe",
+    "emptyName": "El nombre de la etiqueta no puede estar vacío"
+  }
 }

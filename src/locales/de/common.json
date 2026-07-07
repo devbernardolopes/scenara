@@ -108,5 +108,38 @@
       "fileError": "Fehler beim Lesen der Datei"
     }
   },
-  "ok": "OK"
+  "ok": "OK",
+  "tags": {
+    "title": "Tags",
+    "add": "Hinzufügen",
+    "update": "Aktualisieren",
+    "placeholder": "Tag-Namen eingeben...",
+    "cancelEdit": "Bearbeitung abbrechen",
+    "noTags": "Noch keine Tags. Erstelle einen oben!",
+    "noResults": "Keine Tags entsprechen deiner Suche.",
+    "searchPlaceholder": "Tags durchsuchen...",
+    "searchClear": "Suche löschen",
+    "delete": "{{name}} löschen",
+    "filter": {
+      "title": "Filter & Sortierung",
+      "active": "Aktiv"
+    },
+    "sort": {
+      "label": "Sortieren nach",
+      "name": "Name",
+      "createdAt": "Erstellt"
+    },
+    "order": {
+      "asc": "Aufsteigend",
+      "desc": "Absteigend"
+    },
+    "confirmDelete": {
+      "title": "Tag löschen",
+      "message": "Tag \"{{name}}\" löschen?",
+      "messageWithChars": "Tag \"{{name}}\" löschen? Er wird von {{count}} Charakter(en) verwendet und von diesen entfernt.",
+      "confirm": "Löschen"
+    },
+    "duplicate": "Tag \"{{name}}\" existiert bereits",
+    "emptyName": "Der Tag-Name darf nicht leer sein"
+  }
 }

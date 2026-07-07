@@ -108,5 +108,38 @@
       "fileError": "Échec de la lecture du fichier"
     }
   },
-  "ok": "OK"
+  "ok": "OK",
+  "tags": {
+    "title": "Étiquettes",
+    "add": "Ajouter",
+    "update": "Modifier",
+    "placeholder": "Entrez le nom de l'étiquette...",
+    "cancelEdit": "Annuler la modification",
+    "noTags": "Pas encore d'étiquettes. Créez-en une ci-dessus !",
+    "noResults": "Aucune étiquette ne correspond à votre recherche.",
+    "searchPlaceholder": "Rechercher des étiquettes...",
+    "searchClear": "Effacer la recherche",
+    "delete": "Supprimer {{name}}",
+    "filter": {
+      "title": "Filtres & Tri",
+      "active": "Actif"
+    },
+    "sort": {
+      "label": "Trier par",
+      "name": "Nom",
+      "createdAt": "Création"
+    },
+    "order": {
+      "asc": "Croissant",
+      "desc": "Décroissant"
+    },
+    "confirmDelete": {
+      "title": "Supprimer l'Étiquette",
+      "message": "Supprimer l'étiquette \"{{name}}\" ?",
+      "messageWithChars": "Supprimer l'étiquette \"{{name}}\" ? Elle est utilisée par {{count}} personnage(s) et en sera retirée.",
+      "confirm": "Supprimer"
+    },
+    "duplicate": "L'étiquette \"{{name}}\" existe déjà",
+    "emptyName": "Le nom de l'étiquette ne peut pas être vide"
+  }
 }

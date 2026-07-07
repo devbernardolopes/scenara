@@ -136,5 +136,38 @@
     "save": "Salvar",
     "discard": "Descartar",
     "cancel": "Cancelar"
+  },
+  "tags": {
+    "title": "Tags",
+    "add": "Adicionar",
+    "update": "Atualizar",
+    "placeholder": "Digite o nome da tag...",
+    "cancelEdit": "Cancelar edição",
+    "noTags": "Nenhuma tag ainda. Crie uma acima!",
+    "noResults": "Nenhuma tag corresponde à sua pesquisa.",
+    "searchPlaceholder": "Pesquisar tags...",
+    "searchClear": "Limpar pesquisa",
+    "delete": "Excluir {{name}}",
+    "filter": {
+      "title": "Filtros & Ordenação",
+      "active": "Ativo"
+    },
+    "sort": {
+      "label": "Ordenar por",
+      "name": "Nome",
+      "createdAt": "Criação"
+    },
+    "order": {
+      "asc": "Crescente",
+      "desc": "Decrescente"
+    },
+    "confirmDelete": {
+      "title": "Excluir Tag",
+      "message": "Excluir tag \"{{name}}\"?",
+      "messageWithChars": "Excluir tag \"{{name}}\"? Ela é usada por {{count}} personagem(ns) e será removida deles.",
+      "confirm": "Excluir"
+    },
+    "duplicate": "Tag \"{{name}}\" já existe",
+    "emptyName": "O nome da tag não pode estar vazio"
   }
 }

@@ -618,7 +618,10 @@ function Sidebar({ open, onClose }) {
             <BookOpen className="w-4 h-4" />
             {t('sidebar.lorebooks')}
           </button>
-          <button className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover">
+          <button
+            onClick={() => openModal('tagManagement')}
+            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
+          >
             <Tags className="w-4 h-4" />
             {t('sidebar.tags')}
           </button>

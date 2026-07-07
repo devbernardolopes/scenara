@@ -111,4 +111,18 @@ db.version(10).stores({
   promptHistory: '++id, threadId, createdAt',
 })
 
+db.version(11).stores({
+  threads: '++id, title, characterId, personaId, updatedAt, isFavorite, threadNumber',
+  characters: '++id, name, createdAt, updatedAt, characterNumber, *tags',
+  personas: '++id, name, title, createdAt, isDefault',
+  settings: '++id, key',
+  uiState: '++id, key',
+  messages: '++id, threadId, role, personaId, createdAt',
+  writingInstructions: '++id, name, createdAt',
+  connectionProfiles: '++id, name, createdAt',
+  inChatShortcuts: '++id, name, createdAt',
+  promptHistory: '++id, threadId, createdAt',
+  tags: '++id, &name, createdAt',
+})
+
 export default db
