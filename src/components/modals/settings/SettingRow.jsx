@@ -24,8 +24,9 @@ const CONTROL_MAP = {
 function SettingRow({ setting, onSave }) {
   const { t } = useTranslation('settings')
   const [value, setValue] = useState(setting.default)
-  const [depValue, setDepValue] = useState(null)
+  const [depValues, setDepValues] = useState({})
   const dependsOn = setting.dependsOn
+  const dependsOnList = Array.isArray(dependsOn) ? dependsOn : dependsOn ? [dependsOn] : []
 
   useEffect(() => {
     getSetting(setting.key).then((v) => {
@@ -34,16 +35,23 @@ function SettingRow({ setting, onSave }) {
   }, [setting.key])
 
   useEffect(() => {
-    if (!dependsOn) return
-    getSetting(dependsOn.key).then(setDepValue)
+    if (dependsOnList.length === 0) return
+    const keys = dependsOnList.map((d) => d.key)
+    Promise.all(keys.map((k) => getSetting(k))).then((values) => {
+      const map = {}
+      keys.forEach((k, i) => (map[k] = values[i]))
+      setDepValues(map)
+    })
     const handler = (e) => {
-      if (e.detail.key === dependsOn.key) {
-        getSetting(dependsOn.key).then(setDepValue)
+      if (keys.includes(e.detail.key)) {
+        getSetting(e.detail.key).then((v) =>
+          setDepValues((prev) => ({ ...prev, [e.detail.key]: v })),
+        )
       }
     }
     window.addEventListener('settings-changed', handler)
     return () => window.removeEventListener('settings-changed', handler)
-  }, [dependsOn])
+  }, [dependsOn]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (next) => {
     setValue(next)
@@ -66,7 +74,8 @@ function SettingRow({ setting, onSave }) {
 
   if (!Control) return null
 
-  const disabled = dependsOn ? depValue !== dependsOn.value : false
+  const disabled =
+    dependsOnList.length > 0 && !dependsOnList.every((d) => depValues[d.key] === d.value)
 
   return (
     <div

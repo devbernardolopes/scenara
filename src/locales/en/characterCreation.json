@@ -63,10 +63,12 @@
   "writingInjectionTiming": "Writing Instructions Injection Timing",
   "writingPlacement": "Writing Instructions Placement",
   "writingMessageRole": "Writing Instructions Message Role",
+  "personaInjectionTiming": "Persona Injection Timing",
   "personaInjectionPlacement": "Persona Injection Placement",
   "personaInjectionMessageRole": "Persona Injection Message Role",
   "writingInjectionTimingOptions": {
-    "always": "Always"
+    "always": "Always",
+    "never": "Never"
   },
   "writingPlacementOptions": {
     "endOfSystemPrompt": "End of SYSTEM Prompt",
@@ -75,6 +77,10 @@
   "writingMessageRoleOptions": {
     "system": "SYSTEM",
     "assistant": "ASSISTANT"
+  },
+  "personaInjectionTimingOptions": {
+    "always": "Always",
+    "never": "Never"
   },
   "personaInjectionPlacementOptions": {
     "endOfSystemPrompt": "End of SYSTEM Prompt",

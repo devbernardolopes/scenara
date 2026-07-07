@@ -660,11 +660,12 @@ export const SETTINGS = [
     category: 'defaults',
     type: 'select',
     default: 'always',
-    options: ['always'],
+    options: ['always', 'never'],
     labelKey: 'settings:defaults.writingInjectionTiming.label',
     descKey: 'settings:defaults.writingInjectionTiming.desc',
     optionLabels: {
       always: 'settings:defaults.writingInjectionTimingOptions.always',
+      never: 'settings:defaults.writingInjectionTimingOptions.never',
     },
   },
   {
@@ -673,6 +674,7 @@ export const SETTINGS = [
     type: 'select',
     default: 'endOfSystemPrompt',
     options: ['endOfSystemPrompt', 'endOfMessages'],
+    dependsOn: { key: 'prompting.writingInjectionTiming', value: 'always' },
     labelKey: 'settings:defaults.writingPlacement.label',
     descKey: 'settings:defaults.writingPlacement.desc',
     optionLabels: {
@@ -686,7 +688,10 @@ export const SETTINGS = [
     type: 'select',
     default: 'system',
     options: ['system', 'assistant'],
-    dependsOn: { key: 'prompting.writingPlacement', value: 'endOfMessages' },
+    dependsOn: [
+      { key: 'prompting.writingPlacement', value: 'endOfMessages' },
+      { key: 'prompting.writingInjectionTiming', value: 'always' },
+    ],
     labelKey: 'settings:defaults.writingMessageRole.label',
     descKey: 'settings:defaults.writingMessageRole.desc',
     optionLabels: {
@@ -695,11 +700,25 @@ export const SETTINGS = [
     },
   },
   {
+    key: 'prompting.personaInjectionTiming',
+    category: 'defaults',
+    type: 'select',
+    default: 'always',
+    options: ['always', 'never'],
+    labelKey: 'settings:defaults.personaInjectionTiming.label',
+    descKey: 'settings:defaults.personaInjectionTiming.desc',
+    optionLabels: {
+      always: 'settings:defaults.personaInjectionTimingOptions.always',
+      never: 'settings:defaults.personaInjectionTimingOptions.never',
+    },
+  },
+  {
     key: 'personaInjectionPlacement',
     category: 'defaults',
     type: 'select',
     default: 'endOfSystemPrompt',
     options: ['endOfSystemPrompt', 'endOfMessages'],
+    dependsOn: { key: 'prompting.personaInjectionTiming', value: 'always' },
     labelKey: 'settings:defaults.personaInjectionPlacement.label',
     descKey: 'settings:defaults.personaInjectionPlacement.desc',
     optionLabels: {
@@ -713,7 +732,10 @@ export const SETTINGS = [
     type: 'select',
     default: 'system',
     options: ['system', 'assistant'],
-    dependsOn: { key: 'personaInjectionPlacement', value: 'endOfMessages' },
+    dependsOn: [
+      { key: 'personaInjectionPlacement', value: 'endOfMessages' },
+      { key: 'prompting.personaInjectionTiming', value: 'always' },
+    ],
     labelKey: 'settings:defaults.personaInjectionMessageRole.label',
     descKey: 'settings:defaults.personaInjectionMessageRole.desc',
     optionLabels: {

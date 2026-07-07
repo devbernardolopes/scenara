@@ -566,7 +566,8 @@
       "desc": "When writing instructions are injected into the prompt."
     },
     "writingInjectionTimingOptions": {
-      "always": "Always"
+      "always": "Always",
+      "never": "Never"
     },
     "writingPlacement": {
       "label": "Writing Instructions Placement",
@@ -583,6 +584,14 @@
     "writingMessageRoleOptions": {
       "system": "SYSTEM",
       "assistant": "ASSISTANT"
+    },
+    "personaInjectionTiming": {
+      "label": "Persona Injection Timing",
+      "desc": "When persona context is injected into the prompt."
+    },
+    "personaInjectionTimingOptions": {
+      "always": "Always",
+      "never": "Never"
     },
     "personaInjectionPlacement": {
       "label": "Persona Injection Placement",

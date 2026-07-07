@@ -10,8 +10,14 @@ const numberClass =
 
 const AVATAR_SCALE_OPTIONS = ['1x', '2x', '3x', '4x']
 
+const PERSONA_INJECTION_TIMING_OPTIONS = [
+  { value: 'always', labelKey: 'personaInjectionTimingOptions.always' },
+  { value: 'never', labelKey: 'personaInjectionTimingOptions.never' },
+]
+
 const WRITING_INJECTION_TIMING_OPTIONS = [
   { value: 'always', labelKey: 'writingInjectionTimingOptions.always' },
+  { value: 'never', labelKey: 'writingInjectionTimingOptions.never' },
 ]
 
 const WRITING_PLACEMENT_OPTIONS = [
@@ -287,24 +293,29 @@ function OverridesSection({ form, onChange, characterId }) {
           />
         </div>
 
-        <div className="flex items-center gap-3">
+        <div
+          className={`flex items-center gap-3 ${disabledCls(form.writingInjectionTiming === 'never')}`}
+        >
           <label className="text-sm text-text shrink-0">{t('writingPlacement')}</label>
           <ButtonGroup
             options={WRITING_PLACEMENT_OPTIONS}
             value={form.writingPlacement}
             onChange={(v) => onChange('writingPlacement', v)}
+            disabled={form.writingInjectionTiming === 'never'}
           />
         </div>
 
         <div
-          className={`flex items-center gap-3 ${disabledCls(form.writingPlacement !== 'endOfMessages')}`}
+          className={`flex items-center gap-3 ${disabledCls(form.writingPlacement !== 'endOfMessages' || form.writingInjectionTiming === 'never')}`}
         >
           <label className="text-sm text-text shrink-0">{t('writingMessageRole')}</label>
           <ButtonGroup
             options={WRITING_MESSAGE_ROLE_OPTIONS}
             value={form.writingMessageRole}
             onChange={(v) => onChange('writingMessageRole', v)}
-            disabled={form.writingPlacement !== 'endOfMessages'}
+            disabled={
+              form.writingPlacement !== 'endOfMessages' || form.writingInjectionTiming === 'never'
+            }
           />
         </div>
       </div>
@@ -313,27 +324,42 @@ function OverridesSection({ form, onChange, characterId }) {
 
       <div className="space-y-4">
         <p className="text-xs text-tertiary uppercase tracking-wider font-medium">
-          {t('personaInjectionPlacement')}
+          {t('personaInjectionTiming')}
         </p>
 
         <div className="flex items-center gap-3">
+          <label className="text-sm text-text shrink-0">{t('personaInjectionTiming')}</label>
+          <ButtonGroup
+            options={PERSONA_INJECTION_TIMING_OPTIONS}
+            value={form.personaInjectionTiming}
+            onChange={(v) => onChange('personaInjectionTiming', v)}
+          />
+        </div>
+
+        <div
+          className={`flex items-center gap-3 ${disabledCls(form.personaInjectionTiming === 'never')}`}
+        >
           <label className="text-sm text-text shrink-0">{t('personaInjectionPlacement')}</label>
           <ButtonGroup
             options={PERSONA_PLACEMENT_OPTIONS}
             value={form.personaInjectionPlacement}
             onChange={(v) => onChange('personaInjectionPlacement', v)}
+            disabled={form.personaInjectionTiming === 'never'}
           />
         </div>
 
         <div
-          className={`flex items-center gap-3 ${disabledCls(form.personaInjectionPlacement !== 'endOfMessages')}`}
+          className={`flex items-center gap-3 ${disabledCls(form.personaInjectionPlacement !== 'endOfMessages' || form.personaInjectionTiming === 'never')}`}
         >
           <label className="text-sm text-text shrink-0">{t('personaInjectionMessageRole')}</label>
           <ButtonGroup
             options={PERSONA_MESSAGE_ROLE_OPTIONS}
             value={form.personaInjectionMessageRole}
             onChange={(v) => onChange('personaInjectionMessageRole', v)}
-            disabled={form.personaInjectionPlacement !== 'endOfMessages'}
+            disabled={
+              form.personaInjectionPlacement !== 'endOfMessages' ||
+              form.personaInjectionTiming === 'never'
+            }
           />
         </div>
       </div>

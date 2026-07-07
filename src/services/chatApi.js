@@ -57,10 +57,11 @@ export async function buildMessagesPayload({
     systemParts.push(replaceVarsIn(writingInstruction.content))
   }
 
+  const personaTiming = character?.personaInjectionTiming || settings.personaInjectionTiming
   const personaPlacement =
     character?.personaInjectionPlacement || settings.personaInjectionPlacement
   const personaTemplate = replaceVarsWithDesc(settings.personaInjectionTemplate)
-  if (personaTemplate && personaPlacement === 'endOfSystemPrompt') {
+  if (personaTiming !== 'never' && personaTemplate && personaPlacement === 'endOfSystemPrompt') {
     systemParts.push(personaTemplate)
   }
 

@@ -479,6 +479,7 @@ function ChatView() {
         personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
         writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
         writingPlacement: await getSetting('prompting.writingPlacement'),
+        personaInjectionTiming: await getSetting('prompting.personaInjectionTiming'),
         personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
       }
 
@@ -745,6 +746,7 @@ function ChatView() {
           personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
           writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
           writingPlacement: await getSetting('prompting.writingPlacement'),
+          personaInjectionTiming: await getSetting('prompting.personaInjectionTiming'),
           personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
         }
 

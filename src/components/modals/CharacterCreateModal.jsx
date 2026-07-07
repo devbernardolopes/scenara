@@ -37,6 +37,7 @@ const INITIAL_FORM = {
   writingInjectionTiming: 'always',
   writingPlacement: 'endOfSystemPrompt',
   writingMessageRole: 'system',
+  personaInjectionTiming: 'always',
   personaInjectionPlacement: 'endOfSystemPrompt',
   personaInjectionMessageRole: 'system',
 }
@@ -56,6 +57,7 @@ const DEFAULTS_MAP = {
   'prompting.writingInjectionTiming': 'writingInjectionTiming',
   'prompting.writingPlacement': 'writingPlacement',
   'prompting.writingMessageRole': 'writingMessageRole',
+  'prompting.personaInjectionTiming': 'personaInjectionTiming',
   personaInjectionPlacement: 'personaInjectionPlacement',
   personaInjectionMessageRole: 'personaInjectionMessageRole',
 }
