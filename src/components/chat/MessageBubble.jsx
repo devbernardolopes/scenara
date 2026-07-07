@@ -671,7 +671,7 @@ function MessageBubble({
                         {codeText && (
                           <button
                             onClick={() => handleCodeCopy(codeText)}
-                            className="absolute top-3 right-3 p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border opacity-0 group-hover:opacity-100 transition-all active:scale-95 focus:opacity-100"
+                            className="absolute top-3 right-3 p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border transition-all active:scale-95 focus:opacity-100"
                             title={t('copy') || 'Copy code'}
                             aria-label="Copy code"
                           >
