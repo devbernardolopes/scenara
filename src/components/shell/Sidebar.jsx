@@ -463,13 +463,14 @@ function Sidebar({ open, onClose }) {
                             {colorPickerId === thread.id && (
                               <div
                                 ref={colorPickerRef}
-                                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 flex gap-1 p-1.5 bg-surface border border-border rounded-md shadow-surface-md z-10"
+                                className="absolute bottom-full right-0 mb-1 flex gap-1 p-1.5 bg-surface border border-border rounded-md shadow-surface-md z-10"
                               >
                                 {COLOR_PRESETS.map((c, i) => (
                                   <button
                                     key={i}
                                     type="button"
                                     onClick={(e) => {
+                                      e.preventDefault()
                                       e.stopPropagation()
                                       handleColorSelect(thread, c)
                                     }}
