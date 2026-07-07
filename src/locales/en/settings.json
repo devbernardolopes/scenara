@@ -538,6 +538,14 @@
       "label": "Context Window Threshold",
       "desc": "Token count threshold for context window approach."
     },
+    "messagesToKeep": {
+      "label": "Messages to Keep",
+      "desc": "How many of the most recent messages from the last summarization are still passed to API requests until the next summarization."
+    },
+    "memorySlots": {
+      "label": "Memory Slots",
+      "desc": "How many memory entries (slots) per memory level the chat will have."
+    },
     "firstMessage": {
       "label": "First Message",
       "desc": "Default state for the first message toggle."

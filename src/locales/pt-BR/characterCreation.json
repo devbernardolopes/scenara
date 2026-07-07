@@ -36,5 +36,9 @@
   "deleteInitialMessage": "Excluir",
   "confirmDeleteInitialMessage": "Tem certeza que deseja excluir esta mensagem inicial?",
   "confirmDeleteInitialMessageTitle": "Excluir Mensagem Inicial",
-  "noInitialMessages": "Nenhuma mensagem inicial ainda. Adicione uma para saudar o usuário quando um novo chat iniciar."
+  "noInitialMessages": "Nenhuma mensagem inicial ainda. Adicione uma para saudar o usuário quando um novo chat iniciar.",
+  "messagesToKeep": "Mensagens a Manter",
+  "memorySlots": "Slots de Memória",
+  "messagesToKeepDesc": "Quantas das mensagens mais recentes que fizerem parte da última solicitação de resumo ainda serão passadas para as requisições de API de um chat até o próximo evento de resumo.",
+  "memorySlotsDesc": "Quantas entradas de memória (slots) o chat terá por nível de memória."
 }

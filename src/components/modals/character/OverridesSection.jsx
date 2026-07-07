@@ -188,6 +188,36 @@ function OverridesSection({ form, onChange, characterId }) {
       </div>
 
       <div className={`ml-7 space-y-4 ${disabledCls(form.memory === 'never')}`}>
+        <div className="flex items-center gap-3">
+          <label className="text-sm text-secondary shrink-0">{t('messagesToKeep')}</label>
+          <input
+            type="number"
+            className={numberClass}
+            value={form.messagesToKeep}
+            onChange={(e) => onChange('messagesToKeep', Number(e.target.value))}
+            disabled={form.memory === 'never'}
+            min={0}
+            max={50}
+            step={1}
+          />
+        </div>
+
+        <div className="flex items-center gap-3">
+          <label className="text-sm text-secondary shrink-0">{t('memorySlots')}</label>
+          <input
+            type="number"
+            className={numberClass}
+            value={form.memorySlots}
+            onChange={(e) => onChange('memorySlots', Number(e.target.value))}
+            disabled={form.memory === 'never'}
+            min={1}
+            max={5}
+            step={1}
+          />
+        </div>
+      </div>
+
+      <div className={`ml-7 space-y-4 ${disabledCls(form.memory === 'never')}`}>
         <CollapsibleSection
           label={t('summarizationSystemInstructions')}
           summary={

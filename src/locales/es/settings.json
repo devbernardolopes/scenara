@@ -403,6 +403,16 @@
     }
   },
   "versionLabel": "Versión",
+  "defaults": {
+    "messagesToKeep": {
+      "label": "Mensajes a Mantener",
+      "desc": "Cuántas de las mensajes más recientes que formen parte de la última solicitud de resumen aún se pasarán a las solicitudes de API de un chat hasta el próximo evento de resumen."
+    },
+    "memorySlots": {
+      "label": "Slots de Memória",
+      "desc": "Cuántas entradas de memoria (slots) tendrá el chat por nivel de memoria."
+    }
+  },
   "languageOptions": {
     "en": "English",
     "pt-BR": "Português (Brasil)",

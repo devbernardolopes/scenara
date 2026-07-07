@@ -75,7 +75,10 @@ function SettingRow({ setting, onSave }) {
   if (!Control) return null
 
   const disabled =
-    dependsOnList.length > 0 && !dependsOnList.every((d) => depValues[d.key] === d.value)
+    dependsOnList.length > 0 &&
+    !dependsOnList.every((d) =>
+      d.not ? depValues[d.key] !== d.value : depValues[d.key] === d.value,
+    )
 
   return (
     <div
