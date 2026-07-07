@@ -180,6 +180,7 @@
       "label": "Model",
       "placeholder": "Type a model name"
     },
+    "selectModel": "Select a model",
     "modelSearchPlaceholder": "Search models…",
     "noModels": "No models available",
     "refreshModels": "Refresh models",
