@@ -32,7 +32,7 @@ const STORAGE_PREFIX = 'chatInput.'
 
 function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing }) {
   const { t } = useTranslation('chat')
-  const { openModal } = useModal()
+  const { openModal, activeModal } = useModal()
   const textareaRef = useRef(null)
   const promptPanelRef = useRef(null)
   const quickPanelRef = useRef(null)
