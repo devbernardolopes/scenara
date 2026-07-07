@@ -44,6 +44,8 @@
   --color-ooc-muted: rgba(254, 242, 242, 0.65);
   --color-ooc-placeholder: rgba(254, 242, 242, 0.45);
 
+  --color-code-bg: rgba(0, 0, 0, 0.05);
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -81,6 +83,8 @@
   --color-delete: #ef4444;
   --color-delete-hover: #dc2626;
   --color-on-delete: #ffffff;
+
+  --color-code-bg: rgba(255, 255, 255, 0.07);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
@@ -120,6 +124,8 @@
   --color-delete-hover: #991b1b;
   --color-on-delete: #ffffff;
 
+  --color-code-bg: rgba(69, 26, 3, 0.06);
+
   --shadow-sm: 0 1px 2px rgba(69, 26, 3, 0.08);
   --shadow-md: 0 4px 6px -1px rgba(69, 26, 3, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(69, 26, 3, 0.12);
@@ -157,6 +163,8 @@
   --color-delete: #e11d48;
   --color-delete-hover: #be123c;
   --color-on-delete: #ffffff;
+
+  --color-code-bg: rgba(0, 0, 0, 0.04);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
@@ -196,6 +204,8 @@
   --color-delete-hover: #991b1b;
   --color-on-delete: #ffffff;
 
+  --color-code-bg: rgba(0, 0, 0, 0.1);
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.25);
@@ -234,6 +244,8 @@
   --color-delete-hover: #cc3700;
   --color-on-delete: #000000;
 
+  --color-code-bg: rgba(255, 215, 0, 0.08);
+
   --shadow-sm: 0 1px 2px rgba(255, 215, 0, 0.15);
   --shadow-md: 0 4px 6px -1px rgba(255, 215, 0, 0.2);
   --shadow-lg: 0 10px 15px -3px rgba(255, 215, 0, 0.25);
@@ -271,6 +283,8 @@
   --color-delete: #cc0000;
   --color-delete-hover: #990000;
   --color-on-delete: #ffffff;
+
+  --color-code-bg: rgba(0, 255, 0, 0.08);
 
   --shadow-sm: 0 1px 2px rgba(0, 255, 0, 0.12);
   --shadow-md: 0 4px 6px -1px rgba(0, 255, 0, 0.18);
@@ -418,6 +432,20 @@
 }
 .hover\:bg-ooc-hover:hover {
   background-color: rgba(254, 242, 242, 0.1);
+}
+
+/* Code blocks (markdown) */
+.bg-code {
+  background-color: var(--color-code-bg);
+}
+
+/* Neutralize inline-code styling when nested inside a fenced code block,
+   so the <pre> wrapper's own background/padding is the only one that applies */
+.markdown-body pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
 }
 
 /* Toast animations */
