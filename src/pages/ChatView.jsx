@@ -220,6 +220,8 @@ function ChatView() {
       const el = scrollRef.current
       if (!el) return
       el.scrollTo({ top: el.scrollHeight })
+      const initialAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
+      setShowScrollButton(!initialAtBottom)
 
       let sticking = true
       let active = true
