@@ -101,6 +101,10 @@ export async function buildMessagesPayload({
     }
   }
 
+  if (memoryText) {
+    return appendMemoryToPayload(result, memoryText, memoryHeader)
+  }
+
   return result
 }
 

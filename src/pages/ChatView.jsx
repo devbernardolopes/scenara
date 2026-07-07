@@ -443,8 +443,9 @@ function ChatView() {
       includeOOC,
       keepMessages,
     })
+    const latestThread = await getThread(threadId)
     const memoryHeader = await getSetting('prompting.apiRequestSectionHeaders.memories')
-    const memoryText = thread?.memory || ''
+    const memoryText = latestThread?.memory || ''
 
     let payload
     if (isOOC) {
@@ -622,6 +623,7 @@ function ChatView() {
         currentPersona,
       })
       if (summary) {
+        setThread((prev) => (prev ? { ...prev, memory: summary } : prev))
         showToast('Summary generated', { type: 'success' })
       }
     } catch (err) {
