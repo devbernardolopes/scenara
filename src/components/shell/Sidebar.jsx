@@ -88,6 +88,7 @@ function Sidebar({ open, onClose }) {
   const [threads, setThreads] = useState([])
   const [characters, setCharacters] = useState({})
   const [colorPickerId, setColorPickerId] = useState(null)
+  const [colorPickerPos, setColorPickerPos] = useState(null)
   const colorPickerRef = useRef(null)
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [showImportMenu, setShowImportMenu] = useState(false)
@@ -137,6 +138,7 @@ function Sidebar({ open, onClose }) {
     function handleClick(e) {
       if (colorPickerRef.current && !colorPickerRef.current.contains(e.target)) {
         setColorPickerId(null)
+        setColorPickerPos(null)
       }
     }
     document.addEventListener('mousedown', handleClick)
@@ -253,6 +255,7 @@ function Sidebar({ open, onClose }) {
     const colorSlot = color ? findColorSlot(color, theme) : -1
     await updateThreadColor(thread.id, color, colorSlot)
     setColorPickerId(null)
+    setColorPickerPos(null)
   }
 
   function toggleSelect(threadId) {
@@ -439,13 +442,23 @@ function Sidebar({ open, onClose }) {
                           <p className="text-xs text-secondary truncate">
                             {character?.name || t('sidebar.unknownCharacter')}
                           </p>
-                          <div className="relative shrink-0">
+                          <div className="shrink-0">
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.preventDefault()
                                 e.stopPropagation()
-                                setColorPickerId(colorPickerId === thread.id ? null : thread.id)
+                                if (colorPickerId === thread.id) {
+                                  setColorPickerId(null)
+                                  setColorPickerPos(null)
+                                } else {
+                                  const rect = e.currentTarget.getBoundingClientRect()
+                                  setColorPickerPos({
+                                    top: rect.bottom + 4,
+                                    left: Math.max(8, rect.right - 224),
+                                  })
+                                  setColorPickerId(thread.id)
+                                }
                               }}
                               onMouseDown={(e) => {
                                 e.stopPropagation()
@@ -456,19 +469,6 @@ function Sidebar({ open, onClose }) {
                             >
                               <Palette className="w-3.5 h-3.5" />
                             </button>
-                            {colorPickerId === thread.id && (
-                              <div
-                                ref={colorPickerRef}
-                                className="absolute top-full right-0 mt-1 bg-surface border border-border rounded-md shadow-surface-md z-10 p-1.5"
-                              >
-                                <ColorPicker
-                                  value={thread.color || ''}
-                                  onChange={(c) => {
-                                    handleColorSelect(thread, c)
-                                  }}
-                                />
-                              </div>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -615,6 +615,27 @@ function Sidebar({ open, onClose }) {
             {t('topbar.settings')}
           </button>
         </div>
+
+        {colorPickerId &&
+          colorPickerPos &&
+          (() => {
+            const thread = threads.find((t) => t.id === colorPickerId)
+            if (!thread) return null
+            return (
+              <div
+                ref={colorPickerRef}
+                className="fixed bg-surface border border-border rounded-md shadow-surface-md z-50 p-1.5"
+                style={{ top: colorPickerPos.top, left: colorPickerPos.left }}
+              >
+                <ColorPicker
+                  value={thread.color || ''}
+                  onChange={(c) => {
+                    handleColorSelect(thread, c)
+                  }}
+                />
+              </div>
+            )
+          })()}
       </aside>
     </>
   )
