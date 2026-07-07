@@ -447,6 +447,9 @@ function Sidebar({ open, onClose }) {
                                 e.stopPropagation()
                                 setColorPickerId(colorPickerId === thread.id ? null : thread.id)
                               }}
+                              onMouseDown={(e) => {
+                                e.stopPropagation()
+                              }}
                               className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
                               aria-label={t('sidebar.color')}
                               title={t('sidebar.color')}
@@ -456,7 +459,7 @@ function Sidebar({ open, onClose }) {
                             {colorPickerId === thread.id && (
                               <div
                                 ref={colorPickerRef}
-                                className="absolute bottom-full right-0 mb-1 bg-surface border border-border rounded-md shadow-surface-md z-10 p-1.5"
+                                className="absolute top-full right-0 mt-1 bg-surface border border-border rounded-md shadow-surface-md z-10 p-1.5"
                               >
                                 <ColorPicker
                                   value={thread.color || ''}
