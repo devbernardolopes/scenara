@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, memo } from 'react'
+import { useState, useRef, useEffect, useMemo, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { showToast } from '../../lib/toast'
@@ -330,18 +330,67 @@ function MessageBubble({
 
   const visMap = isUser ? VIS_KEY.user : VIS_KEY.assistant
 
-  const headerButtons = []
-  const overflowButtons = []
-  for (const key of buttonOrder) {
-    const def = BUTTON_DEFS[key]
-    if (!def) continue
-    if (!visibility[visMap[key]]) continue
-    if (def.placement === 'header') {
-      headerButtons.push(key)
-    } else {
-      overflowButtons.push(key)
+  const allButtonKeys = useMemo(() => {
+    const keys = []
+    for (const key of buttonOrder) {
+      const def = BUTTON_DEFS[key]
+      if (!def) continue
+      if (!visibility[visMap[key]]) continue
+      keys.push(key)
     }
-  }
+    return keys
+  }, [buttonOrder, visibility, visMap])
+
+  const [headerCount, setHeaderCount] = useState(allButtonKeys.length)
+  const headerBtnRef = useRef(null)
+  const allBtnKeyRef = useRef(allButtonKeys)
+  const prevKeyStrRef = useRef('')
+
+  useEffect(() => {
+    allBtnKeyRef.current = allButtonKeys
+  }, [allButtonKeys])
+
+  useEffect(() => {
+    const keyStr = allButtonKeys.join(',')
+    if (keyStr !== prevKeyStrRef.current) {
+      prevKeyStrRef.current = keyStr
+      setHeaderCount(allButtonKeys.length)
+    }
+  }, [allButtonKeys])
+
+  useEffect(() => {
+    const el = headerBtnRef.current
+    if (!el || allButtonKeys.length <= 1 || !isAssistantOrSystem) return
+
+    function adjust() {
+      const total = allBtnKeyRef.current.length
+
+      if (el.scrollWidth > el.clientWidth) {
+        if (headerCount > 1) {
+          setHeaderCount((n) => Math.max(1, n - 1))
+        }
+      } else if (headerCount < total) {
+        const free = el.clientWidth - el.scrollWidth
+        if (free >= 44) {
+          setHeaderCount((n) => Math.min(total, n + 1))
+        }
+      }
+    }
+
+    const raf = requestAnimationFrame(adjust)
+    const ro = new ResizeObserver(() => requestAnimationFrame(adjust))
+    ro.observe(el)
+    return () => {
+      cancelAnimationFrame(raf)
+      ro.disconnect()
+    }
+  }, [allButtonKeys, headerCount, isAssistantOrSystem])
+
+  const headerKeys = allButtonKeys.slice(
+    0,
+    isAssistantOrSystem ? headerCount : allButtonKeys.length,
+  )
+  const overflowKeys = allButtonKeys.slice(headerKeys.length)
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -398,68 +447,95 @@ function MessageBubble({
             </>
           )}
           <div className="flex-1 min-w-0" />
-          {headerButtons.map((key) => {
-            const def = BUTTON_DEFS[key]
-            if (!def) return null
-            const Icon = def.icon
-            const isDelete = key === 'delete'
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={getButtonHandler(key)}
-                className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
-                  isDelete
-                    ? 'bg-delete text-on-delete hover:bg-delete-hover'
-                    : 'hover:bg-black/10 text-tertiary hover:text-text'
-                }`}
-                title={t(def.labelKey)}
-              >
-                <Icon className="w-3.5 h-3.5" />
-              </button>
-            )
-          })}
-          {isAssistantOrSystem && overflowButtons.length > 0 && (
-            <div ref={overflowRef} className="relative flex-shrink-0">
-              <button
-                ref={overflowBtnRef}
-                type="button"
-                onClick={handleOverflowClick}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text"
-                title={t('moreOptions')}
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-              {overflowOpen && (
-                <div
-                  style={overflowMenuStyle}
-                  className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
-                >
-                  {overflowButtons.map((key) => {
-                    const def = BUTTON_DEFS[key]
-                    if (!def) return null
-                    const Icon = def.icon
-                    return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => {
-                          getButtonHandler(key)()
-                          setOverflowOpen(false)
-                        }}
-                        disabled={
-                          (key === 'prompt' && !promptData) || (key === 'regenerate' && generating)
-                        }
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] disabled:opacity-30 disabled:pointer-events-none"
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span>{t(def.labelKey)}</span>
-                      </button>
-                    )
-                  })}
+          {isAssistantOrSystem ? (
+            <div ref={headerBtnRef} className="flex items-center gap-1 overflow-hidden">
+              {headerKeys.map((key) => {
+                const def = BUTTON_DEFS[key]
+                if (!def) return null
+                const Icon = def.icon
+                const isDelete = key === 'delete'
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={getButtonHandler(key)}
+                    className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                      isDelete
+                        ? 'bg-delete text-on-delete hover:bg-delete-hover'
+                        : 'hover:bg-black/10 text-tertiary hover:text-text'
+                    }`}
+                    title={t(def.labelKey)}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                  </button>
+                )
+              })}
+              {overflowKeys.length > 0 && (
+                <div ref={overflowRef} className="relative flex-shrink-0">
+                  <button
+                    ref={overflowBtnRef}
+                    type="button"
+                    onClick={handleOverflowClick}
+                    className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-black/10 text-tertiary hover:text-text"
+                    title={t('moreOptions')}
+                  >
+                    <MoreHorizontal className="w-4 h-4" />
+                  </button>
+                  {overflowOpen && (
+                    <div
+                      style={overflowMenuStyle}
+                      className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
+                    >
+                      {overflowKeys.map((key) => {
+                        const def = BUTTON_DEFS[key]
+                        if (!def) return null
+                        const Icon = def.icon
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => {
+                              getButtonHandler(key)()
+                              setOverflowOpen(false)
+                            }}
+                            disabled={
+                              (key === 'prompt' && !promptData) ||
+                              (key === 'regenerate' && generating)
+                            }
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] disabled:opacity-30 disabled:pointer-events-none"
+                          >
+                            <Icon className="w-4 h-4" />
+                            <span>{t(def.labelKey)}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
+          ) : (
+            headerKeys.map((key) => {
+              const def = BUTTON_DEFS[key]
+              if (!def) return null
+              const Icon = def.icon
+              const isDelete = key === 'delete'
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={getButtonHandler(key)}
+                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                    isDelete
+                      ? 'bg-delete text-on-delete hover:bg-delete-hover'
+                      : 'hover:bg-black/10 text-tertiary hover:text-text'
+                  }`}
+                  title={t(def.labelKey)}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                </button>
+              )
+            })
           )}
         </div>
 
