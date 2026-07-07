@@ -247,6 +247,14 @@ function MessageBubble({
       .catch(() => {})
   }
 
+  function handleCodeCopy(codeContent) {
+    if (!codeContent) return;
+    navigator.clipboard
+      .writeText(codeContent.trim())
+      .then(() => showToast(t('messageCopied') || 'Code copied!', { type: 'success' })) // reuse existing translation or fallback
+      .catch(() => showToast('Failed to copy', { type: 'error' }));
+  }
+
   function handleStartEdit() {
     setEditedContent(message.content)
     setEditing(true)
@@ -637,11 +645,48 @@ function MessageBubble({
                       {children}
                     </code>
                   ),
-                  pre: ({ children }) => (
-                    <pre className="bg-code border border-border rounded-md p-3 my-2 overflow-x-auto max-w-full whitespace-pre-wrap break-words">
-                      {children}
-                    </pre>
-                  ),
+                  pre: ({ children, ...props }) => {
+                    // Extract the actual code text from the <code> child
+                    let codeText = '';
+                    if (React.isValidElement(children)) {
+                      // Most common case: <pre><code>...</code></pre>
+                      codeText = children.props?.children || '';
+                    } else if (typeof children === 'string') {
+                      codeText = children;
+                    } else if (Array.isArray(children)) {
+                      codeText = children.map((child) => 
+                        React.isValidElement(child) ? child.props?.children || '' : child
+                      ).join('');
+                    }
+
+                    return (
+                      <div className="relative group">
+                        <pre 
+                          className="bg-code border border-border rounded-md p-3 my-2 overflow-x-auto max-w-full whitespace-pre-wrap break-words pr-12"
+                          {...props}
+                        >
+                          {children}
+                        </pre>
+                        
+                        {/* Copy button - top right, appears on hover/tap if = opacity-0 group-hover:opacity-100 */}
+                        {codeText && (
+                          <button
+                            onClick={() => handleCodeCopy(codeText)}
+                            className="absolute top-3 right-3 p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border transition-all active:scale-95 focus:opacity-100"
+                            title={t('copy') || 'Copy code'}
+                            aria-label="Copy code"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  },
+                  // pre: ({ children }) => (
+                  //   <pre className="bg-code border border-border rounded-md p-3 my-2 overflow-x-auto max-w-full whitespace-pre-wrap break-words">
+                  //     {children}
+                  //   </pre>
+                  // ),
                 }}
               >
                 {displayContent}
