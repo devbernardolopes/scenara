@@ -48,7 +48,13 @@
   "autoTitleUserInstructions": "USER Auto-title Instructions",
   "autoTitleUserInstructionsPlaceholder": "Instructions for the user on auto-titling…",
   "memory": "Memory",
-  "memoryThreshold": "Memory Threshold",
+  "memoryOptions": {
+    "never": "Never",
+    "messages": "Messages",
+    "contextWindow": "Context Window"
+  },
+  "messagesThreshold": "Messages Threshold",
+  "contextWindowThreshold": "Context Window Threshold",
   "summarizationSystemInstructions": "SYSTEM Summarization Instructions",
   "summarizationSystemInstructionsPlaceholder": "Instructions for system summarization…",
   "summarizationUserInstructions": "USER Summarization Instructions",

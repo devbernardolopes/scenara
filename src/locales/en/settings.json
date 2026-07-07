@@ -523,11 +523,20 @@
     },
     "memory": {
       "label": "Memory",
-      "desc": "Default state for the memory toggle when creating a new character."
+      "desc": "Controls how memory (summarization) is handled when creating a new character."
     },
-    "memoryThreshold": {
-      "label": "Memory Threshold",
-      "desc": "Default threshold for memory."
+    "memoryOptions": {
+      "never": "Never",
+      "messages": "Messages",
+      "contextWindow": "Context Window"
+    },
+    "messagesThreshold": {
+      "label": "Messages Threshold",
+      "desc": "Number of messages before summarization runs."
+    },
+    "contextWindowThreshold": {
+      "label": "Context Window Threshold",
+      "desc": "Token count threshold for context window approach."
     },
     "firstMessage": {
       "label": "First Message",

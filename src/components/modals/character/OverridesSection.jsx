@@ -10,6 +10,12 @@ const numberClass =
 
 const AVATAR_SCALE_OPTIONS = ['1x', '2x', '3x', '4x']
 
+const MEMORY_OPTIONS = [
+  { value: 'never', labelKey: 'memoryOptions.never' },
+  { value: 'messages', labelKey: 'memoryOptions.messages' },
+  { value: 'contextWindow', labelKey: 'memoryOptions.contextWindow' },
+]
+
 const PERSONA_INJECTION_TIMING_OPTIONS = [
   { value: 'always', labelKey: 'personaInjectionTimingOptions.always' },
   { value: 'never', labelKey: 'personaInjectionTimingOptions.never' },
@@ -140,29 +146,48 @@ function OverridesSection({ form, onChange, characterId }) {
 
       <hr className="border-border" />
 
-      <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">
-        <input
-          type="checkbox"
-          checked={form.memory}
-          onChange={(e) => onChange('memory', e.target.checked)}
-          className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+      <div className="flex items-center gap-3">
+        <label className="text-sm text-text shrink-0">{t('memory')}</label>
+        <ButtonGroup
+          options={MEMORY_OPTIONS}
+          value={form.memory}
+          onChange={(v) => onChange('memory', v)}
         />
-        <span className="text-sm text-text">{t('memory')}</span>
-      </label>
+      </div>
 
-      <div className={`ml-7 space-y-4 ${disabledCls(!form.memory)}`}>
+      <div className={`ml-7 space-y-4 ${disabledCls(form.memory !== 'messages')}`}>
         <div className="flex items-center gap-3">
-          <label className="text-sm text-secondary shrink-0">{t('memoryThreshold')}</label>
+          <label className="text-sm text-secondary shrink-0">{t('messagesThreshold')}</label>
           <input
             type="number"
             className={numberClass}
-            value={form.memoryThreshold}
-            onChange={(e) => onChange('memoryThreshold', Number(e.target.value))}
-            disabled={!form.memory}
+            value={form.messagesThreshold}
+            onChange={(e) => onChange('messagesThreshold', Number(e.target.value))}
+            disabled={form.memory !== 'messages'}
             min={0}
           />
         </div>
+      </div>
 
+      <div className={`ml-7 space-y-4 ${disabledCls(form.memory !== 'contextWindow')}`}>
+        <div className="flex items-center gap-3">
+          <label className="text-sm text-secondary shrink-0">{t('contextWindowThreshold')}</label>
+          <input
+            type="range"
+            min={256}
+            max={8192}
+            step={256}
+            value={form.contextWindowThreshold}
+            onChange={(e) => onChange('contextWindowThreshold', Number(e.target.value))}
+            className="w-32 accent-primary"
+          />
+          <span className="text-sm text-text font-medium w-14 text-right">
+            {form.contextWindowThreshold}
+          </span>
+        </div>
+      </div>
+
+      <div className={`ml-7 space-y-4 ${disabledCls(form.memory === 'never')}`}>
         <CollapsibleSection
           label={t('summarizationSystemInstructions')}
           summary={
@@ -180,7 +205,7 @@ function OverridesSection({ form, onChange, characterId }) {
             value={form.summarizationSystemInstructions}
             onChange={(e) => onChange('summarizationSystemInstructions', e.target.value)}
             placeholder={t('summarizationSystemInstructionsPlaceholder')}
-            disabled={!form.memory}
+            disabled={form.memory === 'never'}
           />
         </CollapsibleSection>
 
@@ -201,7 +226,7 @@ function OverridesSection({ form, onChange, characterId }) {
             value={form.summarizationUserInstructions}
             onChange={(e) => onChange('summarizationUserInstructions', e.target.value)}
             placeholder={t('summarizationUserInstructionsPlaceholder')}
-            disabled={!form.memory}
+            disabled={form.memory === 'never'}
           />
         </CollapsibleSection>
       </div>
