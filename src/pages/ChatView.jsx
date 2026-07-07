@@ -220,19 +220,31 @@ function ChatView() {
       el.scrollTo({ top: el.scrollHeight })
 
       let sticking = true
+      let active = true
+      let prevScrollHeight = el.scrollHeight
 
-      const observer = new ResizeObserver(() => {
-        if (sticking) {
-          el.scrollTop = el.scrollHeight
+      function poll() {
+        if (!active) return
+        const currentScrollHeight = el.scrollHeight
+        if (currentScrollHeight !== prevScrollHeight) {
+          prevScrollHeight = currentScrollHeight
+          if (sticking) {
+            el.scrollTop = currentScrollHeight
+          }
+          const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
+          setShowScrollButton(!atBottom)
         }
-        const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
-        setShowScrollButton(!atBottom)
-      })
-      observer.observe(el)
+        requestAnimationFrame(poll)
+      }
+      requestAnimationFrame(poll)
 
       const settleTimer = setTimeout(() => {
         sticking = false
       }, 800)
+
+      setTimeout(() => {
+        active = false
+      }, 2500)
 
       function onUserScroll() {
         sticking = false
@@ -243,7 +255,7 @@ function ChatView() {
 
       scrollStickyCleanupRef.current = () => {
         sticking = false
-        observer.disconnect()
+        active = false
         clearTimeout(settleTimer)
         el.removeEventListener('wheel', onUserScroll)
         el.removeEventListener('touchmove', onUserScroll)
