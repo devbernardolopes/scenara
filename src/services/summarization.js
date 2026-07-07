@@ -2,6 +2,7 @@ import db from '../db'
 import { updateMessage } from './messages'
 import { updateThread } from './threads'
 import { buildTranscript, replaceVars, sendChatCompletion } from './chatApi'
+import { createThreadMemory } from './threadMemories'
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { getSetting } from './settings'
 import { estimateTokens } from './tokenEstimator'
@@ -163,6 +164,13 @@ export async function triggerSummarization({
   await Promise.all(
     unsummarizedMessages.map((message) => updateMessage(message.id, { summarizedAt: timestamp })),
   )
+  await createThreadMemory({
+    threadId: thread.id,
+    content: cleanedSummary,
+    payload,
+    model: profile.model,
+    params: profile.params,
+  })
   await updateThread(thread.id, { memory: cleanedSummary, lastSummarizationAt: timestamp })
 
   return cleanedSummary

@@ -18,6 +18,7 @@ import IconButton from '../shared/IconButton'
 import { getPersona, getAllPersonas } from '../../services/personas'
 import { getThread } from '../../services/threads'
 import { getUIState, setUIState } from '../../services/uiState'
+import { useModal } from '../../hooks/useModal'
 import db from '../../db'
 
 const QUICK_SETTING_KEYS = ['autoTTS', 'enterToSend', 'autoReply', 'autoSend']
@@ -31,6 +32,7 @@ const STORAGE_PREFIX = 'chatInput.'
 
 function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing }) {
   const { t } = useTranslation('chat')
+  const { openModal } = useModal()
   const textareaRef = useRef(null)
   const promptPanelRef = useRef(null)
   const quickPanelRef = useRef(null)
@@ -240,6 +242,9 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing }) 
       if (lower === '/ai') {
         onSend?.('', selectedPersona?.id, oocActive, quickSettings.autoReply)
       }
+      if (lower === '/mem') {
+        openModal('memory', { threadId })
+      }
     } else {
       onSend?.(text, selectedPersona?.id, oocActive, quickSettings.autoReply)
     }
@@ -356,7 +361,12 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing }) 
             />
             <IconButton icon={Paperclip} label={t('attachFile')} className="hidden sm:flex" />
             <IconButton icon={Zap} label={t('shortcuts')} className="hidden md:flex" />
-            <IconButton icon={BookOpen} label={t('memories')} className="hidden md:flex" />
+            <IconButton
+              icon={BookOpen}
+              label={t('memories')}
+              className="hidden md:flex"
+              onClick={() => openModal('memory', { threadId })}
+            />
             <IconButton
               icon={Mic}
               label={t('stt')}
