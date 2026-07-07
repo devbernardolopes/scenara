@@ -617,7 +617,7 @@ function MessageBubble({
             />
           ) : (
             <div
-              className="text-sm markdown-body"
+              className="text-sm markdown-body w-full overflow-hidden"
               style={{
                 fontFamily: CHAT_FONTS[chatFontFamily],
                 fontSize: CHAT_FONT_SIZES[chatFontSize],
@@ -632,13 +632,13 @@ function MessageBubble({
                   ),
                   code: ({ children, className }) => (
                     <code
-                      className={`font-mono text-[0.85em] px-1.5 py-0.5 rounded bg-code border border-border ${className || ''}`}
+                      className={`font-mono text-[0.85em] px-1.5 py-0.5 rounded bg-code border border-border ${className || ''} break-words`}
                     >
                       {children}
                     </code>
                   ),
                   pre: ({ children }) => (
-                    <pre className="bg-code border border-border rounded-md p-3 my-2 overflow-x-auto max-w-full">
+                    <pre className="bg-code border border-border rounded-md p-3 my-2 overflow-x-auto max-w-full whitespace-pre-wrap break-words">
                       {children}
                     </pre>
                   ),
