@@ -4,6 +4,9 @@ import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import { createCharacter, updateCharacter } from '../../services/characters'
 import { getSetting } from '../../services/settings'
+import { estimateTokens } from '../../services/tokenEstimator'
+import { getAllWritingInstructions } from '../../services/writingInstructions'
+import { getPersona } from '../../services/personas'
 import CloseButton from '../shared/CloseButton'
 import CharacterSidebar from './character/CharacterSidebar'
 import CharacterSection from './character/CharacterSection'
@@ -83,10 +86,10 @@ const SECTION_COMPONENTS = {
   character: CharacterSection,
   overrides: OverridesSection,
   initialMessages: InitialMessagesSection,
+  lorebooks: PlaceholderSection,
+  tags: PlaceholderSection,
   '3d': PlaceholderSection,
   sfx: PlaceholderSection,
-  tags: PlaceholderSection,
-  lorebooks: PlaceholderSection,
 }
 
 function CharacterCreateModal({ character: existing, initialData }) {
@@ -203,10 +206,10 @@ function CharacterCreateModal({ character: existing, initialData }) {
           <option value="character">{t('sectionCharacter')}</option>
           <option value="overrides">{t('sectionOverrides')}</option>
           <option value="initialMessages">{t('sectionInitialMessages')}</option>
+          <option value="lorebooks">{t('sectionLorebooks')}</option>
+          <option value="tags">{t('sectionTags')}</option>
           <option value="3d">{t('section3d')}</option>
           <option value="sfx">{t('sectionSfx')}</option>
-          <option value="tags">{t('sectionTags')}</option>
-          <option value="lorebooks">{t('sectionLorebooks')}</option>
         </select>
       </div>
 

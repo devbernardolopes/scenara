@@ -4,10 +4,10 @@ const SECTIONS = [
   { id: 'character', labelKey: 'sectionCharacter' },
   { id: 'overrides', labelKey: 'sectionOverrides' },
   { id: 'initialMessages', labelKey: 'sectionInitialMessages' },
+  { id: 'lorebooks', labelKey: 'sectionLorebooks' },
+  { id: 'tags', labelKey: 'sectionTags' },
   { id: '3d', labelKey: 'section3d' },
   { id: 'sfx', labelKey: 'sectionSfx' },
-  { id: 'tags', labelKey: 'sectionTags' },
-  { id: 'lorebooks', labelKey: 'sectionLorebooks' },
 ]
 
 function CharacterSidebar({ active, onSelect }) {

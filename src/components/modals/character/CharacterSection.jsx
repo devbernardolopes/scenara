@@ -128,6 +128,24 @@ function CharacterSection({ form, onChange, characterId }) {
         />
       </CollapsibleSection>
 
+      <CollapsibleSection
+        label={t('extraPromptLabel')}
+        summary={
+          form.extraPrompt
+            ? t('common:tokenCount', { count: estimateTokens(form.extraPrompt) })
+            : null
+        }
+        storageKey={characterId ? `charSection.extraPrompt.${characterId}` : undefined}
+        defaultExpanded={false}
+      >
+        <AutoResizeTextarea
+          className={`${inputClass} resize-none mt-2`}
+          value={form.extraPrompt || ''}
+          onChange={(e) => onChange('extraPrompt', e.target.value)}
+          placeholder={t('extraPromptPlaceholder')}
+        />
+      </CollapsibleSection>
+
       <div>
         <label className="block text-sm font-medium text-text mb-1">
           {t('writingInstructionLabel')}
@@ -171,24 +189,6 @@ function CharacterSection({ form, onChange, characterId }) {
           </button>
         </div>
       </div>
-
-      <CollapsibleSection
-        label={t('extraPromptLabel')}
-        summary={
-          form.extraPrompt
-            ? t('common:tokenCount', { count: estimateTokens(form.extraPrompt) })
-            : null
-        }
-        storageKey={characterId ? `charSection.extraPrompt.${characterId}` : undefined}
-        defaultExpanded={false}
-      >
-        <AutoResizeTextarea
-          className={`${inputClass} resize-none mt-2`}
-          value={form.extraPrompt || ''}
-          onChange={(e) => onChange('extraPrompt', e.target.value)}
-          placeholder={t('extraPromptPlaceholder')}
-        />
-      </CollapsibleSection>
     </div>
   )
 }
