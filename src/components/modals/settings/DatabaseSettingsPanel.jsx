@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useConfirm } from '../../../lib/confirm'
 import { showToast } from '../../../lib/toast'
-import { resetDatabase } from '../../../services/database'
-import { Download, Upload, AlertTriangle } from '../../../lib/icons'
+import { resetDatabase, resetSettings } from '../../../services/database'
+import { Download, Upload, AlertTriangle, RefreshCw } from '../../../lib/icons'
 
 function DatabaseSettingsPanel() {
   const { confirm } = useConfirm()
   const { t } = useTranslation('settings')
   const [resetting, setResetting] = useState(false)
+  const [resettingSettings, setResettingSettings] = useState(false)
 
   const handleExport = () => {
     showToast(t('database.exportNotImplemented'), { type: 'info' })
@@ -36,6 +37,27 @@ function DatabaseSettingsPanel() {
       showToast(err.message, { type: 'error' })
     } finally {
       setResetting(false)
+    }
+  }
+
+  const handleResetSettings = async () => {
+    const confirmed = await confirm({
+      title: t('database.resetSettingsConfirmTitle'),
+      message: t('database.resetSettingsConfirmMessage'),
+      confirmLabel: t('common:confirm'),
+      cancelLabel: t('common:cancel'),
+      variant: 'danger',
+    })
+    if (!confirmed) return
+
+    setResettingSettings(true)
+    try {
+      await resetSettings()
+      showToast(t('database.resetSettingsSuccess'), { type: 'success' })
+    } catch (err) {
+      showToast(err.message, { type: 'error' })
+    } finally {
+      setResettingSettings(false)
     }
   }
 
@@ -72,6 +94,14 @@ function DatabaseSettingsPanel() {
         label={t('database.import')}
         desc={t('database.importDesc')}
         onClick={handleImport}
+      />
+      <OptionCard
+        icon={RefreshCw}
+        label={t('database.resetSettings')}
+        desc={t('database.resetSettingsDesc')}
+        onClick={handleResetSettings}
+        disabled={resettingSettings}
+        danger
       />
       <OptionCard
         icon={AlertTriangle}

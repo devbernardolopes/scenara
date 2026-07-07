@@ -1,6 +1,23 @@
 import db from '../db'
 import { SETTINGS, applySettingEffect } from './settings'
 
+export async function resetSettings() {
+  const allSettings = await db.settings.toArray()
+  const apiKeyEntries = allSettings.filter((s) => /^api\.\w+\.keys$/.test(s.key))
+
+  await db.settings.clear()
+
+  for (const setting of SETTINGS) {
+    await db.settings.add({ key: setting.key, value: setting.default })
+  }
+  await db.settings.bulkAdd(apiKeyEntries)
+
+  applySettingEffect('theme', SETTINGS.find((s) => s.key === 'theme').default)
+  applySettingEffect('language', SETTINGS.find((s) => s.key === 'language').default)
+
+  window.dispatchEvent(new CustomEvent('settings-changed', { detail: { action: 'reset' } }))
+}
+
 export async function resetDatabase() {
   await db.threads.clear()
   await db.characters.clear()
