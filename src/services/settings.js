@@ -5,7 +5,7 @@ import { COLOR_SLOTS, getPalette } from '../config/colorPalettes'
 async function migrateColorsOnThemeChange(newTheme) {
   const palette = getPalette(newTheme)
 
-  const personas = await db.personas.where('colorSlot').above(-1).toArray()
+  const personas = await db.personas.filter((p) => p.colorSlot > -1).toArray()
   for (const p of personas) {
     const slot = COLOR_SLOTS[p.colorSlot]
     if (slot && palette[slot]) {
@@ -13,7 +13,7 @@ async function migrateColorsOnThemeChange(newTheme) {
     }
   }
 
-  const threads = await db.threads.where('colorSlot').above(-1).toArray()
+  const threads = await db.threads.filter((t) => t.colorSlot > -1).toArray()
   for (const t of threads) {
     const slot = COLOR_SLOTS[t.colorSlot]
     if (slot && palette[slot]) {
