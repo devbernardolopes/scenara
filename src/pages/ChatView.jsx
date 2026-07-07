@@ -119,6 +119,12 @@ function ChatView() {
   const [generating, setGenerating] = useState(false)
   const [streamingMsgId, setStreamingMsgId] = useState(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
+  useEffect(() => {
+    console.log('[scroll-debug] showScrollButton changed', {
+      showScrollButton,
+      timestamp: performance.now(),
+    })
+  }, [showScrollButton])
   const [noChatProfile, setNoChatProfile] = useState(false)
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [charAvatarScale, setCharAvatarScale] = useState('1x')
@@ -219,8 +225,20 @@ function ChatView() {
     if (scrollCommits.current === 1) {
       const el = scrollRef.current
       if (!el) return
+      console.log('[scroll-debug] layoutEffect enter', {
+        scrollHeight: el.scrollHeight,
+        scrollTop: el.scrollTop,
+        clientHeight: el.clientHeight,
+      })
       el.scrollTo({ top: el.scrollHeight })
       const initialAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
+      console.log('[scroll-debug] after scrollTo', {
+        scrollHeight: el.scrollHeight,
+        scrollTop: el.scrollTop,
+        clientHeight: el.clientHeight,
+        initialAtBottom,
+        showScrollButton: !initialAtBottom,
+      })
       setShowScrollButton(!initialAtBottom)
 
       let sticking = true
@@ -231,11 +249,16 @@ function ChatView() {
         if (!active) return
         const currentScrollHeight = el.scrollHeight
         if (currentScrollHeight !== prevScrollHeight) {
+          console.log('[scroll-debug] poll scrollHeight changed', {
+            prev: prevScrollHeight,
+            current: currentScrollHeight,
+          })
           prevScrollHeight = currentScrollHeight
           if (sticking) {
             el.scrollTop = currentScrollHeight
           }
           const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
+          console.log('[scroll-debug] poll recompute', { atBottom, showScrollButton: !atBottom })
           setShowScrollButton(!atBottom)
         }
         requestAnimationFrame(poll)
@@ -248,6 +271,11 @@ function ChatView() {
 
       setTimeout(() => {
         active = false
+        console.log('[scroll-debug] poll ended at 2500ms', {
+          scrollHeight: el.scrollHeight,
+          scrollTop: el.scrollTop,
+          clientHeight: el.clientHeight,
+        })
       }, 2500)
 
       function onUserScroll() {
@@ -346,6 +374,13 @@ function ChatView() {
     const el = scrollRef.current
     if (!el) return
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
+    console.log('[scroll-debug] handleScroll (live/user-scroll path)', {
+      scrollHeight: el.scrollHeight,
+      scrollTop: el.scrollTop,
+      clientHeight: el.clientHeight,
+      atBottom,
+      showScrollButton: !atBottom,
+    })
     setShowScrollButton(!atBottom)
     isAtBottomRef.current = atBottom
     if (atBottom) {
