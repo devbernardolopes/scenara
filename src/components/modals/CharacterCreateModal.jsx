@@ -5,7 +5,7 @@ import { useSaveConfirm } from '../../lib/saveConfirm'
 import { createCharacter, updateCharacter } from '../../services/characters'
 import { getSetting } from '../../services/settings'
 import { estimateTokens } from '../../services/tokenEstimator'
-import { getAllWritingInstructions } from '../../services/writingInstructions'
+import { getWritingInstruction } from '../../services/writingInstructions'
 import { getPersona } from '../../services/personas'
 import CloseButton from '../shared/CloseButton'
 import CharacterSidebar from './character/CharacterSidebar'
@@ -105,6 +105,50 @@ function CharacterCreateModal({ character: existing, initialData }) {
   const [saving, setSaving] = useState(false)
   const [activeSection, setActiveSection] = useState('character')
   const savePendingRef = useRef(false)
+  const [totalPermTokens, setTotalPermTokens] = useState(0)
+  const [defaultPersonaName, setDefaultPersonaName] = useState('')
+
+  useEffect(() => {
+    getSetting('defaultPersonaId').then((id) => {
+      if (id) getPersona(id).then((p) => setDefaultPersonaName(p?.name || ''))
+    })
+  }, [])
+
+  useEffect(() => {
+    async function compute() {
+      const charName = form.name || ''
+      const userName = defaultPersonaName || ''
+      const replaceVars = (text) =>
+        text.replace(/{{char}}/g, charName).replace(/{{user}}/g, userName)
+
+      let total = 0
+
+      if (form.prompt) total += estimateTokens(replaceVars(form.prompt))
+
+      if (form.writingInstruction) {
+        const wi = await getWritingInstruction(form.writingInstruction)
+        if (wi?.content) total += estimateTokens(replaceVars(wi.content))
+      }
+
+      const writingTiming = form.writingInjectionTiming
+      if (writingTiming !== 'never') {
+        const template = await getSetting('prompting.personaInjectionTemplate')
+        if (template && form.personaInjectionTiming !== 'never') {
+          total += estimateTokens(replaceVars(template))
+        }
+      }
+
+      setTotalPermTokens(total)
+    }
+    compute()
+  }, [
+    form.prompt,
+    form.writingInstruction,
+    form.writingInjectionTiming,
+    form.personaInjectionTiming,
+    form.name,
+    defaultPersonaName,
+  ])
 
   useEffect(() => {
     if (isEditing || isImport) return
@@ -220,22 +264,27 @@ function CharacterCreateModal({ character: existing, initialData }) {
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 px-6 py-4 border-t border-border shrink-0">
-        <button
-          type="button"
-          onClick={isDirty ? handleCloseAttempt : closeModal}
-          className="min-h-[44px] px-4 text-sm text-secondary hover:text-text"
-        >
-          {t('cancel')}
-        </button>
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={saving || !form.name.trim()}
-          className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
-        >
-          {saving ? t('saving') : t('save')}
-        </button>
+      <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-border shrink-0">
+        <div className="text-xs text-tertiary">
+          {t('permanentTokenCount', { count: totalPermTokens })}
+        </div>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={isDirty ? handleCloseAttempt : closeModal}
+            className="min-h-[44px] px-4 text-sm text-secondary hover:text-text"
+          >
+            {t('cancel')}
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || !form.name.trim()}
+            className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
+          >
+            {saving ? t('saving') : t('save')}
+          </button>
+        </div>
       </div>
     </div>
   )

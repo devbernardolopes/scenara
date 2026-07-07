@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -615,9 +616,11 @@ function Sidebar({ open, onClose }) {
             {t('topbar.settings')}
           </button>
         </div>
+      </aside>
 
-        {colorPickerId &&
-          colorPickerPos &&
+      {colorPickerId &&
+        colorPickerPos &&
+        createPortal(
           (() => {
             const thread = threads.find((t) => t.id === colorPickerId)
             if (!thread) return null
@@ -635,8 +638,9 @@ function Sidebar({ open, onClose }) {
                 />
               </div>
             )
-          })()}
-      </aside>
+          })(),
+          document.body,
+        )}
     </>
   )
 }
