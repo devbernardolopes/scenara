@@ -60,5 +60,21 @@
   "noProfileModel": "No Chat profile configured or model selected.",
   "autoTitleGenerating": "Generating title",
   "autoTitleGenerated": "Title generated",
-  "memoryEntry": "Entry #{{number}}"
+  "memoryEntry": "Entry #{{number}}",
+  "memoryRegeneration": {
+    "title": "Memory Entry Regeneration",
+    "userPromptLabel": "Summarization Prompt",
+    "regenerate": "Regenerate",
+    "discardTitle": "Discard changes?",
+    "discardMessage": "You have unsaved changes to the summarization prompt. Are you sure you want to close without regenerating?",
+    "discardConfirm": "Discard changes",
+    "resultTitle": "Memory Regeneration Result",
+    "cancelTitle": "Cancel regeneration?",
+    "cancelMessage": "Are you sure you want to cancel? The regenerated content will be discarded.",
+    "cancelConfirm": "Yes, cancel",
+    "generating": "Generating…",
+    "noProfile": "No summarization profile configured",
+    "error": "An error occurred during regeneration",
+    "accept": "Accept"
+  }
 }

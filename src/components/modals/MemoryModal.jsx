@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
@@ -28,17 +28,27 @@ function MemoryModal({ threadId }) {
   const [saving, setSaving] = useState(false)
   const [dirty, setDirty] = useState(false)
 
-  useEffect(() => {
-    async function load() {
-      const list = await getThreadMemories(threadId)
-      setMemories(list)
-      if (list.length > 0) {
-        setExpandedId(list[0].id)
-        setDrafts({ [list[0].id]: list[0].content || '' })
-      }
+  const loadMemories = useCallback(async () => {
+    const list = await getThreadMemories(threadId)
+    setMemories(list)
+    if (list.length > 0) {
+      setExpandedId(list[0].id)
+      setDrafts({ [list[0].id]: list[0].content || '' })
     }
-    load()
   }, [threadId])
+
+  useEffect(() => {
+    loadMemories()
+  }, [loadMemories])
+
+  useEffect(() => {
+    function handleRegenerated(e) {
+      if (e.detail?.threadId !== Number(threadId)) return
+      loadMemories()
+    }
+    window.addEventListener('memory-regenerated', handleRegenerated)
+    return () => window.removeEventListener('memory-regenerated', handleRegenerated)
+  }, [threadId, loadMemories])
 
   const handleClose = async () => {
     if (!dirty) {
@@ -108,6 +118,11 @@ function MemoryModal({ threadId }) {
     })
     if (!ok) return
     // delete not implemented yet
+  }
+
+  function handleRegenerate(entry) {
+    if (!entry?.payload) return
+    openModal('memoryRegeneration', { threadId, entry })
   }
 
   async function handleShowPrompt(entry) {
@@ -201,6 +216,7 @@ function MemoryModal({ threadId }) {
                       <>
                         <button
                           type="button"
+                          onClick={() => handleRegenerate(entry)}
                           className="p-2 rounded-md hover:bg-surface-hover text-tertiary"
                           title={t('regenerate')}
                         >

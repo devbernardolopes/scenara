@@ -24,6 +24,8 @@ import InChatShortcutManagementModal from './components/modals/InChatShortcutMan
 import InChatShortcutFormModal from './components/modals/InChatShortcutFormModal'
 import ShowPromptModal from './components/modals/ShowPromptModal'
 import MemoryModal from './components/modals/MemoryModal'
+import MemoryRegenerationModal from './components/modals/MemoryRegenerationModal'
+import MemoryRegenerationResultModal from './components/modals/MemoryRegenerationResultModal'
 import TagManagementModal from './components/modals/TagManagementModal'
 
 const SettingsModal = lazy(() => import('./components/modals/settings/SettingsModal'))
@@ -44,6 +46,8 @@ registerModal('inChatShortcutManagement', InChatShortcutManagementModal)
 registerModal('inChatShortcutForm', InChatShortcutFormModal)
 registerModal('showPrompt', ShowPromptModal)
 registerModal('memory', MemoryModal)
+registerModal('memoryRegeneration', MemoryRegenerationModal)
+registerModal('memoryRegenerationResult', MemoryRegenerationResultModal)
 registerModal('tagManagement', TagManagementModal)
 
 createRoot(document.getElementById('root')).render(
