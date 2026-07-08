@@ -126,6 +126,7 @@ function ChatView() {
   const generatingRef = useRef(false)
   const isAtBottomRef = useRef(true)
   const autoTriggeredRef = useRef(false)
+  const currentThreadIdRef = useRef(threadId)
   const handleSendRef = useRef(null)
   const scrollCommits = useRef(0)
   const scrollStickyCleanupRef = useRef(null)
@@ -235,11 +236,19 @@ function ChatView() {
   }, [])
 
   useEffect(() => {
+    currentThreadIdRef.current = threadId
+  }, [threadId])
+
+  useEffect(() => {
     scrollStickyCleanupRef.current?.()
     scrollStickyCleanupRef.current = null
     prevMessagesLengthRef.current = 0
     scrollCommits.current = 0
     setShowScrollButton(false)
+    setGenerating(false)
+    setStreamingMsgId(null)
+    setFailedRequests({})
+    setActiveSlotIndices({})
     loadData()
   }, [threadId])
 
@@ -627,11 +636,11 @@ function ChatView() {
       if (err.name === 'AbortError') {
         await updateMessage(assistantMsgId, { content: '' })
         const msgs = await getMessagesByThread(threadId)
-        setMessages(msgs)
+        if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
       } else {
         await updateMessage(assistantMsgId, { content: '' })
         const msgs = await getMessagesByThread(threadId)
-        setMessages(msgs)
+        if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
         setFailedRequests((prev) => ({ ...prev, [assistantMsgId]: 0 }))
         showToast(err.message, { type: 'error' })
         completedNormally = true
@@ -720,12 +729,16 @@ function ChatView() {
       if (text) {
         await createMessage(threadId, 'user', text, personaId, isOOC)
         currentMsgs = await getMessagesByThread(threadId)
-        setMessages(currentMsgs)
+        if (Number(currentThreadIdRef.current) === Number(threadId)) {
+          setMessages(currentMsgs)
+        }
       }
 
       if (text && !autoReply) {
         generatingRef.current = false
-        setGenerating(false)
+        if (Number(currentThreadIdRef.current) === Number(threadId)) {
+          setGenerating(false)
+        }
         stopGenerating(threadId)
         return
       }
@@ -733,6 +746,7 @@ function ChatView() {
       const currentPersona = personaId ? await getPersona(personaId) : null
       await doChatRequest(isFirstMessage, currentMsgs, chatPersona, currentPersona, isOOC)
 
+      if (Number(currentThreadIdRef.current) !== Number(threadId)) return
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
       generatingRef.current = false
@@ -775,7 +789,9 @@ function ChatView() {
       }
     } finally {
       generatingRef.current = false
-      setGenerating(false)
+      if (Number(currentThreadIdRef.current) === Number(threadId)) {
+        setGenerating(false)
+      }
       stopGenerating(threadId)
     }
   }
@@ -1030,7 +1046,7 @@ function ChatView() {
       completedNormally = true
     } catch (err) {
       const msgs = await getMessagesByThread(threadId)
-      setMessages(msgs)
+      if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
       if (err.name !== 'AbortError') {
         setFailedRequests((prev) => ({ ...prev, [messageId]: slotIndex }))
         showToast(err.message, { type: 'error' })
@@ -1039,7 +1055,9 @@ function ChatView() {
     } finally {
       setStreamingMsgId(null)
       generatingRef.current = false
-      setGenerating(false)
+      if (Number(currentThreadIdRef.current) === Number(threadId)) {
+        setGenerating(false)
+      }
       stopGenerating(threadId)
       abortRef.current = null
       if (completedNormally) {
