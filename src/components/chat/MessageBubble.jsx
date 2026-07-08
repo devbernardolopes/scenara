@@ -394,7 +394,7 @@ function MessageBubble({
 
   useEffect(() => {
     const el = headerBtnRef.current
-    if (!el || allButtonKeys.length <= 1 || !isAssistantOrSystem) return
+    if (!el || allButtonKeys.length <= 1) return
 
     function adjust() {
       const total = allBtnKeyRef.current.length
@@ -418,13 +418,12 @@ function MessageBubble({
       cancelAnimationFrame(raf)
       ro.disconnect()
     }
-  }, [allButtonKeys, headerCount, isAssistantOrSystem])
+  }, [allButtonKeys, headerCount])
 
-  const headerKeys = allButtonKeys.slice(
-    0,
-    isAssistantOrSystem ? headerCount : allButtonKeys.length,
-  )
+  const headerKeys = allButtonKeys.slice(0, headerCount)
   const overflowKeys = allButtonKeys.slice(headerKeys.length)
+
+  const isUserWithOverflow = isUser && allButtonKeys.length > 1 && overflowKeys.length > 0
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -600,6 +599,77 @@ function MessageBubble({
                       </div>
                     )}
                   </div>
+                ) : isUserWithOverflow ? (
+                  <>
+                    {headerKeys.map((key) => {
+                      const def = BUTTON_DEFS[key]
+                      if (!def) return null
+                      const Icon = def.icon
+                      const isDelete = key === 'delete'
+                      const disabled = isButtonDisabled(key)
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={getButtonHandler(key)}
+                          disabled={disabled}
+                          className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                            isDelete
+                              ? 'bg-delete text-on-delete hover:bg-delete-hover'
+                              : userMutedClass
+                                ? `${userHoverBg} ${userMutedClass}`
+                                : userHoverBg
+                          } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
+                          style={isDelete || !userMutedStyle ? undefined : userMutedStyle}
+                          title={t(def.labelKey)}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                        </button>
+                      )
+                    })}
+                    <div ref={headerBtnRef} className="flex items-center gap-1 overflow-hidden">
+                      <div ref={overflowRef} className="relative flex-shrink-0">
+                        <button
+                          ref={overflowBtnRef}
+                          type="button"
+                          onClick={handleOverflowClick}
+                          className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded ${
+                            userMutedClass ? `${userHoverBg} ${userMutedClass}` : userHoverBg
+                          }`}
+                          title={t('moreOptions')}
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </button>
+                        {overflowOpen && (
+                          <div
+                            style={overflowMenuStyle}
+                            className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
+                          >
+                            {overflowKeys.map((key) => {
+                              const def = BUTTON_DEFS[key]
+                              if (!def) return null
+                              const Icon = def.icon
+                              return (
+                                <button
+                                  key={key}
+                                  type="button"
+                                  onClick={() => {
+                                    getButtonHandler(key)()
+                                    setOverflowOpen(false)
+                                  }}
+                                  disabled={isButtonDisabled(key)}
+                                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] disabled:opacity-30 disabled:pointer-events-none"
+                                >
+                                  <Icon className="w-4 h-4" />
+                                  <span>{t(def.labelKey)}</span>
+                                </button>
+                              )
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   headerKeys.map((key) => {
                     const def = BUTTON_DEFS[key]
