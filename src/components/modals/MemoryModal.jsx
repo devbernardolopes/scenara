@@ -9,6 +9,8 @@ import { estimateTokens } from '../../services/tokenEstimator'
 import { getThreadMemories, updateThreadMemory } from '../../services/threadMemories'
 import { updateThread } from '../../services/threads'
 import { ChevronDown, Trash2, RefreshCw, Eye } from '../../lib/icons'
+import db from '../../db'
+import { replaceVars } from '../../services/chatApi'
 
 function formatTokenCount(count) {
   if (count >= 1000) return `${(count / 1000).toFixed(1)}K`
@@ -108,10 +110,26 @@ function MemoryModal({ threadId }) {
     // delete not implemented yet
   }
 
-  function handleShowPrompt(entry) {
+  async function handleShowPrompt(entry) {
     if (!entry?.payload) return
+    const thread = await db.threads.get(Number(threadId))
+    const character = thread ? await db.characters.get(thread.characterId) : null
+    const charName = character?.name || ''
+    let personaName = ''
+    if (thread?.personaId) {
+      const persona = await db.personas.get(thread.personaId)
+      personaName = persona?.name || ''
+    }
+    const transformedPayload = entry.payload.map((msg) => ({
+      ...msg,
+      content: replaceVars(msg.content || '', {
+        charName,
+        personaName,
+        currentPersonaName: personaName,
+      }),
+    }))
     openModal('showPrompt', {
-      payload: entry.payload,
+      payload: transformedPayload,
       model: entry.model,
       params: entry.params,
     })
@@ -123,10 +141,19 @@ function MemoryModal({ threadId }) {
       onClose={handleClose}
       footer={
         <>
-          <button type="button" onClick={handleClose} className="min-h-[44px] px-4 rounded-md text-sm text-secondary hover:text-text">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="min-h-[44px] px-4 rounded-md text-sm text-secondary hover:text-text"
+          >
             {t('cancel')}
           </button>
-          <button type="button" onClick={handleSave} disabled={saving || !dirty} className="min-h-[44px] px-4 rounded-md text-sm bg-primary text-on-primary hover:bg-primary-hover disabled:opacity-60">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || !dirty}
+            className="min-h-[44px] px-4 rounded-md text-sm bg-primary text-on-primary hover:bg-primary-hover disabled:opacity-60"
+          >
             {t('save', { ns: 'common' })}
           </button>
         </>
@@ -134,7 +161,9 @@ function MemoryModal({ threadId }) {
     >
       <div className="space-y-3">
         {sortedMemories.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border p-6 text-sm text-secondary">{t('promptHistory.empty')}</div>
+          <div className="rounded-lg border border-dashed border-border p-6 text-sm text-secondary">
+            {t('promptHistory.empty')}
+          </div>
         ) : (
           sortedMemories.map((entry, index) => {
             const isLatest = index === 0
@@ -143,21 +172,45 @@ function MemoryModal({ threadId }) {
             return (
               <div key={entry.id} className="border border-border rounded-lg overflow-hidden">
                 <div className="flex items-center gap-2 px-3 py-2 bg-surface-secondary">
-                  <button type="button" onClick={() => setExpandedId(isOpen ? null : entry.id)} className="flex-1 flex items-center gap-2 min-h-[44px] text-left">
-                    <ChevronDown className={`w-4 h-4 text-tertiary transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                    <span className="text-sm font-medium text-text">{t('memoryEntry', { number: sortedMemories.length - index })}</span>
-                    <span className="text-xs text-tertiary">{t('tokens', { count: formatTokenCount(tokenCount) })}</span>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedId(isOpen ? null : entry.id)}
+                    className="flex-1 flex items-center gap-2 min-h-[44px] text-left"
+                  >
+                    <ChevronDown
+                      className={`w-4 h-4 text-tertiary transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    />
+                    <span className="text-sm font-medium text-text">
+                      {t('memoryEntry', { number: sortedMemories.length - index })}
+                    </span>
+                    <span className="text-xs text-tertiary">
+                      {t('tokens', { count: formatTokenCount(tokenCount) })}
+                    </span>
                   </button>
                   <div className="flex items-center gap-1">
-                    <button type="button" onClick={() => handleShowPrompt(entry)} className="p-2 rounded-md hover:bg-surface-hover text-tertiary" title={t('showPrompt')}>
+                    <button
+                      type="button"
+                      onClick={() => handleShowPrompt(entry)}
+                      className="p-2 rounded-md hover:bg-surface-hover text-tertiary"
+                      title={t('showPrompt')}
+                    >
                       <Eye className="w-4 h-4" />
                     </button>
                     {isLatest && (
                       <>
-                        <button type="button" className="p-2 rounded-md hover:bg-surface-hover text-tertiary" title={t('regenerate')}>
+                        <button
+                          type="button"
+                          className="p-2 rounded-md hover:bg-surface-hover text-tertiary"
+                          title={t('regenerate')}
+                        >
                           <RefreshCw className="w-4 h-4" />
                         </button>
-                        <button type="button" onClick={handleDelete} className="p-2 rounded-md hover:bg-surface-hover text-error" title={t('delete')}>
+                        <button
+                          type="button"
+                          onClick={handleDelete}
+                          className="p-2 rounded-md hover:bg-surface-hover text-error"
+                          title={t('delete')}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </>

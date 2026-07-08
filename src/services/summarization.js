@@ -17,7 +17,7 @@ export function getUnsummarizedMessages(messages, { includeOOC = true } = {}) {
 export function getMessagesForApiRequest(messages, { includeOOC = true, keepMessages = 0 } = {}) {
   if (!Array.isArray(messages)) return []
 
-  const eligible = messages.filter((message) => (includeOOC || !message?.isOOC))
+  const eligible = messages.filter((message) => includeOOC || !message?.isOOC)
   if (keepMessages <= 0) {
     return eligible.filter((message) => !message?.summarizedAt)
   }
@@ -43,7 +43,9 @@ export async function shouldTriggerSummarization({ character, messages, includeO
 
   if (resolvedMemory === 'contextWindow') {
     const threshold = Number(
-      character.contextWindowThreshold ?? (await getSetting('defaultContextWindowThreshold')) ?? 1024,
+      character.contextWindowThreshold ??
+        (await getSetting('defaultContextWindowThreshold')) ??
+        1024,
     )
     const tokenCount = unsummarizedMessages.reduce(
       (total, message) => total + estimateTokens(message?.content || ''),
@@ -83,21 +85,22 @@ export async function buildSummarizationPayload({
   }
   const currentPersonaName = currentPersona?.name || personaName
 
-  const replaceVarsIn = (text) =>
-    replaceVars(text, { charName, personaName, currentPersonaName })
+  const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
 
   const includeOOCOverride = character?.includeOOC !== false
   const userPersonaPrefixOverride = character?.userPersonaPrefix !== false
 
-  const transcript = buildTranscript({
-    messages,
-    personaName,
-    currentPersonaName,
-    includeOOCOverride,
-    userPersonaPrefixOverride,
-    personaMap,
-    rolePrefixes,
-  })
+  const transcript = replaceVarsIn(
+    buildTranscript({
+      messages,
+      personaName,
+      currentPersonaName,
+      includeOOCOverride,
+      userPersonaPrefixOverride,
+      personaMap,
+      rolePrefixes,
+    }),
+  )
 
   let systemContent = character?.summarizationSystemInstructions
   if (!systemContent) {
