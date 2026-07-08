@@ -27,7 +27,7 @@ const STRATEGIES = {
 }
 
 async function fetchOpenAIModels(baseUrl, apiKey, signal, modelsPath) {
-  const url = modelsPath ? `${baseUrl}${modelsPath}` : `${baseUrl}/openai/v1/models`
+  const url = modelsPath ? `${baseUrl}${modelsPath}` : `${baseUrl}/v1/models`
   const headers = { 'Content-Type': 'application/json' }
   if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`
 
