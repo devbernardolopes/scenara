@@ -4,6 +4,6 @@
 body {
   margin: 0;
   /* Force bottom bar visibility */
-  padding-bottom: env(safe-area-inset-bottom);
-  box-sizing: border-box;
+  /* padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box; */
 }
