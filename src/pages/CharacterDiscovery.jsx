@@ -188,6 +188,11 @@ function CharacterDiscovery() {
     }
   }
 
+  async function loadChatCounts() {
+    const counts = await getCharacterChatCounts()
+    setChatCounts(counts)
+  }
+
   useEffect(() => {
     loadCharacters()
     getSetting('cardsPerPage').then((val) => setCardsPerPage(val || 10))
@@ -196,7 +201,11 @@ function CharacterDiscovery() {
     getUIState('discovery.sortOrder').then((val) => val && setSortOrder(val))
     getUIState('discovery.searchQuery').then((val) => val && setSearchQuery(val))
     window.addEventListener('characters-changed', loadCharacters)
-    return () => window.removeEventListener('characters-changed', loadCharacters)
+    window.addEventListener('threads-changed', loadChatCounts)
+    return () => {
+      window.removeEventListener('characters-changed', loadCharacters)
+      window.removeEventListener('threads-changed', loadChatCounts)
+    }
   }, [])
 
   useEffect(() => {
@@ -396,6 +405,11 @@ function CharacterDiscovery() {
                       characterCardMarquee={characterCardMarquee}
                     />
                     <span className="text-xs text-tertiary shrink-0">#{char.characterNumber}</span>
+                    {chatCounts.get(char.id) > 0 && (
+                      <span className="text-xs text-tertiary shrink-0">
+                        #{chatCounts.get(char.id)}
+                      </span>
+                    )}
                   </div>
                 </div>
                 {(char.tagline || char.description) && (
