@@ -70,20 +70,8 @@ async function fetchHordeModels(signal) {
   return { models, meta }
 }
 
-export async function fetchModels(providerId, { signal, hordeMethod } = {}) {
+export async function fetchModels(providerId, { signal, hordeMethod: _hordeMethod } = {}) {
   if (providerId === 'ai-horde') {
-    if (hordeMethod === 'openai-compatible') {
-      const keyEntry = await getActiveKey(providerId)
-      const apiKey = keyEntry?.value || null
-      const models = await fetchOpenAIModels(
-        'https://oai.aihorde.net',
-        apiKey,
-        signal,
-        '/v1/models?min_size=0&max_size=-1',
-      )
-      startCooldown()
-      return { models, meta: {} }
-    }
     const result = await fetchHordeModels(signal)
     startCooldown()
     return result

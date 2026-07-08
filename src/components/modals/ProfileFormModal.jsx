@@ -155,7 +155,7 @@ function ProfileFormModal({ profile }) {
   useEffect(() => {
     if (form.providerId) {
       getCachedModels(form.providerId, hordeMethod).then(setCachedModels)
-      if (form.providerId === 'ai-horde' && hordeMethod === 'native') {
+      if (form.providerId === 'ai-horde') {
         getCachedModelMeta(form.providerId, hordeMethod).then(setModelMeta)
       } else {
         setModelMeta({})
