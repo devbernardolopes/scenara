@@ -180,7 +180,7 @@ function OverridesSection({ form, onChange, characterId }) {
             type="range"
             min={256}
             max={8192}
-            step={256}
+            step={128}
             value={form.contextWindowThreshold}
             onChange={(e) => onChange('contextWindowThreshold', Number(e.target.value))}
             className="w-48 accent-primary"

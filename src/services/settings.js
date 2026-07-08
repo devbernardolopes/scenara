@@ -450,7 +450,7 @@ export const SETTINGS = [
     category: 'defaults',
     type: 'slider',
     default: 1024,
-    props: { min: 256, max: 8192, step: 256 },
+    props: { min: 256, max: 8192, step: 128 },
     labelKey: 'settings:defaults.contextWindowThreshold.label',
     descKey: 'settings:defaults.contextWindowThreshold.desc',
     dependsOn: { key: 'defaultMemory', value: 'contextWindow' },
