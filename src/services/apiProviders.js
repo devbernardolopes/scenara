@@ -142,6 +142,7 @@ export const PROVIDERS = [
         max: 8192,
         step: 128,
         default: 1024,
+        deprecated: true,
       },
       {
         key: 'max_tokens',
@@ -150,8 +151,8 @@ export const PROVIDERS = [
         min: 256,
         max: 8192,
         step: 128,
-        default: null,
-        deprecated: true,
+        default: 384,
+        // deprecated: true,
       },
       {
         key: 'temperature',
