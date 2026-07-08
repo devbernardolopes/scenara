@@ -100,7 +100,7 @@ const SECTION_COMPONENTS = {
 
 function CharacterCreateModal({ character: existing, initialData }) {
   const { t } = useTranslation('characterCreation')
-  const { closeModal, setCloseGuard } = useModal()
+  const { closeModal, setCloseGuard, activeModal } = useModal()
   const { promptSave } = useSaveConfirm()
   const isEditing = Boolean(existing)
   const isImport = Boolean(initialData)
@@ -182,7 +182,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
   handleCloseRef.current = handleCloseAttempt
 
   useEffect(() => {
-    if (isDirty) {
+    if (isDirty && activeModal === 'characterCreate') {
       setCloseGuard(() => {
         if (savePendingRef.current) return false
         savePendingRef.current = true
@@ -195,7 +195,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       setCloseGuard(null)
     }
     return () => setCloseGuard(null)
-  }, [isDirty, setCloseGuard])
+  }, [isDirty, setCloseGuard, activeModal])
 
   function handleChange(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }))
