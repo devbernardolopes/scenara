@@ -11,7 +11,7 @@ function formatTokenCount(count) {
   return String(count)
 }
 
-function ShowPromptModal({ payload, model, params }) {
+function ShowPromptModal({ payload, model, params, msgNumbers }) {
   const { t } = useTranslation('chat')
   const { closeModal } = useModal()
   const [expandedIdx, setExpandedIdx] = useState(null)
@@ -63,9 +63,9 @@ function ShowPromptModal({ payload, model, params }) {
                   onClick={() => setExpandedIdx(isOpen ? null : idx)}
                   className="w-full flex items-center gap-2 px-4 py-3 min-h-[44px] text-left hover:bg-surface-hover transition-colors"
                 >
-                  {msg.messageNumber && (
+                  {msgNumbers?.[idx] && (
                     <span className="text-xs font-medium text-text shrink-0">
-                      #{msg.messageNumber}
+                      #{msgNumbers[idx]}
                     </span>
                   )}
                   <span className="text-xs font-medium text-secondary shrink-0 uppercase">

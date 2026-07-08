@@ -132,6 +132,7 @@ function MemoryModal({ threadId }) {
       payload: transformedPayload,
       model: entry.model,
       params: entry.params,
+      msgNumbers: null,
     })
   }
 

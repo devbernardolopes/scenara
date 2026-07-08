@@ -60,6 +60,20 @@ function parseBundleEntries(bundleMessages) {
   }
 }
 
+function buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload) {
+  const numMap = new Map(currentMsgs.map((m, i) => [m.id, i + 1]))
+  const numbers = [null]
+  if (isFirstMessage) {
+    if (payload.length > 1) numbers.push(null)
+  } else {
+    for (const msg of apiMessages) {
+      numbers.push(numMap.get(msg.id) || null)
+    }
+    if (payload.length > numbers.length) numbers.push(null)
+  }
+  return numbers
+}
+
 function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
   const wrapperRef = useRef(null)
   const [overflows, setOverflows] = useState(false)
@@ -466,9 +480,9 @@ function ChatView() {
     const latestThread = await getThread(threadId)
     const memoryHeader = await getSetting('prompting.apiRequestSectionHeaders.memories')
     const memoryText = latestThread?.memory || ''
-    const msgNumbers = new Map(currentMsgs.map((m, i) => [m.id, i + 1]))
 
     let payload
+    let msgNumbers = null
     if (isOOC) {
       const oocSystemInstructions = await getSetting('prompting.oocSystem')
       const oocUserInstructions = await getSetting('prompting.oocUser')
@@ -541,12 +555,17 @@ function ChatView() {
         writingInstruction,
         memoryText,
         memoryHeader,
-        msgNumbers,
       })
+      msgNumbers = buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload)
     }
 
     const activeParams = getActiveParams(profile)
-    const promptData = JSON.stringify({ payload, model: profile.model, params: activeParams })
+    const promptData = JSON.stringify({
+      payload,
+      model: profile.model,
+      params: activeParams,
+      msgNumbers,
+    })
 
     const assistantMsgId = await createAssistantMessage(threadId, '', null, isOOC)
     await updateMessage(assistantMsgId, { promptData })
@@ -805,7 +824,6 @@ function ChatView() {
       )
 
       const currentMsgs = messages.slice(0, idx)
-      const msgNumbers = new Map(currentMsgs.map((m, i) => [m.id, i + 1]))
       let chatPersona = null
       if (thread?.personaId) {
         chatPersona = await getPersona(thread.personaId)
@@ -824,6 +842,7 @@ function ChatView() {
 
       let payload
       let promptDataStr
+      let msgNumbers = null
 
       if (isOOCRegen) {
         const oocSystemInstructions = await getSetting('prompting.oocSystem')
@@ -913,12 +932,17 @@ function ChatView() {
           writingInstruction,
           memoryText: memoryTextRegen,
           memoryHeader: memoryHeaderRegen,
-          msgNumbers,
         })
+        msgNumbers = buildMsgNumbersArray(isFirstMessage, apiMessagesRegen, currentMsgs, payload)
       }
 
       const activeParams = getActiveParams(profile)
-      promptDataStr = JSON.stringify({ payload, model: profile.model, params: activeParams })
+      promptDataStr = JSON.stringify({
+        payload,
+        model: profile.model,
+        params: activeParams,
+        msgNumbers,
+      })
 
       entries[slotIndex].promptData = promptDataStr
       await updateMessage(messageId, {
