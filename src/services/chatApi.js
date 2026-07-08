@@ -41,6 +41,7 @@ export async function buildMessagesPayload({
   writingInstruction,
   memoryText,
   memoryHeader,
+  msgNumbers,
 }) {
   const systemParts = []
 
@@ -90,7 +91,11 @@ export async function buildMessagesPayload({
     }
   } else {
     for (const msg of messages) {
-      result.push({ role: msg.role, content: replaceVarsIn(msg.content) })
+      result.push({
+        role: msg.role,
+        content: replaceVarsIn(msg.content),
+        ...(msgNumbers?.has(msg.id) ? { messageNumber: msgNumbers.get(msg.id) } : {}),
+      })
     }
 
     const lastMsg = messages[messages.length - 1]

@@ -466,6 +466,7 @@ function ChatView() {
     const latestThread = await getThread(threadId)
     const memoryHeader = await getSetting('prompting.apiRequestSectionHeaders.memories')
     const memoryText = latestThread?.memory || ''
+    const msgNumbers = new Map(currentMsgs.map((m, i) => [m.id, i + 1]))
 
     let payload
     if (isOOC) {
@@ -540,6 +541,7 @@ function ChatView() {
         writingInstruction,
         memoryText,
         memoryHeader,
+        msgNumbers,
       })
     }
 
@@ -803,6 +805,7 @@ function ChatView() {
       )
 
       const currentMsgs = messages.slice(0, idx)
+      const msgNumbers = new Map(currentMsgs.map((m, i) => [m.id, i + 1]))
       let chatPersona = null
       if (thread?.personaId) {
         chatPersona = await getPersona(thread.personaId)
@@ -910,6 +913,7 @@ function ChatView() {
           writingInstruction,
           memoryText: memoryTextRegen,
           memoryHeader: memoryHeaderRegen,
+          msgNumbers,
         })
       }
 
