@@ -441,175 +441,197 @@ function MessageBubble({
         style={isUser ? userBgStyle : undefined}
       >
         {/* Header */}
-        <div className="flex items-center gap-1 px-3 pt-2 pb-1.5 border-b border-border-light">
-          <Avatar
-            src={avatarSrc}
-            size={avatarSize}
-            className="flex-shrink-0"
-            onClick={handleAvatarClick}
-          />
-          {nameLabel && (
-            <span
-              className={`text-xs font-medium truncate max-w-[100px] ${
-                isUser
-                  ? userMutedClass || 'text-on-primary-muted'
-                  : isOOC
-                    ? 'text-ooc'
-                    : 'text-text'
+        {(() => {
+          const hasBundleNav = bundleMessages && bundleMessages.length > 1
+          return (
+            <div
+              className={`px-3 pt-2 pb-1.5 border-b border-border-light ${
+                hasBundleNav
+                  ? 'flex flex-col md:flex-row md:items-center gap-1'
+                  : 'flex items-center gap-1'
               }`}
-              style={isUser ? userMutedStyle : undefined}
             >
-              {nameLabel}
-            </span>
-          )}
-          {bundleMessages && bundleMessages.length > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  const newIdx = (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
-                  onBundleNavigate?.(message.id, newIdx)
-                }}
-                className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
-                  isUser
-                    ? `${userHoverBg} ${userMutedClass}`
-                    : isOOC
-                      ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
-                      : 'hover:bg-black/10 text-tertiary hover:text-text'
-                }`}
-                style={isUser ? userMutedStyle : undefined}
-                title={t('previousInitialMessage')}
+              <div
+                className={`flex items-center gap-1 min-w-0 ${hasBundleNav ? 'w-full md:w-auto' : ''}`}
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </button>
-              <span
-                className={`text-xs whitespace-nowrap ${isUser ? userMutedClass || '' : isOOC ? 'text-ooc-muted' : 'text-tertiary'}`}
-                style={isUser ? userMutedStyle : undefined}
-              >
-                {bundleIndex + 1}/{bundleMessages.length}
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  const newIdx = (bundleIndex + 1) % bundleMessages.length
-                  onBundleNavigate?.(message.id, newIdx)
-                }}
-                className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
-                  isUser
-                    ? `${userHoverBg} ${userMutedClass}`
-                    : isOOC
-                      ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
-                      : 'hover:bg-black/10 text-tertiary hover:text-text'
-                }`}
-                style={isUser ? userMutedStyle : undefined}
-                title={t('nextInitialMessage')}
-              >
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </>
-          )}
-          <div className="flex-1 min-w-0" />
-          {isAssistantOrSystem ? (
-            <div ref={headerBtnRef} className="flex items-center gap-1 overflow-hidden">
-              {headerKeys.map((key) => {
-                const def = BUTTON_DEFS[key]
-                if (!def) return null
-                const Icon = def.icon
-                const isDelete = key === 'delete'
-                const disabled = isButtonDisabled(key)
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={getButtonHandler(key)}
-                    disabled={disabled}
-                    className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
-                      isDelete
-                        ? 'bg-delete text-on-delete hover:bg-delete-hover'
+                <Avatar
+                  src={avatarSrc}
+                  size={avatarSize}
+                  className="flex-shrink-0"
+                  onClick={handleAvatarClick}
+                />
+                {nameLabel && (
+                  <span
+                    className={`text-xs font-medium truncate max-w-[100px] ${
+                      isUser
+                        ? userMutedClass || 'text-on-primary-muted'
                         : isOOC
-                          ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
-                          : 'hover:bg-black/10 text-tertiary hover:text-text'
-                    } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
-                    title={t(def.labelKey)}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                  </button>
-                )
-              })}
-              {overflowKeys.length > 0 && (
-                <div ref={overflowRef} className="relative flex-shrink-0">
-                  <button
-                    ref={overflowBtnRef}
-                    type="button"
-                    onClick={handleOverflowClick}
-                    className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded ${
-                      isOOC
-                        ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
-                        : 'hover:bg-black/10 text-tertiary hover:text-text'
+                          ? 'text-ooc'
+                          : 'text-text'
                     }`}
-                    title={t('moreOptions')}
+                    style={isUser ? userMutedStyle : undefined}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
-                  </button>
-                  {overflowOpen && (
-                    <div
-                      style={overflowMenuStyle}
-                      className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
+                    {nameLabel}
+                  </span>
+                )}
+              </div>
+              <div
+                className={`flex items-center gap-1 ${hasBundleNav ? 'w-full md:w-auto' : 'flex-1 min-w-0'}`}
+              >
+                {bundleMessages && bundleMessages.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newIdx =
+                          (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
+                        onBundleNavigate?.(message.id, newIdx)
+                      }}
+                      className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                        isUser
+                          ? `${userHoverBg} ${userMutedClass}`
+                          : isOOC
+                            ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                            : 'hover:bg-black/10 text-tertiary hover:text-text'
+                      }`}
+                      style={isUser ? userMutedStyle : undefined}
+                      title={t('previousInitialMessage')}
                     >
-                      {overflowKeys.map((key) => {
-                        const def = BUTTON_DEFS[key]
-                        if (!def) return null
-                        const Icon = def.icon
-                        return (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={() => {
-                              getButtonHandler(key)()
-                              setOverflowOpen(false)
-                            }}
-                            disabled={(key === 'prompt' && !promptData) || isButtonDisabled(key)}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] disabled:opacity-30 disabled:pointer-events-none"
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                    </button>
+                    <span
+                      className={`text-xs whitespace-nowrap ${isUser ? userMutedClass || '' : isOOC ? 'text-ooc-muted' : 'text-tertiary'}`}
+                      style={isUser ? userMutedStyle : undefined}
+                    >
+                      {bundleIndex + 1}/{bundleMessages.length}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newIdx = (bundleIndex + 1) % bundleMessages.length
+                        onBundleNavigate?.(message.id, newIdx)
+                      }}
+                      className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                        isUser
+                          ? `${userHoverBg} ${userMutedClass}`
+                          : isOOC
+                            ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                            : 'hover:bg-black/10 text-tertiary hover:text-text'
+                      }`}
+                      style={isUser ? userMutedStyle : undefined}
+                      title={t('nextInitialMessage')}
+                    >
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                )}
+                <div className="flex-1 min-w-0" />
+                {isAssistantOrSystem ? (
+                  <div ref={headerBtnRef} className="flex items-center gap-1 overflow-hidden">
+                    {headerKeys.map((key) => {
+                      const def = BUTTON_DEFS[key]
+                      if (!def) return null
+                      const Icon = def.icon
+                      const isDelete = key === 'delete'
+                      const disabled = isButtonDisabled(key)
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={getButtonHandler(key)}
+                          disabled={disabled}
+                          className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                            isDelete
+                              ? 'bg-delete text-on-delete hover:bg-delete-hover'
+                              : isOOC
+                                ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                                : 'hover:bg-black/10 text-tertiary hover:text-text'
+                          } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
+                          title={t(def.labelKey)}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                        </button>
+                      )
+                    })}
+                    {overflowKeys.length > 0 && (
+                      <div ref={overflowRef} className="relative flex-shrink-0">
+                        <button
+                          ref={overflowBtnRef}
+                          type="button"
+                          onClick={handleOverflowClick}
+                          className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded ${
+                            isOOC
+                              ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                              : 'hover:bg-black/10 text-tertiary hover:text-text'
+                          }`}
+                          title={t('moreOptions')}
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </button>
+                        {overflowOpen && (
+                          <div
+                            style={overflowMenuStyle}
+                            className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
                           >
-                            <Icon className="w-4 h-4" />
-                            <span>{t(def.labelKey)}</span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
+                            {overflowKeys.map((key) => {
+                              const def = BUTTON_DEFS[key]
+                              if (!def) return null
+                              const Icon = def.icon
+                              return (
+                                <button
+                                  key={key}
+                                  type="button"
+                                  onClick={() => {
+                                    getButtonHandler(key)()
+                                    setOverflowOpen(false)
+                                  }}
+                                  disabled={
+                                    (key === 'prompt' && !promptData) || isButtonDisabled(key)
+                                  }
+                                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] disabled:opacity-30 disabled:pointer-events-none"
+                                >
+                                  <Icon className="w-4 h-4" />
+                                  <span>{t(def.labelKey)}</span>
+                                </button>
+                              )
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  headerKeys.map((key) => {
+                    const def = BUTTON_DEFS[key]
+                    if (!def) return null
+                    const Icon = def.icon
+                    const isDelete = key === 'delete'
+                    const disabled = isButtonDisabled(key)
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={getButtonHandler(key)}
+                        disabled={disabled}
+                        className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                          isDelete
+                            ? 'bg-delete text-on-delete hover:bg-delete-hover'
+                            : userMutedClass
+                              ? `${userHoverBg} ${userMutedClass}`
+                              : userHoverBg
+                        } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
+                        style={isDelete || !userMutedStyle ? undefined : userMutedStyle}
+                        title={t(def.labelKey)}
+                      >
+                        <Icon className="w-3.5 h-3.5" />
+                      </button>
+                    )
+                  })
+                )}
+              </div>
             </div>
-          ) : (
-            headerKeys.map((key) => {
-              const def = BUTTON_DEFS[key]
-              if (!def) return null
-              const Icon = def.icon
-              const isDelete = key === 'delete'
-              const disabled = isButtonDisabled(key)
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={getButtonHandler(key)}
-                  disabled={disabled}
-                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
-                    isDelete
-                      ? 'bg-delete text-on-delete hover:bg-delete-hover'
-                      : userMutedClass
-                        ? `${userHoverBg} ${userMutedClass}`
-                        : userHoverBg
-                  } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
-                  style={isDelete || !userMutedStyle ? undefined : userMutedStyle}
-                  title={t(def.labelKey)}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                </button>
-              )
-            })
-          )}
-        </div>
+          )
+        })()}
 
         {/* Content */}
         <div
