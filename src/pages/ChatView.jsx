@@ -247,6 +247,16 @@ function ChatView() {
     setBaseTitle(thread?.title ? `Scenara - ${thread.title}` : 'Scenara')
   }, [thread?.title])
 
+  useEffect(() => {
+    function handleThreadsChanged() {
+      getThread(threadId).then((thr) => {
+        if (thr) setThread(thr)
+      })
+    }
+    window.addEventListener('threads-changed', handleThreadsChanged)
+    return () => window.removeEventListener('threads-changed', handleThreadsChanged)
+  }, [threadId])
+
   useLayoutEffect(() => {
     if (messages.length === 0 || loading) return
 
