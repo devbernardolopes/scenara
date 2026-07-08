@@ -462,11 +462,11 @@ html, body, #root {
 }
 
 /* Safe area padding for bottom controls */
-main,
-.chat-input-area,           /* or whatever class wraps ChatInputArea */
+/* main,
+.chat-input-area,
 #root > div {
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
-}
+} */
 
 /* Make the scrollable messages area respect safe areas */
 .overflow-y-auto {
