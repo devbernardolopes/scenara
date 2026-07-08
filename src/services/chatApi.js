@@ -361,6 +361,26 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
       }
     }
 
+    // Flush: decode remaining bytes and process leftover buffer
+    buffer += decoder.decode()
+    if (buffer.trim()) {
+      const line = buffer.trim()
+      if (line.startsWith('data: ')) {
+        const data = line.slice(6)
+        if (data !== '[DONE]') {
+          try {
+            const parsed = JSON.parse(data)
+            if (parsed.choices?.[0]?.delta?.content) {
+              fullContent += parsed.choices[0].delta.content
+              onToken?.(fullContent)
+            }
+          } catch {
+            /* skip */
+          }
+        }
+      }
+    }
+
     return fullContent
   }
 
