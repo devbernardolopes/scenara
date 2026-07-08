@@ -71,6 +71,7 @@
       "label": "Sort by",
       "createdAt": "Created",
       "updatedAt": "Updated",
+      "lastUsed": "Last Used",
       "chatCount": "Chats",
       "name": "Name"
     },

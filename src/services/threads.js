@@ -1,5 +1,6 @@
 import db from '../db'
 import { setUIState } from './uiState'
+import { touchCharacterLastUsed } from './characters'
 
 export async function getAllThreads() {
   const all = await db.threads.toArray()
@@ -51,6 +52,7 @@ export async function createThread({ characterId, personaId, title, initialMessa
     memory: null,
     lastSummarizationAt: null,
   })
+  await touchCharacterLastUsed(characterId)
   window.dispatchEvent(
     new CustomEvent('threads-changed', {
       detail: { action: 'create', entityName: title || 'New Chat' },
@@ -60,8 +62,10 @@ export async function createThread({ characterId, personaId, title, initialMessa
 }
 
 export async function updateThread(id, data) {
+  const thread = await db.threads.get(Number(id))
   const updated = await db.threads.update(Number(id), { ...data, updatedAt: new Date() })
   if (updated) {
+    if (thread) await touchCharacterLastUsed(thread.characterId)
     window.dispatchEvent(
       new CustomEvent('threads-changed', {
         detail: { action: 'update' },
@@ -86,7 +90,9 @@ export async function updateThreadTitle(id, title) {
 }
 
 export async function updateThreadTimestamp(id) {
+  const thread = await db.threads.get(Number(id))
   await db.threads.update(Number(id), { updatedAt: new Date() })
+  if (thread) await touchCharacterLastUsed(thread.characterId)
   window.dispatchEvent(new CustomEvent('threads-changed'))
 }
 
@@ -229,7 +235,10 @@ export async function forkThread(id, messageId) {
   }
 
   const memories = await db.threadMemories.where('threadId').equals(Number(id)).toArray()
-  const memoriesToCopy = memories.filter((entry) => !entry.createdAt || new Date(entry.createdAt) <= new Date(allMessages[msgIdx].createdAt))
+  const memoriesToCopy = memories.filter(
+    (entry) =>
+      !entry.createdAt || new Date(entry.createdAt) <= new Date(allMessages[msgIdx].createdAt),
+  )
   if (memoriesToCopy.length > 0) {
     await db.threadMemories.bulkAdd(
       memoriesToCopy.map(({ id: _id, ...rest }) => ({
@@ -256,6 +265,7 @@ export async function forkThread(id, messageId) {
     await setUIState(`chatInput.${newId}`, uiStateEntry.value)
   }
 
+  await touchCharacterLastUsed(original.characterId)
   window.dispatchEvent(
     new CustomEvent('threads-changed', {
       detail: { action: 'duplicate', entityName: newTitle },

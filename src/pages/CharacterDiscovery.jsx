@@ -34,7 +34,7 @@ import {
   SlidersHorizontal,
 } from '../lib/icons'
 
-const SORT_OPTIONS = ['createdAt', 'updatedAt', 'chatCount', 'name']
+const SORT_OPTIONS = ['createdAt', 'updatedAt', 'lastUsed', 'chatCount', 'name']
 
 function StartChatButton({ character, onStart }) {
   const { t } = useTranslation('common')
@@ -145,6 +145,9 @@ function CharacterDiscovery() {
           break
         case 'updatedAt':
           cmp = new Date(a.updatedAt || a.createdAt) - new Date(b.updatedAt || b.createdAt)
+          break
+        case 'lastUsed':
+          cmp = new Date(a.lastUsedAt || a.createdAt) - new Date(b.lastUsedAt || b.createdAt)
           break
         case 'chatCount':
           cmp = (chatCounts.get(a.id) || 0) - (chatCounts.get(b.id) || 0)
