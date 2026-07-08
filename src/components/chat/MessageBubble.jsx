@@ -116,6 +116,7 @@ function MessageBubble({
   onRegenerate,
   onSpeak,
   generating,
+  requestFailed,
   charName,
   personaName,
   isUnread,
@@ -196,6 +197,13 @@ function MessageBubble({
   const isSystem = role === 'system'
   const isAssistantOrSystem = role === 'assistant' || role === 'system'
   const displayContent = renderContent(message.content)
+
+  function isButtonDisabled(key) {
+    if (streaming) return true
+    if (requestFailed) return key !== 'delete' && key !== 'regenerate'
+    if (key === 'regenerate' && generating) return true
+    return false
+  }
   const unreadClass = isUnread ? 'ring-1 ring-primary/40' : ''
 
   const avatarSize = AVATAR_SIZE_MAP[avatarScale] || 'sm'
@@ -248,11 +256,11 @@ function MessageBubble({
   }
 
   function handleCodeCopy(codeContent) {
-    if (!codeContent) return;
+    if (!codeContent) return
     navigator.clipboard
       .writeText(codeContent.trim())
       .then(() => showToast(t('messageCopied') || 'Code copied!', { type: 'success' })) // reuse existing translation or fallback
-      .catch(() => showToast('Failed to copy', { type: 'error' }));
+      .catch(() => showToast('Failed to copy', { type: 'error' }))
   }
 
   function handleStartEdit() {
@@ -507,18 +515,20 @@ function MessageBubble({
                 if (!def) return null
                 const Icon = def.icon
                 const isDelete = key === 'delete'
+                const disabled = isButtonDisabled(key)
                 return (
                   <button
                     key={key}
                     type="button"
                     onClick={getButtonHandler(key)}
+                    disabled={disabled}
                     className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                       isDelete
                         ? 'bg-delete text-on-delete hover:bg-delete-hover'
                         : isOOC
                           ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
                           : 'hover:bg-black/10 text-tertiary hover:text-text'
-                    }`}
+                    } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
                     title={t(def.labelKey)}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -557,10 +567,7 @@ function MessageBubble({
                               getButtonHandler(key)()
                               setOverflowOpen(false)
                             }}
-                            disabled={
-                              (key === 'prompt' && !promptData) ||
-                              (key === 'regenerate' && generating)
-                            }
+                            disabled={(key === 'prompt' && !promptData) || isButtonDisabled(key)}
                             className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] disabled:opacity-30 disabled:pointer-events-none"
                           >
                             <Icon className="w-4 h-4" />
@@ -579,18 +586,20 @@ function MessageBubble({
               if (!def) return null
               const Icon = def.icon
               const isDelete = key === 'delete'
+              const disabled = isButtonDisabled(key)
               return (
                 <button
                   key={key}
                   type="button"
                   onClick={getButtonHandler(key)}
+                  disabled={disabled}
                   className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                     isDelete
                       ? 'bg-delete text-on-delete hover:bg-delete-hover'
                       : userMutedClass
                         ? `${userHoverBg} ${userMutedClass}`
                         : userHoverBg
-                  }`}
+                  } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
                   style={isDelete || !userMutedStyle ? undefined : userMutedStyle}
                   title={t(def.labelKey)}
                 >
@@ -602,7 +611,10 @@ function MessageBubble({
         </div>
 
         {/* Content */}
-        <div onDoubleClick={handleStartEdit} className="px-3 py-2">
+        <div
+          onDoubleClick={streaming || requestFailed ? undefined : handleStartEdit}
+          className="px-3 py-2"
+        >
           {editing ? (
             <AutoResizeTextarea
               value={editedContent}
@@ -647,27 +659,31 @@ function MessageBubble({
                   ),
                   pre: ({ children }) => {
                     // Extract code text without React.isValidElement
-                    let codeText = '';
-                    
+                    let codeText = ''
+
                     if (typeof children === 'string') {
-                      codeText = children;
+                      codeText = children
                     } else if (children && children.props && children.props.children) {
                       // <pre><code>text</code></pre> case
-                      const inner = children.props.children;
-                      codeText = typeof inner === 'string' ? inner : 
-                                (Array.isArray(inner) ? inner.join('') : String(inner || ''));
+                      const inner = children.props.children
+                      codeText =
+                        typeof inner === 'string'
+                          ? inner
+                          : Array.isArray(inner)
+                            ? inner.join('')
+                            : String(inner || '')
                     } else if (Array.isArray(children)) {
-                      codeText = children.map(c => typeof c === 'string' ? c : (c?.props?.children || '')).join('');
+                      codeText = children
+                        .map((c) => (typeof c === 'string' ? c : c?.props?.children || ''))
+                        .join('')
                     }
 
                     return (
                       <div className="relative group">
-                        <pre 
-                          className="bg-code border border-border rounded-md p-3 my-2 overflow-x-auto max-w-full whitespace-pre-wrap break-words pr-12"
-                        >
+                        <pre className="bg-code border border-border rounded-md p-3 my-2 overflow-x-auto max-w-full whitespace-pre-wrap break-words pr-12">
                           {children}
                         </pre>
-                        
+
                         {codeText && (
                           <button
                             onClick={() => handleCodeCopy(codeText)}
@@ -679,7 +695,7 @@ function MessageBubble({
                           </button>
                         )}
                       </div>
-                    );
+                    )
                   },
                 }}
               >

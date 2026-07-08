@@ -134,6 +134,7 @@ function ChatView() {
   const [visibleStartIndex, setVisibleStartIndex] = useState(0)
   const [messageThreshold, setMessageThreshold] = useState(0)
   const [activeSlotIndices, setActiveSlotIndices] = useState({})
+  const [failedRequests, setFailedRequests] = useState({})
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const [systemAvatar, setSystemAvatar] = useState('')
   const [oocMessageRole, setOocMessageRole] = useState('system')
@@ -204,20 +205,20 @@ function ChatView() {
 
   useEffect(() => {
     const preventPullToRefresh = (e) => {
-      if (e.touches && e.touches.length > 1) return; // Allow multi-touch
+      if (e.touches && e.touches.length > 1) return // Allow multi-touch
       // Optional: only prevent near top
-      const scrollEl = scrollRef.current;
+      const scrollEl = scrollRef.current
       if (scrollEl && scrollEl.scrollTop <= 0) {
-        e.preventDefault();
+        e.preventDefault()
       }
-    };
-
-    const chatContainer = scrollRef.current;
-    if (chatContainer) {
-      chatContainer.addEventListener('touchstart', preventPullToRefresh, { passive: false });
-      return () => chatContainer.removeEventListener('touchstart', preventPullToRefresh);
     }
-  }, []);
+
+    const chatContainer = scrollRef.current
+    if (chatContainer) {
+      chatContainer.addEventListener('touchstart', preventPullToRefresh, { passive: false })
+      return () => chatContainer.removeEventListener('touchstart', preventPullToRefresh)
+    }
+  }, [])
 
   useEffect(() => {
     scrollStickyCleanupRef.current?.()
@@ -455,7 +456,9 @@ function ChatView() {
     }
 
     const includeOOC = character?.includeOOC !== false
-    const keepMessages = Number(character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0)
+    const keepMessages = Number(
+      character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0,
+    )
     const apiMessages = getMessagesForApiRequest(currentMsgs, {
       includeOOC,
       keepMessages,
@@ -574,6 +577,10 @@ function ChatView() {
         },
       })
 
+      if (!content) {
+        setFailedRequests((prev) => ({ ...prev, [assistantMsgId]: 0 }))
+      }
+
       await updateMessage(assistantMsgId, { content })
       setMessages((prev) => prev.map((m) => (m.id === assistantMsgId ? { ...m, content } : m)))
       showToast(t('messageUpdated'), { type: 'success' })
@@ -587,6 +594,7 @@ function ChatView() {
         await updateMessage(assistantMsgId, { content: '' })
         const msgs = await getMessagesByThread(threadId)
         setMessages(msgs)
+        setFailedRequests((prev) => ({ ...prev, [assistantMsgId]: 0 }))
         showToast(err.message, { type: 'error' })
         completedNormally = true
       }
@@ -612,11 +620,13 @@ function ChatView() {
   async function handleSummarization(currentMessages = messages) {
     if (summarizing) return
     if (!thread || !character) return
-    if (!(await shouldTriggerSummarization({
-      character,
-      messages: currentMessages,
-      includeOOC: character.includeOOC !== false,
-    }))) {
+    if (
+      !(await shouldTriggerSummarization({
+        character,
+        messages: currentMessages,
+        includeOOC: character.includeOOC !== false,
+      }))
+    ) {
       return
     }
 
@@ -770,6 +780,7 @@ function ChatView() {
 
       const slotIndex = entries.length
       entries.push({ content: '', promptData: null, createdAt: new Date().toISOString() })
+      setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
       const bundleJson = JSON.stringify(entries)
 
       await updateMessage(messageId, { bundleMessages: bundleJson, content: '' })
@@ -816,7 +827,9 @@ function ChatView() {
         const userRolePrefixOoc = await getSetting('prompting.userRolePrefixOoc')
 
         const includeOOCRegen = character?.includeOOC !== false
-        const keepMessagesRegen = Number(character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0)
+        const keepMessagesRegen = Number(
+          character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0,
+        )
         const apiMessagesRegen = getMessagesForApiRequest(currentMsgs, {
           includeOOC: includeOOCRegen,
           keepMessages: keepMessagesRegen,
@@ -866,7 +879,9 @@ function ChatView() {
         }
 
         const includeOOCRegen = character?.includeOOC !== false
-        const keepMessagesRegen = Number(character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0)
+        const keepMessagesRegen = Number(
+          character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0,
+        )
         const apiMessagesRegen = getMessagesForApiRequest(currentMsgs, {
           includeOOC: includeOOCRegen,
           keepMessages: keepMessagesRegen,
@@ -910,6 +925,10 @@ function ChatView() {
         },
       })
 
+      if (!content) {
+        setFailedRequests((prev) => ({ ...prev, [messageId]: slotIndex }))
+      }
+
       const dbMsg = await db.messages.get(Number(messageId))
       const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || entries
       if (finalEntries[slotIndex]) {
@@ -934,12 +953,18 @@ function ChatView() {
         ),
       )
       setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
+      setFailedRequests((prev) => {
+        const next = { ...prev }
+        delete next[messageId]
+        return next
+      })
       showToast(t('messageUpdated'), { type: 'success' })
       completedNormally = true
     } catch (err) {
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
       if (err.name !== 'AbortError') {
+        setFailedRequests((prev) => ({ ...prev, [messageId]: slotIndex }))
         showToast(err.message, { type: 'error' })
         completedNormally = true
       }
@@ -1135,6 +1160,7 @@ function ChatView() {
                     ? entries[bundleIndex].origin || null
                     : null
                 const slotCreatedAt = entries?.[bundleIndex]?.createdAt || msg.createdAt
+                const isFailedSlot = failedRequests[msg.id] === bundleIndex
                 return (
                   <div
                     key={msg.id}
@@ -1161,6 +1187,7 @@ function ChatView() {
                       onRegenerate={handleRegenerate}
                       onSpeak={() => {}}
                       generating={generating}
+                      requestFailed={isFailedSlot}
                       isUnread={msg.isUnread || false}
                       charName={character?.name || ''}
                       personaName={personaMap[thread?.personaId]?.name || ''}
@@ -1185,7 +1212,9 @@ function ChatView() {
         </div>
       </div>
 
-      <div className="flex-shrink-0 border-t border-border bg-surface">   {/* Wrap input for better control */}
+      <div className="flex-shrink-0 border-t border-border bg-surface">
+        {' '}
+        {/* Wrap input for better control */}
         <ChatInputArea
           threadId={threadId}
           onSend={handleSend}
