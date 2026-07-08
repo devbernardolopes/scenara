@@ -63,7 +63,9 @@ function ShowPromptModal({ payload, model, params }) {
                   onClick={() => setExpandedIdx(isOpen ? null : idx)}
                   className="w-full flex items-center gap-2 px-4 py-3 min-h-[44px] text-left hover:bg-surface-hover transition-colors"
                 >
-                  <span className="text-xs font-medium text-text shrink-0">#{idx + 1}</span>
+                  {idx > 0 && (
+                    <span className="text-xs font-medium text-text shrink-0">#{idx}</span>
+                  )}
                   <span className="text-xs font-medium text-secondary shrink-0 uppercase">
                     {msg.role}
                   </span>
