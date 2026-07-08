@@ -35,6 +35,7 @@
   "edited": "(editado)",
   "messageCopied": "Mensaje copiado",
   "messageUpdated": "Mensaje actualizado",
+  "responseTruncated": "La respuesta puede haber sido truncada (límite de tokens alcanzado)",
   "messageDeleted": "Mensaje eliminado",
   "initialMessage": "Mensaje Inicial",
   "clearInitialMessages": "Eliminar mensajes iniciales",

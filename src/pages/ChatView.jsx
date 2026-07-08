@@ -608,6 +608,11 @@ function ChatView() {
             prev.map((m) => (m.id === assistantMsgId ? { ...m, content: fullContent } : m)),
           )
         },
+        onFinish: (reason) => {
+          if (reason === 'length') {
+            showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
+          }
+        },
       })
 
       if (!content) {
@@ -980,6 +985,11 @@ function ChatView() {
           setMessages((prev) =>
             prev.map((m) => (m.id === messageId ? { ...m, content: fullContent } : m)),
           )
+        },
+        onFinish: (reason) => {
+          if (reason === 'length') {
+            showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
+          }
         },
       })
 

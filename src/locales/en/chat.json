@@ -45,6 +45,7 @@
   "edited": "(edited)",
   "messageCopied": "Message copied",
   "messageUpdated": "Message updated",
+  "responseTruncated": "Response may have been cut off (max tokens reached)",
   "messageDeleted": "Message deleted",
   "noChatProfile": "No Chat profile assigned. Please configure one in Settings > API before continuing.",
   "initialMessage": "Initial Message",

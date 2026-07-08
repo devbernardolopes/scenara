@@ -291,7 +291,7 @@ export async function buildOOCMessagesPayload({
   return result
 }
 
-export async function sendChatCompletion({ profile, messages, signal, onToken }) {
+export async function sendChatCompletion({ profile, messages, signal, onToken, onFinish }) {
   const baseUrl = getChatBaseUrl(profile.providerId)
   if (!baseUrl) throw new Error(`No base URL for provider "${profile.providerId}"`)
 
@@ -326,7 +326,6 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
     const decoder = new TextDecoder()
     let buffer = ''
     let fullContent = ''
-    let contentStarted = false
 
     while (true) {
       const { done, value } = await reader.read()
@@ -346,14 +345,11 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
           const parsed = JSON.parse(data)
           const choice = parsed.choices?.[0]
           if (choice?.delta?.content) {
-            if (!contentStarted) {
-              contentStarted = true
-            }
             fullContent += choice.delta.content
             onToken?.(fullContent)
           }
           if (choice?.finish_reason) {
-            // generation finished
+            onFinish?.(choice.finish_reason)
           }
         } catch {
           // skip unparseable chunks
@@ -398,5 +394,7 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
 
   const json = await res.json()
   const content = json.choices?.[0]?.message?.content || ''
+  const finishReason = json.choices?.[0]?.finish_reason || null
+  if (finishReason) onFinish?.(finishReason)
   return content
 }

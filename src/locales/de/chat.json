@@ -35,6 +35,7 @@
   "edited": "(bearbeitet)",
   "messageCopied": "Nachricht kopiert",
   "messageUpdated": "Nachricht aktualisiert",
+  "responseTruncated": "Antwort wurde möglicherweise abgeschnitten (Maximaltoken erreicht)",
   "messageDeleted": "Nachricht gelöscht",
   "initialMessage": "Erste Nachricht",
   "clearInitialMessages": "Erste Nachrichten entfernen",
