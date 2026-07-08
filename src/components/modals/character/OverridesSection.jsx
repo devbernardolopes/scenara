@@ -101,7 +101,9 @@ function OverridesSection({ form, onChange, characterId }) {
             value={form.autoTitleThreshold}
             onChange={(e) => onChange('autoTitleThreshold', Number(e.target.value))}
             disabled={!form.autoTitle}
-            min={0}
+            min={3}
+            max={10}
+            step={1}
           />
         </div>
 
@@ -164,7 +166,9 @@ function OverridesSection({ form, onChange, characterId }) {
             value={form.messagesThreshold}
             onChange={(e) => onChange('messagesThreshold', Number(e.target.value))}
             disabled={form.memory !== 'messages'}
-            min={0}
+            min={3}
+            max={50}
+            step={1}
           />
         </div>
       </div>
@@ -197,7 +201,7 @@ function OverridesSection({ form, onChange, characterId }) {
             onChange={(e) => onChange('messagesToKeep', Number(e.target.value))}
             disabled={form.memory === 'never'}
             min={0}
-            max={50}
+            max={25}
             step={1}
           />
         </div>
