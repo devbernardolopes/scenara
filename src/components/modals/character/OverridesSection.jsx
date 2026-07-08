@@ -183,7 +183,7 @@ function OverridesSection({ form, onChange, characterId }) {
             step={256}
             value={form.contextWindowThreshold}
             onChange={(e) => onChange('contextWindowThreshold', Number(e.target.value))}
-            className="w-32 accent-primary"
+            className="w-48 accent-primary"
           />
           <span className="text-sm text-text font-medium w-14 text-right">
             {form.contextWindowThreshold}
