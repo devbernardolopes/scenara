@@ -42,6 +42,10 @@ export async function buildMessagesPayload({
   memoryText,
   memoryHeader,
 }) {
+  const writingMessageRole =
+    character?.writingMessageRole || settings.writingMessageRole || 'system'
+  const personaInjectionMessageRole =
+    character?.personaInjectionMessageRole || settings.personaInjectionMessageRole || 'system'
   const systemParts = []
 
   const charName = character?.name || ''
@@ -99,6 +103,20 @@ export async function buildMessagesPayload({
     if (lastMsg && lastMsg.role !== 'user' && continuePrompt) {
       result.push({ role: continueRole, content: continuePrompt })
     }
+  }
+
+  const writingEndOfMessages =
+    writingInstruction?.content &&
+    writingTiming === 'always' &&
+    writingPlacement === 'endOfMessages'
+  if (writingEndOfMessages) {
+    result.push({ role: writingMessageRole, content: replaceVarsIn(writingInstruction.content) })
+  }
+
+  const personaEndOfMessages =
+    personaTiming !== 'never' && personaTemplate && personaPlacement === 'endOfMessages'
+  if (personaEndOfMessages) {
+    result.push({ role: personaInjectionMessageRole, content: personaTemplate })
   }
 
   if (memoryText) {
@@ -329,16 +347,10 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
           const choice = parsed.choices?.[0]
           if (choice?.delta?.content) {
             if (!contentStarted) {
-              const clean = choice.delta.content.trimStart()
-              if (clean) {
-                contentStarted = true
-                fullContent += clean
-                onToken?.(fullContent)
-              }
-            } else {
-              fullContent += choice.delta.content
-              onToken?.(fullContent)
+              contentStarted = true
             }
+            fullContent += choice.delta.content
+            onToken?.(fullContent)
           }
           if (choice?.finish_reason) {
             // generation finished
@@ -366,5 +378,5 @@ export async function sendChatCompletion({ profile, messages, signal, onToken })
 
   const json = await res.json()
   const content = json.choices?.[0]?.message?.content || ''
-  return content.trimStart()
+  return content
 }

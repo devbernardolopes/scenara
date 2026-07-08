@@ -76,6 +76,8 @@ export async function buildSummarizationPayload({
   personaMap,
   rolePrefixes,
   currentPersona,
+  memoryText,
+  memoryHeader,
 }) {
   const charName = character?.name || ''
   let personaName = ''
@@ -90,7 +92,7 @@ export async function buildSummarizationPayload({
   const includeOOCOverride = character?.includeOOC !== false
   const userPersonaPrefixOverride = character?.userPersonaPrefix !== false
 
-  const transcript = replaceVarsIn(
+  let transcript = replaceVarsIn(
     buildTranscript({
       messages,
       personaName,
@@ -101,6 +103,11 @@ export async function buildSummarizationPayload({
       rolePrefixes,
     }),
   )
+
+  if (memoryText) {
+    const section = memoryHeader ? `${memoryHeader}\n\n${memoryText}` : memoryText
+    transcript = section + '\n\n' + transcript
+  }
 
   let systemContent = character?.summarizationSystemInstructions
   if (!systemContent) {
@@ -152,6 +159,9 @@ export async function triggerSummarization({
     userRolePrefixOoc: await getSetting('prompting.userRolePrefixOoc'),
   }
 
+  const memoryHeader = await getSetting('prompting.apiRequestSectionHeaders.memories')
+  const memoryText = thread?.memory || ''
+
   const payload = await buildSummarizationPayload({
     character,
     thread,
@@ -159,6 +169,8 @@ export async function triggerSummarization({
     personaMap,
     rolePrefixes,
     currentPersona,
+    memoryText,
+    memoryHeader,
   })
 
   const profile = await getEffectiveProfileFor('summarization')

@@ -551,8 +551,10 @@ function ChatView() {
         personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
         writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
         writingPlacement: await getSetting('prompting.writingPlacement'),
+        writingMessageRole: await getSetting('prompting.writingMessageRole'),
         personaInjectionTiming: await getSetting('prompting.personaInjectionTiming'),
         personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
+        personaInjectionMessageRole: await getSetting('personaInjectionMessageRole'),
       }
 
       payload = await buildMessagesPayload({
@@ -880,12 +882,17 @@ function ChatView() {
         const memoryHeaderRegen = await getSetting('prompting.apiRequestSectionHeaders.memories')
         const memoryTextRegen = thread?.memory || ''
 
+        const lastUserMsg =
+          currentMsgs.length > 0 && currentMsgs[currentMsgs.length - 1].role === 'user'
+            ? currentMsgs[currentMsgs.length - 1].content
+            : ''
+
         payload = await buildOOCMessagesPayload({
           character,
           chatPersona,
           currentPersona: null,
-          messages: apiMessagesRegen,
-          userMessage: '',
+          messages: apiMessagesRegen.slice(0, -1),
+          userMessage: lastUserMsg,
           personaMap,
           memoryText: memoryTextRegen,
           memoryHeader: memoryHeaderRegen,
@@ -917,8 +924,10 @@ function ChatView() {
           personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
           writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
           writingPlacement: await getSetting('prompting.writingPlacement'),
+          writingMessageRole: await getSetting('prompting.writingMessageRole'),
           personaInjectionTiming: await getSetting('prompting.personaInjectionTiming'),
           personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
+          personaInjectionMessageRole: await getSetting('personaInjectionMessageRole'),
         }
 
         const includeOOCRegen = character?.includeOOC !== false
