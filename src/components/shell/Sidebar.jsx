@@ -96,6 +96,7 @@ function Sidebar({ open, onClose }) {
   const [generatingSet, setGeneratingSet] = useState(() => getGeneratingThreads())
   const [threadCardMarquee, setThreadCardMarquee] = useState(true)
   const [unreadBadges, setUnreadBadges] = useState(true)
+  const [sidebarNavLayout, setSidebarNavLayout] = useState('vertical')
   const fileInputRef = useRef(null)
   useUnread()
 
@@ -205,6 +206,19 @@ function Sidebar({ open, onClose }) {
     function onSettingsChanged(e) {
       if (e.detail?.key === 'unreadBadges') {
         setUnreadBadges(e.detail.value !== false)
+      }
+    }
+    window.addEventListener('settings-changed', onSettingsChanged)
+    return () => window.removeEventListener('settings-changed', onSettingsChanged)
+  }, [])
+
+  useEffect(() => {
+    getSetting('sidebarNavLayout').then((val) => {
+      setSidebarNavLayout(val || 'vertical')
+    })
+    function onSettingsChanged(e) {
+      if (e.detail?.key === 'sidebarNavLayout') {
+        setSidebarNavLayout(e.detail.value || 'vertical')
       }
     }
     window.addEventListener('settings-changed', onSettingsChanged)
@@ -568,54 +582,63 @@ function Sidebar({ open, onClose }) {
           </div>
         )}
 
-        <div className="border-t border-border p-3 shrink-0 space-y-1">
-          <button
-            onClick={() => openModal('personaManagement')}
-            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
-          >
-            <UserPlus className="w-4 h-4" />
-            {t('sidebar.personas')}
-          </button>
-          <button
-            onClick={() => openModal('writingInstructionManagement')}
-            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
-          >
-            <FileText className="w-4 h-4" />
-            {t('sidebar.writingInstructions')}
-          </button>
-          <button
-            onClick={() => openModal('profileManagement')}
-            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-            {t('sidebar.connectionProfiles')}
-          </button>
-          <button
-            onClick={() => openModal('inChatShortcutManagement')}
-            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
-          >
-            <Zap className="w-4 h-4" />
-            {t('sidebar.inChatShortcuts')}
-          </button>
-          <button className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover">
-            <BookOpen className="w-4 h-4" />
-            {t('sidebar.lorebooks')}
-          </button>
-          <button
-            onClick={() => openModal('tagManagement')}
-            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
-          >
-            <Tags className="w-4 h-4" />
-            {t('sidebar.tags')}
-          </button>
-          <button
-            onClick={() => openModal('settings')}
-            className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
-          >
-            <Settings className="w-4 h-4" />
-            {t('topbar.settings')}
-          </button>
-        </div>
+        {(() => {
+          const navButtons = [
+            {
+              onClick: () => openModal('personaManagement'),
+              icon: UserPlus,
+              labelKey: 'sidebar.personas',
+            },
+            {
+              onClick: () => openModal('writingInstructionManagement'),
+              icon: FileText,
+              labelKey: 'sidebar.writingInstructions',
+            },
+            {
+              onClick: () => openModal('profileManagement'),
+              icon: SlidersHorizontal,
+              labelKey: 'sidebar.connectionProfiles',
+            },
+            {
+              onClick: () => openModal('inChatShortcutManagement'),
+              icon: Zap,
+              labelKey: 'sidebar.inChatShortcuts',
+            },
+            { onClick: null, icon: BookOpen, labelKey: 'sidebar.lorebooks' },
+            { onClick: () => openModal('tagManagement'), icon: Tags, labelKey: 'sidebar.tags' },
+            { onClick: () => openModal('settings'), icon: Settings, labelKey: 'topbar.settings' },
+          ]
+          if (sidebarNavLayout === 'compact') {
+            return (
+              <div className="border-t border-border p-3 shrink-0 flex flex-wrap gap-1">
+                {navButtons.map((btn) => (
+                  <button
+                    key={btn.labelKey}
+                    onClick={btn.onClick || undefined}
+                    className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-secondary hover:text-text hover:bg-surface-hover"
+                    title={t(btn.labelKey)}
+                  >
+                    <btn.icon className="w-4 h-4" />
+                  </button>
+                ))}
+              </div>
+            )
+          }
+          return (
+            <div className="border-t border-border p-3 shrink-0 space-y-1">
+              {navButtons.map((btn) => (
+                <button
+                  key={btn.labelKey}
+                  onClick={btn.onClick || undefined}
+                  className="flex items-center gap-2 w-full min-h-[44px] px-3 rounded-md text-sm text-secondary hover:text-text hover:bg-surface-hover"
+                >
+                  <btn.icon className="w-4 h-4" />
+                  {t(btn.labelKey)}
+                </button>
+              ))}
+            </div>
+          )
+        })()}
       </aside>
 
       {colorPickerId &&

@@ -166,6 +166,19 @@ export const SETTINGS = [
     },
   },
   {
+    key: 'sidebarNavLayout',
+    category: 'appearance',
+    type: 'select',
+    default: 'vertical',
+    options: ['vertical', 'compact'],
+    labelKey: 'settings:appearance.sidebarNavLayout.label',
+    descKey: 'settings:appearance.sidebarNavLayout.desc',
+    optionLabels: {
+      vertical: 'settings:sidebarNavLayoutOptions.vertical',
+      compact: 'settings:sidebarNavLayoutOptions.compact',
+    },
+  },
+  {
     key: 'showAssistantDelete',
     category: 'appearance',
     type: 'toggle',

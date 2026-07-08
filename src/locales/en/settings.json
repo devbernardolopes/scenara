@@ -45,6 +45,10 @@
       "label": "Sidebar Toggle Position",
       "desc": "Where the sidebar toggle button appears on small screens."
     },
+    "sidebarNavLayout": {
+      "label": "Sidebar Navigation Layout",
+      "desc": "How sidebar navigation buttons (Personas, Writing Instructions, etc.) are displayed."
+    },
     "showAssistantDelete": {
       "label": "Assistant/System – Delete",
       "desc": "Show the delete button on assistant and system message bubbles."
@@ -416,6 +420,10 @@
     "top-left": "Top Left",
     "top-right": "Top Right",
     "top-center": "Top Center"
+  },
+  "sidebarNavLayoutOptions": {
+    "vertical": "Vertical (labels visible)",
+    "compact": "Compact (icons only)"
   },
   "persona": {
     "title": "Personas",
