@@ -51,34 +51,54 @@ function HordeDropdown({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm text-left flex items-center gap-2"
+        className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm text-left flex items-start gap-2"
       >
-        <span className={`flex-1 truncate ${value ? '' : 'text-tertiary'}`}>
-          {value || selectLabel}
-        </span>
-        {selectedMeta && (
-          <span className="flex items-center gap-1 shrink-0">
-            <Pill className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-              {selectedMeta.count}
-            </Pill>
-            <Pill className="bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300">
-              {selectedMeta.queued}
-            </Pill>
-            <Pill className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
-              {formatEta(selectedMeta.eta)}
-            </Pill>
-            <Pill className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
-              {selectedMeta.performance} tok/s
-            </Pill>
-          </span>
-        )}
+        <div className="flex flex-col md:flex-row md:items-center gap-0.5 md:gap-2 flex-1 min-w-0">
+          <span className={`truncate ${value ? '' : 'text-tertiary'}`}>{value || selectLabel}</span>
+          {selectedMeta && (
+            <span className="flex items-center gap-1 flex-wrap">
+              <Pill
+                style={{
+                  backgroundColor: 'var(--color-pill-count-bg)',
+                  color: 'var(--color-pill-count-text)',
+                }}
+              >
+                {selectedMeta.count}
+              </Pill>
+              <Pill
+                style={{
+                  backgroundColor: 'var(--color-pill-queued-bg)',
+                  color: 'var(--color-pill-queued-text)',
+                }}
+              >
+                {selectedMeta.queued}
+              </Pill>
+              <Pill
+                style={{
+                  backgroundColor: 'var(--color-pill-eta-bg)',
+                  color: 'var(--color-pill-eta-text)',
+                }}
+              >
+                {formatEta(selectedMeta.eta)}
+              </Pill>
+              <Pill
+                style={{
+                  backgroundColor: 'var(--color-pill-perf-bg)',
+                  color: 'var(--color-pill-perf-text)',
+                }}
+              >
+                {selectedMeta.performance} tok/s
+              </Pill>
+            </span>
+          )}
+        </div>
         <ChevronDown
           className={`w-4 h-4 text-tertiary shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
       {open && (
-        <div className="absolute z-50 left-0 right-0 mt-1 border border-border rounded-md bg-surface shadow-surface-lg max-h-72 overflow-y-auto">
+        <div className="absolute z-50 left-0 right-0 mt-1 border border-border rounded-md bg-surface text-text shadow-surface-lg max-h-72 overflow-y-auto">
           <div
             className="flex items-center gap-2 px-3 py-2.5 text-sm text-tertiary hover:bg-surface-hover cursor-pointer min-h-[44px]"
             onClick={() => {
@@ -94,7 +114,7 @@ function HordeDropdown({
             return (
               <div
                 key={model}
-                className={`flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer min-h-[44px] ${
+                className={`flex items-start gap-2 px-3 py-2.5 text-sm cursor-pointer min-h-[44px] ${
                   value === model ? 'bg-primary-subtle' : 'hover:bg-surface-hover'
                 }`}
                 onClick={() => {
@@ -108,7 +128,7 @@ function HordeDropdown({
                     e.stopPropagation()
                     onToggleFav(model)
                   }}
-                  className="shrink-0 focus:outline-none"
+                  className="shrink-0 focus:outline-none mt-0.5"
                 >
                   <Star
                     className={`w-4 h-4 ${
@@ -118,23 +138,45 @@ function HordeDropdown({
                     }`}
                   />
                 </button>
-                <span className="flex-1 truncate">{model}</span>
-                {meta && (
-                  <span className="flex items-center gap-1 shrink-0">
-                    <Pill className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-                      {meta.count}
-                    </Pill>
-                    <Pill className="bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300">
-                      {meta.queued}
-                    </Pill>
-                    <Pill className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
-                      {formatEta(meta.eta)}
-                    </Pill>
-                    <Pill className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
-                      {meta.performance} tok/s
-                    </Pill>
-                  </span>
-                )}
+                <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                  <span className="truncate">{model}</span>
+                  {meta && (
+                    <span className="flex items-center gap-1 flex-wrap">
+                      <Pill
+                        style={{
+                          backgroundColor: 'var(--color-pill-count-bg)',
+                          color: 'var(--color-pill-count-text)',
+                        }}
+                      >
+                        {meta.count}
+                      </Pill>
+                      <Pill
+                        style={{
+                          backgroundColor: 'var(--color-pill-queued-bg)',
+                          color: 'var(--color-pill-queued-text)',
+                        }}
+                      >
+                        {meta.queued}
+                      </Pill>
+                      <Pill
+                        style={{
+                          backgroundColor: 'var(--color-pill-eta-bg)',
+                          color: 'var(--color-pill-eta-text)',
+                        }}
+                      >
+                        {formatEta(meta.eta)}
+                      </Pill>
+                      <Pill
+                        style={{
+                          backgroundColor: 'var(--color-pill-perf-bg)',
+                          color: 'var(--color-pill-perf-text)',
+                        }}
+                      >
+                        {meta.performance} tok/s
+                      </Pill>
+                    </span>
+                  )}
+                </div>
               </div>
             )
           })}

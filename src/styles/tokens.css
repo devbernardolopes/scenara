@@ -46,6 +46,15 @@
 
   --color-code-bg: rgba(0, 0, 0, 0.05);
 
+  --color-pill-count-bg: #dbeafe;
+  --color-pill-count-text: #1d4ed8;
+  --color-pill-queued-bg: #fef3c7;
+  --color-pill-queued-text: #a16207;
+  --color-pill-eta-bg: #dcfce7;
+  --color-pill-eta-text: #15803d;
+  --color-pill-perf-bg: #f3e8ff;
+  --color-pill-perf-text: #7c3aed;
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -86,6 +95,15 @@
 
   --color-code-bg: rgba(255, 255, 255, 0.07);
 
+  --color-pill-count-bg: #1e3a5f;
+  --color-pill-count-text: #93c5fd;
+  --color-pill-queued-bg: #713f12;
+  --color-pill-queued-text: #fcd34d;
+  --color-pill-eta-bg: #14532d;
+  --color-pill-eta-text: #86efac;
+  --color-pill-perf-bg: #3b0764;
+  --color-pill-perf-text: #d8b4fe;
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
@@ -123,6 +141,15 @@
   --color-delete: #b91c1c;
   --color-delete-hover: #991b1b;
   --color-on-delete: #ffffff;
+
+  --color-pill-count-bg: #dbeafe;
+  --color-pill-count-text: #1d4ed8;
+  --color-pill-queued-bg: #fef3c7;
+  --color-pill-queued-text: #92400e;
+  --color-pill-eta-bg: #d1fae5;
+  --color-pill-eta-text: #065f46;
+  --color-pill-perf-bg: #ede9fe;
+  --color-pill-perf-text: #6d28d9;
 
   --color-code-bg: rgba(69, 26, 3, 0.06);
 
@@ -164,6 +191,15 @@
   --color-delete-hover: #be123c;
   --color-on-delete: #ffffff;
 
+  --color-pill-count-bg: #e0e7ff;
+  --color-pill-count-text: #4338ca;
+  --color-pill-queued-bg: #fef3c7;
+  --color-pill-queued-text: #a16207;
+  --color-pill-eta-bg: #d1fae5;
+  --color-pill-eta-text: #065f46;
+  --color-pill-perf-bg: #f3e8ff;
+  --color-pill-perf-text: #7c3aed;
+
   --color-code-bg: rgba(0, 0, 0, 0.04);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
@@ -203,6 +239,15 @@
   --color-delete: #b91c1c;
   --color-delete-hover: #991b1b;
   --color-on-delete: #ffffff;
+
+  --color-pill-count-bg: #bfdbfe;
+  --color-pill-count-text: #1e40af;
+  --color-pill-queued-bg: #fef3c7;
+  --color-pill-queued-text: #92400e;
+  --color-pill-eta-bg: #bbf7d0;
+  --color-pill-eta-text: #166534;
+  --color-pill-perf-bg: #e9d5ff;
+  --color-pill-perf-text: #5b21b6;
 
   --color-code-bg: rgba(0, 0, 0, 0.1);
 
@@ -244,6 +289,15 @@
   --color-delete-hover: #cc3700;
   --color-on-delete: #000000;
 
+  --color-pill-count-bg: #1e3a5f;
+  --color-pill-count-text: #93c5fd;
+  --color-pill-queued-bg: #713f12;
+  --color-pill-queued-text: #fcd34d;
+  --color-pill-eta-bg: #14532d;
+  --color-pill-eta-text: #86efac;
+  --color-pill-perf-bg: #3b0764;
+  --color-pill-perf-text: #d8b4fe;
+
   --color-code-bg: rgba(255, 215, 0, 0.08);
 
   --shadow-sm: 0 1px 2px rgba(255, 215, 0, 0.15);
@@ -283,6 +337,15 @@
   --color-delete: #cc0000;
   --color-delete-hover: #990000;
   --color-on-delete: #ffffff;
+
+  --color-pill-count-bg: #003300;
+  --color-pill-count-text: #33ff33;
+  --color-pill-queued-bg: #332200;
+  --color-pill-queued-text: #ffd700;
+  --color-pill-eta-bg: #003300;
+  --color-pill-eta-text: #33ff33;
+  --color-pill-perf-bg: #002233;
+  --color-pill-perf-text: #00ffff;
 
   --color-code-bg: rgba(0, 255, 0, 0.08);
 
@@ -449,15 +512,18 @@
 }
 
 /* Safe area handling for iOS/Android dynamic toolbars */
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
-  height: 100dvh;           /* Dynamic viewport height (best for mobile) */
+  height: 100dvh; /* Dynamic viewport height (best for mobile) */
   margin: 0;
   padding: 0;
-  overflow: hidden;         /* Prevent body scroll */
+  overflow: hidden; /* Prevent body scroll */
 }
 
-.flex.h-full {              /* Targets ShellLayout + ChatView */
+.flex.h-full {
+  /* Targets ShellLayout + ChatView */
   height: 100dvh !important;
 }
 
