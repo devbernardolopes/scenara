@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
@@ -71,6 +71,33 @@ const DEFAULTS_MAP = {
   personaInjectionMessageRole: 'personaInjectionMessageRole',
 }
 
+const OVERRIDE_FIELDS = [
+  'autoTitle',
+  'autoTitleThreshold',
+  'autoTitleSystemInstructions',
+  'autoTitleUserInstructions',
+  'memory',
+  'messagesThreshold',
+  'contextWindowThreshold',
+  'messagesToKeep',
+  'memorySlots',
+  'summarizationSystemInstructions',
+  'summarizationUserInstructions',
+  'firstMessage',
+  'userPersonaPrefix',
+  'includeOOC',
+  'postProcessing',
+  'systemAvatarScale',
+  'characterAvatarScale',
+  'userPersonaAvatarScale',
+  'writingInjectionTiming',
+  'writingPlacement',
+  'writingMessageRole',
+  'personaInjectionTiming',
+  'personaInjectionPlacement',
+  'personaInjectionMessageRole',
+]
+
 function buildInitialForm(existing) {
   if (!existing) return { ...INITIAL_FORM }
   const result = {}
@@ -113,10 +140,25 @@ function CharacterCreateModal({ character: existing, initialData }) {
   const savePendingRef = useRef(false)
   const [totalPermTokens, setTotalPermTokens] = useState(0)
   const [defaultPersonaName, setDefaultPersonaName] = useState('')
+  const [overrideDefaults, setOverrideDefaults] = useState(null)
 
   useEffect(() => {
     getSetting('defaultPersonaId').then((id) => {
       if (id) getPersona(id).then((p) => setDefaultPersonaName(p?.name || ''))
+    })
+  }, [])
+
+  useEffect(() => {
+    const keys = Object.keys(DEFAULTS_MAP)
+    Promise.all(keys.map((k) => getSetting(k))).then((values) => {
+      const defaults = {}
+      keys.forEach((key, i) => {
+        const val = values[i]
+        if (val !== null && val !== undefined) {
+          defaults[DEFAULTS_MAP[key]] = val
+        }
+      })
+      setOverrideDefaults(defaults)
     })
   }, [])
 
@@ -177,6 +219,25 @@ function CharacterCreateModal({ character: existing, initialData }) {
   const isDirty = Object.keys(initialRef.current).some(
     (key) => form[key] !== initialRef.current[key],
   )
+
+  const sectionHighlights = useMemo(() => {
+    const highlights = {
+      character: form.writingInstruction != null,
+      initialMessages: (form.initialMessages || []).some((m) => m.content?.trim()),
+      overrides: false,
+    }
+    if (overrideDefaults) {
+      highlights.overrides = OVERRIDE_FIELDS.some((key) => {
+        const defaultVal = key in overrideDefaults ? overrideDefaults[key] : INITIAL_FORM[key]
+        const currentVal = form[key]
+        if (Array.isArray(currentVal)) {
+          return JSON.stringify(currentVal) !== JSON.stringify(defaultVal)
+        }
+        return currentVal !== defaultVal
+      })
+    }
+    return highlights
+  }, [form, overrideDefaults])
 
   const handleCloseRef = useRef()
   handleCloseRef.current = handleCloseAttempt
@@ -253,18 +314,28 @@ function CharacterCreateModal({ character: existing, initialData }) {
           onChange={(e) => setActiveSection(e.target.value)}
           className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text text-sm"
         >
-          <option value="character">{t('sectionCharacter')}</option>
-          <option value="overrides">{t('sectionOverrides')}</option>
-          <option value="initialMessages">{t('sectionInitialMessages')}</option>
-          <option value="lorebooks">{t('sectionLorebooks')}</option>
-          <option value="tags">{t('sectionTags')}</option>
-          <option value="3d">{t('section3d')}</option>
-          <option value="sfx">{t('sectionSfx')}</option>
+          {[
+            { id: 'character', labelKey: 'sectionCharacter' },
+            { id: 'overrides', labelKey: 'sectionOverrides' },
+            { id: 'initialMessages', labelKey: 'sectionInitialMessages' },
+            { id: 'lorebooks', labelKey: 'sectionLorebooks' },
+            { id: 'tags', labelKey: 'sectionTags' },
+            { id: '3d', labelKey: 'section3d' },
+            { id: 'sfx', labelKey: 'sectionSfx' },
+          ].map((sec) => (
+            <option key={sec.id} value={sec.id}>
+              {sectionHighlights[sec.id] ? `● ${t(sec.labelKey)}` : t(sec.labelKey)}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="flex flex-1 min-h-0">
-        <CharacterSidebar active={activeSection} onSelect={setActiveSection} />
+        <CharacterSidebar
+          active={activeSection}
+          onSelect={setActiveSection}
+          highlights={sectionHighlights}
+        />
         <div className="flex-1 overflow-y-auto px-6 py-4">
           <ActivePanel form={form} onChange={handleChange} characterId={characterId} />
         </div>

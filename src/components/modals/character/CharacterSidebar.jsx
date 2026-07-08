@@ -10,7 +10,7 @@ const SECTIONS = [
   { id: 'sfx', labelKey: 'sectionSfx' },
 ]
 
-function CharacterSidebar({ active, onSelect }) {
+function CharacterSidebar({ active, onSelect, highlights }) {
   const { t } = useTranslation('characterCreation')
 
   return (
@@ -23,7 +23,9 @@ function CharacterSidebar({ active, onSelect }) {
               className={`w-full text-left px-3 min-h-[44px] rounded-md text-sm ${
                 active === sec.id
                   ? 'bg-primary-subtle text-primary font-medium'
-                  : 'text-secondary hover:bg-surface-hover'
+                  : highlights?.[sec.id]
+                    ? 'text-highlight hover:bg-surface-hover'
+                    : 'text-secondary hover:bg-surface-hover'
               }`}
             >
               {t(sec.labelKey)}

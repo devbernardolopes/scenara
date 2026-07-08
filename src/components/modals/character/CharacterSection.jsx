@@ -102,16 +102,6 @@ function CharacterSection({ form, onChange, characterId }) {
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-text mb-1">{t('taglineLabel')}</label>
-        <AutoResizeTextarea
-          className={`${inputClass} resize-none`}
-          value={form.tagline || ''}
-          onChange={(e) => onChange('tagline', e.target.value)}
-          placeholder={t('taglinePlaceholder')}
-        />
-      </div>
-
       <CollapsibleSection
         label={t('promptLabel')}
         summary={
@@ -188,6 +178,17 @@ function CharacterSection({ form, onChange, characterId }) {
             <FileText className="w-4 h-4" />
           </button>
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-text mb-1">{t('taglineLabel')}</label>
+        <input
+          type="text"
+          className={inputClass}
+          value={form.tagline || ''}
+          onChange={(e) => onChange('tagline', e.target.value)}
+          placeholder={t('taglinePlaceholder')}
+        />
       </div>
     </div>
   )
