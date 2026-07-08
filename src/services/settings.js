@@ -355,6 +355,14 @@ export const SETTINGS = [
     descKey: 'settings:appearance.highlightDeleteButtons.desc',
   },
   {
+    key: 'regenerationConfirmation',
+    category: 'appearance',
+    type: 'toggle',
+    default: false,
+    labelKey: 'settings:appearance.regenerationConfirmation.label',
+    descKey: 'settings:appearance.regenerationConfirmation.desc',
+  },
+  {
     key: 'unreadSound',
     category: 'appearance',
     type: 'toggle',

@@ -761,6 +761,17 @@ function ChatView() {
   }
 
   async function handleRegenerate(messageId) {
+    const regenConfirm = await getSetting('regenerationConfirmation')
+    if (regenConfirm) {
+      const ok = await confirm({
+        title: t('regenerationConfirmTitle'),
+        message: t('regenerationConfirmMessage'),
+        confirmLabel: t('regenerate'),
+        cancelLabel: t('cancel'),
+      })
+      if (!ok) return
+    }
+
     if (generatingRef.current) return
     generatingRef.current = true
     setGenerating(true)

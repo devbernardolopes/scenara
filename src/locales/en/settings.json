@@ -148,6 +148,10 @@
     "highlightDeleteButtons": {
       "label": "Highlight Delete Buttons",
       "desc": "Show delete buttons with a distinct red background for emphasis."
+    },
+    "regenerationConfirmation": {
+      "label": "Regeneration Confirmation",
+      "desc": "Show a confirmation dialog before regenerating a message."
     }
   },
   "themeOptions": {

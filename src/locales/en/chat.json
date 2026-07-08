@@ -33,6 +33,8 @@
   "forkConfirmTitle": "Fork Thread",
   "forkConfirmMessage": "Create a new thread from this message and all previous messages?",
   "regenerate": "Regenerate",
+  "regenerationConfirmTitle": "Regenerate Message",
+  "regenerationConfirmMessage": "Are you sure you want to regenerate this message? The current content will be saved as a new slot.",
   "speak": "Speak",
   "stop": "Stop",
   "showPrompt": "Show prompt",
