@@ -124,12 +124,17 @@ export async function buildSummarizationPayload({
 
   systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/g, transcript)
 
+  const messagesHeader = (await getSetting('prompting.apiRequestSectionHeaders.messages')) || ''
+  const userTranscript = messagesHeader
+    ? `${replaceVarsIn(messagesHeader)}\n\n${transcript}`
+    : transcript
+
   const payload = [{ role: 'system', content: systemContent }]
   if (userContent) {
-    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/g, transcript)
+    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/g, userTranscript)
     payload.push({ role: 'user', content: userContent })
   } else {
-    payload.push({ role: 'user', content: transcript })
+    payload.push({ role: 'user', content: userTranscript })
   }
 
   return payload
