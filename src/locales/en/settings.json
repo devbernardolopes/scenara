@@ -181,10 +181,6 @@
     "keyLabelLabel": "Label (optional)",
     "keyLabelPlaceholder": "e.g. Work, Home",
     "useTrialKey": "Use trial key",
-    "deleteKeyConfirm": {
-      "title": "Delete API Key",
-      "message": "Are you sure you want to delete this key?"
-    },
     "addKeyDialogTitle": "Add API Key",
     "editKeyDialogTitle": "Edit API Key",
     "model": {
