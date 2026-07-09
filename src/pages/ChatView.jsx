@@ -438,6 +438,18 @@ function ChatView() {
     const elements = container.querySelectorAll('[data-message-id][data-unread="true"]')
     elements.forEach((el) => observer.observe(el))
 
+    const containerRect = container.getBoundingClientRect()
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect()
+      const isVisible = rect.top < containerRect.bottom && rect.bottom > containerRect.top
+      if (!isVisible) return
+      observer.unobserve(el)
+      const msgId = Number(el.dataset.messageId)
+      if (!msgId) return
+      markMessageRead(msgId, threadId)
+      setMessages((prev) => prev.map((m) => (m.id === msgId ? { ...m, isUnread: false } : m)))
+    })
+
     return () => observer.disconnect()
   }, [messages, threadId])
 
