@@ -86,11 +86,17 @@ export async function buildMessagesPayload({
 
   const result = [{ role: 'system', content: systemParts.join('\n\n') }]
 
+  const postHistoryInstructions = replaceVarsIn(character?.postHistoryInstructions)
+
   if (isFirstMessage) {
     const firstMessageContent = replaceVarsIn(settings.firstMessagePrompt)
     const firstMessageRole = settings.firstMessageRole || 'system'
     if (firstMessageContent) {
+      if (postHistoryInstructions) {
+        result.push({ role: firstMessageRole, content: firstMessageContent + '\n\n' + postHistoryInstructions })
+      } else {
       result.push({ role: firstMessageRole, content: firstMessageContent })
+      }
     }
   } else {
     for (const msg of messages) {
@@ -123,8 +129,8 @@ export async function buildMessagesPayload({
     return appendMemoryToPayload(result, memoryText, memoryHeader)
   }
 
-  const postHistoryInstructions = replaceVarsIn(character?.postHistoryInstructions)
-  if (postHistoryInstructions) {
+  // const postHistoryInstructions = replaceVarsIn(character?.postHistoryInstructions)
+  if (!isFirstMessage && postHistoryInstructions) {
     result.push({ role: 'system', content: postHistoryInstructions })
   } 
 
