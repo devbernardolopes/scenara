@@ -67,6 +67,7 @@ export const SETTINGS = [
       'high-contrast-dark',
       'terminal',
       'midnight',
+      'obsidian',
     ],
     labelKey: 'settings:appearance.theme.label',
     descKey: 'settings:appearance.theme.desc',
@@ -79,6 +80,7 @@ export const SETTINGS = [
       'high-contrast-dark': 'settings:themeOptions.highContrastDark',
       terminal: 'settings:themeOptions.terminal',
       midnight: 'settings:themeOptions.midnight',
+      obsidian: 'settings:themeOptions.obsidian',
     },
   },
   {

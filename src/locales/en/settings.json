@@ -162,7 +162,8 @@
     "highContrast": "High Contrast",
     "highContrastDark": "High Contrast Dark",
     "terminal": "Terminal",
-    "midnight": "Midnight"
+    "midnight": "Midnight",
+    "obsidian": "Obsidian"
   },
   "api": {
     "activeProvider": {

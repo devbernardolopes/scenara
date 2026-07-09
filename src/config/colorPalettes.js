@@ -81,6 +81,16 @@ export const COLOR_PALETTES = {
     purple: '#cc44ff',
     pink: '#ff44aa',
   },
+  obsidian: {
+    red: '#ff4444',
+    orange: '#ff8800',
+    yellow: '#ffff00',
+    green: '#00ff00',
+    teal: '#00ffaa',
+    blue: '#4488ff',
+    purple: '#cc44ff',
+    pink: '#ff44aa',
+  },
 }
 
 export function getPalette(theme) {
