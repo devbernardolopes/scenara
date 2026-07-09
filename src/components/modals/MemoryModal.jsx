@@ -101,6 +101,7 @@ function MemoryModal({ threadId }) {
       setMemories(refreshed)
       setDrafts({ [refreshed[0]?.id]: refreshed[0]?.content || '' })
       setDirty(false)
+      closeModal()
     } finally {
       setSaving(false)
     }
