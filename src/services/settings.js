@@ -930,6 +930,22 @@ export const SETTINGS = [
     group: 'apiRequestSectionHeaders',
     labelKey: 'settings:prompting.apiRequestSectionHeaders.loreContext.label',
   },
+  {
+    key: 'prompting.prefixAssistantRole',
+    category: 'prompting',
+    type: 'toggleInput',
+    default: { enabled: false, value: '{{char}}: ' },
+    labelKey: 'settings:prompting.prefixAssistantRole.label',
+    descKey: 'settings:prompting.prefixAssistantRole.desc',
+  },
+  {
+    key: 'prompting.prefixUserRole',
+    category: 'prompting',
+    type: 'toggleInput',
+    default: { enabled: false, value: '{{name}}: ' },
+    labelKey: 'settings:prompting.prefixUserRole.label',
+    descKey: 'settings:prompting.prefixUserRole.desc',
+  },
 ]
 
 const SETTING_EFFECTS = {

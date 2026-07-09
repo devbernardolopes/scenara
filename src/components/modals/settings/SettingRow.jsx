@@ -9,6 +9,7 @@ import SettingTextarea from './controls/SettingTextarea'
 import SettingButtonOrder from './controls/SettingButtonOrder'
 import SettingAvatarPicker from './controls/SettingAvatarPicker'
 import SettingOocDelimiters from './controls/SettingOocDelimiters'
+import SettingToggleInput from './controls/SettingToggleInput'
 
 const CONTROL_MAP = {
   toggle: SettingToggle,
@@ -19,6 +20,7 @@ const CONTROL_MAP = {
   buttonOrder: SettingButtonOrder,
   avatar: SettingAvatarPicker,
   oocDelimiters: SettingOocDelimiters,
+  toggleInput: SettingToggleInput,
 }
 
 function SettingRow({ setting, onSave }) {
