@@ -354,6 +354,304 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 255, 0, 0.24);
 }
 
+/* ==================== NEW THEMES ==================== */
+
+/* --- Midnight (Deep cosmic dark) --- */
+.theme-midnight {
+  --color-primary: #6366f1;
+  --color-primary-hover: #818cf8;
+  --color-primary-subtle: #312e81;
+  --color-on-primary: #ffffff;
+  --color-on-primary-muted: rgba(255, 255, 255, 0.65);
+
+  --color-surface: #0a0a1f;
+  --color-surface-secondary: #11112b;
+  --color-surface-hover: #1a1a3d;
+
+  --color-text: #e0e7ff;
+  --color-text-secondary: #a5b4fc;
+  --color-text-tertiary: #818cf8;
+  --color-text-highlight: #c4d0ff;
+
+  --color-border: #4338ca;
+  --color-border-light: #312e81;
+
+  --color-overlay: rgba(10, 10, 31, 0.85);
+
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+
+  --color-accent: #a78bfa;
+  --color-accent-hover: #c4b5fd;
+
+  --color-delete: #f87171;
+  --color-delete-hover: #ef4444;
+  --color-on-delete: #ffffff;
+
+  --color-ooc-bg: #7f1d1d;
+  --color-ooc-text: #fee2e2;
+  --color-ooc-border: #b91c1c;
+  --color-ooc-muted: rgba(254, 226, 226, 0.7);
+  --color-ooc-placeholder: rgba(254, 226, 226, 0.45);
+
+  --color-code-bg: rgba(129, 140, 248, 0.08);
+
+  --color-pill-count-bg: #312e81;
+  --color-pill-count-text: #c4d0ff;
+  --color-pill-queued-bg: #451a03;
+  --color-pill-queued-text: #fcd34d;
+  --color-pill-eta-bg: #14532d;
+  --color-pill-eta-text: #86efac;
+  --color-pill-perf-bg: #4c1d95;
+  --color-pill-perf-text: #e0e7ff;
+
+  --shadow-sm: 0 1px 3px rgba(99, 102, 241, 0.15);
+  --shadow-md: 0 4px 8px -2px rgba(99, 102, 241, 0.2);
+  --shadow-lg: 0 10px 20px -4px rgba(99, 102, 241, 0.25);
+}
+
+/* --- Obsidian (Pure black + electric accents) --- */
+.theme-obsidian {
+  --color-primary: #22d3ee;
+  --color-primary-hover: #67e8f9;
+  --color-primary-subtle: #164e63;
+  --color-on-primary: #0f172a;
+  --color-on-primary-muted: rgba(15, 23, 42, 0.75);
+
+  --color-surface: #050505;
+  --color-surface-secondary: #0a0a0a;
+  --color-surface-hover: #111111;
+
+  --color-text: #f1f5f9;
+  --color-text-secondary: #cbd5e1;
+  --color-text-tertiary: #94a3b8;
+  --color-text-highlight: #67e8f9;
+
+  --color-border: #334155;
+  --color-border-light: #1e2937;
+
+  --color-overlay: rgba(0, 0, 0, 0.9);
+
+  --color-success: #4ade80;
+  --color-warning: #facc15;
+  --color-error: #fb7185;
+
+  --color-accent: #f472b6;
+  --color-accent-hover: #fb7185;
+
+  --color-delete: #fb7185;
+  --color-delete-hover: #f43f5e;
+  --color-on-delete: #111827;
+
+  --color-ooc-bg: #881337;
+  --color-ooc-text: #fce7f3;
+  --color-ooc-border: #be123c;
+  --color-ooc-muted: rgba(251, 113, 133, 0.7);
+
+  --color-code-bg: rgba(103, 232, 249, 0.08);
+
+  --shadow-sm: 0 1px 2px rgba(34, 211, 238, 0.2);
+  --shadow-md: 0 4px 6px -1px rgba(34, 211, 238, 0.25);
+  --shadow-lg: 0 10px 15px -3px rgba(34, 211, 238, 0.3);
+}
+
+/* --- Cyberpunk (Neon on dark) --- */
+.theme-cyberpunk {
+  --color-primary: #ff00ff;
+  --color-primary-hover: #ff66ff;
+  --color-primary-subtle: #4c1d95;
+  --color-on-primary: #ffffff;
+  --color-on-primary-muted: rgba(255, 255, 255, 0.75);
+
+  --color-surface: #0a0a0a;
+  --color-surface-secondary: #121212;
+  --color-surface-hover: #1f1f1f;
+
+  --color-text: #00ffff;
+  --color-text-secondary: #ff00ff;
+  --color-text-tertiary: #39ff14;
+  --color-text-highlight: #ffff00;
+
+  --color-border: #ff00ff;
+  --color-border-light: #4c1d95;
+
+  --color-overlay: rgba(255, 0, 255, 0.15);
+
+  --color-success: #39ff14;
+  --color-warning: #ffff00;
+  --color-error: #ff0044;
+
+  --color-accent: #00ffff;
+  --color-accent-hover: #66ffff;
+
+  --color-delete: #ff0044;
+  --color-delete-hover: #cc0033;
+  --color-on-delete: #ffffff;
+
+  --color-ooc-bg: #7f1d1d;
+  --color-ooc-text: #ff99aa;
+  --color-ooc-border: #ff0044;
+
+  --color-code-bg: rgba(255, 0, 255, 0.1);
+
+  --shadow-sm: 0 0 8px rgba(255, 0, 255, 0.4);
+  --shadow-md: 0 0 15px rgba(0, 255, 255, 0.4);
+  --shadow-lg: 0 0 25px rgba(255, 255, 0, 0.3);
+}
+
+/* --- Vaporwave (Synthwave aesthetic) --- */
+.theme-vaporwave {
+  --color-primary: #ff69b4;
+  --color-primary-hover: #ff8ac6;
+  --color-primary-subtle: #4c1d95;
+  --color-on-primary: #ffffff;
+  --color-on-primary-muted: rgba(255, 255, 255, 0.8);
+
+  --color-surface: #1a0033;
+  --color-surface-secondary: #2a0a4d;
+  --color-surface-hover: #3a1a5c;
+
+  --color-text: #ff99cc;
+  --color-text-secondary: #cc99ff;
+  --color-text-tertiary: #66ccff;
+  --color-text-highlight: #ffff66;
+
+  --color-border: #ff69b4;
+  --color-border-light: #6b21a8;
+
+  --color-overlay: rgba(106, 0, 106, 0.6);
+
+  --color-success: #66ff99;
+  --color-warning: #ffdd66;
+  --color-error: #ff4488;
+
+  --color-accent: #00ffff;
+  --color-accent-hover: #88ffff;
+
+  --color-delete: #ff4488;
+  --color-delete-hover: #e11d48;
+
+  --color-code-bg: rgba(255, 105, 180, 0.12);
+
+  --shadow-sm: 0 2px 8px rgba(255, 105, 180, 0.3);
+  --shadow-md: 0 4px 20px rgba(0, 255, 255, 0.25);
+  --shadow-lg: 0 10px 30px rgba(255, 153, 204, 0.3);
+}
+
+/* --- Retro CRT (Warm phosphor) --- */
+.theme-retro-crt {
+  --color-primary: #22c55e;
+  --color-primary-hover: #4ade80;
+  --color-primary-subtle: #052e16;
+  --color-on-primary: #052e16;
+  --color-on-primary-muted: rgba(5, 46, 22, 0.7);
+
+  --color-surface: #0a0f0a;
+  --color-surface-secondary: #111811;
+  --color-surface-hover: #1a221a;
+
+  --color-text: #a3e635;
+  --color-text-secondary: #84cc16;
+  --color-text-tertiary: #65a30d;
+  --color-text-highlight: #fef08c;
+
+  --color-border: #4ade80;
+  --color-border-light: #365314;
+
+  --color-overlay: rgba(163, 230, 53, 0.12);
+
+  --color-success: #a3e635;
+  --color-warning: #fef08c;
+  --color-error: #f87171;
+
+  --color-accent: #eab308;
+  --color-accent-hover: #fde047;
+
+  --color-delete: #ef4444;
+  --color-delete-hover: #b91c1c;
+
+  --color-code-bg: rgba(163, 230, 53, 0.15);
+
+  --shadow-sm: 0 1px 4px rgba(163, 230, 53, 0.3);
+  --shadow-md: 0 4px 12px rgba(163, 230, 53, 0.25);
+  --shadow-lg: 0 8px 25px rgba(163, 230, 53, 0.2);
+}
+
+/* --- Solarized Dark (High contrast, accessible) --- */
+.theme-solarized-dark {
+  --color-primary: #268bd2;
+  --color-primary-hover: #2aa1f0;
+  --color-primary-subtle: #073642;
+  --color-on-primary: #fdf6e3;
+  --color-on-primary-muted: rgba(253, 246, 227, 0.7);
+
+  --color-surface: #002b36;
+  --color-surface-secondary: #073642;
+  --color-surface-hover: #0f4a5a;
+
+  --color-text: #93a1a1;
+  --color-text-secondary: #839496;
+  --color-text-tertiary: #586e75;
+  --color-text-highlight: #b58900;
+
+  --color-border: #586e75;
+  --color-border-light: #073642;
+
+  --color-overlay: rgba(0, 43, 54, 0.85);
+
+  --color-success: #859900;
+  --color-warning: #cb4b16;
+  --color-error: #dc322f;
+
+  --color-accent: #6c71c4;
+  --color-accent-hover: #8c8ec0;
+
+  --color-delete: #dc322f;
+  --color-delete-hover: #b22c2a;
+
+  --color-code-bg: rgba(131, 148, 150, 0.15);
+}
+
+/* --- Neon Abyss (Extreme high-contrast) --- */
+.theme-neon-abyss {
+  --color-primary: #00ffea;
+  --color-primary-hover: #7afff0;
+  --color-primary-subtle: #082b2b;
+  --color-on-primary: #000000;
+  --color-on-primary-muted: rgba(0, 0, 0, 0.65);
+
+  --color-surface: #000000;
+  --color-surface-secondary: #0a0a0a;
+  --color-surface-hover: #1a1a1a;
+
+  --color-text: #00ffea;
+  --color-text-secondary: #ff00ff;
+  --color-text-tertiary: #ffff00;
+  --color-text-highlight: #ff00aa;
+
+  --color-border: #00ffea;
+  --color-border-light: #082b2b;
+
+  --color-overlay: rgba(0, 255, 234, 0.1);
+
+  --color-success: #39ff14;
+  --color-warning: #ffff00;
+  --color-error: #ff0055;
+
+  --color-accent: #ff00ff;
+  --color-accent-hover: #ff66ff;
+
+  --color-delete: #ff0055;
+  --color-delete-hover: #cc0044;
+
+  --color-code-bg: rgba(0, 255, 234, 0.12);
+
+  --shadow-sm: 0 0 10px #00ffea;
+  --shadow-md: 0 0 20px #ff00ff;
+  --shadow-lg: 0 0 35px #ffff00;
+}
+
 /* ============================================================
    Utility classes
    Use these in JSX className instead of hardcoded color values.

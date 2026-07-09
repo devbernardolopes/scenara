@@ -161,7 +161,8 @@
     "pastel": "Pastel",
     "highContrast": "High Contrast",
     "highContrastDark": "High Contrast Dark",
-    "terminal": "Terminal"
+    "terminal": "Terminal",
+    "midnight": "Midnight"
   },
   "api": {
     "activeProvider": {

@@ -66,6 +66,7 @@ export const SETTINGS = [
       'high-contrast',
       'high-contrast-dark',
       'terminal',
+      'midnight',
     ],
     labelKey: 'settings:appearance.theme.label',
     descKey: 'settings:appearance.theme.desc',
@@ -77,6 +78,7 @@ export const SETTINGS = [
       'high-contrast': 'settings:themeOptions.highContrast',
       'high-contrast-dark': 'settings:themeOptions.highContrastDark',
       terminal: 'settings:themeOptions.terminal',
+      midnight: 'settings:themeOptions.midnight',
     },
   },
   {
