@@ -442,7 +442,7 @@ function ChatView() {
     const containerRect = container.getBoundingClientRect()
     const isOverflowing = container.scrollHeight > container.clientHeight
 
-    if (!isOverflowing) {
+    if (!isOverflowing && elements.length > 0) {
       clearUnread(threadId)
       setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
     } else {
