@@ -779,6 +779,7 @@ function ChatView() {
         threadId,
         type: 'chat',
         signal: abortController.signal,
+        controller: abortController,
         execute: async () => {
           return await doChatRequest(
             isFirstMessage,
@@ -811,6 +812,7 @@ function ChatView() {
             threadId,
             type: 'autoTitle',
             signal: atAbort.signal,
+            controller: atAbort,
             execute: async () => {
               return await triggerAutoTitle({
                 thread: thr,
@@ -855,6 +857,7 @@ function ChatView() {
               threadId,
               type: 'summarization',
               signal: summAbort.signal,
+              controller: summAbort,
               execute: async () => {
                 return await triggerSummarization({
                   thread: currentThread,
@@ -1105,6 +1108,7 @@ function ChatView() {
         threadId,
         type: 'regenerate',
         signal: regenAbortController.signal,
+        controller: regenAbortController,
         execute: async () => {
           return await sendChatCompletion({
             profile,

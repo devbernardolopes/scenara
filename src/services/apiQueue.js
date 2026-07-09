@@ -102,7 +102,7 @@ function autoRemoveIfAborted(item) {
   )
 }
 
-export function enqueue({ threadId, type, execute, signal }) {
+export function enqueue({ threadId, type, execute, signal, controller }) {
   let resolve, reject
   const promise = new Promise((res, rej) => {
     resolve = res
@@ -110,7 +110,16 @@ export function enqueue({ threadId, type, execute, signal }) {
   })
 
   const id = generateId()
-  const item = { id, threadId: Number(threadId), type, execute, signal, resolve, reject }
+  const item = {
+    id,
+    threadId: Number(threadId),
+    type,
+    execute,
+    signal,
+    controller,
+    resolve,
+    reject,
+  }
 
   queue.push(item)
   autoRemoveIfAborted(item)
@@ -131,7 +140,7 @@ export function cancelRequest(id) {
   }
 
   if (currentRequest?.id === id) {
-    currentRequest.signal?.abort()
+    currentRequest.controller?.abort()
     return true
   }
 
@@ -152,7 +161,7 @@ export function cancelThreadRequests(threadId) {
   })
 
   if (currentRequest?.threadId === tid) {
-    currentRequest.signal?.abort()
+    currentRequest.controller?.abort()
     cancelled = true
   }
 
