@@ -22,8 +22,24 @@ export function getMessagesForApiRequest(messages, { includeOOC = true, keepMess
     return eligible.filter((message) => !message?.summarizedAt)
   }
 
-  const cutoff = Math.max(0, eligible.length - keepMessages)
-  return eligible.filter((message, index) => !message?.summarizedAt || index >= cutoff)
+  let maxTs = null
+  for (const m of eligible) {
+    if (m?.summarizedAt) {
+      const ts = new Date(m.summarizedAt).getTime()
+      if (maxTs === null || ts > maxTs) maxTs = ts
+    }
+  }
+
+  const keptIds = new Set()
+  if (maxTs !== null) {
+    const block = eligible.filter(
+      (m) => m?.summarizedAt && new Date(m.summarizedAt).getTime() === maxTs,
+    )
+    const kept = block.slice(-keepMessages)
+    kept.forEach((m) => keptIds.add(m.id))
+  }
+
+  return eligible.filter((m) => !m.summarizedAt || keptIds.has(m.id))
 }
 
 export async function shouldTriggerSummarization({ character, messages, includeOOC = true }) {
