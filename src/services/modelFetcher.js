@@ -20,7 +20,7 @@ export function resetCooldown() {
 }
 
 const STRATEGIES = {
-  groq: { type: 'openai', baseUrl: 'https://api.groq.com', needsKey: true },
+  groq: { type: 'openai', baseUrl: 'https://api.groq.com/openai', needsKey: true },
   openrouter: { type: 'openai', baseUrl: 'https://openrouter.ai/api', needsKey: true },
   'ai-horde': { type: 'horde', needsKey: false },
   'lm-studio': { type: 'openai', baseUrl: null, needsKey: false },
