@@ -8,6 +8,16 @@ function SettingSlider({ value, onChange, min = 0, max = 100, step = 1 }) {
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
+        onTouchStart={(e) => {
+          e.stopPropagation()
+          if (
+            document.activeElement &&
+            document.activeElement !== e.target &&
+            document.activeElement.tagName !== 'BODY'
+          ) {
+            document.activeElement.blur()
+          }
+        }}
         onTouchEnd={(e) => e.stopPropagation()}
         className="w-48 accent-primary"
       />
