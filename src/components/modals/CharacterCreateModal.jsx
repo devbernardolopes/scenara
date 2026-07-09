@@ -174,7 +174,8 @@ function CharacterCreateModal({ character: existing, initialData }) {
 
       if (form.prompt) total += estimateTokens(replaceVars(form.prompt))
 
-      if (form.postHistoryInstructions) total += estimateTokens(replaceVars(form.postHistoryInstructions))
+      if (form.postHistoryInstructions)
+        total += estimateTokens(replaceVars(form.postHistoryInstructions))
 
       if (form.writingInstruction) {
         const wi = await getWritingInstruction(form.writingInstruction)
@@ -194,6 +195,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
     compute()
   }, [
     form.prompt,
+    form.postHistoryInstructions,
     form.writingInstruction,
     form.writingInjectionTiming,
     form.personaInjectionTiming,
