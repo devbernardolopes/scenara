@@ -240,10 +240,14 @@ function ChatView() {
   }, [])
 
   useEffect(() => {
+    const prevId = currentThreadIdRef.current
     currentThreadIdRef.current = threadId
-  }, [threadId])
 
-  useEffect(() => {
+    if (prevId && Number(prevId) !== Number(threadId)) {
+      generatingRef.current = false
+      stopGenerating(prevId)
+    }
+
     scrollStickyCleanupRef.current?.()
     scrollStickyCleanupRef.current = null
     prevMessagesLengthRef.current = 0
