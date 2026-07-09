@@ -1,4 +1,5 @@
 import { PROVIDERS } from './apiProviders'
+import { getSetting } from './settings'
 
 const BASE_URLS = {
   groq: 'https://api.groq.com/openai/v1',
@@ -60,6 +61,12 @@ export async function buildMessagesPayload({
     return replaceVarsIn(text).replace(/{{description}}/g, desc)
   }
 
+  const prefixAssistant = await getSetting('prompting.prefixAssistantRole')
+  const prefixUser = await getSetting('prompting.prefixUserRole')
+  const assistantPrefix =
+    prefixAssistant?.enabled && prefixAssistant.value ? replaceVarsIn(prefixAssistant.value) : ''
+  const userPrefix = prefixUser?.enabled && prefixUser.value ? replaceVarsIn(prefixUser.value) : ''
+
   const prompt = replaceVarsIn(character?.prompt)
   if (prompt) systemParts.push(prompt)
 
@@ -93,14 +100,25 @@ export async function buildMessagesPayload({
     const firstMessageRole = settings.firstMessageRole || 'system'
     if (firstMessageContent) {
       if (postHistoryInstructions) {
-        result.push({ role: firstMessageRole, content: firstMessageContent + '\n\n' + postHistoryInstructions })
+        result.push({
+          role: firstMessageRole,
+          content: firstMessageContent + '\n\n' + postHistoryInstructions,
+        })
       } else {
-      result.push({ role: firstMessageRole, content: firstMessageContent })
+        result.push({ role: firstMessageRole, content: firstMessageContent })
       }
     }
   } else {
     for (const msg of messages) {
-      result.push({ role: msg.role, content: replaceVarsIn(msg.content) })
+      let content = replaceVarsIn(msg.content)
+      if (!msg.isOOC) {
+        if (msg.role === 'assistant' && assistantPrefix) {
+          content = assistantPrefix + content
+        } else if (msg.role === 'user' && userPrefix) {
+          content = userPrefix + content
+        }
+      }
+      result.push({ role: msg.role, content })
     }
 
     const lastMsg = messages[messages.length - 1]
@@ -132,7 +150,7 @@ export async function buildMessagesPayload({
   // const postHistoryInstructions = replaceVarsIn(character?.postHistoryInstructions)
   if (!isFirstMessage && postHistoryInstructions) {
     result.push({ role: 'system', content: postHistoryInstructions })
-  } 
+  }
 
   return result
 }
