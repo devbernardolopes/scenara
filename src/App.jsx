@@ -5,7 +5,7 @@ import ChatView from './pages/ChatView'
 import { useViewportHeight } from './hooks/useViewportHeight'
 
 function App() {
-  useViewportHeight()
+  // useViewportHeight()
 
   return (
     <Routes>
