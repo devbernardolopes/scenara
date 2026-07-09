@@ -154,6 +154,7 @@ function ChatView() {
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const [systemAvatar, setSystemAvatar] = useState('')
   const [oocMessageRole, setOocMessageRole] = useState('system')
+  const [isTabVisible, setIsTabVisible] = useState(true)
   const scrollHeightBeforeRef = useRef(null)
 
   async function loadPersonas() {
@@ -404,6 +405,14 @@ function ChatView() {
     }
   }, [loading, character, noChatProfile, thread?.initialMessages])
 
+  useEffect(() => {
+    function handleVisibility() {
+      setIsTabVisible(document.visibilityState === 'visible')
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [])
+
   const handleScroll = useCallback(() => {
     const el = scrollRef.current
     if (!el) return
@@ -419,7 +428,6 @@ function ChatView() {
   useEffect(() => {
     const container = scrollRef.current
     if (!container || messages.length === 0) return
-    if (isAwayFromThread(threadId)) return
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -436,30 +444,36 @@ function ChatView() {
       { root: container, threshold: 0.3 },
     )
 
-    const elements = container.querySelectorAll('[data-message-id][data-unread="true"]')
-    elements.forEach((el) => observer.observe(el))
+    const unreadElements = container.querySelectorAll('[data-message-id][data-unread="true"]')
+    unreadElements.forEach((el) => observer.observe(el))
 
-    const containerRect = container.getBoundingClientRect()
-    const isOverflowing = container.scrollHeight > container.clientHeight
+    if (isTabVisible && unreadElements.length > 0) {
+      const containerRect = container.getBoundingClientRect()
 
-    if (!isOverflowing && elements.length > 0) {
-      clearUnread(threadId)
-      setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
-    } else {
-      elements.forEach((el) => {
-        const rect = el.getBoundingClientRect()
-        const isVisible = rect.top < containerRect.bottom && rect.bottom > containerRect.top
-        if (!isVisible) return
-        observer.unobserve(el)
-        const msgId = Number(el.dataset.messageId)
-        if (!msgId) return
-        markMessageRead(msgId, threadId)
-        setMessages((prev) => prev.map((m) => (m.id === msgId ? { ...m, isUnread: false } : m)))
-      })
+      if (container.scrollHeight <= container.clientHeight + 1) {
+        clearUnread(threadId)
+        setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
+      } else {
+        const visibleIds = []
+        unreadElements.forEach((el) => {
+          const rect = el.getBoundingClientRect()
+          if (rect.top < containerRect.bottom && rect.bottom > containerRect.top) {
+            observer.unobserve(el)
+            const msgId = Number(el.dataset.messageId)
+            if (msgId) visibleIds.push(msgId)
+          }
+        })
+        if (visibleIds.length > 0) {
+          visibleIds.forEach((msgId) => markMessageRead(msgId, threadId))
+          setMessages((prev) =>
+            prev.map((m) => (visibleIds.includes(m.id) ? { ...m, isUnread: false } : m)),
+          )
+        }
+      }
     }
 
     return () => observer.disconnect()
-  }, [messages, threadId])
+  }, [messages, threadId, isTabVisible])
 
   function scrollToBottom() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
