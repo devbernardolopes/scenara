@@ -818,14 +818,15 @@ body,
 #root {
   height: 100%;
   height: 100dvh;
-  height: var(--app-height, 100dvh);
+  /* height: var(--app-height, 100dvh); */
   margin: 0;
   padding: 0;
   overflow: hidden;
 }
 
 .flex.h-full {
-  height: var(--app-height, 100dvh) !important;
+  /* height: var(--app-height, 100dvh) !important; */
+  height: 100dvh !important;
 }
 
 /* Make the scrollable messages area respect safe areas */
