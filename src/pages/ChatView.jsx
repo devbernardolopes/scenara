@@ -419,6 +419,7 @@ function ChatView() {
   useEffect(() => {
     const container = scrollRef.current
     if (!container || messages.length === 0) return
+    if (isAwayFromThread(threadId)) return
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -439,16 +440,23 @@ function ChatView() {
     elements.forEach((el) => observer.observe(el))
 
     const containerRect = container.getBoundingClientRect()
-    elements.forEach((el) => {
-      const rect = el.getBoundingClientRect()
-      const isVisible = rect.top < containerRect.bottom && rect.bottom > containerRect.top
-      if (!isVisible) return
-      observer.unobserve(el)
-      const msgId = Number(el.dataset.messageId)
-      if (!msgId) return
-      markMessageRead(msgId, threadId)
-      setMessages((prev) => prev.map((m) => (m.id === msgId ? { ...m, isUnread: false } : m)))
-    })
+    const isOverflowing = container.scrollHeight > container.clientHeight
+
+    if (!isOverflowing) {
+      clearUnread(threadId)
+      setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
+    } else {
+      elements.forEach((el) => {
+        const rect = el.getBoundingClientRect()
+        const isVisible = rect.top < containerRect.bottom && rect.bottom > containerRect.top
+        if (!isVisible) return
+        observer.unobserve(el)
+        const msgId = Number(el.dataset.messageId)
+        if (!msgId) return
+        markMessageRead(msgId, threadId)
+        setMessages((prev) => prev.map((m) => (m.id === msgId ? { ...m, isUnread: false } : m)))
+      })
+    }
 
     return () => observer.disconnect()
   }, [messages, threadId])
