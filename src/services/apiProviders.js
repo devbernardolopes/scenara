@@ -121,7 +121,7 @@ export const PROVIDERS = [
         min: 256,
         max: 8192,
         step: 128,
-        default: 384,
+        default: 512,
       },
       {
         key: 'temperature',
