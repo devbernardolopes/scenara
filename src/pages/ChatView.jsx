@@ -419,6 +419,23 @@ function ChatView() {
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
 
+  useEffect(() => {
+    handleSendRef.current = handleSend
+  })
+
+  useEffect(() => {
+    const handler = () => {
+      setQueuedCount(apiQueue.getThreadQueueCount(threadId))
+    }
+    handler()
+    const unsub = apiQueue.subscribe(handler)
+    window.addEventListener('api-queue-changed', handler)
+    return () => {
+      unsub()
+      window.removeEventListener('api-queue-changed', handler)
+    }
+  }, [threadId])
+
   const handleScroll = useCallback(() => {
     const el = scrollRef.current
     if (!el) return
@@ -677,12 +694,14 @@ function ChatView() {
         signal,
         onToken: (fullContent) => {
           updateMessage(assistantMsgId, { content: fullContent })
-          setMessages((prev) =>
-            prev.map((m) => (m.id === assistantMsgId ? { ...m, content: fullContent } : m)),
-          )
+          if (Number(currentThreadIdRef.current) === Number(threadId)) {
+            setMessages((prev) =>
+              prev.map((m) => (m.id === assistantMsgId ? { ...m, content: fullContent } : m)),
+            )
+          }
         },
         onFinish: (reason) => {
-          if (reason === 'length') {
+          if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
             showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
           }
         },
@@ -703,9 +722,9 @@ function ChatView() {
       }
     } catch (err) {
       if (err.name === 'AbortError') {
-        await updateMessage(assistantMsgId, { content: '' })
-        const msgs = await getMessagesByThread(threadId)
-        if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
+        await deleteMessage(assistantMsgId)
+        setMessages((prev) => prev.filter((m) => m.id !== assistantMsgId))
+        throw err
       } else {
         await updateMessage(assistantMsgId, { content: '' })
         const msgs = await getMessagesByThread(threadId)
@@ -883,6 +902,8 @@ function ChatView() {
           }
         }
       }
+    } catch {
+      // doChatRequest re-throws AbortError on cancel — handled silently
     } finally {
       generatingRef.current = false
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
@@ -891,23 +912,6 @@ function ChatView() {
       stopGenerating(threadId)
     }
   }
-
-  useEffect(() => {
-    handleSendRef.current = handleSend
-  })
-
-  useEffect(() => {
-    const handler = () => {
-      setQueuedCount(apiQueue.getThreadQueueCount(threadId))
-    }
-    handler()
-    const unsub = apiQueue.subscribe(handler)
-    window.addEventListener('api-queue-changed', handler)
-    return () => {
-      unsub()
-      window.removeEventListener('api-queue-changed', handler)
-    }
-  }, [threadId])
 
   async function handleBundleNavigate(messageId, slotIndex) {
     const msg = messages.find((m) => m.id === messageId)
@@ -942,21 +946,22 @@ function ChatView() {
 
     let slotIndex = 0
     let completedNormally = false
+    let regenEntries
     try {
       const idx = messages.findIndex((m) => m.id === messageId)
       if (idx === -1) return
 
       const msg = messages[idx]
 
-      let entries = parseBundleEntries(msg.bundleMessages)
-      if (!entries) {
-        entries = [{ content: msg.content, promptData: msg.promptData || null }]
+      regenEntries = parseBundleEntries(msg.bundleMessages)
+      if (!regenEntries) {
+        regenEntries = [{ content: msg.content, promptData: msg.promptData || null }]
       }
 
-      slotIndex = entries.length
-      entries.push({ content: '', promptData: null, createdAt: new Date().toISOString() })
+      slotIndex = regenEntries.length
+      regenEntries.push({ content: '', promptData: null, createdAt: new Date().toISOString() })
       setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
-      const bundleJson = JSON.stringify(entries)
+      const bundleJson = JSON.stringify(regenEntries)
 
       await updateMessage(messageId, { bundleMessages: bundleJson, content: '' })
       setStreamingMsgId(messageId)
@@ -1135,7 +1140,7 @@ function ChatView() {
 
       if (content) {
         const dbMsg = await db.messages.get(Number(messageId))
-        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || entries
+        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
         if (finalEntries[slotIndex]) {
           finalEntries[slotIndex].content = content
           finalEntries[slotIndex].promptData = promptDataStr
@@ -1167,9 +1172,20 @@ function ChatView() {
         completedNormally = true
       }
     } catch (err) {
-      const msgs = await getMessagesByThread(threadId)
-      if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
-      if (err.name !== 'AbortError') {
+      if (err.name === 'AbortError') {
+        if (regenEntries) {
+          regenEntries.pop()
+          const cleanedBundle = JSON.stringify(regenEntries)
+          await updateMessage(messageId, { bundleMessages: cleanedBundle })
+          if (Number(currentThreadIdRef.current) === Number(threadId)) {
+            setMessages((prev) =>
+              prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: cleanedBundle } : m)),
+            )
+          }
+        }
+      } else {
+        const msgs = await getMessagesByThread(threadId)
+        if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
         setFailedRequests((prev) => ({ ...prev, [messageId]: { slotIndex, error: err.message } }))
         showToast(err.message, { type: 'error' })
         completedNormally = true
