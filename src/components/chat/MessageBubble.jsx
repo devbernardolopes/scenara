@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useMemo, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
+import { useSwipe } from '../../hooks/useSwipe'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
 import { getContrastColor, isLightColor } from '../../lib/color'
@@ -135,6 +137,7 @@ function MessageBubble({
   const [overflowOpen, setOverflowOpen] = useState(false)
   const overflowRef = useRef(null)
   const overflowBtnRef = useRef(null)
+  const bubbleRef = useRef(null)
   const [overflowMenuStyle, setOverflowMenuStyle] = useState(null)
   const [visibility, setVisibility] = useState(
     Object.fromEntries(VISIBILITY_KEYS.map((k) => [k, true])),
@@ -193,6 +196,23 @@ function MessageBubble({
     window.addEventListener('settings-changed', handler)
     return () => window.removeEventListener('settings-changed', handler)
   }, [])
+
+  const isMobile = useIsMobile()
+  const hasMultipleSlots = bundleMessages?.length > 1
+  useSwipe(bubbleRef, {
+    onSwipeLeft: () => {
+      if (!hasMultipleSlots) return
+      const newIdx = (bundleIndex + 1) % bundleMessages.length
+      onBundleNavigate?.(message.id, newIdx)
+    },
+    onSwipeRight: () => {
+      if (!hasMultipleSlots) return
+      const newIdx = (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
+      onBundleNavigate?.(message.id, newIdx)
+    },
+    enabled: isMobile && hasMultipleSlots,
+    threshold: 50,
+  })
 
   const isUser = role === 'user'
   const isSystem = role === 'system'
@@ -426,6 +446,7 @@ function MessageBubble({
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
+        ref={bubbleRef}
         className={`max-w-[80%] md:max-w-[65%] rounded-lg ${unreadClass} ${
           isUser
             ? `${userBgClass} text-on-primary`
