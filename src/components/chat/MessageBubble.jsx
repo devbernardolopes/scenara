@@ -637,9 +637,9 @@ function MessageBubble({
               }}
             />
           ) : requestFailed ? (
-            <div className="bg-error-subtle rounded p-3 text-sm">
+            <div className="bg-error-subtle rounded p-3 text-sm max-w-full overflow-hidden">
               <p className="font-bold text-error">Error:</p>
-              <pre className="mt-1 text-error whitespace-pre-wrap text-xs">
+              <pre className="mt-1 text-error text-xs overflow-x-auto max-w-full whitespace-pre-wrap break-words">
                 {errorText || '(No content)'}
               </pre>
             </div>
