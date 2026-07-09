@@ -726,7 +726,6 @@ function ChatView() {
         setMessages((prev) => prev.filter((m) => m.id !== assistantMsgId))
         throw err
       } else {
-        await updateMessage(assistantMsgId, { content: '' })
         const msgs = await getMessagesByThread(threadId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
         setFailedRequests((prev) => ({
