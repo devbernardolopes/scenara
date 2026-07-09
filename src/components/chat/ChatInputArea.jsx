@@ -357,7 +357,11 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
               icon={MessageSquare}
               label={t('ooc')}
               onClick={() => setOocActive((prev) => !prev)}
-              className={oocActive ? '!text-ooc !bg-ooc hover:!bg-ooc-hover' : ''}
+              className={
+                oocActive
+                  ? '!text-ooc !bg-ooc hover:!bg-ooc-hover ring-2 ring-ooc-border shadow-[inset_0_2px_4px_rgba(0,0,0,0.35)]'
+                  : ''
+              }
             />
             <IconButton icon={Paperclip} label={t('attachFile')} className="hidden sm:flex" />
             <IconButton icon={Zap} label={t('shortcuts')} className="hidden md:flex" />
