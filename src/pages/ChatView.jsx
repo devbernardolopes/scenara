@@ -1100,9 +1100,9 @@ function ChatView() {
         msgNumbers,
       })
 
-      entries[slotIndex].promptData = promptDataStr
+      regenEntries[slotIndex].promptData = promptDataStr
       await updateMessage(messageId, {
-        bundleMessages: JSON.stringify(entries),
+        bundleMessages: JSON.stringify(regenEntries),
         promptData: promptDataStr,
       })
 
