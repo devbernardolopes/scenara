@@ -289,9 +289,8 @@ function MessageBubble({
   }
 
   function handleSaveEdit() {
-    const trimmed = editedContent.trim()
-    if (trimmed && trimmed !== message.content) {
-      onEdit?.(message.id, trimmed)
+    if (editedContent !== message.content) {
+      onEdit?.(message.id, editedContent)
     }
     setEditing(false)
   }
