@@ -18,6 +18,8 @@
   "writingInstructionLabel": "Writing Instruction",
   "extraPromptLabel": "One-time only Extra Prompt",
   "extraPromptPlaceholder": "Additional instructions that will only be sent once…",
+  "postHistoryInstructionsLabel": "Post-History Instructions",
+  "postHistoryInstructionsPlaceholder": "Additional instructions that will be sent after last message…",
   "personaTitle": "Edit Persona",
   "personaSubtitle": "Manage your personas — who you are in the story.",
   "personaNameLabel": "Name",

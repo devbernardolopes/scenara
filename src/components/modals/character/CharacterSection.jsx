@@ -136,6 +136,24 @@ function CharacterSection({ form, onChange, characterId }) {
         />
       </CollapsibleSection>
 
+      <CollapsibleSection
+        label={t('postHistoryInstructionsLabel')}
+        summary={
+          form.postHistoryInstructions
+            ? t('common:tokenCount', { count: estimateTokens(form.postHistoryInstructions) })
+            : null
+        }
+        storageKey={characterId ? `charSection.postHistoryInstructions.${characterId}` : undefined}
+        defaultExpanded={false}
+      >
+        <AutoResizeTextarea
+          className={`${inputClass} resize-none mt-2`}
+          value={form.postHistoryInstructions || ''}
+          onChange={(e) => onChange('postHistoryInstructions', e.target.value)}
+          placeholder={t('postHistoryInstructionsPlaceholder')}
+        />
+      </CollapsibleSection>
+
       <div>
         <label className="block text-sm font-medium text-text mb-1">
           {t('writingInstructionLabel')}

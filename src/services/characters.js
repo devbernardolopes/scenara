@@ -119,6 +119,7 @@ export async function deleteCharacter(id) {
 const COLLAPSIBLE_PREFIXES = [
   'charSection.prompt.',
   'charSection.extraPrompt.',
+  'charSection.postHistoryInstructions.',
   'charSection.autoTitleSystem.',
   'charSection.autoTitleUser.',
   'charSection.summarizationSystem.',

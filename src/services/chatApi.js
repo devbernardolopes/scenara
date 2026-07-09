@@ -123,6 +123,11 @@ export async function buildMessagesPayload({
     return appendMemoryToPayload(result, memoryText, memoryHeader)
   }
 
+  const postHistoryInstructions = replaceVarsIn(character?.postHistoryInstructions)
+  if (postHistoryInstructions) {
+    result.push({ role: 'system', content: postHistoryInstructions })
+  } 
+
   return result
 }
 
