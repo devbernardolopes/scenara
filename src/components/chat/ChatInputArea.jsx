@@ -474,6 +474,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
             </button>
             <PersonaPicker
               open={personaPickerOpen}
+              titleKey="personaPicker.changeTitle"
               onClose={() => setPersonaPickerOpen(false)}
               onSelect={(p) => {
                 setSelectedPersona(p)

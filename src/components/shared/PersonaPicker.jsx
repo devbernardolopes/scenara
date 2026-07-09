@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { getAllPersonas } from '../../services/personas'
 import Avatar from './Avatar'
 
-function PersonaPicker({ open, onClose, onSelect }) {
+function PersonaPicker({ open, onClose, onSelect, titleKey = 'personaPicker.title' }) {
   const { t } = useTranslation('common')
   const [personas, setPersonas] = useState([])
   const ref = useRef(null)
@@ -47,7 +47,7 @@ function PersonaPicker({ open, onClose, onSelect }) {
       className="absolute bottom-full mb-2 right-0 w-64 max-h-64 overflow-y-auto bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1"
     >
       <p className="px-3 py-2 text-xs font-medium text-tertiary uppercase tracking-wider">
-        {t('personaPicker.title')}
+        {t(titleKey)}
       </p>
       {personas.length === 0 ? (
         <p className="px-3 py-4 text-sm text-secondary text-center">{t('personaPicker.empty')}</p>

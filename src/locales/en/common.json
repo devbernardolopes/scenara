@@ -162,6 +162,7 @@
   },
   "personaPicker": {
     "title": "Start with persona",
+    "changeTitle": "Change Persona",
     "empty": "No personas yet",
     "default": "Default"
   },
