@@ -247,11 +247,11 @@
       "title": "No API Key",
       "message": "This profile won't be able to be assigned to any chat request type while an API key is not provided."
     },
-    // "deleteKeyConfirm": {
-    //   "title": "Delete API Key",
-    //   "message": "Are you sure you want to delete this key?",
-    //   "profileWarning": "This key is used by {{count}} connection profile(s). Deleting it will break those profiles."
-    // },
+    "deleteKeyConfirm": {
+      "title": "Delete API Key",
+      "message": "Are you sure you want to delete this key?",
+      "profileWarning": "This key is used by {{count}} connection profile(s). Deleting it will break those profiles."
+    },
     "chatProfile": {
       "label": "Chat profile",
       "desc": "Profile used for chat requests."
