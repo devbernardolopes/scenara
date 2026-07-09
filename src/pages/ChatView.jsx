@@ -289,6 +289,7 @@ function ChatView() {
     if (scrollCommits.current === 1) {
       el.scrollTo({ top: el.scrollHeight })
       const initialAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
+      isAtBottomRef.current = initialAtBottom
       setShowScrollButton(!initialAtBottom)
 
       let sticking = true
@@ -483,26 +484,24 @@ function ChatView() {
 
     if (isTabVisible && validElements.length > 0) {
       const containerRect = container.getBoundingClientRect()
-
-      if (container.scrollHeight <= container.clientHeight + 1) {
-        clearUnread(threadId)
-        setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
-      } else {
-        const visibleIds = []
-        validElements.forEach((el) => {
-          const rect = el.getBoundingClientRect()
-          if (rect.top < containerRect.bottom && rect.bottom > containerRect.top) {
-            observer.unobserve(el)
-            const msgId = Number(el.dataset.messageId)
-            if (msgId) visibleIds.push(msgId)
-          }
-        })
-        if (visibleIds.length > 0) {
-          visibleIds.forEach((msgId) => markMessageRead(msgId, threadId))
-          setMessages((prev) =>
-            prev.map((m) => (visibleIds.includes(m.id) ? { ...m, isUnread: false } : m)),
-          )
+      const visibleIds = []
+      validElements.forEach((el) => {
+        const rect = el.getBoundingClientRect()
+        if (rect.top < containerRect.bottom && rect.bottom > containerRect.top) {
+          observer.unobserve(el)
+          const msgId = Number(el.dataset.messageId)
+          if (msgId) visibleIds.push(msgId)
         }
+      })
+      if (visibleIds.length > 0) {
+        if (visibleIds.length === validElements.length) {
+          clearUnread(threadId)
+        } else {
+          visibleIds.forEach((msgId) => markMessageRead(msgId, threadId))
+        }
+        setMessages((prev) =>
+          prev.map((m) => (visibleIds.includes(m.id) ? { ...m, isUnread: false } : m)),
+        )
       }
     }
 
