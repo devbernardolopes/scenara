@@ -68,6 +68,7 @@ export const SETTINGS = [
       'terminal',
       'midnight',
       'obsidian',
+      'cyberpunk',
     ],
     labelKey: 'settings:appearance.theme.label',
     descKey: 'settings:appearance.theme.desc',
@@ -81,6 +82,7 @@ export const SETTINGS = [
       terminal: 'settings:themeOptions.terminal',
       midnight: 'settings:themeOptions.midnight',
       obsidian: 'settings:themeOptions.obsidian',
+      cyberpunk: 'settings:themeOptions.cyberpunk',
     },
   },
   {

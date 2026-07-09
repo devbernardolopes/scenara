@@ -163,7 +163,8 @@
     "highContrastDark": "High Contrast Dark",
     "terminal": "Terminal",
     "midnight": "Midnight",
-    "obsidian": "Obsidian"
+    "obsidian": "Obsidian",
+    "cyberpunk": "Cyberpunk"
   },
   "api": {
     "activeProvider": {
