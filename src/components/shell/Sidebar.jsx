@@ -345,6 +345,29 @@ function Sidebar({ open, onClose }) {
             {t('appName')}
           </Link>
           <div className="flex items-center gap-1">
+            {threads.length > 0 && (
+              <button
+                type="button"
+                onClick={toggleSelectAll}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                aria-label={
+                  selectedIds.size === threads.length
+                    ? t('sidebar.deselectAll')
+                    : t('sidebar.selectAll')
+                }
+                title={
+                  selectedIds.size === threads.length
+                    ? t('sidebar.deselectAll')
+                    : t('sidebar.selectAll')
+                }
+              >
+                {selectedIds.size === threads.length ? (
+                  <CheckSquare className="w-4 h-4" />
+                ) : (
+                  <Square className="w-4 h-4" />
+                )}
+              </button>
+            )}
             <button
               onClick={handleCreateCharacter}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
@@ -398,29 +421,6 @@ function Sidebar({ open, onClose }) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">
-          {threads.length > 0 && (
-            <button
-              type="button"
-              onClick={toggleSelectAll}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
-              aria-label={
-                selectedIds.size === threads.length
-                  ? t('sidebar.deselectAll')
-                  : t('sidebar.selectAll')
-              }
-              title={
-                selectedIds.size === threads.length
-                  ? t('sidebar.deselectAll')
-                  : t('sidebar.selectAll')
-              }
-            >
-              {selectedIds.size === threads.length ? (
-                <CheckSquare className="w-4 h-4" />
-              ) : (
-                <Square className="w-4 h-4" />
-              )}
-            </button>
-          )}
           {threads.length === 0 ? (
             <p className="text-xs text-tertiary px-3">{t('sidebar.newChat')}</p>
           ) : (
