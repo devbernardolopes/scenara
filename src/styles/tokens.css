@@ -741,6 +741,9 @@
 .bg-error {
   background-color: var(--color-error);
 }
+.bg-error-subtle {
+  background-color: color-mix(in srgb, var(--color-error) 12%, transparent);
+}
 
 /* Accent */
 .text-accent {

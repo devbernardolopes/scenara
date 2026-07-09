@@ -133,6 +133,7 @@ function ChatView() {
   const prevMessagesLengthRef = useRef(0)
   const messagesGrewRef = useRef(false)
   const bundleSlotRef = useRef({})
+  const failedIdsRef = useRef(new Set())
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
@@ -460,6 +461,20 @@ function ChatView() {
     }
   })
 
+  useEffect(() => {
+    const ids = new Set()
+    for (const [id, info] of Object.entries(failedRequests)) {
+      if (info && typeof info === 'object' && 'slotIndex' in info) {
+        const msgId = Number(id)
+        const currentSlot = activeSlotIndices[msgId]
+        if (currentSlot === info.slotIndex) {
+          ids.add(msgId)
+        }
+      }
+    }
+    failedIdsRef.current = ids
+  }, [failedRequests, activeSlotIndices])
+
   async function handleCancel() {
     if (summarizationAbortRef.current) {
       summarizationAbortRef.current.abort()
@@ -473,6 +488,11 @@ function ChatView() {
     }
   }
 
+  function withoutFailedMessages(msgs) {
+    const ids = failedIdsRef.current
+    return ids.size > 0 ? msgs.filter((m) => !ids.has(m.id)) : msgs
+  }
+
   async function doChatRequest(
     isFirstMessage,
     currentMsgs,
@@ -480,6 +500,7 @@ function ChatView() {
     currentPersona,
     isOOC = false,
   ) {
+    currentMsgs = withoutFailedMessages(currentMsgs)
     const profile = isOOC
       ? await getEffectiveProfileFor('ooc')
       : await getEffectiveProfileFor('chat')
@@ -625,13 +646,18 @@ function ChatView() {
       })
 
       if (!content) {
-        setFailedRequests((prev) => ({ ...prev, [assistantMsgId]: 0 }))
+        setFailedRequests((prev) => ({ ...prev, [assistantMsgId]: { slotIndex: 0, error: null } }))
+        const newFailed = new Set(failedIdsRef.current)
+        newFailed.add(assistantMsgId)
+        failedIdsRef.current = newFailed
       }
 
-      await updateMessage(assistantMsgId, { content })
-      setMessages((prev) => prev.map((m) => (m.id === assistantMsgId ? { ...m, content } : m)))
-      showToast(t('messageUpdated'), { type: 'success' })
-      completedNormally = true
+      if (content) {
+        await updateMessage(assistantMsgId, { content })
+        setMessages((prev) => prev.map((m) => (m.id === assistantMsgId ? { ...m, content } : m)))
+        showToast(t('messageUpdated'), { type: 'success' })
+        completedNormally = true
+      }
     } catch (err) {
       if (err.name === 'AbortError') {
         await updateMessage(assistantMsgId, { content: '' })
@@ -641,7 +667,13 @@ function ChatView() {
         await updateMessage(assistantMsgId, { content: '' })
         const msgs = await getMessagesByThread(threadId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
-        setFailedRequests((prev) => ({ ...prev, [assistantMsgId]: 0 }))
+        setFailedRequests((prev) => ({
+          ...prev,
+          [assistantMsgId]: { slotIndex: 0, error: err.message },
+        }))
+        const newFailed = new Set(failedIdsRef.current)
+        newFailed.add(assistantMsgId)
+        failedIdsRef.current = newFailed
         showToast(err.message, { type: 'error' })
         completedNormally = true
       }
@@ -749,6 +781,7 @@ function ChatView() {
       if (Number(currentThreadIdRef.current) !== Number(threadId)) return
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
+      const nonFailedMsgs = withoutFailedMessages(msgs)
       generatingRef.current = false
       setGenerating(false)
       stopGenerating(threadId)
@@ -757,23 +790,23 @@ function ChatView() {
         character &&
         (await shouldTriggerSummarization({
           character,
-          messages: msgs,
+          messages: nonFailedMsgs,
           includeOOC: character.includeOOC !== false,
         }))
       ) {
-        await handleSummarization(msgs)
+        await handleSummarization(nonFailedMsgs)
       }
 
       const thr = await getThread(threadId)
       const chr = await getCharacter(thr.characterId)
-      if (await shouldAutoTitle(thr, chr, msgs)) {
+      if (await shouldAutoTitle(thr, chr, nonFailedMsgs)) {
         showToast(t('autoTitleGenerating'), { type: 'info' })
         autoTitleAbortRef.current = new AbortController()
         try {
           const title = await triggerAutoTitle({
             thread: thr,
             character: chr,
-            messages: msgs,
+            messages: nonFailedMsgs,
             personaMap,
             signal: autoTitleAbortRef.current.signal,
           })
@@ -831,6 +864,7 @@ function ChatView() {
     setGenerating(true)
     startGenerating(threadId)
 
+    let slotIndex = 0
     let completedNormally = false
     try {
       const idx = messages.findIndex((m) => m.id === messageId)
@@ -843,7 +877,7 @@ function ChatView() {
         entries = [{ content: msg.content, promptData: msg.promptData || null }]
       }
 
-      const slotIndex = entries.length
+      slotIndex = entries.length
       entries.push({ content: '', promptData: null, createdAt: new Date().toISOString() })
       setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
       const bundleJson = JSON.stringify(entries)
@@ -856,7 +890,8 @@ function ChatView() {
         ),
       )
 
-      const currentMsgs = messages.slice(0, idx)
+      let currentMsgs = messages.slice(0, idx)
+      currentMsgs = withoutFailedMessages(currentMsgs)
       let chatPersona = null
       if (thread?.personaId) {
         chatPersona = await getPersona(thread.personaId)
@@ -1010,45 +1045,47 @@ function ChatView() {
       })
 
       if (!content) {
-        setFailedRequests((prev) => ({ ...prev, [messageId]: slotIndex }))
+        setFailedRequests((prev) => ({ ...prev, [messageId]: { slotIndex, error: null } }))
       }
 
-      const dbMsg = await db.messages.get(Number(messageId))
-      const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || entries
-      if (finalEntries[slotIndex]) {
-        finalEntries[slotIndex].content = content
-        finalEntries[slotIndex].promptData = promptDataStr
+      if (content) {
+        const dbMsg = await db.messages.get(Number(messageId))
+        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || entries
+        if (finalEntries[slotIndex]) {
+          finalEntries[slotIndex].content = content
+          finalEntries[slotIndex].promptData = promptDataStr
+        }
+        await updateMessage(messageId, {
+          bundleMessages: JSON.stringify(finalEntries),
+          content,
+          promptData: promptDataStr,
+        })
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === messageId
+              ? {
+                  ...m,
+                  content,
+                  bundleMessages: JSON.stringify(finalEntries),
+                  promptData: promptDataStr,
+                }
+              : m,
+          ),
+        )
+        setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
+        setFailedRequests((prev) => {
+          const next = { ...prev }
+          delete next[messageId]
+          return next
+        })
+        showToast(t('messageUpdated'), { type: 'success' })
+        completedNormally = true
       }
-      await updateMessage(messageId, {
-        bundleMessages: JSON.stringify(finalEntries),
-        content,
-        promptData: promptDataStr,
-      })
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === messageId
-            ? {
-                ...m,
-                content,
-                bundleMessages: JSON.stringify(finalEntries),
-                promptData: promptDataStr,
-              }
-            : m,
-        ),
-      )
-      setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
-      setFailedRequests((prev) => {
-        const next = { ...prev }
-        delete next[messageId]
-        return next
-      })
-      showToast(t('messageUpdated'), { type: 'success' })
-      completedNormally = true
     } catch (err) {
       const msgs = await getMessagesByThread(threadId)
       if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
       if (err.name !== 'AbortError') {
-        setFailedRequests((prev) => ({ ...prev, [messageId]: slotIndex }))
+        setFailedRequests((prev) => ({ ...prev, [messageId]: { slotIndex, error: err.message } }))
         showToast(err.message, { type: 'error' })
         completedNormally = true
       }
@@ -1246,7 +1283,9 @@ function ChatView() {
                     ? entries[bundleIndex].origin || null
                     : null
                 const slotCreatedAt = entries?.[bundleIndex]?.createdAt || msg.createdAt
-                const isFailedSlot = failedRequests[msg.id] === bundleIndex
+                const failedInfo = failedRequests[msg.id]
+                const isFailedSlot = failedInfo && failedInfo.slotIndex === bundleIndex
+                const errorText = isFailedSlot ? failedInfo.error || null : null
                 return (
                   <div
                     key={msg.id}
@@ -1274,6 +1313,7 @@ function ChatView() {
                       onSpeak={() => {}}
                       generating={generating}
                       requestFailed={isFailedSlot}
+                      errorText={errorText}
                       isUnread={msg.isUnread || false}
                       charName={character?.name || ''}
                       personaName={personaMap[thread?.personaId]?.name || ''}

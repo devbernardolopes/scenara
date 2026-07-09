@@ -117,6 +117,7 @@ function MessageBubble({
   onSpeak,
   generating,
   requestFailed,
+  errorText,
   charName,
   personaName,
   isUnread,
@@ -635,6 +636,13 @@ function MessageBubble({
                 fontSize: CHAT_FONT_SIZES[chatFontSize],
               }}
             />
+          ) : requestFailed ? (
+            <div className="bg-error-subtle rounded p-3 text-sm">
+              <p className="font-bold text-error">Error:</p>
+              <pre className="mt-1 text-error whitespace-pre-wrap text-xs">
+                {errorText || '(No content)'}
+              </pre>
+            </div>
           ) : (
             <div
               className="text-sm markdown-body w-full overflow-hidden"
