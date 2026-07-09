@@ -108,7 +108,14 @@
     "pastel": "Pastell",
     "highContrast": "Hoher Kontrast",
     "highContrastDark": "Hoher Kontrast Dunkel",
-    "terminal": "Terminal"
+    "terminal": "Terminal",
+    "midnight": "Mitternacht",
+    "obsidian": "Obsidian",
+    "cyberpunk": "Cyberpunk",
+    "vaporwave": "Vaporwave",
+    "retroCrt": "Retro CRT",
+    "solarizedDark": "Solarisiert Dunkel",
+    "neonAbyss": "Neon-Abgrund"
   },
   "api": {
     "activeProvider": {

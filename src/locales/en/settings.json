@@ -164,7 +164,11 @@
     "terminal": "Terminal",
     "midnight": "Midnight",
     "obsidian": "Obsidian",
-    "cyberpunk": "Cyberpunk"
+    "cyberpunk": "Cyberpunk",
+    "vaporwave": "Vaporwave",
+    "retroCrt": "Retro CRT",
+    "solarizedDark": "Solarized Dark",
+    "neonAbyss": "Neon Abyss"
   },
   "api": {
     "activeProvider": {

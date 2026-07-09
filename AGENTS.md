@@ -127,24 +127,6 @@ All visual properties are defined as CSS custom properties in `src/styles/tokens
 
 Spacing, typography, and radius use Tailwind's built-in classes (`p-4`, `text-sm`, `rounded-lg`). Do not create custom tokens for these.
 
-### Available themes
-
-| Class                 | Description   |
-| --------------------- | ------------- |
-| (none, default)       | Light         |
-| `theme-dark`          | Dark          |
-| `theme-sepia`         | Sepia         |
-| `theme-pastel`        | Pastel        |
-| `theme-high-contrast` | High Contrast |
-
-Switch themes via `useTheme()`:
-
-```js
-import { useTheme } from '../hooks/useTheme'
-const { theme, setTheme } = useTheme()
-setTheme('dark')
-```
-
 ### Adding a new theme
 
 1. Add a `.theme-{name}` block in `tokens.css` overriding every `--color-*` and `--shadow-*` variable
@@ -184,14 +166,6 @@ The namespace prefix (`:`) syntax references other namespaces from any component
 ```js
 t('settings:appearance.theme.label')
 ```
-
-### Adding a new language
-
-1. Copy the `en/` folder to `{lang-code}/`
-2. Translate each JSON file
-3. Add the locale to `src/lib/i18n.js` — static import all 4 namespace files and add to the `resources` object
-4. Add the language option to the `language` setting in `src/services/settings.js`
-5. Add a label in the `settings.json` locale files under `languageOptions`
 
 ## Settings System
 
@@ -306,4 +280,4 @@ The `ModalProvider` wraps every modal in `<Suspense>`, so no additional setup is
 
 ## Commit Convention
 
-When there are changes to commit, AI agents should suggest a commit message at the end of their response following conventional commit format: `type(scope): description`. Use types like `feat`, `fix`, `refactor`, `docs`, `chore` and keep descriptions concise but descriptive — focus on the "why" rather than the "what".
+When there are changes to commit, AI agents should suggest an one-line commit message at the end of their response following conventional commit format: `type(scope): description`. Use types like `feat`, `fix`, `refactor`, `docs`, `chore` and keep descriptions concise but descriptive — focus on the "why" rather than the "what".
