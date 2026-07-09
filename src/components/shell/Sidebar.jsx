@@ -42,6 +42,7 @@ import {
   RefreshCw,
 } from '../../lib/icons'
 import { getGeneratingThreads } from '../../services/generatingState'
+import * as apiQueue from '../../services/apiQueue'
 import { useUnread } from '../../hooks/useUnread'
 
 function ThreadCardTitle({ title, isActive, threadCardMarquee }) {
@@ -94,6 +95,7 @@ function Sidebar({ open, onClose }) {
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [showImportMenu, setShowImportMenu] = useState(false)
   const [generatingSet, setGeneratingSet] = useState(() => getGeneratingThreads())
+  const [queueCounts, setQueueCounts] = useState({})
   const [threadCardMarquee, setThreadCardMarquee] = useState(true)
   const [unreadBadges, setUnreadBadges] = useState(true)
   const [sidebarNavLayout, setSidebarNavLayout] = useState('vertical')
@@ -185,6 +187,24 @@ function Sidebar({ open, onClose }) {
     window.addEventListener('generating-state-changed', handleChange)
     return () => window.removeEventListener('generating-state-changed', handleChange)
   }, [])
+
+  useEffect(() => {
+    function updateQueueCounts() {
+      const counts = {}
+      threads.forEach((t) => {
+        const c = apiQueue.getThreadQueueCount(t.id)
+        if (c > 0) counts[t.id] = c
+      })
+      setQueueCounts(counts)
+    }
+    updateQueueCounts()
+    const unsub = apiQueue.subscribe(updateQueueCounts)
+    window.addEventListener('api-queue-changed', updateQueueCounts)
+    return () => {
+      unsub()
+      window.removeEventListener('api-queue-changed', updateQueueCounts)
+    }
+  }, [threads])
 
   useEffect(() => {
     getSetting('threadCardMarquee').then((val) => {
@@ -448,6 +468,11 @@ function Sidebar({ open, onClose }) {
                           )}
                           {generatingSet.has(thread.id) && (
                             <RefreshCw className="w-3.5 h-3.5 text-primary animate-spin shrink-0" />
+                          )}
+                          {queueCounts[thread.id] > 0 && (
+                            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-primary rounded-full shrink-0">
+                              {queueCounts[thread.id]}
+                            </span>
                           )}
                           <span className="text-xs text-tertiary shrink-0">
                             #{thread.threadNumber}

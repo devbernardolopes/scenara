@@ -29,6 +29,7 @@ import {
 } from '../services/chatApi'
 import { getSetting } from '../services/settings'
 import { startGenerating, stopGenerating } from '../services/generatingState'
+import * as apiQueue from '../services/apiQueue'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import {
   shouldTriggerSummarization,
@@ -140,6 +141,7 @@ function ChatView() {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
+  const [queuedCount, setQueuedCount] = useState(0)
   const [summarizing, setSummarizing] = useState(false)
   const [streamingMsgId, setStreamingMsgId] = useState(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
@@ -522,16 +524,7 @@ function ChatView() {
   }, [failedRequests, activeSlotIndices])
 
   async function handleCancel() {
-    if (summarizationAbortRef.current) {
-      summarizationAbortRef.current.abort()
-      summarizationAbortRef.current = null
-    } else if (autoTitleAbortRef.current) {
-      autoTitleAbortRef.current.abort()
-      autoTitleAbortRef.current = null
-    } else if (abortRef.current) {
-      abortRef.current.abort()
-      abortRef.current = null
-    }
+    apiQueue.cancelThreadRequests(threadId)
   }
 
   function withoutFailedMessages(msgs) {
@@ -545,6 +538,7 @@ function ChatView() {
     chatPersona,
     currentPersona,
     isOOC = false,
+    signal,
   ) {
     currentMsgs = withoutFailedMessages(currentMsgs)
     const profile = isOOC
@@ -670,14 +664,13 @@ function ChatView() {
       },
     ])
 
-    abortRef.current = new AbortController()
     let completedNormally = false
 
     try {
       const content = await sendChatCompletion({
         profile,
         messages: payload,
-        signal: abortRef.current.signal,
+        signal,
         onToken: (fullContent) => {
           updateMessage(assistantMsgId, { content: fullContent })
           setMessages((prev) =>
@@ -725,7 +718,6 @@ function ChatView() {
       }
     } finally {
       setStreamingMsgId(null)
-      abortRef.current = null
       if (completedNormally) {
         try {
           const away = isAwayFromThread(threadId) || !isAtBottomRef.current
@@ -742,54 +734,8 @@ function ChatView() {
     }
   }
 
-  async function handleSummarization(currentMessages = messages) {
-    if (summarizing) return
-    if (!thread || !character) return
-    if (
-      !(await shouldTriggerSummarization({
-        character,
-        messages: currentMessages,
-        includeOOC: character.includeOOC !== false,
-      }))
-    ) {
-      return
-    }
-
-    const unsummarizedMessages = getUnsummarizedMessages(currentMessages, {
-      includeOOC: character.includeOOC !== false,
-    })
-    if (unsummarizedMessages.length === 0) return
-
-    const currentPersona = null
-    setSummarizing(true)
-    showToast('Generating summary', { type: 'info' })
-
-    summarizationAbortRef.current = new AbortController()
-    try {
-      const summary = await triggerSummarization({
-        thread,
-        character,
-        messages: currentMessages,
-        personaMap,
-        signal: summarizationAbortRef.current.signal,
-        currentPersona,
-      })
-      if (summary) {
-        setThread((prev) => (prev ? { ...prev, memory: summary } : prev))
-        showToast('Summary generated', { type: 'success' })
-      }
-    } catch (err) {
-      if (err.name !== 'AbortError') {
-        showToast(err.message || 'Summarization failed', { type: 'error' })
-      }
-    } finally {
-      summarizationAbortRef.current = null
-      setSummarizing(false)
-    }
-  }
-
   async function handleSend(text, personaId, isOOC, autoReply = true) {
-    if (generatingRef.current || summarizing) return
+    if (generatingRef.current) return
     generatingRef.current = true
     setGenerating(true)
     startGenerating(threadId)
@@ -822,7 +768,24 @@ function ChatView() {
       }
 
       const currentPersona = personaId ? await getPersona(personaId) : null
-      await doChatRequest(isFirstMessage, currentMsgs, chatPersona, currentPersona, isOOC)
+      const abortController = new AbortController()
+      abortRef.current = abortController
+
+      await apiQueue.enqueue({
+        threadId,
+        type: 'chat',
+        signal: abortController.signal,
+        execute: async () => {
+          return await doChatRequest(
+            isFirstMessage,
+            currentMsgs,
+            chatPersona,
+            currentPersona,
+            isOOC,
+            abortController.signal,
+          )
+        },
+      }).promise
 
       if (Number(currentThreadIdRef.current) !== Number(threadId)) return
       const msgs = await getMessagesByThread(threadId)
@@ -832,6 +795,40 @@ function ChatView() {
       setGenerating(false)
       stopGenerating(threadId)
 
+      const thr = await getThread(threadId)
+      const chr = await getCharacter(thr.characterId)
+
+      if (await shouldAutoTitle(thr, chr, nonFailedMsgs)) {
+        showToast(t('autoTitleGenerating'), { type: 'info' })
+        const atAbort = new AbortController()
+        autoTitleAbortRef.current = atAbort
+        try {
+          await apiQueue.enqueue({
+            threadId,
+            type: 'autoTitle',
+            signal: atAbort.signal,
+            execute: async () => {
+              return await triggerAutoTitle({
+                thread: thr,
+                character: chr,
+                messages: nonFailedMsgs,
+                personaMap,
+                signal: atAbort.signal,
+              })
+            },
+          }).promise
+          const updatedThr = await getThread(threadId)
+          setThread((prev) => ({ ...prev, title: updatedThr.title, autoTitleGenerated: true }))
+          showToast(t('autoTitleGenerated'), { type: 'success' })
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            showToast(err.message, { type: 'error' })
+          }
+        } finally {
+          autoTitleAbortRef.current = null
+        }
+      }
+
       if (
         character &&
         (await shouldTriggerSummarization({
@@ -840,30 +837,43 @@ function ChatView() {
           includeOOC: character.includeOOC !== false,
         }))
       ) {
-        await handleSummarization(nonFailedMsgs)
-      }
-
-      const thr = await getThread(threadId)
-      const chr = await getCharacter(thr.characterId)
-      if (await shouldAutoTitle(thr, chr, nonFailedMsgs)) {
-        showToast(t('autoTitleGenerating'), { type: 'info' })
-        autoTitleAbortRef.current = new AbortController()
-        try {
-          const title = await triggerAutoTitle({
-            thread: thr,
-            character: chr,
-            messages: nonFailedMsgs,
-            personaMap,
-            signal: autoTitleAbortRef.current.signal,
-          })
-          setThread((prev) => ({ ...prev, title, autoTitleGenerated: true }))
-          showToast(t('autoTitleGenerated'), { type: 'success' })
-        } catch (err) {
-          if (err.name !== 'AbortError') {
-            showToast(err.message, { type: 'error' })
+        const currentThread = await getThread(threadId)
+        const unsummarizedMessages = getUnsummarizedMessages(nonFailedMsgs, {
+          includeOOC: character.includeOOC !== false,
+        })
+        if (unsummarizedMessages.length > 0) {
+          const summAbort = new AbortController()
+          summarizationAbortRef.current = summAbort
+          setSummarizing(true)
+          showToast('Generating summary', { type: 'info' })
+          try {
+            const summary = await apiQueue.enqueue({
+              threadId,
+              type: 'summarization',
+              signal: summAbort.signal,
+              execute: async () => {
+                return await triggerSummarization({
+                  thread: currentThread,
+                  character,
+                  messages: nonFailedMsgs,
+                  personaMap,
+                  signal: summAbort.signal,
+                  currentPersona: null,
+                })
+              },
+            }).promise
+            if (summary) {
+              setThread((prev) => (prev ? { ...prev, memory: summary } : prev))
+              showToast('Summary generated', { type: 'success' })
+            }
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              showToast(err.message || 'Summarization failed', { type: 'error' })
+            }
+          } finally {
+            summarizationAbortRef.current = null
+            setSummarizing(false)
           }
-        } finally {
-          autoTitleAbortRef.current = null
         }
       }
     } finally {
@@ -878,6 +888,19 @@ function ChatView() {
   useEffect(() => {
     handleSendRef.current = handleSend
   })
+
+  useEffect(() => {
+    const handler = () => {
+      setQueuedCount(apiQueue.getThreadQueueCount(threadId))
+    }
+    handler()
+    const unsub = apiQueue.subscribe(handler)
+    window.addEventListener('api-queue-changed', handler)
+    return () => {
+      unsub()
+      window.removeEventListener('api-queue-changed', handler)
+    }
+  }, [threadId])
 
   async function handleBundleNavigate(messageId, slotIndex) {
     const msg = messages.find((m) => m.id === messageId)
@@ -1071,24 +1094,32 @@ function ChatView() {
         promptData: promptDataStr,
       })
 
-      abortRef.current = new AbortController()
+      const regenAbortController = new AbortController()
+      abortRef.current = regenAbortController
 
-      const content = await sendChatCompletion({
-        profile,
-        messages: payload,
-        signal: abortRef.current.signal,
-        onToken: (fullContent) => {
-          updateMessage(messageId, { content: fullContent })
-          setMessages((prev) =>
-            prev.map((m) => (m.id === messageId ? { ...m, content: fullContent } : m)),
-          )
+      const content = await apiQueue.enqueue({
+        threadId,
+        type: 'regenerate',
+        signal: regenAbortController.signal,
+        execute: async () => {
+          return await sendChatCompletion({
+            profile,
+            messages: payload,
+            signal: regenAbortController.signal,
+            onToken: (fullContent) => {
+              updateMessage(messageId, { content: fullContent })
+              setMessages((prev) =>
+                prev.map((m) => (m.id === messageId ? { ...m, content: fullContent } : m)),
+              )
+            },
+            onFinish: (reason) => {
+              if (reason === 'length') {
+                showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
+              }
+            },
+          })
         },
-        onFinish: (reason) => {
-          if (reason === 'length') {
-            showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
-          }
-        },
-      })
+      }).promise
 
       if (!content) {
         setFailedRequests((prev) => ({ ...prev, [messageId]: { slotIndex, error: null } }))
@@ -1142,7 +1173,6 @@ function ChatView() {
         setGenerating(false)
       }
       stopGenerating(threadId)
-      abortRef.current = null
       if (completedNormally) {
         try {
           const away = isAwayFromThread(threadId) || !isAtBottomRef.current
@@ -1293,6 +1323,11 @@ function ChatView() {
               />
             </div>
             {generating && <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />}
+            {queuedCount > 1 && (
+              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-primary rounded-full shrink-0">
+                {queuedCount}
+              </span>
+            )}
           </div>
         </div>
 
@@ -1393,6 +1428,7 @@ function ChatView() {
           onCancel={handleCancel}
           generating={generating}
           summarizing={summarizing}
+          hasQueued={queuedCount > 0}
         />
       </div>
 

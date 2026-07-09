@@ -30,7 +30,7 @@ const DEFAULT_QUICK_SETTINGS = {
 }
 const STORAGE_PREFIX = 'chatInput.'
 
-function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing }) {
+function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, hasQueued }) {
   const { t } = useTranslation('chat')
   const { openModal, activeModal } = useModal()
   const textareaRef = useRef(null)
@@ -222,7 +222,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing }) 
   }, [])
 
   function handleSend() {
-    if (generating || summarizing) {
+    if (generating || summarizing || hasQueued) {
       onCancel?.()
       return
     }
@@ -483,12 +483,12 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing }) 
             type="button"
             onClick={handleSend}
             className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-sm flex-shrink-0 ${
-              generating || summarizing
+              generating || summarizing || hasQueued
                 ? 'bg-error text-on-primary hover:opacity-90'
                 : 'bg-primary text-on-primary hover:bg-primary-hover'
             }`}
           >
-            {generating || summarizing ? (
+            {generating || summarizing || hasQueued ? (
               <Square className="w-4 h-4" />
             ) : (
               <Send className="w-4 h-4" />
