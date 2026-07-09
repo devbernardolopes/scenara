@@ -21,6 +21,7 @@ const INITIAL_FORM = {
   prompt: '',
   writingInstruction: null,
   extraPrompt: '',
+  postHistoryInstructions: '',
   initialMessages: [],
   autoTitle: true,
   autoTitleThreshold: 3,
@@ -28,7 +29,7 @@ const INITIAL_FORM = {
   autoTitleUserInstructions: '',
   memory: 'messages',
   messagesThreshold: 7,
-  contextWindowThreshold: 1024,
+  contextWindowThreshold: 512,
   messagesToKeep: 5,
   memorySlots: 3,
   summarizationSystemInstructions: '',
@@ -185,6 +186,8 @@ function CharacterCreateModal({ character: existing, initialData }) {
           total += estimateTokens(replaceVars(template))
         }
       }
+
+      if (form.postHistoryInstructions) total += estimateTokens(replaceVars(form.postHistoryInstructions))
 
       setTotalPermTokens(total)
     }
