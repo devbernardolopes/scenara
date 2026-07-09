@@ -152,6 +152,10 @@
     "regenerationConfirmation": {
       "label": "Regeneration Confirmation",
       "desc": "Show a confirmation dialog before regenerating a message."
+    },
+    "summarizationMarker": {
+      "label": "Summarization Marker",
+      "desc": "Show a divider labeled “Summarization” in the chat after a summary is generated."
     }
   },
   "themeOptions": {

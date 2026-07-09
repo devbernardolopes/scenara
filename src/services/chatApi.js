@@ -110,6 +110,7 @@ export async function buildMessagesPayload({
     }
   } else {
     for (const msg of messages) {
+      if (msg.isSummaryMarker) continue
       let content = replaceVarsIn(msg.content)
       if (!msg.isOOC) {
         if (msg.role === 'assistant' && assistantPrefix) {
@@ -187,6 +188,7 @@ export function buildTranscript({
   const lines = []
 
   for (const msg of messages) {
+    if (msg.isSummaryMarker) continue
     if (msg.isOOC && !includeOOCOverride) continue
 
     let prefix = ''

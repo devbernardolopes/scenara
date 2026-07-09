@@ -419,6 +419,14 @@ export const SETTINGS = [
     },
   },
   {
+    key: 'summarizationMarker',
+    category: 'appearance',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.summarizationMarker.label',
+    descKey: 'settings:appearance.summarizationMarker.desc',
+  },
+  {
     key: 'defaultAutoTitle',
     category: 'defaults',
     type: 'toggle',

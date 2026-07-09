@@ -11,13 +11,18 @@ const DEFAULT_SYSTEM_INSTRUCTION = 'You are a memory generator for conversationa
 
 export function getUnsummarizedMessages(messages, { includeOOC = true } = {}) {
   if (!Array.isArray(messages)) return []
-  return messages.filter((message) => !message?.summarizedAt && (includeOOC || !message?.isOOC))
+  return messages.filter(
+    (message) =>
+      !message?.isSummaryMarker && !message?.summarizedAt && (includeOOC || !message?.isOOC),
+  )
 }
 
 export function getMessagesForApiRequest(messages, { includeOOC = true, keepMessages = 0 } = {}) {
   if (!Array.isArray(messages)) return []
 
-  const eligible = messages.filter((message) => includeOOC || !message?.isOOC)
+  const eligible = messages.filter(
+    (message) => !message?.isSummaryMarker && (includeOOC || !message?.isOOC),
+  )
   if (keepMessages <= 0) {
     return eligible.filter((message) => !message?.summarizedAt)
   }

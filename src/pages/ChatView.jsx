@@ -17,6 +17,7 @@ import {
   getMessagesByThread,
   createMessage,
   createAssistantMessage,
+  createSummaryMarker,
   updateMessage,
   deleteMessage,
 } from '../services/messages'
@@ -950,6 +951,25 @@ function ChatView() {
             if (summary) {
               setThread((prev) => (prev ? { ...prev, memory: summary } : prev))
               showToast('Summary generated', { type: 'success' })
+
+              const markerEnabled = await getSetting('summarizationMarker')
+              if (markerEnabled) {
+                const postMsgs = await getMessagesByThread(threadId)
+                let lastSummarizedIdx = -1
+                for (let i = postMsgs.length - 1; i >= 0; i--) {
+                  if (postMsgs[i].summarizedAt) {
+                    lastSummarizedIdx = i
+                    break
+                  }
+                }
+                if (lastSummarizedIdx !== -1 && !postMsgs[lastSummarizedIdx + 1]?.isSummaryMarker) {
+                  await createSummaryMarker(threadId, postMsgs[lastSummarizedIdx].createdAt)
+                  const updated = await getMessagesByThread(threadId)
+                  if (Number(currentThreadIdRef.current) === Number(threadId)) {
+                    setMessages(updated)
+                  }
+                }
+              }
             }
           } catch (err) {
             if (err.name !== 'AbortError') {
@@ -1470,7 +1490,26 @@ function ChatView() {
                   </button>
                 </div>
               )}
-              {messages.slice(visibleStartIndex).map((msg, idx) => {
+              {messages.map((msg, idx) => {
+                if (msg.isSummaryMarker) {
+                  const isVisible = idx >= visibleStartIndex
+                  let nextIdx = idx + 1
+                  while (nextIdx < messages.length && messages[nextIdx].isSummaryMarker) nextIdx++
+                  const nextVisible = nextIdx < messages.length && nextIdx >= visibleStartIndex
+                  if (!isVisible || !nextVisible) return null
+                  return (
+                    <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
+                      <div className="flex-1 h-px bg-border" />
+                      <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap">
+                        {t('summarizationMarker')}
+                      </span>
+                      <div className="flex-1 h-px bg-border" />
+                    </div>
+                  )
+                }
+
+                if (idx < visibleStartIndex) return null
+
                 const entries = parseBundleEntries(msg.bundleMessages)
                 const bundleMessages = entries ? entries.map((e) => e.content) : null
                 const trackIdx = activeSlotIndices[msg.id]
@@ -1496,7 +1535,7 @@ function ChatView() {
                   >
                     <MessageBubble
                       message={msg}
-                      messageNumber={visibleStartIndex + idx + 1}
+                      messageNumber={idx + 1}
                       avatarSrc={getAvatarSrc(msg)}
                       avatarScale={getAvatarScale(msg)}
                       role={msg.role}

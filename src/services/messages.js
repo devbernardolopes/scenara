@@ -41,6 +41,21 @@ export async function createAssistantMessage(threadId, content, createdAt, isOOC
   return id
 }
 
+export async function createSummaryMarker(threadId, afterCreatedAt) {
+  const id = await db.messages.add({
+    threadId: Number(threadId),
+    role: 'system',
+    content: '',
+    personaId: null,
+    isOOC: false,
+    isSummaryMarker: true,
+    createdAt: new Date(new Date(afterCreatedAt).getTime() + 1),
+    summarizedAt: null,
+  })
+  await updateThreadTimestamp(threadId)
+  return id
+}
+
 export async function updateMessage(id, updates) {
   return db.messages.update(Number(id), updates)
 }
