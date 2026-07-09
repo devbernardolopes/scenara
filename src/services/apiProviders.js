@@ -21,16 +21,6 @@ export const PROVIDERS = [
         default: 1024,
       },
       {
-        key: 'max_tokens',
-        label: 'Max Tokens (Deprecated)',
-        type: 'range',
-        min: 256,
-        max: 8192,
-        step: 128,
-        default: null,
-        deprecated: true,
-      },
-      {
         key: 'temperature',
         label: 'Temperature',
         type: 'range',
@@ -39,7 +29,7 @@ export const PROVIDERS = [
         step: 0.05,
         default: 0.75,
       },
-      { key: 'top_p', label: 'Top P', type: 'range', min: 0, max: 1, step: 0.05, default: 0 },
+      { key: 'top_p', label: 'Top P', type: 'range', min: 0, max: 1, step: 0.05, default: 1 },
       {
         key: 'frequency_penalty',
         label: 'Frequency Penalty',
@@ -82,16 +72,6 @@ export const PROVIDERS = [
         default: 1024,
       },
       {
-        key: 'max_tokens',
-        label: 'Max Tokens (Deprecated)',
-        type: 'range',
-        min: 256,
-        max: 8192,
-        step: 128,
-        default: null,
-        deprecated: true,
-      },
-      {
         key: 'temperature',
         label: 'Temperature',
         type: 'range',
@@ -100,7 +80,7 @@ export const PROVIDERS = [
         step: 0.05,
         default: 0.75,
       },
-      { key: 'top_p', label: 'Top P', type: 'range', min: 0, max: 1, step: 0.05, default: 0 },
+      { key: 'top_p', label: 'Top P', type: 'range', min: 0, max: 1, step: 0.05, default: 1 },
       {
         key: 'frequency_penalty',
         label: 'Frequency Penalty',
@@ -135,16 +115,6 @@ export const PROVIDERS = [
     trialKey: 'placeholder-horde-trial-key',
     params: [
       {
-        key: 'max_completion_tokens',
-        label: 'Max Tokens (not used in AI Horde)',
-        type: 'range',
-        min: 256,
-        max: 8192,
-        step: 128,
-        default: 1024,
-        deprecated: true,
-      },
-      {
         key: 'max_tokens',
         label: 'Max Tokens',
         type: 'range',
@@ -162,7 +132,7 @@ export const PROVIDERS = [
         step: 0.05,
         default: 0.75,
       },
-      { key: 'top_p', label: 'Top P', type: 'range', min: 0, max: 1, step: 0.05, default: 0 },
+      { key: 'top_p', label: 'Top P', type: 'range', min: 0, max: 1, step: 0.05, default: 1 },
       {
         key: 'frequency_penalty',
         label: 'Frequency Penalty',
@@ -205,16 +175,6 @@ export const PROVIDERS = [
         default: 1024,
       },
       {
-        key: 'max_tokens',
-        label: 'Max Tokens (Deprecated)',
-        type: 'range',
-        min: 256,
-        max: 8192,
-        step: 128,
-        default: null,
-        deprecated: true,
-      },
-      {
         key: 'temperature',
         label: 'Temperature',
         type: 'range',
@@ -223,7 +183,7 @@ export const PROVIDERS = [
         step: 0.05,
         default: 0.75,
       },
-      { key: 'top_p', label: 'Top P', type: 'range', min: 0, max: 1, step: 0.05, default: 0 },
+      { key: 'top_p', label: 'Top P', type: 'range', min: 0, max: 1, step: 0.05, default: 1 },
       {
         key: 'frequency_penalty',
         label: 'Frequency Penalty',
