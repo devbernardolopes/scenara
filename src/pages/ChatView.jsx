@@ -445,9 +445,17 @@ function ChatView() {
     )
 
     const unreadElements = container.querySelectorAll('[data-message-id][data-unread="true"]')
-    unreadElements.forEach((el) => observer.observe(el))
 
-    if (isTabVisible && unreadElements.length > 0) {
+    const unreadMsgIds = new Set()
+    messages.forEach((m) => {
+      if (m.isUnread) unreadMsgIds.add(m.id)
+    })
+    const validElements = Array.from(unreadElements).filter((el) =>
+      unreadMsgIds.has(Number(el.dataset.messageId)),
+    )
+    validElements.forEach((el) => observer.observe(el))
+
+    if (isTabVisible && validElements.length > 0) {
       const containerRect = container.getBoundingClientRect()
 
       if (container.scrollHeight <= container.clientHeight + 1) {
@@ -455,7 +463,7 @@ function ChatView() {
         setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
       } else {
         const visibleIds = []
-        unreadElements.forEach((el) => {
+        validElements.forEach((el) => {
           const rect = el.getBoundingClientRect()
           if (rect.top < containerRect.bottom && rect.bottom > containerRect.top) {
             observer.unobserve(el)
