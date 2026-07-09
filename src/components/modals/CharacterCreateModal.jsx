@@ -174,6 +174,8 @@ function CharacterCreateModal({ character: existing, initialData }) {
 
       if (form.prompt) total += estimateTokens(replaceVars(form.prompt))
 
+      if (form.postHistoryInstructions) total += estimateTokens(replaceVars(form.postHistoryInstructions))
+
       if (form.writingInstruction) {
         const wi = await getWritingInstruction(form.writingInstruction)
         if (wi?.content) total += estimateTokens(replaceVars(wi.content))
@@ -186,8 +188,6 @@ function CharacterCreateModal({ character: existing, initialData }) {
           total += estimateTokens(replaceVars(template))
         }
       }
-
-      if (form.postHistoryInstructions) total += estimateTokens(replaceVars(form.postHistoryInstructions))
 
       setTotalPermTokens(total)
     }
