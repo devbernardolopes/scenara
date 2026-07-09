@@ -20,6 +20,7 @@ import { useTheme } from '../../hooks/useTheme'
 import ColorPicker from '../shared/ColorPicker'
 import CloseButton from '../shared/CloseButton'
 import Avatar from '../shared/Avatar'
+import MarkdownTitle from '../shared/MarkdownTitle'
 import {
   UserPlus,
   Settings,
@@ -65,7 +66,7 @@ function ThreadCardTitle({ title, isActive, threadCardMarquee }) {
   if (!threadCardMarquee) {
     return (
       <span className={`text-sm font-medium truncate ${isActive ? 'text-primary' : 'text-text'}`}>
-        {title}
+        <MarkdownTitle>{title}</MarkdownTitle>
       </span>
     )
   }
@@ -75,7 +76,9 @@ function ThreadCardTitle({ title, isActive, threadCardMarquee }) {
       ref={wrapperRef}
       className={`text-sm font-medium marquee-wrapper ${overflows ? 'marquee-animate' : ''} ${isActive ? 'text-primary' : 'text-text'}`}
     >
-      <span className="marquee-text">{title}</span>
+      <span className="marquee-text">
+        <MarkdownTitle>{title}</MarkdownTitle>
+      </span>
     </span>
   )
 }

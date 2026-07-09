@@ -6,6 +6,7 @@ import { useModal } from '../hooks/useModal'
 import { showToast } from '../lib/toast'
 import { useConfirm } from '../lib/confirm'
 import Avatar from '../components/shared/Avatar'
+import MarkdownTitle from '../components/shared/MarkdownTitle'
 import ChatInputArea from '../components/chat/ChatInputArea'
 import MessageBubble from '../components/chat/MessageBubble'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
@@ -98,7 +99,7 @@ function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
         className="text-sm text-secondary truncate cursor-pointer"
         onDoubleClick={onDoubleClick}
       >
-        {title}
+        <MarkdownTitle>{title}</MarkdownTitle>
       </span>
     )
   }
@@ -109,7 +110,9 @@ function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
       className={`text-sm text-secondary marquee-wrapper ${overflows ? 'marquee-animate' : ''} cursor-pointer`}
       onDoubleClick={onDoubleClick}
     >
-      <span className="marquee-text">{title}</span>
+      <span className="marquee-text">
+        <MarkdownTitle>{title}</MarkdownTitle>
+      </span>
     </span>
   )
 }
