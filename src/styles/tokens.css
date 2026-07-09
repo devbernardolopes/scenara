@@ -814,23 +814,16 @@ html,
 body,
 #root {
   height: 100%;
-  height: 100dvh; /* Dynamic viewport height (best for mobile) */
+  height: 100dvh;
+  height: var(--app-height, 100dvh);
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent body scroll */
+  overflow: hidden;
 }
 
 .flex.h-full {
-  /* Targets ShellLayout + ChatView */
-  height: 100dvh !important;
+  height: var(--app-height, 100dvh) !important;
 }
-
-/* Safe area padding for bottom controls */
-/* main,
-.chat-input-area,
-#root > div {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
-} */
 
 /* Make the scrollable messages area respect safe areas */
 .overflow-y-auto {
