@@ -429,6 +429,10 @@ function ChatView() {
     const container = scrollRef.current
     if (!container || messages.length === 0) return
 
+    if (messages[0].threadId !== undefined && messages[0].threadId !== Number(threadId)) {
+      return
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

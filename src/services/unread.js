@@ -32,7 +32,7 @@ export async function addUnread(threadId, messageId) {
 export async function markMessageRead(messageId, threadId) {
   await db.transaction('rw', db.messages, db.threads, async () => {
     const msg = await db.messages.get(Number(messageId))
-    if (!msg || !msg.isUnread) return
+    if (!msg || !msg.isUnread || msg.threadId !== Number(threadId)) return
     await db.messages.update(Number(messageId), { isUnread: false })
     const thread = await db.threads.get(Number(threadId))
     if (!thread) return
