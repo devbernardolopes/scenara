@@ -62,6 +62,26 @@ function parseBundleEntries(bundleMessages) {
   }
 }
 
+function rebuildFailedState(msgs) {
+  const failed = {}
+  const slots = {}
+  for (const msg of msgs || []) {
+    const entries = parseBundleEntries(msg.bundleMessages)
+    if (!entries) continue
+    let idx = 0
+    if (msg.content) {
+      const found = entries.findIndex((e) => e.content === msg.content)
+      if (found !== -1) idx = found
+    }
+    slots[msg.id] = idx
+    const entry = entries[idx]
+    if (entry && entry.isError) {
+      failed[msg.id] = { slotIndex: idx, error: entry.error || entry.content || null }
+    }
+  }
+  return { failed, slots }
+}
+
 function buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload) {
   const numMap = new Map(currentMsgs.map((m, i) => [m.id, i + 1]))
   const numbers = [null]
@@ -192,6 +212,10 @@ function ChatView() {
 
       setThread(thr)
       setMessages(msgs)
+
+      const { failed, slots } = rebuildFailedState(msgs)
+      setFailedRequests(failed)
+      setActiveSlotIndices(slots)
 
       const threshold = Number(await getSetting('defaultMessageThreshold')) || 0
       setMessageThreshold(threshold)
@@ -707,6 +731,17 @@ function ChatView() {
       })
 
       if (!content) {
+        const failedEntry = {
+          content: '',
+          promptData: null,
+          isError: true,
+          error: null,
+          createdAt: new Date().toISOString(),
+        }
+        await updateMessage(assistantMsgId, {
+          content: '',
+          bundleMessages: JSON.stringify([failedEntry]),
+        })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setFailedRequests((prev) => ({
             ...prev,
@@ -734,6 +769,17 @@ function ChatView() {
         }
         throw err
       } else {
+        const failedEntry = {
+          content: err.message || '',
+          promptData: null,
+          isError: true,
+          error: err.message || null,
+          createdAt: new Date().toISOString(),
+        }
+        await updateMessage(assistantMsgId, {
+          content: err.message || '',
+          bundleMessages: JSON.stringify([failedEntry]),
+        })
         const msgs = await getMessagesByThread(threadId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
@@ -1156,6 +1202,13 @@ function ChatView() {
       }).promise
 
       if (!content) {
+        const dbMsg = await db.messages.get(Number(messageId))
+        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
+        if (finalEntries[slotIndex]) {
+          finalEntries[slotIndex].isError = true
+          finalEntries[slotIndex].error = null
+        }
+        await updateMessage(messageId, { bundleMessages: JSON.stringify(finalEntries) })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setFailedRequests((prev) => ({ ...prev, [messageId]: { slotIndex, error: null } }))
         }
@@ -1167,6 +1220,8 @@ function ChatView() {
         if (finalEntries[slotIndex]) {
           finalEntries[slotIndex].content = content
           finalEntries[slotIndex].promptData = promptDataStr
+          finalEntries[slotIndex].isError = false
+          finalEntries[slotIndex].error = null
         }
         await updateMessage(messageId, {
           bundleMessages: JSON.stringify(finalEntries),
@@ -1209,6 +1264,17 @@ function ChatView() {
           }
         }
       } else {
+        const dbMsg = await db.messages.get(Number(messageId))
+        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
+        if (finalEntries[slotIndex]) {
+          finalEntries[slotIndex].isError = true
+          finalEntries[slotIndex].error = err.message || null
+          finalEntries[slotIndex].content = err.message || finalEntries[slotIndex].content || ''
+        }
+        await updateMessage(messageId, {
+          bundleMessages: JSON.stringify(finalEntries),
+          content: finalEntries[slotIndex]?.content ?? '',
+        })
         const msgs = await getMessagesByThread(threadId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
