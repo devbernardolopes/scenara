@@ -134,16 +134,16 @@ export const PROVIDERS = [
     supportsHordeMethods: true,
     trialKey: 'placeholder-horde-trial-key',
     params: [
-      // {
-      //   key: 'max_completion_tokens',
-      //   label: 'Max Tokens',
-      //   type: 'range',
-      //   min: 256,
-      //   max: 8192,
-      //   step: 128,
-      //   default: 1024,
-      //   deprecated: true,
-      // },
+      {
+        key: 'max_completion_tokens',
+        label: 'Max Tokens (not used in AI Horde)',
+        type: 'range',
+        min: 256,
+        max: 8192,
+        step: 128,
+        default: 1024,
+        deprecated: true,
+      },
       {
         key: 'max_tokens',
         label: 'Max Tokens',
