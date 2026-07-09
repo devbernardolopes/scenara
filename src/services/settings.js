@@ -519,8 +519,8 @@ export const SETTINGS = [
     type: 'text',
     default: 0,
     props: { type: 'number', min: 0 },
-    labelKey: 'settings:defaults.messageThreshold.label',
-    descKey: 'settings:defaults.messageThreshold.desc',
+    labelKey: 'settings:defaults.unloadMessagesThreshold.label',
+    descKey: 'settings:defaults.unloadMessagesThreshold.desc',
   },
   {
     key: 'defaultPostProcessing',

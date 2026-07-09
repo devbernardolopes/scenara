@@ -573,9 +573,9 @@
       "label": "Include OOC",
       "desc": "Default state for the include OOC toggle."
     },
-    "messageThreshold": {
-      "label": "Message Threshold",
-      "desc": "Maximum visible messages per chat. Older messages are hidden from view but kept. 0 = unlimited."
+    "unloadMessagesThreshold": {
+      "label": "Unload Messages Threshold",
+      "desc": "Maximum number of recent messages kept in the chat view. Older messages are unloaded from view but kept. 0 = unlimited."
     },
     "postProcessing": {
       "label": "Post-processing",

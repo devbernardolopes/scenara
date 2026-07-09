@@ -354,11 +354,7 @@ function ChatView() {
       if (e.detail?.key === 'defaultMessageThreshold') {
         const newThreshold = Number(e.detail.value) || 0
         setMessageThreshold(newThreshold)
-        setVisibleStartIndex((prev) => {
-          if (newThreshold === 0) return 0
-          const defaultStart = Math.max(0, messages.length - newThreshold)
-          return Math.min(prev, defaultStart)
-        })
+        setVisibleStartIndex(newThreshold > 0 ? Math.max(0, messages.length - newThreshold) : 0)
       }
     }
     window.addEventListener('settings-changed', onSettingsChanged)
