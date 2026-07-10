@@ -274,8 +274,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
     if (!promptHistoryOpen) return
     function handleClick(e) {
       const panel = promptPanelRef.current
-      const ta = textareaRef.current
-      if (panel && !panel.contains(e.target) && ta && !ta.contains(e.target)) {
+      if (panel && !panel.contains(e.target)) {
         setPromptHistoryOpen(false)
       }
     }
