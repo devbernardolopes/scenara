@@ -222,6 +222,7 @@ function MessageBubble({
     if (streaming) return true
     if (requestFailed) return key !== 'delete' && key !== 'regenerate'
     if (key === 'regenerate' && generating) return true
+    if (!message.content?.trim() && ['edit', 'copy', 'fork', 'speak'].includes(key)) return true
     return false
   }
   const unreadClass = isUnread ? 'ring-1 ring-primary/40' : ''
@@ -290,6 +291,11 @@ function MessageBubble({
 
   function handleSaveEdit() {
     if (editedContent !== message.content) {
+      if (!editedContent?.trim()) {
+        setEditing(false)
+        onDeleteRequest?.(message.id)
+        return
+      }
       onEdit?.(message.id, editedContent)
     }
     setEditing(false)
@@ -633,7 +639,9 @@ function MessageBubble({
 
         {/* Content */}
         <div
-          onDoubleClick={streaming || requestFailed ? undefined : handleStartEdit}
+          onDoubleClick={
+            streaming || requestFailed || !message.content?.trim() ? undefined : handleStartEdit
+          }
           className="px-3 py-2"
         >
           {editing ? (
