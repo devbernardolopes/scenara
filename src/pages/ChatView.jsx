@@ -66,7 +66,6 @@ function parseBundleEntries(bundleMessages) {
 }
 
 function rebuildFailedState(msgs) {
-  const failed = {}
   const slots = {}
   for (const msg of msgs || []) {
     const entries = parseBundleEntries(msg.bundleMessages)
@@ -77,12 +76,8 @@ function rebuildFailedState(msgs) {
       if (found !== -1) idx = found
     }
     slots[msg.id] = idx
-    const entry = entries[idx]
-    if (entry && entry.isError) {
-      failed[msg.id] = { slotIndex: idx, error: entry.error || entry.content || null }
-    }
   }
-  return { failed, slots }
+  return { slots }
 }
 
 function buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload) {
@@ -179,12 +174,6 @@ function ChatView() {
   const [visibleStartIndex, setVisibleStartIndex] = useState(0)
   const [messageThreshold, setMessageThreshold] = useState(0)
   const [activeSlotIndices, setActiveSlotIndices] = useState({})
-  const [failedRequests, setFailedRequests] = useState({})
-  const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
-  const [systemAvatar, setSystemAvatar] = useState('')
-  const [oocMessageRole, setOocMessageRole] = useState('system')
-  const [isTabVisible, setIsTabVisible] = useState(true)
-  const scrollHeightBeforeRef = useRef(null)
 
   async function loadPersonas() {
     const list = await getAllPersonas()
@@ -217,8 +206,7 @@ function ChatView() {
       setThread(thr)
       setMessages(msgs)
 
-      const { failed, slots } = rebuildFailedState(msgs)
-      setFailedRequests(failed)
+      const { slots } = rebuildFailedState(msgs)
       setActiveSlotIndices(slots)
 
       const threshold = Number(await getSetting('defaultMessageThreshold')) || 0
@@ -567,17 +555,17 @@ function ChatView() {
 
   useEffect(() => {
     const ids = new Set()
-    for (const [id, info] of Object.entries(failedRequests)) {
-      if (info && typeof info === 'object' && 'slotIndex' in info) {
-        const msgId = Number(id)
-        const currentSlot = activeSlotIndices[msgId]
-        if (currentSlot === info.slotIndex) {
-          ids.add(msgId)
-        }
+    for (const msg of messages) {
+      const entries = parseBundleEntries(msg.bundleMessages)
+      if (!entries) continue
+      const activeIdx = activeSlotIndices[msg.id]
+      if (activeIdx === undefined || activeIdx < 0 || activeIdx >= entries.length) continue
+      if (entries[activeIdx]?.isError) {
+        ids.add(msg.id)
       }
     }
     failedIdsRef.current = ids
-  }, [failedRequests, activeSlotIndices])
+  }, [messages, activeSlotIndices])
 
   async function handleCancel() {
     const confirmCancellation = await getSetting('cancellationConfirmation')
@@ -761,12 +749,6 @@ function ChatView() {
           content: '',
           bundleMessages: JSON.stringify([failedEntry]),
         })
-        if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          setFailedRequests((prev) => ({
-            ...prev,
-            [assistantMsgId]: { slotIndex: 0, error: null },
-          }))
-        }
         const newFailed = new Set(failedIdsRef.current)
         newFailed.add(assistantMsgId)
         failedIdsRef.current = newFailed
@@ -806,10 +788,6 @@ function ChatView() {
         const msgs = await getMessagesByThread(threadId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          setFailedRequests((prev) => ({
-            ...prev,
-            [assistantMsgId]: { slotIndex: 0, error: err.message },
-          }))
           showToast(err.message, { type: 'error' })
         }
         const newFailed = new Set(failedIdsRef.current)
@@ -1268,9 +1246,6 @@ function ChatView() {
           finalEntries[slotIndex].error = null
         }
         await updateMessage(messageId, { bundleMessages: JSON.stringify(finalEntries) })
-        if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          setFailedRequests((prev) => ({ ...prev, [messageId]: { slotIndex, error: null } }))
-        }
       }
 
       if (content) {
@@ -1303,11 +1278,6 @@ function ChatView() {
             ),
           )
           setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
-          setFailedRequests((prev) => {
-            const next = { ...prev }
-            delete next[messageId]
-            return next
-          })
           showToast(t('messageUpdated'), { type: 'success' })
         }
         completedNormally = true
@@ -1339,7 +1309,6 @@ function ChatView() {
         const msgs = await getMessagesByThread(threadId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          setFailedRequests((prev) => ({ ...prev, [messageId]: { slotIndex, error: err.message } }))
           showToast(err.message, { type: 'error' })
         }
         completedNormally = true
@@ -1593,9 +1562,11 @@ function ChatView() {
                     ? entries[bundleIndex].origin || null
                     : null
                 const slotCreatedAt = entries?.[bundleIndex]?.createdAt || msg.createdAt
-                const failedInfo = failedRequests[msg.id]
-                const isFailedSlot = failedInfo && failedInfo.slotIndex === bundleIndex
-                const errorText = isFailedSlot ? failedInfo.error || null : null
+                const bundleEntry = entries?.[bundleIndex]
+                const isFailedSlot = bundleEntry?.isError === true
+                const errorText = isFailedSlot
+                  ? bundleEntry.error || bundleEntry.content || ''
+                  : null
                 return (
                   <div
                     key={msg.id}
