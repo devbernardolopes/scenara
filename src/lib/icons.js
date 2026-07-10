@@ -37,6 +37,7 @@ export {
   FileText,
   Zap,
   BookOpen,
+  Brain,
   Tags,
   Database,
   Globe,
