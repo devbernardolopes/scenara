@@ -741,7 +741,40 @@
     "resetSettingsConfirmMessage": "All settings, with the exception of the already added API keys, will be reverted to the original system defaults. No characters, personas, threads, writing instructions, tags, or other data will be deleted. This action cannot be undone.",
     "resetSettingsSuccess": "Settings have been reset to their defaults",
     "exportNotImplemented": "Export is not yet implemented",
-    "importNotImplemented": "Import is not yet implemented"
+    "importNotImplemented": "Import is not yet implemented",
+    "exportModal": {
+      "title": "Export Database",
+      "characters": "Characters",
+      "personas": "Personas",
+      "threads": "Threads",
+      "writingInstructions": "Writing Instructions",
+      "inChatShortcuts": "In-Chat Shortcuts",
+      "connectionProfiles": "Connection Profiles",
+      "lorebooks": "Lorebooks",
+      "lorebooksDisabled": "Not yet implemented",
+      "tags": "Tags",
+      "tagsDescription": "All tags",
+      "settings": "Settings",
+      "settingsDescription": "All settings",
+      "selectUnselectAll": "Select / Unselect All",
+      "selectedCount": "{{count}} selected",
+      "noItems": "No items",
+      "cancel": "Cancel",
+      "export": "Export",
+      "exporting": "Exporting…",
+      "exported": "Exported.",
+      "close": "Close",
+      "notAvailable": "N/A"
+    },
+    "importModal": {
+      "title": "Import Database",
+      "importing": "Importing…",
+      "imported": "Imported.",
+      "invalidFile": "Invalid file.",
+      "failedImport": "Failed to import database.",
+      "restart": "Restart",
+      "close": "Close"
+    }
   },
   "inChatShortcut": {
     "title": "In-Chat Shortcuts",

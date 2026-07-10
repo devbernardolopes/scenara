@@ -30,6 +30,7 @@ export {
   Info,
   CheckCircle,
   AlertTriangle,
+  Loader,
   XCircle,
   Palette,
   CheckSquare,

@@ -1,22 +1,59 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useConfirm } from '../../../lib/confirm'
+import { useModal } from '../../../hooks/useModal'
 import { showToast } from '../../../lib/toast'
-import { resetDatabase, resetSettings } from '../../../services/database'
+import { resetDatabase, resetSettings, importDatabase } from '../../../services/database'
 import { Download, Upload, AlertTriangle, RefreshCw } from '../../../lib/icons'
 
 function DatabaseSettingsPanel() {
   const { confirm } = useConfirm()
+  const { openModal } = useModal()
   const { t } = useTranslation('settings')
   const [resetting, setResetting] = useState(false)
   const [resettingSettings, setResettingSettings] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
+  const fileInputRef = useRef(null)
 
   const handleExport = () => {
-    showToast(t('database.exportNotImplemented'), { type: 'info' })
+    openModal('exportDatabase', { modalSize: 'lg' })
   }
 
   const handleImport = () => {
-    showToast(t('database.importNotImplemented'), { type: 'info' })
+    fileInputRef.current?.click()
+  }
+
+  async function handleFileSelected(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+
+    setIsImporting(true)
+    openModal('progress', { status: 'importing', label: t('database.importModal.importing') })
+
+    try {
+      const text = await file.text()
+      let data
+      try {
+        data = JSON.parse(text)
+      } catch {
+        openModal('progress', {
+          status: 'error',
+          label: t('database.importModal.invalidFile'),
+        })
+        return
+      }
+
+      await importDatabase(data)
+      openModal('progress', { status: 'imported', label: t('database.importModal.imported') })
+    } catch (err) {
+      openModal('progress', {
+        status: 'error',
+        label: err.message || t('database.importModal.failedImport'),
+      })
+    } finally {
+      setIsImporting(false)
+    }
   }
 
   const handleReset = async () => {
@@ -94,6 +131,14 @@ function DatabaseSettingsPanel() {
         label={t('database.import')}
         desc={t('database.importDesc')}
         onClick={handleImport}
+        disabled={isImporting}
+      />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        onChange={handleFileSelected}
+        className="hidden"
       />
       <OptionCard
         icon={RefreshCw}
