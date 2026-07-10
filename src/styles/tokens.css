@@ -716,6 +716,12 @@
 .border-border-light {
   border-color: var(--color-border-light);
 }
+.bg-border {
+  background-color: var(--color-border);
+}
+.bg-border-light {
+  background-color: var(--color-border-light);
+}
 
 /* Overlay backdrop */
 .bg-overlay {
