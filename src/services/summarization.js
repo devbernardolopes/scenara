@@ -125,11 +125,6 @@ export async function buildSummarizationPayload({
     }),
   )
 
-  if (memoryText) {
-    const section = memoryHeader ? `${memoryHeader}\n\n${memoryText}` : memoryText
-    transcript = section + '\n\n' + transcript
-  }
-
   let systemContent = character?.summarizationSystemInstructions
   if (!systemContent) {
     systemContent = await getSetting('prompting.summarizationSystem')
@@ -143,19 +138,25 @@ export async function buildSummarizationPayload({
     userContent = await getSetting('prompting.summarizationUser')
   }
 
-  systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/g, transcript)
-
   const messagesHeader = (await getSetting('prompting.apiRequestSectionHeaders.messages')) || ''
-  const userTranscript = messagesHeader
+  const memorySection = memoryText
+    ? memoryHeader
+      ? `${memoryHeader}\n\n${memoryText}`
+      : memoryText
+    : ''
+  const transcriptSection = messagesHeader
     ? `${replaceVarsIn(messagesHeader)}\n\n${transcript}`
     : transcript
+  const fullContent = memorySection ? `${memorySection}\n\n${transcriptSection}` : transcriptSection
+
+  systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/g, fullContent)
 
   const payload = [{ role: 'system', content: systemContent }]
   if (userContent) {
-    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/g, userTranscript)
+    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/g, fullContent)
     payload.push({ role: 'user', content: userContent })
   } else {
-    payload.push({ role: 'user', content: userTranscript })
+    payload.push({ role: 'user', content: fullContent })
   }
 
   return payload
