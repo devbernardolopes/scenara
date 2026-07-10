@@ -33,17 +33,18 @@ const DEFAULT_QUICK_SETTINGS = {
 }
 const STORAGE_PREFIX = 'chatInput.'
 
-const CHAT_BUTTON_VIS_KEYS = [
-  'showChatOOC',
-  'showChatAttachFile',
-  'showChatShortcuts',
-  'showChatMemories',
-  'showChatSTT',
-  'showChatAutoTTS',
-  'showChatEnterToSend',
-  'showChatAutoReply',
-  'showChatAutoSend',
-]
+const CHAT_BUTTON_VIS_MAP = {
+  ooc: 'showChatOOC',
+  attachFile: 'showChatAttachFile',
+  shortcuts: 'showChatShortcuts',
+  memories: 'showChatMemories',
+  stt: 'showChatSTT',
+  autoTTS: 'showChatAutoTTS',
+  enterToSend: 'showChatEnterToSend',
+  autoReply: 'showChatAutoReply',
+  autoSend: 'showChatAutoSend',
+}
+const CHAT_BUTTON_VIS_KEYS = Object.values(CHAT_BUTTON_VIS_MAP)
 const CHAT_BUTTON_ORDER_KEY = 'chatButtonOrder'
 const DEFAULT_CHAT_BUTTON_ORDER = [
   'ooc',
@@ -289,7 +290,8 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
     const order = chatOrder || DEFAULT_CHAT_BUTTON_ORDER
     const keys = []
     for (const key of order) {
-      const visKey = 'showChat' + key.charAt(0).toUpperCase() + key.slice(1)
+      const visKey = CHAT_BUTTON_VIS_MAP[key]
+      if (!visKey) continue
       if (!visibility[visKey]) continue
       if (!CHAT_BUTTON_DEFS[key]) continue
       keys.push(key)
