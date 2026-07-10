@@ -142,6 +142,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
   const [totalPermTokens, setTotalPermTokens] = useState(0)
   const [defaultPersonaName, setDefaultPersonaName] = useState('')
   const [overrideDefaults, setOverrideDefaults] = useState(null)
+  const [wiRevision, setWiRevision] = useState(0)
 
   useEffect(() => {
     getSetting('defaultPersonaId').then((id) => {
@@ -161,6 +162,12 @@ function CharacterCreateModal({ character: existing, initialData }) {
       })
       setOverrideDefaults(defaults)
     })
+  }, [])
+
+  useEffect(() => {
+    const handler = () => setWiRevision((c) => c + 1)
+    window.addEventListener('writingInstructions-changed', handler)
+    return () => window.removeEventListener('writingInstructions-changed', handler)
   }, [])
 
   useEffect(() => {
@@ -201,6 +208,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
     form.personaInjectionTiming,
     form.name,
     defaultPersonaName,
+    wiRevision,
   ])
 
   useEffect(() => {
