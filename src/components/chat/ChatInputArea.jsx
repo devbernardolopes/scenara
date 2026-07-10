@@ -660,7 +660,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                           ? '!text-primary !bg-primary-subtle shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]'
                           : ''
                         : isToggleable && isToggled
-                          ? '!text-on-primary !bg-primary hover:!bg-primary-hover shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]'
+                          ? '!text-on-primary !bg-primary hover:!bg-primary-hover ring-1 ring-primary-hover shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)]'
                           : ''
                   return (
                     <button
@@ -729,7 +729,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                               }}
                               className={`w-full flex items-center justify-between px-3 py-2 text-sm min-h-[44px] ${
                                 isToggleable && isToggled
-                                  ? 'bg-primary-subtle text-primary'
+                                  ? '!bg-primary !text-on-primary hover:!bg-primary-hover'
                                   : 'text-text hover:bg-surface-hover'
                               }`}
                             >
