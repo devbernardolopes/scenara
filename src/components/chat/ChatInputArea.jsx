@@ -547,8 +547,8 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
         {/* Bottom bar */}
         <div className="flex flex-nowrap items-center gap-1.5 mt-2">
           {/* Left button group (overflow-aware) */}
-          <div className="flex items-center gap-0.5 bg-surface-secondary rounded-lg px-1 py-0.5 flex-shrink-0">
-            <div ref={headerBtnRef} className="flex items-center gap-0.5 overflow-hidden">
+          <div className="flex items-center gap-0.5 bg-surface-secondary rounded-lg px-1 py-0.5 min-w-0">
+            <div ref={headerBtnRef} className="flex items-center gap-0.5 overflow-hidden min-w-0">
               {headerKeys.map((key) => {
                 const def = CHAT_BUTTON_DEFS[key]
                 if (!def) return null
