@@ -14,7 +14,8 @@
   "groups": {
     "assistantButtons": "Assistant/System Message Bubbles Buttons",
     "userButtons": "User Message Bubbles Buttons",
-    "apiRequestSectionHeaders": "API Request Section Headers"
+    "apiRequestSectionHeaders": "API Request Section Headers",
+    "chatButtons": "User Chat Buttons"
   },
   "appearance": {
     "theme": {
@@ -91,6 +92,46 @@
     "userButtonOrder": {
       "label": "User button order",
       "desc": "Arrange buttons shown on user message bubbles using the arrow buttons."
+    },
+    "showChatOOC": {
+      "label": "Chat – OOC Mode",
+      "desc": "Show the OOC (out-of-character) mode toggle button in the chat input area."
+    },
+    "showChatAttachFile": {
+      "label": "Chat – Attach File",
+      "desc": "Show the attach file button in the chat input area."
+    },
+    "showChatShortcuts": {
+      "label": "Chat – In-Chat Shortcuts",
+      "desc": "Show the in-chat shortcuts toggle button in the chat input area."
+    },
+    "showChatMemories": {
+      "label": "Chat – Saved Memories",
+      "desc": "Show the saved memories button in the chat input area."
+    },
+    "showChatSTT": {
+      "label": "Chat – Speech-to-Text",
+      "desc": "Show the speech-to-text toggle button in the chat input area."
+    },
+    "showChatAutoTTS": {
+      "label": "Chat – Auto TTS",
+      "desc": "Show the auto TTS toggle button in the chat input area."
+    },
+    "showChatEnterToSend": {
+      "label": "Chat – ENTER to Send",
+      "desc": "Show the ENTER to send toggle button in the chat input area."
+    },
+    "showChatAutoReply": {
+      "label": "Chat – Auto-Reply",
+      "desc": "Show the auto-reply toggle button in the chat input area."
+    },
+    "showChatAutoSend": {
+      "label": "Chat – Auto-Send",
+      "desc": "Show the auto-send toggle button in the chat input area."
+    },
+    "chatButtonOrder": {
+      "label": "User Chat Button Order",
+      "desc": "Arrange the user chat buttons shown in the chat input area using the arrow buttons."
     },
     "unreadBadges": {
       "label": "Ungelesene Nachrichten-Anzeige",

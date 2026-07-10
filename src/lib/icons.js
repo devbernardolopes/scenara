@@ -50,4 +50,8 @@ export {
   GitBranch,
   Play,
   Terminal,
+  Volume2,
+  CornerDownLeft,
+  Reply,
+  Forward,
 } from 'lucide-react'

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Send,
@@ -11,17 +11,20 @@ import {
   MoreHorizontal,
   ChevronDown,
   Check,
+  Volume2,
+  CornerDownLeft,
+  Reply,
+  Forward,
 } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 import PersonaPicker from '../shared/PersonaPicker'
-import IconButton from '../shared/IconButton'
 import { getPersona, getAllPersonas } from '../../services/personas'
 import { getThread } from '../../services/threads'
 import { getUIState, setUIState } from '../../services/uiState'
 import { useModal } from '../../hooks/useModal'
+import { getSetting } from '../../services/settings'
 import db from '../../db'
 
-const QUICK_SETTING_KEYS = ['autoTTS', 'enterToSend', 'autoReply', 'autoSend']
 const DEFAULT_QUICK_SETTINGS = {
   autoTTS: false,
   enterToSend: true,
@@ -30,13 +33,56 @@ const DEFAULT_QUICK_SETTINGS = {
 }
 const STORAGE_PREFIX = 'chatInput.'
 
+const CHAT_BUTTON_VIS_KEYS = [
+  'showChatOOC',
+  'showChatAttachFile',
+  'showChatShortcuts',
+  'showChatMemories',
+  'showChatSTT',
+  'showChatAutoTTS',
+  'showChatEnterToSend',
+  'showChatAutoReply',
+  'showChatAutoSend',
+]
+const CHAT_BUTTON_ORDER_KEY = 'chatButtonOrder'
+const DEFAULT_CHAT_BUTTON_ORDER = [
+  'ooc',
+  'attachFile',
+  'shortcuts',
+  'memories',
+  'stt',
+  'autoTTS',
+  'enterToSend',
+  'autoReply',
+  'autoSend',
+]
+const TOGGLEABLE_CHAT_BUTTONS = new Set([
+  'ooc',
+  'shortcuts',
+  'autoTTS',
+  'enterToSend',
+  'autoReply',
+  'autoSend',
+])
+
+const CHAT_BUTTON_DEFS = {
+  ooc: { icon: MessageSquare, labelKey: 'ooc' },
+  attachFile: { icon: Paperclip, labelKey: 'attachFile' },
+  shortcuts: { icon: Zap, labelKey: 'shortcuts' },
+  memories: { icon: BookOpen, labelKey: 'memories' },
+  stt: { icon: Mic, labelKey: 'stt' },
+  autoTTS: { icon: Volume2, labelKey: 'quickSettings.autoTTS' },
+  enterToSend: { icon: CornerDownLeft, labelKey: 'quickSettings.enterToSend' },
+  autoReply: { icon: Reply, labelKey: 'quickSettings.autoReply' },
+  autoSend: { icon: Forward, labelKey: 'quickSettings.autoSend' },
+}
+
 function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, hasQueued }) {
   const { t } = useTranslation('chat')
-  const { openModal, activeModal } = useModal()
+  const { openModal } = useModal()
   const textareaRef = useRef(null)
   const promptPanelRef = useRef(null)
   const quickPanelRef = useRef(null)
-  const ellipsisRef = useRef(null)
   const saveTimerRef = useRef(null)
   const initializedRef = useRef(false)
   const latestRef = useRef({
@@ -52,12 +98,24 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
   const [sttActive, setSttActive] = useState(false)
   const [selectedPersona, setSelectedPersona] = useState(null)
   const [personaPickerOpen, setPersonaPickerOpen] = useState(false)
-  const [quickSettingsOpen, setQuickSettingsOpen] = useState(false)
   const [quickSettings, setQuickSettings] = useState(DEFAULT_QUICK_SETTINGS)
   const [promptHistoryOpen, setPromptHistoryOpen] = useState(false)
   const [promptHistory, setPromptHistory] = useState([])
   const [personaColorMap, setPersonaColorMap] = useState({})
   const [ready, setReady] = useState(false)
+
+  const [visibility, setVisibility] = useState(
+    Object.fromEntries(CHAT_BUTTON_VIS_KEYS.map((k) => [k, true])),
+  )
+  const [chatOrder, setChatOrder] = useState(null)
+  const [shortcutsActive, setShortcutsActive] = useState(false)
+  const [overflowOpen, setOverflowOpen] = useState(false)
+  const [headerCount, setHeaderCount] = useState(0)
+  const [overflowMenuStyle, setOverflowMenuStyle] = useState(null)
+  const headerBtnRef = useRef(null)
+  const overflowBtnRef = useRef(null)
+  const allBtnKeyRef = useRef([])
+  const prevKeyStrRef = useRef('')
 
   const storageKey = `${STORAGE_PREFIX}${threadId}`
 
@@ -186,35 +244,128 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
   }, [])
 
   useEffect(() => {
-    if (!promptHistoryOpen && !quickSettingsOpen) return
+    if (!promptHistoryOpen) return
     function handleClick(e) {
-      if (promptHistoryOpen) {
-        const panel = promptPanelRef.current
-        const ta = textareaRef.current
-        if (panel && !panel.contains(e.target) && ta && !ta.contains(e.target)) {
-          setPromptHistoryOpen(false)
+      const panel = promptPanelRef.current
+      const ta = textareaRef.current
+      if (panel && !panel.contains(e.target) && ta && !ta.contains(e.target)) {
+        setPromptHistoryOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [promptHistoryOpen])
+
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      const entries = await Promise.all(
+        CHAT_BUTTON_VIS_KEYS.map(async (k) => [k, await getSetting(k)]),
+      )
+      const vis = Object.fromEntries(entries)
+      const ord = await getSetting(CHAT_BUTTON_ORDER_KEY)
+      if (!cancelled) {
+        setVisibility(vis)
+        setChatOrder(ord || DEFAULT_CHAT_BUTTON_ORDER)
+      }
+    }
+    load()
+    function handleChange(e) {
+      const { key, value } = e.detail
+      if (CHAT_BUTTON_VIS_KEYS.includes(key)) {
+        setVisibility((prev) => ({ ...prev, [key]: value }))
+      } else if (key === CHAT_BUTTON_ORDER_KEY) {
+        setChatOrder(value || DEFAULT_CHAT_BUTTON_ORDER)
+      }
+    }
+    window.addEventListener('settings-changed', handleChange)
+    return () => {
+      cancelled = true
+      window.removeEventListener('settings-changed', handleChange)
+    }
+  }, [])
+
+  const allButtonKeys = useMemo(() => {
+    const order = chatOrder || DEFAULT_CHAT_BUTTON_ORDER
+    const keys = []
+    for (const key of order) {
+      const visKey = 'showChat' + key.charAt(0).toUpperCase() + key.slice(1)
+      if (!visibility[visKey]) continue
+      if (!CHAT_BUTTON_DEFS[key]) continue
+      keys.push(key)
+    }
+    return keys
+  }, [chatOrder, visibility])
+
+  useEffect(() => {
+    allBtnKeyRef.current = allButtonKeys
+  }, [allButtonKeys])
+
+  useEffect(() => {
+    const keyStr = allButtonKeys.join(',')
+    if (keyStr !== prevKeyStrRef.current) {
+      prevKeyStrRef.current = keyStr
+      setHeaderCount(allButtonKeys.length)
+    }
+  }, [allButtonKeys])
+
+  useEffect(() => {
+    const el = headerBtnRef.current
+    if (!el || allButtonKeys.length <= 1) return
+
+    function adjust() {
+      const total = allBtnKeyRef.current.length
+
+      if (el.scrollWidth > el.clientWidth) {
+        if (headerCount > 1) {
+          setHeaderCount((n) => Math.max(1, n - 1))
+        }
+      } else if (headerCount < total) {
+        const free = el.clientWidth - el.scrollWidth
+        if (free >= 44) {
+          setHeaderCount((n) => Math.min(total, n + 1))
         }
       }
-      if (quickSettingsOpen) {
+    }
+
+    const raf = requestAnimationFrame(adjust)
+    const ro = new ResizeObserver(() => requestAnimationFrame(adjust))
+    ro.observe(el)
+    return () => {
+      cancelAnimationFrame(raf)
+      ro.disconnect()
+    }
+  }, [allButtonKeys, headerCount])
+
+  const headerKeys = allButtonKeys.slice(0, headerCount)
+  const overflowKeys = allButtonKeys.slice(headerKeys.length)
+
+  useEffect(() => {
+    if (!overflowOpen) return
+    function handleClick(e) {
+      if (overflowBtnRef.current && !overflowBtnRef.current.contains(e.target)) {
         const panel = quickPanelRef.current
-        const btn = ellipsisRef.current
-        if (panel && !panel.contains(e.target) && btn && !btn.contains(e.target)) {
-          setQuickSettingsOpen(false)
+        if (panel && !panel.contains(e.target)) {
+          setOverflowOpen(false)
+          setOverflowMenuStyle(null)
         }
       }
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
-  }, [promptHistoryOpen, quickSettingsOpen])
+  }, [overflowOpen])
 
   useEffect(() => {
-    if (!quickSettingsOpen) return
+    if (!overflowOpen) return
     function handleKey(e) {
-      if (e.key === 'Escape') setQuickSettingsOpen(false)
+      if (e.key === 'Escape') {
+        setOverflowOpen(false)
+        setOverflowMenuStyle(null)
+      }
     }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
-  }, [quickSettingsOpen])
+  }, [overflowOpen])
 
   const autoResize = useCallback((el) => {
     el.style.height = 'auto'
@@ -351,108 +502,151 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
 
         {/* Bottom bar */}
         <div className="flex flex-nowrap items-center gap-1.5 mt-2">
-          {/* Left button group */}
+          {/* Left button group (overflow-aware) */}
           <div className="flex items-center gap-0.5 bg-surface-secondary rounded-lg px-1 py-0.5 flex-shrink-0">
-            <IconButton
-              icon={MessageSquare}
-              label={t('ooc')}
-              onClick={() => setOocActive((prev) => !prev)}
-              className={
-                oocActive
-                  ? '!text-ooc !bg-ooc hover:!bg-ooc-hover ring-2 ring-ooc-border shadow-[inset_0_2px_4px_rgba(0,0,0,0.35)]'
-                  : ''
-              }
-            />
-            <IconButton icon={Paperclip} label={t('attachFile')} className="hidden sm:flex" />
-            <IconButton icon={Zap} label={t('shortcuts')} className="hidden md:flex" />
-            <IconButton
-              icon={BookOpen}
-              label={t('memories')}
-              className="hidden md:flex"
-              onClick={() => openModal('memory', { threadId })}
-            />
-            <IconButton
-              icon={Mic}
-              label={t('stt')}
-              onClick={() => setSttActive((prev) => !prev)}
-              className={`hidden sm:flex ${sttActive ? '!text-primary !bg-primary-subtle' : ''}`}
-            />
-          </div>
-
-          {/* Ellipsis quick settings */}
-          <div ref={ellipsisRef} className="relative flex-shrink-0">
-            <IconButton
-              icon={MoreHorizontal}
-              label={t('moreOptions')}
-              onClick={() => setQuickSettingsOpen((prev) => !prev)}
-            />
-            {quickSettingsOpen && (
-              <div
-                ref={quickPanelRef}
-                className="absolute bottom-full left-0 mb-1 w-52 bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1"
-              >
-                <p className="px-3 py-1.5 text-xs font-medium text-tertiary uppercase tracking-wider">
-                  {t('moreOptions')}
-                </p>
-                {QUICK_SETTING_KEYS.map((key) => (
+            <div ref={headerBtnRef} className="flex items-center gap-0.5 overflow-hidden">
+              {headerKeys.map((key) => {
+                const def = CHAT_BUTTON_DEFS[key]
+                if (!def) return null
+                const Icon = def.icon
+                const isToggleable = TOGGLEABLE_CHAT_BUTTONS.has(key)
+                const isToggled =
+                  key === 'ooc'
+                    ? oocActive
+                    : key === 'shortcuts'
+                      ? shortcutsActive
+                      : key === 'stt'
+                        ? sttActive
+                        : key === 'autoTTS'
+                          ? quickSettings.autoTTS
+                          : key === 'enterToSend'
+                            ? quickSettings.enterToSend
+                            : key === 'autoReply'
+                              ? quickSettings.autoReply
+                              : key === 'autoSend'
+                                ? quickSettings.autoSend
+                                : false
+                const btnClass =
+                  key === 'ooc'
+                    ? isToggled
+                      ? '!text-ooc !bg-ooc hover:!bg-ooc-hover ring-2 ring-ooc-border shadow-[inset_0_2px_4px_rgba(0,0,0,0.35)]'
+                      : ''
+                    : key === 'stt'
+                      ? isToggled
+                        ? '!text-primary !bg-primary-subtle'
+                        : ''
+                      : isToggleable && isToggled
+                        ? '!text-primary !bg-primary-subtle'
+                        : ''
+                return (
                   <button
                     key={key}
                     type="button"
-                    onClick={() => setQuickSettings((prev) => ({ ...prev, [key]: !prev[key] }))}
-                    className="w-full flex items-center justify-between px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
+                    onClick={() => {
+                      if (key === 'ooc') setOocActive((prev) => !prev)
+                      else if (key === 'shortcuts') setShortcutsActive((prev) => !prev)
+                      else if (key === 'memories') openModal('memory', { threadId })
+                      else if (key === 'stt') setSttActive((prev) => !prev)
+                      else if (['autoTTS', 'enterToSend', 'autoReply', 'autoSend'].includes(key))
+                        setQuickSettings((prev) => ({ ...prev, [key]: !prev[key] }))
+                    }}
+                    className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md shrink-0 text-secondary hover:text-text hover:bg-surface-hover ${btnClass}`}
+                    title={t(def.labelKey)}
                   >
-                    <span>{t(`quickSettings.${key}`)}</span>
-                    <div
-                      className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
-                        quickSettings[key]
-                          ? 'bg-primary text-on-primary'
-                          : 'bg-surface-secondary border border-border'
-                      }`}
-                    >
-                      {quickSettings[key] && <Check className="w-3 h-3" />}
-                    </div>
+                    <Icon className="w-4 h-4" />
                   </button>
-                ))}
-                <hr className="border-border mx-2 my-1" />
+                )
+              })}
+            </div>
+            {overflowKeys.length > 0 && (
+              <div className="relative flex-shrink-0">
                 <button
+                  ref={overflowBtnRef}
                   type="button"
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] sm:hidden"
-                  onClick={() => setQuickSettingsOpen(false)}
-                >
-                  <Paperclip className="w-4 h-4" />
-                  <span>{t('attachFile')}</span>
-                </button>
-                <button
-                  type="button"
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] md:hidden"
-                  onClick={() => setQuickSettingsOpen(false)}
-                >
-                  <Zap className="w-4 h-4" />
-                  <span>{t('shortcuts')}</span>
-                </button>
-                <button
-                  type="button"
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px] md:hidden"
-                  onClick={() => openModal('memory', { threadId })}
-                >
-                  <BookOpen className="w-4 h-4" />
-                  <span>{t('memories')}</span>
-                </button>
-                <button
-                  type="button"
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm min-h-[44px] sm:hidden ${
-                    sttActive
-                      ? 'text-primary hover:bg-primary-subtle'
-                      : 'text-text hover:bg-surface-hover'
-                  }`}
                   onClick={() => {
-                    setSttActive((prev) => !prev)
-                    setQuickSettingsOpen(false)
+                    if (overflowBtnRef.current) {
+                      const rect = overflowBtnRef.current.getBoundingClientRect()
+                      setOverflowMenuStyle({
+                        position: 'fixed',
+                        top: rect.top - 4,
+                        right: window.innerWidth - rect.right,
+                        zIndex: 9999,
+                      })
+                    }
+                    setOverflowOpen((prev) => !prev)
                   }}
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-secondary hover:text-text hover:bg-surface-hover"
+                  title={t('moreOptions')}
                 >
-                  <Mic className="w-4 h-4" />
-                  <span>{t('stt')}</span>
+                  <MoreHorizontal className="w-4 h-4" />
                 </button>
+                {overflowOpen && (
+                  <div
+                    ref={quickPanelRef}
+                    style={overflowMenuStyle}
+                    className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
+                  >
+                    <p className="px-3 py-1.5 text-xs font-medium text-tertiary uppercase tracking-wider">
+                      {t('moreOptions')}
+                    </p>
+                    {overflowKeys.map((key) => {
+                      const def = CHAT_BUTTON_DEFS[key]
+                      if (!def) return null
+                      const Icon = def.icon
+                      const isToggleable = TOGGLEABLE_CHAT_BUTTONS.has(key)
+                      const isToggled =
+                        key === 'ooc'
+                          ? oocActive
+                          : key === 'shortcuts'
+                            ? shortcutsActive
+                            : key === 'stt'
+                              ? sttActive
+                              : key === 'autoTTS'
+                                ? quickSettings.autoTTS
+                                : key === 'enterToSend'
+                                  ? quickSettings.enterToSend
+                                  : key === 'autoReply'
+                                    ? quickSettings.autoReply
+                                    : key === 'autoSend'
+                                      ? quickSettings.autoSend
+                                      : false
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => {
+                            if (key === 'ooc') setOocActive((prev) => !prev)
+                            else if (key === 'shortcuts') setShortcutsActive((prev) => !prev)
+                            else if (key === 'memories') openModal('memory', { threadId })
+                            else if (key === 'stt') setSttActive((prev) => !prev)
+                            else if (
+                              ['autoTTS', 'enterToSend', 'autoReply', 'autoSend'].includes(key)
+                            )
+                              setQuickSettings((prev) => ({ ...prev, [key]: !prev[key] }))
+                            setOverflowOpen(false)
+                          }}
+                          className="w-full flex items-center justify-between px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
+                        >
+                          <span className="flex items-center gap-2">
+                            <Icon className="w-4 h-4" />
+                            <span>{t(def.labelKey)}</span>
+                          </span>
+                          {isToggleable && (
+                            <div
+                              className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
+                                isToggled
+                                  ? 'bg-primary text-on-primary'
+                                  : 'bg-surface-secondary border border-border'
+                              }`}
+                            >
+                              {isToggled && <Check className="w-3 h-3" />}
+                            </div>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>
