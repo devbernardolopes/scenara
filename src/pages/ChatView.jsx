@@ -157,6 +157,7 @@ function ChatView() {
   const scrollStickyCleanupRef = useRef(null)
   const prevMessagesLengthRef = useRef(0)
   const messagesGrewRef = useRef(false)
+  const messagesRef = useRef(messages)
   const bundleSlotRef = useRef({})
   const failedIdsRef = useRef(new Set())
   const [thread, setThread] = useState(null)
@@ -375,16 +376,22 @@ function ChatView() {
   }, [messages])
 
   useEffect(() => {
+    messagesRef.current = messages
+  }, [messages])
+
+  useEffect(() => {
     function onSettingsChanged(e) {
       if (e.detail?.key === 'defaultMessageThreshold') {
         const newThreshold = Number(e.detail.value) || 0
         setMessageThreshold(newThreshold)
-        setVisibleStartIndex(newThreshold > 0 ? Math.max(0, messages.length - newThreshold) : 0)
+        setVisibleStartIndex(
+          newThreshold > 0 ? Math.max(0, messagesRef.current.length - newThreshold) : 0,
+        )
       }
     }
     window.addEventListener('settings-changed', onSettingsChanged)
     return () => window.removeEventListener('settings-changed', onSettingsChanged)
-  }, [messages.length])
+  }, [])
 
   useEffect(() => {
     getSetting('chatTitleMarquee').then((val) => {
