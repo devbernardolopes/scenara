@@ -175,6 +175,10 @@ function ChatView() {
   const [messageThreshold, setMessageThreshold] = useState(0)
   const [activeSlotIndices, setActiveSlotIndices] = useState({})
   const [isTabVisible, setIsTabVisible] = useState(true)
+  const [systemAvatar, setSystemAvatar] = useState('')
+  const [oocMessageRole, setOocMessageRole] = useState('system')
+  const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
+  const scrollHeightBeforeRef = useRef(null)
 
   async function loadPersonas() {
     const list = await getAllPersonas()
