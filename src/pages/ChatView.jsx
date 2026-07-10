@@ -157,7 +157,7 @@ function ChatView() {
   const scrollStickyCleanupRef = useRef(null)
   const prevMessagesLengthRef = useRef(0)
   const messagesGrewRef = useRef(false)
-  const messagesRef = useRef(messages)
+  const messagesRef = useRef(null)
   const bundleSlotRef = useRef({})
   const failedIdsRef = useRef(new Set())
   const [thread, setThread] = useState(null)
