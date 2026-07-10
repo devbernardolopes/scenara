@@ -852,10 +852,10 @@ body,
   overscroll-behavior-y: contain;
 }
 
-.chat-container, /* or your main chat wrapper */
+/* .chat-container,
 main {
-  padding-bottom: env(safe-area-inset-bottom); /* iOS notch/home indicator */
-}
+  padding-bottom: env(safe-area-inset-bottom);
+} */
 
 /* Toast animations */
 @keyframes toast-enter-top {
