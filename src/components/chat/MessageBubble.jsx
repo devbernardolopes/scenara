@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSwipe } from '../../hooks/useSwipe'
 import { useIsMobile } from '../../hooks/useIsMobile'
+import { useOverflowButtons } from '../../hooks/useOverflowButtons'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
 import { getContrastColor, isLightColor } from '../../lib/color'
@@ -400,53 +401,7 @@ function MessageBubble({
     return keys
   }, [buttonOrder, visibility, visMap])
 
-  const [headerCount, setHeaderCount] = useState(allButtonKeys.length)
-  const headerBtnRef = useRef(null)
-  const allBtnKeyRef = useRef(allButtonKeys)
-  const prevKeyStrRef = useRef('')
-
-  useEffect(() => {
-    allBtnKeyRef.current = allButtonKeys
-  }, [allButtonKeys])
-
-  useEffect(() => {
-    const keyStr = allButtonKeys.join(',')
-    if (keyStr !== prevKeyStrRef.current) {
-      prevKeyStrRef.current = keyStr
-      setHeaderCount(allButtonKeys.length)
-    }
-  }, [allButtonKeys])
-
-  useEffect(() => {
-    const el = headerBtnRef.current
-    if (!el || allButtonKeys.length <= 1) return
-
-    function adjust() {
-      const total = allBtnKeyRef.current.length
-
-      if (el.scrollWidth > el.clientWidth) {
-        if (headerCount > 1) {
-          setHeaderCount((n) => Math.max(1, n - 1))
-        }
-      } else if (headerCount < total) {
-        const free = el.clientWidth - el.scrollWidth
-        if (free >= 44) {
-          setHeaderCount((n) => Math.min(total, n + 1))
-        }
-      }
-    }
-
-    const raf = requestAnimationFrame(adjust)
-    const ro = new ResizeObserver(() => requestAnimationFrame(adjust))
-    ro.observe(el)
-    return () => {
-      cancelAnimationFrame(raf)
-      ro.disconnect()
-    }
-  }, [allButtonKeys, headerCount])
-
-  const headerKeys = allButtonKeys.slice(0, headerCount)
-  const overflowKeys = allButtonKeys.slice(headerKeys.length)
+  const { headerBtnRef, headerKeys, overflowKeys } = useOverflowButtons(allButtonKeys)
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>

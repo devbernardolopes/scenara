@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useOverflowButtons } from '../../hooks/useOverflowButtons'
 import { useTranslation } from 'react-i18next'
 import {
   Send,
@@ -137,12 +138,8 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
   const [shortcutsActive, setShortcutsActive] = useState(false)
   const [shortcutsSet, setShortcutsSet] = useState(null)
   const [overflowOpen, setOverflowOpen] = useState(false)
-  const [headerCount, setHeaderCount] = useState(0)
   const [overflowMenuStyle, setOverflowMenuStyle] = useState(null)
-  const headerBtnRef = useRef(null)
   const overflowBtnRef = useRef(null)
-  const allBtnKeyRef = useRef([])
-  const prevKeyStrRef = useRef('')
 
   const storageKey = `${STORAGE_PREFIX}${threadId}`
 
@@ -346,49 +343,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
     return keys
   }, [chatOrder, visibility])
 
-  useEffect(() => {
-    allBtnKeyRef.current = allButtonKeys
-  }, [allButtonKeys])
-
-  useEffect(() => {
-    const keyStr = allButtonKeys.join(',')
-    if (keyStr !== prevKeyStrRef.current) {
-      prevKeyStrRef.current = keyStr
-      setHeaderCount(allButtonKeys.length)
-    }
-  }, [allButtonKeys])
-
-  useEffect(() => {
-    const el = headerBtnRef.current
-    if (!el || allButtonKeys.length <= 1) return
-
-    function adjust() {
-      const total = allBtnKeyRef.current.length
-
-      if (el.scrollWidth > el.clientWidth) {
-        if (headerCount > 1) {
-          setHeaderCount((n) => Math.max(1, n - 1))
-        }
-      } else if (headerCount < total) {
-        const free = el.clientWidth - el.scrollWidth
-        const canFit = Math.floor(free / 46)
-        if (canFit > 0) {
-          setHeaderCount((n) => Math.min(total, n + canFit))
-        }
-      }
-    }
-
-    const raf = requestAnimationFrame(adjust)
-    const ro = new ResizeObserver(() => requestAnimationFrame(adjust))
-    ro.observe(el)
-    return () => {
-      cancelAnimationFrame(raf)
-      ro.disconnect()
-    }
-  }, [allButtonKeys, headerCount])
-
-  const headerKeys = allButtonKeys.slice(0, headerCount)
-  const overflowKeys = allButtonKeys.slice(headerKeys.length)
+  const { headerBtnRef, headerKeys, overflowKeys } = useOverflowButtons(allButtonKeys)
 
   useEffect(() => {
     if (!overflowOpen) return
