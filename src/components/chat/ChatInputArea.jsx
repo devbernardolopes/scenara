@@ -414,6 +414,48 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
     }
   }
 
+  const getToggleState = useCallback(
+    (key) => {
+      switch (key) {
+        case 'ooc':
+          return oocActive
+        case 'shortcuts':
+          return shortcutsActive
+        case 'stt':
+          return sttActive
+        case 'autoTTS':
+          return quickSettings.autoTTS
+        case 'enterToSend':
+          return quickSettings.enterToSend
+        case 'autoReply':
+          return quickSettings.autoReply
+        case 'autoSend':
+          return quickSettings.autoSend
+        default:
+          return false
+      }
+    },
+    [oocActive, shortcutsActive, sttActive, quickSettings],
+  )
+
+  const toggleButton = useCallback((key) => {
+    switch (key) {
+      case 'ooc':
+        setOocActive((prev) => !prev)
+        break
+      case 'shortcuts':
+        setShortcutsActive((prev) => !prev)
+        break
+      case 'stt':
+        setSttActive((prev) => !prev)
+        break
+      default:
+        if (TOGGLEABLE_CHAT_BUTTONS.has(key)) {
+          setQuickSettings((prev) => ({ ...prev, [key]: !prev[key] }))
+        }
+    }
+  }, [])
+
   return (
     <div className="border-t border-border p-4">
       <div className="relative max-w-4xl mx-auto">
@@ -512,22 +554,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                 if (!def) return null
                 const Icon = def.icon
                 const isToggleable = TOGGLEABLE_CHAT_BUTTONS.has(key)
-                const isToggled =
-                  key === 'ooc'
-                    ? oocActive
-                    : key === 'shortcuts'
-                      ? shortcutsActive
-                      : key === 'stt'
-                        ? sttActive
-                        : key === 'autoTTS'
-                          ? quickSettings.autoTTS
-                          : key === 'enterToSend'
-                            ? quickSettings.enterToSend
-                            : key === 'autoReply'
-                              ? quickSettings.autoReply
-                              : key === 'autoSend'
-                                ? quickSettings.autoSend
-                                : false
+                const isToggled = getToggleState(key)
                 const btnClass =
                   key === 'ooc'
                     ? isToggled
@@ -535,22 +562,18 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                       : ''
                     : key === 'stt'
                       ? isToggled
-                        ? '!text-primary !bg-primary-subtle'
+                        ? '!text-primary !bg-primary-subtle shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]'
                         : ''
                       : isToggleable && isToggled
-                        ? '!text-primary !bg-primary-subtle'
+                        ? '!text-primary !bg-primary-subtle shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]'
                         : ''
                 return (
                   <button
                     key={key}
                     type="button"
                     onClick={() => {
-                      if (key === 'ooc') setOocActive((prev) => !prev)
-                      else if (key === 'shortcuts') setShortcutsActive((prev) => !prev)
-                      else if (key === 'memories') openModal('memory', { threadId })
-                      else if (key === 'stt') setSttActive((prev) => !prev)
-                      else if (['autoTTS', 'enterToSend', 'autoReply', 'autoSend'].includes(key))
-                        setQuickSettings((prev) => ({ ...prev, [key]: !prev[key] }))
+                      if (key === 'memories') openModal('memory', { threadId })
+                      else toggleButton(key)
                     }}
                     className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md shrink-0 text-secondary hover:text-text hover:bg-surface-hover ${btnClass}`}
                     title={t(def.labelKey)}
@@ -596,35 +619,14 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                       if (!def) return null
                       const Icon = def.icon
                       const isToggleable = TOGGLEABLE_CHAT_BUTTONS.has(key)
-                      const isToggled =
-                        key === 'ooc'
-                          ? oocActive
-                          : key === 'shortcuts'
-                            ? shortcutsActive
-                            : key === 'stt'
-                              ? sttActive
-                              : key === 'autoTTS'
-                                ? quickSettings.autoTTS
-                                : key === 'enterToSend'
-                                  ? quickSettings.enterToSend
-                                  : key === 'autoReply'
-                                    ? quickSettings.autoReply
-                                    : key === 'autoSend'
-                                      ? quickSettings.autoSend
-                                      : false
+                      const isToggled = getToggleState(key)
                       return (
                         <button
                           key={key}
                           type="button"
                           onClick={() => {
-                            if (key === 'ooc') setOocActive((prev) => !prev)
-                            else if (key === 'shortcuts') setShortcutsActive((prev) => !prev)
-                            else if (key === 'memories') openModal('memory', { threadId })
-                            else if (key === 'stt') setSttActive((prev) => !prev)
-                            else if (
-                              ['autoTTS', 'enterToSend', 'autoReply', 'autoSend'].includes(key)
-                            )
-                              setQuickSettings((prev) => ({ ...prev, [key]: !prev[key] }))
+                            if (key === 'memories') openModal('memory', { threadId })
+                            else toggleButton(key)
                             setOverflowOpen(false)
                           }}
                           className="w-full flex items-center justify-between px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
