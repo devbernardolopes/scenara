@@ -161,11 +161,21 @@ export function getActiveParams(profile) {
   const deprecatedKeys = new Set(
     (providerDef?.params || []).filter((p) => p.deprecated).map((p) => p.key),
   )
-  return Object.fromEntries(
+  const active = Object.fromEntries(
     Object.entries(profile.params || {}).filter(
       ([key]) => !deprecatedKeys.has(key) && key !== 'hordeMethod',
     ),
   )
+  // Always send penalty params with their effective value (0 when unset) so a
+  // profile explicitly configured to zero still passes 0 to the API.
+  if (providerDef) {
+    for (const key of ['frequency_penalty', 'presence_penalty']) {
+      if (providerDef.params.some((p) => p.key === key) && !(key in active)) {
+        active[key] = 0
+      }
+    }
+  }
+  return active
 }
 
 export function buildTranscript({
