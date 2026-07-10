@@ -522,7 +522,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
         {promptHistoryOpen && (
           <div
             ref={promptPanelRef}
-            className="absolute bottom-full left-0 right-0 mb-2 max-h-60 bg-surface border border-border rounded-lg shadow-surface-lg z-50 overflow-y-auto"
+            className="absolute bottom-full left-0 right-0 mb-2 max-h-60 bg-surface border border-border rounded-lg shadow-surface-lg z-20 overflow-y-auto"
           >
             <p className="px-3 py-2 text-xs font-medium text-tertiary uppercase tracking-wider sticky top-0 bg-surface z-10 border-b border-border">
               {t('promptHistory.title')}
@@ -586,7 +586,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
 
         {/* In-Chat Shortcuts Pills */}
         {shortcutsActive && parsedShortcuts && (
-          <div className="absolute bottom-full left-0 right-0 mb-2 bg-surface border border-border rounded-lg shadow-surface-lg z-50 p-3 max-h-60 overflow-y-auto">
+          <div className="absolute bottom-full left-0 right-0 mb-2 bg-surface border border-border rounded-lg shadow-surface-lg z-20 p-3 max-h-60 overflow-y-auto">
             <div className="flex flex-wrap-reverse gap-2">
               {parsedShortcuts.map((s, i) => (
                 <button
@@ -703,7 +703,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                       <div
                         ref={quickPanelRef}
                         style={overflowMenuStyle}
-                        className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px] max-h-[60vh] overflow-y-auto"
+                        className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[220px] max-h-[60vh] overflow-y-auto"
                       >
                         <p className="px-3 py-1.5 text-xs font-medium text-tertiary uppercase tracking-wider">
                           {t('moreOptions')}
