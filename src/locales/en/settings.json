@@ -153,6 +153,10 @@
       "label": "Regeneration Confirmation",
       "desc": "Show a confirmation dialog before regenerating a message."
     },
+    "cancellationConfirmation": {
+      "label": "Cancellation Confirmation",
+      "desc": "Show a confirmation dialog before cancelling an ongoing API request."
+    },
     "summarizationMarker": {
       "label": "Summarization Marker",
       "desc": "Show a divider labeled “Summarization” in the chat after a summary is generated."

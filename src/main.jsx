@@ -27,6 +27,7 @@ import MemoryModal from './components/modals/MemoryModal'
 import MemoryRegenerationModal from './components/modals/MemoryRegenerationModal'
 import MemoryRegenerationResultModal from './components/modals/MemoryRegenerationResultModal'
 import TagManagementModal from './components/modals/TagManagementModal'
+import CancelConfirmModal from './components/modals/CancelConfirmModal'
 
 const SettingsModal = lazy(() => import('./components/modals/settings/SettingsModal'))
 const ImageViewerModal = lazy(() => import('./components/modals/ImageViewerModal'))
@@ -49,6 +50,7 @@ registerModal('memory', MemoryModal)
 registerModal('memoryRegeneration', MemoryRegenerationModal)
 registerModal('memoryRegenerationResult', MemoryRegenerationResultModal)
 registerModal('tagManagement', TagManagementModal)
+registerModal('cancelConfirm', CancelConfirmModal)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

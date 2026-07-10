@@ -377,6 +377,14 @@ export const SETTINGS = [
     descKey: 'settings:appearance.regenerationConfirmation.desc',
   },
   {
+    key: 'cancellationConfirmation',
+    category: 'appearance',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.cancellationConfirmation.label',
+    descKey: 'settings:appearance.cancellationConfirmation.desc',
+  },
+  {
     key: 'unreadSound',
     category: 'appearance',
     type: 'toggle',

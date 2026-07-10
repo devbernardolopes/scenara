@@ -33,6 +33,7 @@ export function getState() {
     queueLength: queue.length,
     currentRequestId: currentRequest?.id ?? null,
     currentThreadId: currentRequest?.threadId ?? null,
+    currentRequestType: currentRequest?.type ?? null,
     queue: queue.map((item) => ({ id: item.id, threadId: item.threadId, type: item.type })),
   }
 }

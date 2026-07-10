@@ -574,6 +574,11 @@ function ChatView() {
   }, [failedRequests, activeSlotIndices])
 
   async function handleCancel() {
+    const confirmCancellation = await getSetting('cancellationConfirmation')
+    if (confirmCancellation) {
+      openModal('cancelConfirm', { threadId })
+      return
+    }
     apiQueue.cancelThreadRequests(threadId)
   }
 
