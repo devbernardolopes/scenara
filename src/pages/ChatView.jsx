@@ -174,6 +174,7 @@ function ChatView() {
   const [visibleStartIndex, setVisibleStartIndex] = useState(0)
   const [messageThreshold, setMessageThreshold] = useState(0)
   const [activeSlotIndices, setActiveSlotIndices] = useState({})
+  const [isTabVisible, setIsTabVisible] = useState(true)
 
   async function loadPersonas() {
     const list = await getAllPersonas()
