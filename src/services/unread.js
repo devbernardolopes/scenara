@@ -75,7 +75,55 @@ export function playNotificationSound() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
     osc.stop(ctx.currentTime + 0.3)
     osc.onended = () => ctx.close()
-  } catch {}
+  } catch {
+    /* AudioContext may be blocked by browser autoplay policy */
+  }
+}
+
+export function createTestNotificationSound() {
+  let ctx = null
+  let osc = null
+  let stopped = false
+
+  return {
+    play(onEnd) {
+      stopped = false
+      try {
+        ctx = new (window.AudioContext || window.webkitAudioContext)()
+        osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.type = 'sine'
+        osc.frequency.value = 880
+        gain.gain.value = 0.3
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.start()
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
+        osc.stop(ctx.currentTime + 0.3)
+        osc.onended = () => {
+          ctx.close()
+          if (!stopped) onEnd?.()
+        }
+      } catch {
+        onEnd?.()
+      }
+    },
+    stop() {
+      stopped = true
+      try {
+        osc?.stop()
+      } catch {
+        /* oscillator may not have started yet */
+      }
+      try {
+        ctx?.close()
+      } catch {
+        /* context may already be closed */
+      }
+      osc = null
+      ctx = null
+    },
+  }
 }
 
 export function initBroadcastChannel(onMessage) {

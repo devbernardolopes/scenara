@@ -139,7 +139,9 @@
     },
     "unreadSound": {
       "label": "Sonido de Notificación",
-      "desc": "Reproducir un sonido cuando llegue un nuevo mensaje mientras estás ausente."
+      "desc": "Reproducir un sonido cuando llegue un nuevo mensaje mientras estás ausente.",
+      "testPlay": "Probar sonido de notificación",
+      "testStop": "Detener reproducción de prueba"
     }
   },
   "themeOptions": {

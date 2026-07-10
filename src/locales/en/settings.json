@@ -112,7 +112,9 @@
     },
     "unreadSound": {
       "label": "Notification Sound",
-      "desc": "Play a sound when a new message arrives while you are away."
+      "desc": "Play a sound when a new message arrives while you are away.",
+      "testPlay": "Test notification sound",
+      "testStop": "Stop test playback"
     },
     "chatFontFamily": {
       "label": "Chat Font Family",

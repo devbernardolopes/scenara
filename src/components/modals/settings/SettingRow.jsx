@@ -10,6 +10,7 @@ import SettingButtonOrder from './controls/SettingButtonOrder'
 import SettingAvatarPicker from './controls/SettingAvatarPicker'
 import SettingOocDelimiters from './controls/SettingOocDelimiters'
 import SettingToggleInput from './controls/SettingToggleInput'
+import NotificationSoundTestButton from './controls/NotificationSoundTestButton'
 
 const CONTROL_MAP = {
   toggle: SettingToggle,
@@ -21,6 +22,10 @@ const CONTROL_MAP = {
   avatar: SettingAvatarPicker,
   oocDelimiters: SettingOocDelimiters,
   toggleInput: SettingToggleInput,
+}
+
+const TRAILING_MAP = {
+  unreadSound: NotificationSoundTestButton,
 }
 
 function SettingRow({ setting, onSave }) {
@@ -63,6 +68,7 @@ function SettingRow({ setting, onSave }) {
   const labelPath = setting.labelKey.replace('settings:', '')
   const descPath = setting.descKey?.replace('settings:', '')
   const Control = CONTROL_MAP[setting.type]
+  const Trailing = TRAILING_MAP[setting.key]
   const {
     key,
     category,
@@ -91,14 +97,17 @@ function SettingRow({ setting, onSave }) {
         {descPath && <p className="text-xs text-secondary mt-0.5">{t(descPath)}</p>}
       </div>
       <div className="w-full sm:max-w-sm min-w-0">
-        <Control
-          value={value}
-          onChange={handleChange}
-          disabled={disabled}
-          storageKey={key}
-          {...extraProps}
-          {...controlProps}
-        />
+        <div className="flex items-center gap-1">
+          <Control
+            value={value}
+            onChange={handleChange}
+            disabled={disabled}
+            storageKey={key}
+            {...extraProps}
+            {...controlProps}
+          />
+          {Trailing && <Trailing value={value} disabled={disabled} />}
+        </div>
       </div>
     </div>
   )

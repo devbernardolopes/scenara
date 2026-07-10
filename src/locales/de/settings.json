@@ -139,7 +139,9 @@
     },
     "unreadSound": {
       "label": "Benachrichtigungston",
-      "desc": "Spiele einen Ton ab, wenn eine neue Nachricht eintrifft, während du abwesend bist."
+      "desc": "Spiele einen Ton ab, wenn eine neue Nachricht eintrifft, während du abwesend bist.",
+      "testPlay": "Benachrichtigungston testen",
+      "testStop": "Testwiedergabe stoppen"
     }
   },
   "themeOptions": {

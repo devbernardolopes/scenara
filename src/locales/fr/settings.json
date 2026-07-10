@@ -139,7 +139,9 @@
     },
     "unreadSound": {
       "label": "Son de Notification",
-      "desc": "Jouer un son lorsqu'un nouveau message arrive pendant votre absence."
+      "desc": "Jouer un son lorsqu'un nouveau message arrive pendant votre absence.",
+      "testPlay": "Tester le son de notification",
+      "testStop": "Arrêter la lecture de test"
     }
   },
   "themeOptions": {
