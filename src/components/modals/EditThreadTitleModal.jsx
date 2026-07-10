@@ -49,6 +49,12 @@ function EditThreadTitleModal({ thread }) {
         className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            handleSave()
+          }
+        }}
         placeholder={t('editThreadTitle.placeholder')}
         autoFocus
         required
