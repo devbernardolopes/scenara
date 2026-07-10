@@ -23,6 +23,7 @@ import { getThread } from '../../services/threads'
 import { getUIState, setUIState } from '../../services/uiState'
 import { useModal } from '../../hooks/useModal'
 import { getSetting } from '../../services/settings'
+import { getAllInChatShortcuts } from '../../services/inChatShortcuts'
 import db from '../../db'
 
 const DEFAULT_QUICK_SETTINGS = {
@@ -78,6 +79,30 @@ const CHAT_BUTTON_DEFS = {
   autoSend: { icon: Forward, labelKey: 'quickSettings.autoSend' },
 }
 
+const SHORTCUT_KEYS = ['name', 'message', 'insertionType', 'autoSend', 'clearAfterSend']
+
+function parseShortcuts(content) {
+  if (typeof content !== 'string' || !content.trim()) return null
+  const blocks = content.split(/\n\s*\n/)
+  const result = []
+  for (const raw of blocks) {
+    const lines = raw.split('\n').filter((l) => l.trim() !== '')
+    if (lines.length === 0) continue
+    const entry = {}
+    for (const line of lines) {
+      const m = line.match(/^@([A-Za-z]+)=(.*)$/)
+      if (!m) return null
+      const k = m[1]
+      if (!SHORTCUT_KEYS.includes(k)) return null
+      if (k in entry) return null
+      entry[k] = m[2]
+    }
+    if (!entry.name || !entry.message) return null
+    result.push({ name: entry.name, message: entry.message })
+  }
+  return result.length > 0 ? result : null
+}
+
 function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, hasQueued }) {
   const { t } = useTranslation('chat')
   const { openModal } = useModal()
@@ -110,6 +135,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
   )
   const [chatOrder, setChatOrder] = useState(null)
   const [shortcutsActive, setShortcutsActive] = useState(false)
+  const [shortcutsSet, setShortcutsSet] = useState(null)
   const [overflowOpen, setOverflowOpen] = useState(false)
   const [headerCount, setHeaderCount] = useState(0)
   const [overflowMenuStyle, setOverflowMenuStyle] = useState(null)
@@ -256,6 +282,28 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [promptHistoryOpen])
+
+  // Load the active In-Chat Shortcuts set (first in DB)
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      const all = await getAllInChatShortcuts()
+      if (cancelled) return
+      setShortcutsSet(all && all.length > 0 ? all[0] : null)
+    }
+    load()
+    window.addEventListener('inChatShortcuts-changed', load)
+    return () => {
+      cancelled = true
+      window.removeEventListener('inChatShortcuts-changed', load)
+    }
+  }, [])
+
+  const hasShortcutsSet = Boolean(shortcutsSet)
+  const parsedShortcuts = useMemo(() => {
+    if (!shortcutsSet?.content) return null
+    return parseShortcuts(shortcutsSet.content)
+  }, [shortcutsSet])
 
   useEffect(() => {
     let cancelled = false
@@ -438,23 +486,34 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
     [oocActive, shortcutsActive, sttActive, quickSettings],
   )
 
-  const toggleButton = useCallback((key) => {
-    switch (key) {
-      case 'ooc':
-        setOocActive((prev) => !prev)
-        break
-      case 'shortcuts':
-        setShortcutsActive((prev) => !prev)
-        break
-      case 'stt':
-        setSttActive((prev) => !prev)
-        break
-      default:
-        if (TOGGLEABLE_CHAT_BUTTONS.has(key)) {
-          setQuickSettings((prev) => ({ ...prev, [key]: !prev[key] }))
-        }
-    }
-  }, [])
+  const toggleButton = useCallback(
+    (key) => {
+      switch (key) {
+        case 'ooc':
+          setOocActive((prev) => !prev)
+          break
+        case 'shortcuts':
+          if (!hasShortcutsSet) {
+            openModal('inChatShortcutManagement')
+            return
+          }
+          setShortcutsActive((prev) => {
+            const next = !prev
+            if (next) setPromptHistoryOpen(false)
+            return next
+          })
+          break
+        case 'stt':
+          setSttActive((prev) => !prev)
+          break
+        default:
+          if (TOGGLEABLE_CHAT_BUTTONS.has(key)) {
+            setQuickSettings((prev) => ({ ...prev, [key]: !prev[key] }))
+          }
+      }
+    },
+    [hasShortcutsSet, openModal],
+  )
 
   return (
     <div className="border-t border-border p-4">
@@ -525,6 +584,31 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
           </div>
         )}
 
+        {/* In-Chat Shortcuts Pills */}
+        {shortcutsActive && parsedShortcuts && (
+          <div className="absolute bottom-full left-0 right-0 mb-2 bg-surface border border-border rounded-lg shadow-surface-lg z-50 p-3 max-h-60 overflow-y-auto">
+            <div className="flex flex-wrap-reverse gap-2">
+              {parsedShortcuts.map((s, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    setInputValue(s.message)
+                    requestAnimationFrame(() => {
+                      textareaRef.current?.focus()
+                      if (textareaRef.current) autoResize(textareaRef.current)
+                    })
+                  }}
+                  className="min-h-[44px] min-w-[44px] px-3 py-2 flex items-center justify-center rounded-md bg-primary-subtle text-primary hover:bg-primary/20 text-sm break-words transition-colors"
+                  title={s.message}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Textarea */}
         <textarea
           ref={textareaRef}
@@ -534,7 +618,14 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
           onChange={(e) => setInputValue(e.target.value)}
           disabled={summarizing}
           onInput={(e) => autoResize(e.target)}
-          onDoubleClick={() => setPromptHistoryOpen((prev) => !prev)}
+          onDoubleClick={() => {
+            if (shortcutsActive) {
+              setShortcutsActive(false)
+              setPromptHistoryOpen(true)
+            } else {
+              setPromptHistoryOpen((prev) => !prev)
+            }
+          }}
           onKeyDown={handleKeyDown}
           placeholder={t('inputPlaceholder')}
           className={`w-full resize-none rounded-lg border px-4 py-3 pr-12 text-sm leading-relaxed transition-colors duration-150 min-h-[56px] max-h-48 focus:outline-none focus:ring-2 focus:ring-primary/30 ${
