@@ -162,7 +162,9 @@ export function getActiveParams(profile) {
     (providerDef?.params || []).filter((p) => p.deprecated).map((p) => p.key),
   )
   return Object.fromEntries(
-    Object.entries(profile.params || {}).filter(([key]) => !deprecatedKeys.has(key)),
+    Object.entries(profile.params || {}).filter(
+      ([key]) => !deprecatedKeys.has(key) && key !== 'hordeMethod',
+    ),
   )
 }
 
