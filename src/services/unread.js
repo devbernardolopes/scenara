@@ -83,11 +83,16 @@ export function playNotificationSound() {
 export function createTestNotificationSound() {
   let ctx = null
   let osc = null
-  let stopped = false
+  let ended = false
+
+  function cleanup() {
+    osc = null
+    ctx = null
+  }
 
   return {
     play(onEnd) {
-      stopped = false
+      ended = false
       try {
         ctx = new (window.AudioContext || window.webkitAudioContext)()
         osc = ctx.createOscillator()
@@ -101,27 +106,24 @@ export function createTestNotificationSound() {
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
         osc.stop(ctx.currentTime + 0.3)
         osc.onended = () => {
-          ctx.close()
-          if (!stopped) onEnd?.()
+          ctx.close().catch(() => {})
+          cleanup()
+          if (!ended) onEnd?.()
         }
       } catch {
         onEnd?.()
       }
     },
     stop() {
-      stopped = true
+      if (ended) return
+      ended = true
       try {
         osc?.stop()
       } catch {
         /* oscillator may not have started yet */
       }
-      try {
-        ctx?.close()
-      } catch {
-        /* context may already be closed */
-      }
-      osc = null
-      ctx = null
+      ctx?.close().catch(() => {})
+      cleanup()
     },
   }
 }
