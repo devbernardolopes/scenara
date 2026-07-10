@@ -493,7 +493,7 @@ function MessageBubble({
                 )}
               </div>
               <div
-                className={`flex items-center gap-1 ${hasBundleNav ? 'w-full md:w-auto' : 'flex-1 min-w-0'}`}
+                className={`flex items-center gap-1 ${hasBundleNav ? 'w-full md:flex-1 md:min-w-0' : 'flex-1 min-w-0'}`}
               >
                 {bundleMessages && bundleMessages.length > 1 && (
                   <>
