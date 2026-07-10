@@ -56,6 +56,21 @@ export async function createSummaryMarker(threadId, afterCreatedAt) {
   return id
 }
 
+export async function createAutoTitleMarker(threadId, afterCreatedAt) {
+  const id = await db.messages.add({
+    threadId: Number(threadId),
+    role: 'system',
+    content: '',
+    personaId: null,
+    isOOC: false,
+    isAutoTitleMarker: true,
+    createdAt: new Date(new Date(afterCreatedAt).getTime() + 1),
+    summarizedAt: null,
+  })
+  await updateThreadTimestamp(threadId)
+  return id
+}
+
 export async function updateMessage(id, updates) {
   return db.messages.update(Number(id), updates)
 }

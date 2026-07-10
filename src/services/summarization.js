@@ -13,7 +13,10 @@ export function getUnsummarizedMessages(messages, { includeOOC = true } = {}) {
   if (!Array.isArray(messages)) return []
   return messages.filter(
     (message) =>
-      !message?.isSummaryMarker && !message?.summarizedAt && (includeOOC || !message?.isOOC),
+      !message?.isSummaryMarker &&
+      !message?.isAutoTitleMarker &&
+      !message?.summarizedAt &&
+      (includeOOC || !message?.isOOC),
   )
 }
 
@@ -21,7 +24,8 @@ export function getMessagesForApiRequest(messages, { includeOOC = true, keepMess
   if (!Array.isArray(messages)) return []
 
   const eligible = messages.filter(
-    (message) => !message?.isSummaryMarker && (includeOOC || !message?.isOOC),
+    (message) =>
+      !message?.isSummaryMarker && !message?.isAutoTitleMarker && (includeOOC || !message?.isOOC),
   )
   if (keepMessages <= 0) {
     return eligible.filter((message) => !message?.summarizedAt)

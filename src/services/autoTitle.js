@@ -7,7 +7,7 @@ import { updateThread } from './threads'
 const DEFAULT_SYSTEM_INSTRUCTION = 'You are a title generator for conversational AI.'
 
 export function getCountedMessageCount(messages, includeOOC) {
-  const counted = messages.filter((m) => !m?.isSummaryMarker)
+  const counted = messages.filter((m) => !m?.isSummaryMarker && !m?.isAutoTitleMarker)
   if (includeOOC) return counted.length
   return counted.filter((m) => !m.isOOC).length
 }

@@ -57,6 +57,7 @@
   "model": "Model",
   "parameters": "Parameters",
   "oocLabel": "OOC",
+  "autoTitleMarker": "AUTO-TITLE",
   "summarizationMarker": "Summarization",
   "scrollToBottom": "Scroll to bottom",
   "noProfileModel": "No Chat profile configured or model selected.",

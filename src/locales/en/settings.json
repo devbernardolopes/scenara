@@ -157,6 +157,10 @@
       "label": "Cancellation Confirmation",
       "desc": "Show a confirmation dialog before cancelling an ongoing API request."
     },
+    "autoTitleMarker": {
+      "label": "Auto-title Marker",
+      "desc": "Show a divider labeled \"AUTO-TITLE\" in the chat after a title is generated."
+    },
     "summarizationMarker": {
       "label": "Summarization Marker",
       "desc": "Show a divider labeled “Summarization” in the chat after a summary is generated."

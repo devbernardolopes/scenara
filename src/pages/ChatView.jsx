@@ -18,6 +18,7 @@ import {
   createMessage,
   createAssistantMessage,
   createSummaryMarker,
+  createAutoTitleMarker,
   updateMessage,
   deleteMessage,
   trimLeadingTrailingNewlines,
@@ -924,6 +925,21 @@ function ChatView() {
           const updatedThr = await getThread(threadId)
           setThread((prev) => ({ ...prev, title: updatedThr.title, autoTitleGenerated: true }))
           showToast(t('autoTitleGenerated'), { type: 'success' })
+
+          const markerEnabled = await getSetting('autoTitleMarker')
+          if (markerEnabled) {
+            const postMsgs = await getMessagesByThread(threadId)
+            if (postMsgs.length > 0) {
+              const lastMsg = postMsgs[postMsgs.length - 1]
+              if (!lastMsg.isAutoTitleMarker) {
+                await createAutoTitleMarker(threadId, lastMsg.createdAt)
+                const updated = await getMessagesByThread(threadId)
+                if (Number(currentThreadIdRef.current) === Number(threadId)) {
+                  setMessages(updated)
+                }
+              }
+            }
+          }
         } catch (err) {
           if (err.name !== 'AbortError') {
             showToast(err.message, { type: 'error' })
@@ -1530,6 +1546,27 @@ function ChatView() {
                       <div className="flex-1 h-px bg-border" />
                       <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap">
                         {t('summarizationMarker')}
+                      </span>
+                      <div className="flex-1 h-px bg-border" />
+                    </div>
+                  )
+                }
+
+                if (msg.isAutoTitleMarker) {
+                  const isVisible = idx >= visibleStartIndex
+                  let nextIdx = idx + 1
+                  while (
+                    nextIdx < messages.length &&
+                    (messages[nextIdx].isAutoTitleMarker || messages[nextIdx].isSummaryMarker)
+                  )
+                    nextIdx++
+                  const nextVisible = nextIdx < messages.length && nextIdx >= visibleStartIndex
+                  if (!isVisible || !nextVisible) return null
+                  return (
+                    <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
+                      <div className="flex-1 h-px bg-border" />
+                      <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap">
+                        {t('autoTitleMarker')}
                       </span>
                       <div className="flex-1 h-px bg-border" />
                     </div>

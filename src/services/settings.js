@@ -427,6 +427,14 @@ export const SETTINGS = [
     },
   },
   {
+    key: 'autoTitleMarker',
+    category: 'appearance',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.autoTitleMarker.label',
+    descKey: 'settings:appearance.autoTitleMarker.desc',
+  },
+  {
     key: 'summarizationMarker',
     category: 'appearance',
     type: 'toggle',
