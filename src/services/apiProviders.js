@@ -364,3 +364,20 @@ export async function getCachedModelMeta(providerId, hordeMethod) {
 export async function setCachedModelMeta(providerId, meta, hordeMethod) {
   await setSetting(cachedModelMetaKey(providerId, hordeMethod), JSON.stringify(meta))
 }
+
+function cachedModelNamesKey(providerId) {
+  return `api.${providerId}.cachedModelNames`
+}
+
+export async function getCachedModelNames(providerId) {
+  const raw = await getSetting(cachedModelNamesKey(providerId))
+  try {
+    return JSON.parse(raw) || {}
+  } catch {
+    return {}
+  }
+}
+
+export async function setCachedModelNames(providerId, names) {
+  await setSetting(cachedModelNamesKey(providerId), JSON.stringify(names))
+}

@@ -11,6 +11,8 @@ import {
   setCachedModels as persistCachedModels,
   getCachedModelMeta,
   setCachedModelMeta as persistCachedModelMeta,
+  getCachedModelNames,
+  setCachedModelNames as persistCachedModelNames,
 } from '../../services/apiProviders'
 import { fetchModels, getCooldownRemaining } from '../../services/modelFetcher'
 import { createProfile, updateProfile } from '../../services/connectionProfiles'
@@ -114,6 +116,7 @@ function ProfileFormModal({ profile }) {
   const [keys, setKeys] = useState([])
   const [cachedModels, setCachedModels] = useState([])
   const [modelMeta, setModelMeta] = useState({})
+  const [modelNames, setModelNames] = useState({})
   const [fetching, setFetching] = useState(false)
   const abortRef = useRef(null)
   const savePendingRef = useRef(false)
@@ -160,9 +163,11 @@ function ProfileFormModal({ profile }) {
       } else {
         setModelMeta({})
       }
+      getCachedModelNames(form.providerId).then(setModelNames)
     } else {
       setCachedModels([])
       setModelMeta({})
+      setModelNames({})
     }
   }, [form.providerId, hordeMethod])
 
@@ -239,7 +244,7 @@ function ProfileFormModal({ profile }) {
         signal: abortRef.current.signal,
         hordeMethod,
       })
-      const { models, meta } = result
+      const { models, meta, names } = result
       await persistCachedModels(form.providerId, models, hordeMethod)
       setCachedModels(models)
       if (meta && Object.keys(meta).length > 0) {
@@ -247,6 +252,12 @@ function ProfileFormModal({ profile }) {
         setModelMeta(meta)
       } else {
         setModelMeta({})
+      }
+      if (names && Object.keys(names).length > 0) {
+        await persistCachedModelNames(form.providerId, names)
+        setModelNames(names)
+      } else {
+        setModelNames({})
       }
     } catch (err) {
       if (err.name !== 'AbortError') throw err
@@ -387,6 +398,7 @@ function ProfileFormModal({ profile }) {
                 value={form.model}
                 onChange={(v) => setForm((prev) => ({ ...prev, model: v }))}
                 models={cachedModels}
+                modelNames={modelNames}
                 modelMeta={modelMeta}
                 onRefresh={handleRefresh}
                 fetching={fetching}

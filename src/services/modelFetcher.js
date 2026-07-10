@@ -45,6 +45,36 @@ async function fetchOpenAIModels(baseUrl, apiKey, signal, modelsPath) {
   return models
 }
 
+async function fetchOpenRouterModels(baseUrl, apiKey, signal) {
+  const url = `${baseUrl}/v1/models`
+  const headers = { 'Content-Type': 'application/json' }
+  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`
+
+  const res = await fetch(url, { headers, signal })
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    throw new Error(`HTTP ${res.status}${body ? `: ${body}` : ''}`)
+  }
+
+  const json = await res.json()
+  const names = {}
+  const models = (json.data || [])
+    .filter((m) => {
+      if (!(m.id || m.name)) return false
+      if (m.active === false) return false
+      if (m.architecture?.modality !== 'text->text') return false
+      if (m.pricing?.prompt !== '0' || m.pricing?.completion !== '0') return false
+      return true
+    })
+    .map((m) => {
+      if (m.name) names[m.id] = m.name
+      return m.id
+    })
+    .sort((a, b) => a.localeCompare(b))
+
+  return { models, meta: {}, names }
+}
+
 async function fetchHordeModels(signal) {
   const url = 'https://stablehorde.net/api/v2/status/models?type=text&model_state=all'
   const res = await fetch(url, { signal })
@@ -73,6 +103,21 @@ async function fetchHordeModels(signal) {
 export async function fetchModels(providerId, { signal, hordeMethod: _hordeMethod } = {}) {
   if (providerId === 'ai-horde') {
     const result = await fetchHordeModels(signal)
+    startCooldown()
+    return result
+  }
+
+  if (providerId === 'openrouter') {
+    const strategy = STRATEGIES[providerId]
+    let apiKey = null
+    if (strategy.needsKey) {
+      const keyEntry = await getActiveKey(providerId)
+      if (!keyEntry) {
+        throw new Error(`No active API key configured for ${providerId}`)
+      }
+      apiKey = keyEntry.value
+    }
+    const result = await fetchOpenRouterModels(strategy.baseUrl, apiKey, signal)
     startCooldown()
     return result
   }

@@ -1,7 +1,19 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RefreshCw, X, ChevronDown, Star } from '../../../../lib/icons'
+import {
+  RefreshCw,
+  X,
+  ChevronDown,
+  Star,
+  Search,
+  ArrowUpDown,
+  SlidersHorizontal,
+} from '../../../../lib/icons'
 import { getFavModels, toggleFavModel } from '../../../../services/apiProviders'
+import { getUIState, setUIState } from '../../../../services/uiState'
+import CollapsibleSection from '../../../shared/CollapsibleSection'
+
+const SORT_OPTIONS = ['name']
 
 function formatEta(seconds) {
   if (seconds >= 60) {
@@ -21,8 +33,9 @@ function Pill({ children, className }) {
   )
 }
 
-function HordeDropdown({
+function ModelDropdown({
   models,
+  modelNames,
   modelMeta,
   value,
   onChange,
@@ -46,6 +59,10 @@ function HordeDropdown({
 
   const selectedMeta = modelMeta[value]
 
+  function displayName(modelId) {
+    return modelNames[modelId] || modelId
+  }
+
   return (
     <div ref={ref} className="relative">
       <button
@@ -54,41 +71,51 @@ function HordeDropdown({
         className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm text-left flex items-start gap-2"
       >
         <div className="flex flex-col md:flex-row md:items-center gap-0.5 md:gap-2 flex-1 min-w-0">
-          <span className={`truncate ${value ? '' : 'text-tertiary'}`}>{value || selectLabel}</span>
+          <span className={`truncate ${value ? '' : 'text-tertiary'}`}>
+            {value ? displayName(value) : selectLabel}
+          </span>
           {selectedMeta && (
             <span className="flex items-center gap-1 flex-wrap">
-              <Pill
-                style={{
-                  backgroundColor: 'var(--color-pill-count-bg)',
-                  color: 'var(--color-pill-count-text)',
-                }}
-              >
-                {selectedMeta.count}
-              </Pill>
-              <Pill
-                style={{
-                  backgroundColor: 'var(--color-pill-queued-bg)',
-                  color: 'var(--color-pill-queued-text)',
-                }}
-              >
-                {selectedMeta.queued}
-              </Pill>
-              <Pill
-                style={{
-                  backgroundColor: 'var(--color-pill-eta-bg)',
-                  color: 'var(--color-pill-eta-text)',
-                }}
-              >
-                {formatEta(selectedMeta.eta)}
-              </Pill>
-              <Pill
-                style={{
-                  backgroundColor: 'var(--color-pill-perf-bg)',
-                  color: 'var(--color-pill-perf-text)',
-                }}
-              >
-                {selectedMeta.performance} tok/s
-              </Pill>
+              {selectedMeta.count !== undefined && (
+                <Pill
+                  style={{
+                    backgroundColor: 'var(--color-pill-count-bg)',
+                    color: 'var(--color-pill-count-text)',
+                  }}
+                >
+                  {selectedMeta.count}
+                </Pill>
+              )}
+              {selectedMeta.queued !== undefined && (
+                <Pill
+                  style={{
+                    backgroundColor: 'var(--color-pill-queued-bg)',
+                    color: 'var(--color-pill-queued-text)',
+                  }}
+                >
+                  {selectedMeta.queued}
+                </Pill>
+              )}
+              {selectedMeta.eta !== undefined && (
+                <Pill
+                  style={{
+                    backgroundColor: 'var(--color-pill-eta-bg)',
+                    color: 'var(--color-pill-eta-text)',
+                  }}
+                >
+                  {formatEta(selectedMeta.eta)}
+                </Pill>
+              )}
+              {selectedMeta.performance !== undefined && (
+                <Pill
+                  style={{
+                    backgroundColor: 'var(--color-pill-perf-bg)',
+                    color: 'var(--color-pill-perf-text)',
+                  }}
+                >
+                  {selectedMeta.performance} tok/s
+                </Pill>
+              )}
             </span>
           )}
         </div>
@@ -108,6 +135,9 @@ function HordeDropdown({
           >
             {selectLabel}
           </div>
+          {models.length === 0 && (
+            <div className="px-3 py-2.5 text-sm text-tertiary">No models available</div>
+          )}
           {models.map((model) => {
             const meta = modelMeta[model]
             const isFav = favModels.includes(model)
@@ -139,41 +169,49 @@ function HordeDropdown({
                   />
                 </button>
                 <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                  <span className="truncate">{model}</span>
+                  <span className="truncate">{displayName(model)}</span>
                   {meta && (
                     <span className="flex items-center gap-1 flex-wrap">
-                      <Pill
-                        style={{
-                          backgroundColor: 'var(--color-pill-count-bg)',
-                          color: 'var(--color-pill-count-text)',
-                        }}
-                      >
-                        {meta.count}
-                      </Pill>
-                      <Pill
-                        style={{
-                          backgroundColor: 'var(--color-pill-queued-bg)',
-                          color: 'var(--color-pill-queued-text)',
-                        }}
-                      >
-                        {meta.queued}
-                      </Pill>
-                      <Pill
-                        style={{
-                          backgroundColor: 'var(--color-pill-eta-bg)',
-                          color: 'var(--color-pill-eta-text)',
-                        }}
-                      >
-                        {formatEta(meta.eta)}
-                      </Pill>
-                      <Pill
-                        style={{
-                          backgroundColor: 'var(--color-pill-perf-bg)',
-                          color: 'var(--color-pill-perf-text)',
-                        }}
-                      >
-                        {meta.performance} tok/s
-                      </Pill>
+                      {meta.count !== undefined && (
+                        <Pill
+                          style={{
+                            backgroundColor: 'var(--color-pill-count-bg)',
+                            color: 'var(--color-pill-count-text)',
+                          }}
+                        >
+                          {meta.count}
+                        </Pill>
+                      )}
+                      {meta.queued !== undefined && (
+                        <Pill
+                          style={{
+                            backgroundColor: 'var(--color-pill-queued-bg)',
+                            color: 'var(--color-pill-queued-text)',
+                          }}
+                        >
+                          {meta.queued}
+                        </Pill>
+                      )}
+                      {meta.eta !== undefined && (
+                        <Pill
+                          style={{
+                            backgroundColor: 'var(--color-pill-eta-bg)',
+                            color: 'var(--color-pill-eta-text)',
+                          }}
+                        >
+                          {formatEta(meta.eta)}
+                        </Pill>
+                      )}
+                      {meta.performance !== undefined && (
+                        <Pill
+                          style={{
+                            backgroundColor: 'var(--color-pill-perf-bg)',
+                            color: 'var(--color-pill-perf-text)',
+                          }}
+                        >
+                          {meta.performance} tok/s
+                        </Pill>
+                      )}
                     </span>
                   )}
                 </div>
@@ -191,6 +229,7 @@ function ModelSelect({
   value,
   onChange,
   models = [],
+  modelNames = {},
   modelMeta = {},
   onRefresh,
   fetching,
@@ -201,13 +240,24 @@ function ModelSelect({
   const [countdown, setCountdown] = useState(0)
   const timerRef = useRef(null)
   const [favModels, setFavModels] = useState([])
-  const isHorde = providerId === 'ai-horde'
+  const [sortBy, setSortBy] = useState('name')
+  const [sortOrder, setSortOrder] = useState('asc')
+  const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    if (isHorde) {
+    if (providerId) {
       getFavModels(providerId).then(setFavModels)
+      getUIState(`modelSelect.${providerId}.sortBy`).then((val) => {
+        if (val && SORT_OPTIONS.includes(val)) setSortBy(val)
+      })
+      getUIState(`modelSelect.${providerId}.sortOrder`).then((val) => {
+        if (val === 'asc' || val === 'desc') setSortOrder(val)
+      })
+      getUIState(`modelSelect.${providerId}.filter`).then((val) => {
+        if (val) setFilter(val)
+      })
     }
-  }, [providerId, isHorde])
+  }, [providerId])
 
   useEffect(() => {
     if (cooldownRemaining > 0) {
@@ -230,37 +280,120 @@ function ModelSelect({
     }
   }, [cooldownRemaining])
 
+  function persistSortBy(val) {
+    setSortBy(val)
+    if (providerId) setUIState(`modelSelect.${providerId}.sortBy`, val)
+  }
+
+  function persistSortOrder(val) {
+    setSortOrder(val)
+    if (providerId) setUIState(`modelSelect.${providerId}.sortOrder`, val)
+  }
+
+  function persistFilter(val) {
+    setFilter(val)
+    if (providerId) setUIState(`modelSelect.${providerId}.filter`, val)
+  }
+
+  const processedModels = useMemo(() => {
+    let list = [...new Set([...models])]
+    const q = filter.toLowerCase().trim()
+    if (q) {
+      list = list.filter((m) => (modelNames[m] || m).toLowerCase().includes(q))
+    }
+    if (sortBy === 'name') {
+      list.sort((a, b) => {
+        const nameA = modelNames[a] || a
+        const nameB = modelNames[b] || b
+        return sortOrder === 'desc' ? nameB.localeCompare(nameA) : nameA.localeCompare(nameB)
+      })
+    }
+    return list
+  }, [models, filter, sortBy, sortOrder, modelNames])
+
   async function handleToggleFav(modelName) {
     const updated = await toggleFavModel(providerId, modelName)
     setFavModels(updated)
   }
 
-  return (
-    <div className="space-y-2">
-      {isHorde ? (
-        <HordeDropdown
-          models={[...new Set([...models])]}
-          modelMeta={modelMeta}
-          value={value || ''}
-          onChange={onChange}
-          favModels={favModels}
-          onToggleFav={handleToggleFav}
-          selectLabel={t('api.selectModel')}
-        />
-      ) : (
+  const filterControl = providerId ? (
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-secondary whitespace-nowrap">{t('api.modelSortBy')}</span>
         <select
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm"
+          value={sortBy}
+          onChange={(e) => persistSortBy(e.target.value)}
+          className="min-h-[44px] px-3 py-2 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
         >
-          <option value="">{t('api.selectModel')}</option>
-          {[...new Set([...models])].map((model) => (
-            <option key={model} value={model}>
-              {model}
+          {SORT_OPTIONS.map((key) => (
+            <option key={key} value={key}>
+              {t(`api.modelSort.${key}`)}
             </option>
           ))}
         </select>
+      </div>
+      <button
+        type="button"
+        onClick={() => persistSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+        className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 border border-border rounded-md text-sm text-text hover:bg-surface-hover"
+      >
+        <ArrowUpDown className="w-4 h-4" />
+        <span className="text-xs text-secondary">{t(`api.modelOrder.${sortOrder}`)}</span>
+      </button>
+    </div>
+  ) : null
+
+  return (
+    <div className="space-y-2">
+      {providerId && (
+        <CollapsibleSection
+          label={
+            <span className="flex items-center gap-2">
+              <SlidersHorizontal className="w-4 h-4" />
+              {t('api.modelFilterSection')}
+            </span>
+          }
+          summary={
+            filter || sortBy !== 'name' || sortOrder !== 'asc' ? t('api.modelFilterActive') : ''
+          }
+          storageKey={`modelSelectFilter.${providerId}`}
+          defaultExpanded={false}
+        >
+          <div className="pt-1 pb-2 space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
+              <input
+                type="text"
+                value={filter}
+                onChange={(e) => persistFilter(e.target.value)}
+                placeholder={t('api.modelSearchPlaceholder')}
+                className="w-full min-h-[44px] pl-10 pr-10 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              {filter && (
+                <button
+                  type="button"
+                  onClick={() => persistFilter('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            {filterControl}
+          </div>
+        </CollapsibleSection>
       )}
+
+      <ModelDropdown
+        models={processedModels}
+        modelNames={modelNames}
+        modelMeta={modelMeta}
+        value={value || ''}
+        onChange={onChange}
+        favModels={favModels}
+        onToggleFav={handleToggleFav}
+        selectLabel={t('api.selectModel')}
+      />
 
       {fetching ? (
         <div className="flex items-center justify-between px-3 py-2 min-h-[44px] border border-border rounded-md">

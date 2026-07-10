@@ -205,6 +205,16 @@
     },
     "selectModel": "Select a model",
     "modelSearchPlaceholder": "Search models…",
+    "modelFilterSection": "Filters & Sorting",
+    "modelFilterActive": "Active",
+    "modelSortBy": "Sort by",
+    "modelSort": {
+      "name": "Name"
+    },
+    "modelOrder": {
+      "asc": "Asc",
+      "desc": "Desc"
+    },
     "noModels": "No models available",
     "refreshModels": "Refresh models",
     "fetchingModels": "Fetching models…",
