@@ -371,8 +371,9 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
         }
       } else if (headerCount < total) {
         const free = el.clientWidth - el.scrollWidth
-        if (free >= 44) {
-          setHeaderCount((n) => Math.min(total, n + 1))
+        const canFit = Math.floor(free / 46)
+        if (canFit > 0) {
+          setHeaderCount((n) => Math.min(total, n + canFit))
         }
       }
     }
