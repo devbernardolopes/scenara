@@ -962,6 +962,14 @@ export const SETTINGS = [
     labelKey: 'settings:prompting.prefixUserRole.label',
     descKey: 'settings:prompting.prefixUserRole.desc',
   },
+  {
+    key: 'prompting.trimMessages',
+    category: 'prompting',
+    type: 'toggle',
+    default: false,
+    labelKey: 'settings:prompting.trimMessages.label',
+    descKey: 'settings:prompting.trimMessages.desc',
+  },
 ]
 
 const SETTING_EFFECTS = {

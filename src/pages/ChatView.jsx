@@ -20,6 +20,7 @@ import {
   createSummaryMarker,
   updateMessage,
   deleteMessage,
+  trimLeadingTrailingNewlines,
 } from '../services/messages'
 import { getWritingInstruction } from '../services/writingInstructions'
 import { getEffectiveProfileFor } from '../services/connectionProfiles'
@@ -767,9 +768,13 @@ function ChatView() {
       }
 
       if (content) {
-        await updateMessage(assistantMsgId, { content })
+        const trimMsgs = await getSetting('prompting.trimMessages')
+        const finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
+        await updateMessage(assistantMsgId, { content: finalContent })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          setMessages((prev) => prev.map((m) => (m.id === assistantMsgId ? { ...m, content } : m)))
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantMsgId ? { ...m, content: finalContent } : m)),
+          )
           showToast(t('messageUpdated'), { type: 'success' })
         }
         completedNormally = true
@@ -846,7 +851,9 @@ function ChatView() {
       const isFirstMessage = messages.length === 0
 
       if (text) {
-        await createMessage(threadId, 'user', text, personaId, isOOC)
+        const trimMsgs = await getSetting('prompting.trimMessages')
+        const userText = trimMsgs ? trimLeadingTrailingNewlines(text) : text
+        await createMessage(threadId, 'user', userText, personaId, isOOC)
         currentMsgs = await getMessagesByThread(threadId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages(currentMsgs)
@@ -1247,17 +1254,19 @@ function ChatView() {
       }
 
       if (content) {
+        const trimMsgs = await getSetting('prompting.trimMessages')
+        const finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
         const dbMsg = await db.messages.get(Number(messageId))
         const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
         if (finalEntries[slotIndex]) {
-          finalEntries[slotIndex].content = content
+          finalEntries[slotIndex].content = finalContent
           finalEntries[slotIndex].promptData = promptDataStr
           finalEntries[slotIndex].isError = false
           finalEntries[slotIndex].error = null
         }
         await updateMessage(messageId, {
           bundleMessages: JSON.stringify(finalEntries),
-          content,
+          content: finalContent,
           promptData: promptDataStr,
         })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
@@ -1266,7 +1275,7 @@ function ChatView() {
               m.id === messageId
                 ? {
                     ...m,
-                    content,
+                    content: finalContent,
                     bundleMessages: JSON.stringify(finalEntries),
                     promptData: promptDataStr,
                   }
@@ -1343,13 +1352,20 @@ function ChatView() {
   }
 
   async function handleEditMessage(id, content) {
+    const trimMsgs = await getSetting('prompting.trimMessages')
+    const finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
     const msg = messages.find((m) => m.id === id)
     let entries = parseBundleEntries(msg?.bundleMessages)
     if (!entries) {
       entries = [{ content: msg.content, promptData: msg.promptData || null }]
     }
-    entries.push({ content, promptData: null, origin: 'edit', createdAt: new Date().toISOString() })
-    await updateMessage(id, { bundleMessages: JSON.stringify(entries), content })
+    entries.push({
+      content: finalContent,
+      promptData: null,
+      origin: 'edit',
+      createdAt: new Date().toISOString(),
+    })
+    await updateMessage(id, { bundleMessages: JSON.stringify(entries), content: finalContent })
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
     setActiveSlotIndices((prev) => ({ ...prev, [id]: entries.length - 1 }))

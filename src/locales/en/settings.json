@@ -427,6 +427,10 @@
       "label": "Prefix USER Role",
       "desc": "Prefix USER messages with current active persona name for regular chat API calls."
     },
+    "trimMessages": {
+      "label": "Trim Messages",
+      "desc": "Remove leading and trailing newlines from all messages."
+    },
     "toggleInputPlaceholder": "Enter value"
   },
   "toastPositionOptions": {

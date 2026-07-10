@@ -77,3 +77,8 @@ export async function deleteMessagesFrom(id) {
 export async function deleteMessagesByThread(threadId) {
   return db.messages.where('threadId').equals(Number(threadId)).delete()
 }
+
+export function trimLeadingTrailingNewlines(text) {
+  if (!text) return text
+  return text.replace(/^\n+|\n+$/g, '')
+}
