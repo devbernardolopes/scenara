@@ -322,6 +322,10 @@ function ChatView() {
       const initialAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
       isAtBottomRef.current = initialAtBottom
       setShowScrollButton(!initialAtBottom)
+      if (initialAtBottom) {
+        clearUnread(threadId)
+        setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
+      }
 
       let sticking = true
       let active = true
@@ -365,7 +369,7 @@ function ChatView() {
         el.removeEventListener('touchmove', onUserScroll)
       }
     }
-  }, [messages, loading])
+  }, [messages, loading, threadId])
 
   useEffect(() => {
     if (messages.length > 0 && scrollCommits.current > 1 && messagesGrewRef.current) {
