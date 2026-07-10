@@ -660,7 +660,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                           ? '!text-primary !bg-primary-subtle shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]'
                           : ''
                         : isToggleable && isToggled
-                          ? '!text-primary !bg-primary-subtle shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]'
+                          ? '!text-on-primary !bg-primary hover:!bg-primary-hover shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]'
                           : ''
                   return (
                     <button
@@ -727,7 +727,11 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                                   if (!isToggleable && key !== 'stt') setOverflowOpen(false)
                                 }
                               }}
-                              className="w-full flex items-center justify-between px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
+                              className={`w-full flex items-center justify-between px-3 py-2 text-sm min-h-[44px] ${
+                                isToggleable && isToggled
+                                  ? 'bg-primary-subtle text-primary'
+                                  : 'text-text hover:bg-surface-hover'
+                              }`}
                             >
                               <span className="flex items-center gap-2">
                                 <Icon className="w-4 h-4" />
