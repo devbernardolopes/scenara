@@ -19,15 +19,16 @@ import { createMessage } from '../services/messages'
 import { setBaseTitle } from '../services/titleManager'
 import CollapsibleSection from '../components/shared/CollapsibleSection'
 import IconButton from '../components/shared/IconButton'
-import Avatar from '../components/shared/Avatar'
 import Pagination from '../components/shared/Pagination'
 import PersonaPicker from '../components/shared/PersonaPicker'
+import { getAllTags } from '../services/tags'
 import {
   Trash2,
   Heart,
   Copy,
   Download,
-  UserPlus,
+  ChevronDown,
+  MessageSquare,
   Search,
   X,
   ArrowUpDown,
@@ -59,7 +60,7 @@ function StartChatButton({ character, onStart }) {
           aria-label={t('discovery.actions.selectPersona')}
           title={t('discovery.actions.selectPersona')}
         >
-          <UserPlus className="w-4 h-4" />
+          <ChevronDown className="w-4 h-4" />
         </button>
       </div>
       <PersonaPicker
@@ -70,6 +71,45 @@ function StartChatButton({ character, onStart }) {
           onStart(character, persona)
         }}
       />
+    </div>
+  )
+}
+
+function TagRow({ tags }) {
+  const rowRef = useRef(null)
+  const [overflows, setOverflows] = useState(false)
+
+  useLayoutEffect(() => {
+    const el = rowRef.current
+    if (!el) return
+    const check = () => setOverflows(el.scrollWidth > el.clientWidth)
+    check()
+    const ro = new ResizeObserver(check)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [tags])
+
+  return (
+    <div className="relative">
+      <div data-tag-row ref={rowRef} className="flex gap-1 overflow-x-auto">
+        {tags.map((tag, i) => (
+          <span
+            key={i}
+            className="bg-white/15 text-on-image text-xs rounded-full px-2 py-0.5 whitespace-nowrap shrink-0"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+      {overflows && (
+        <div
+          className="absolute right-0 top-0 bottom-0 w-5 pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(to right, var(--color-image-scrim-fade), var(--color-image-scrim))',
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -92,13 +132,13 @@ function CharacterNameCell({ name, characterCardMarquee }) {
   }, [name, characterCardMarquee])
 
   if (!characterCardMarquee) {
-    return <span className="font-semibold text-text truncate">{name}</span>
+    return <span className="font-semibold text-on-image truncate">{name}</span>
   }
 
   return (
     <span
       ref={wrapperRef}
-      className={`font-semibold text-text marquee-wrapper ${overflows ? 'marquee-animate' : ''}`}
+      className={`font-semibold text-on-image marquee-wrapper ${overflows ? 'marquee-animate' : ''}`}
     >
       <span className="marquee-text">{name}</span>
     </span>
@@ -123,6 +163,7 @@ function CharacterDiscovery() {
   const [sortBy, setSortBy] = useState('createdAt')
   const [sortOrder, setSortOrder] = useState('desc')
   const [chatCounts, setChatCounts] = useState(new Map())
+  const [tagsMap, setTagsMap] = useState(new Map())
 
   const filteredCharacters = useMemo(() => {
     const q = searchQuery.toLowerCase().trim()
@@ -180,12 +221,22 @@ function CharacterDiscovery() {
   async function loadCharacters() {
     setLoading(true)
     try {
-      const [chars, counts] = await Promise.all([getAllCharacters(), getCharacterChatCounts()])
+      const [chars, counts, tags] = await Promise.all([
+        getAllCharacters(),
+        getCharacterChatCounts(),
+        getAllTags(),
+      ])
       setCharacters(chars)
       setChatCounts(counts)
+      setTagsMap(new Map(tags.map((t) => [t.id, t.name])))
     } finally {
       setLoading(false)
     }
+  }
+
+  async function loadTagsMap() {
+    const tags = await getAllTags()
+    setTagsMap(new Map(tags.map((t) => [t.id, t.name])))
   }
 
   async function loadChatCounts() {
@@ -202,9 +253,11 @@ function CharacterDiscovery() {
     getUIState('discovery.searchQuery').then((val) => val && setSearchQuery(val))
     window.addEventListener('characters-changed', loadCharacters)
     window.addEventListener('threads-changed', loadChatCounts)
+    window.addEventListener('tags-changed', loadTagsMap)
     return () => {
       window.removeEventListener('characters-changed', loadCharacters)
       window.removeEventListener('threads-changed', loadChatCounts)
+      window.removeEventListener('tags-changed', loadTagsMap)
     }
   }, [])
 
@@ -384,68 +437,82 @@ function CharacterDiscovery() {
           </p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {visibleCharacters.map((char) => (
-              <div
-                key={char.id}
-                onClick={(e) => {
-                  if (e.target.closest('button') || e.target.closest('[data-avatar]')) return
-                  handleEditCharacter(char)
-                }}
-                className="border border-border rounded-lg p-4 bg-surface hover:shadow-surface-md transition-shadow cursor-pointer flex flex-col"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <Avatar
-                    src={char.avatar}
-                    size="lg"
-                    onClick={() => handleImageClick(char.avatar)}
-                  />
-                  <div className="flex items-center gap-2 min-w-0">
-                    <CharacterNameCell
-                      name={char.name}
-                      characterCardMarquee={characterCardMarquee}
-                    />
-                    <span className="text-xs text-tertiary shrink-0">#{char.characterNumber}</span>
-                    {chatCounts.get(char.id) > 0 && (
-                      <span className="text-xs text-tertiary shrink-0">
-                        #{chatCounts.get(char.id)}
-                      </span>
+            {visibleCharacters.map((char) => {
+              const displayTags = (char.tags || []).map((id) => tagsMap.get(id)).filter(Boolean)
+              const chatCount = chatCounts.get(char.id) || 0
+              return (
+                <div
+                  key={char.id}
+                  onClick={(e) => {
+                    if (
+                      e.target.closest('button') ||
+                      e.target.closest('[data-avatar]') ||
+                      e.target.closest('[data-tag-row]')
+                    )
+                      return
+                    handleEditCharacter(char)
+                  }}
+                  className="border border-border rounded-lg bg-surface hover:shadow-surface-md transition-shadow cursor-pointer flex flex-col overflow-hidden"
+                >
+                  <div className="relative h-[250px] overflow-hidden">
+                    {char.avatar ? (
+                      <img
+                        src={char.avatar}
+                        alt={char.name}
+                        data-avatar
+                        className="w-full h-full object-cover cursor-pointer"
+                        onClick={() => handleImageClick(char.avatar)}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-surface-secondary flex items-center justify-center text-4xl">
+                        {'👤'}
+                      </div>
                     )}
+                    <div className="absolute bottom-0 left-0 right-0 bg-image-scrim p-3 space-y-1">
+                      <CharacterNameCell
+                        name={char.name}
+                        characterCardMarquee={characterCardMarquee}
+                      />
+                      {displayTags.length > 0 && <TagRow tags={displayTags} />}
+                      {chatCount > 0 && (
+                        <div className="flex items-center gap-1 text-on-image-muted">
+                          <MessageSquare className="w-3 h-3" />
+                          <span className="text-xs">
+                            {t('discovery.chatCount', { count: chatCount })}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="p-3 space-y-3 mt-auto">
+                    <div className="flex items-center gap-2">
+                      <IconButton
+                        icon={Trash2}
+                        label={t('discovery.actions.delete')}
+                        onClick={() => handleDelete(char)}
+                        className="bg-delete text-on-delete hover:bg-delete-hover"
+                      />
+                      <IconButton
+                        icon={Heart}
+                        label={t('discovery.actions.favorite')}
+                        onClick={() => handleFavorite(char)}
+                      />
+                      <IconButton
+                        icon={Copy}
+                        label={t('discovery.actions.duplicate')}
+                        onClick={() => handleDuplicate(char)}
+                      />
+                      <IconButton
+                        icon={Download}
+                        label={t('discovery.actions.export')}
+                        onClick={() => handleExport(char)}
+                      />
+                    </div>
+                    <StartChatButton character={char} onStart={handleSelectCharacter} />
                   </div>
                 </div>
-                {(char.tagline || char.description) && (
-                  <p className="text-sm text-secondary line-clamp-2 mb-3">
-                    {char.tagline || char.description}
-                  </p>
-                )}
-
-                <div className="mt-auto space-y-3">
-                  <div className="flex items-center gap-2">
-                    <IconButton
-                      icon={Trash2}
-                      label={t('discovery.actions.delete')}
-                      onClick={() => handleDelete(char)}
-                      className="bg-delete text-on-delete hover:bg-delete-hover"
-                    />
-                    <IconButton
-                      icon={Heart}
-                      label={t('discovery.actions.favorite')}
-                      onClick={() => handleFavorite(char)}
-                    />
-                    <IconButton
-                      icon={Copy}
-                      label={t('discovery.actions.duplicate')}
-                      onClick={() => handleDuplicate(char)}
-                    />
-                    <IconButton
-                      icon={Download}
-                      label={t('discovery.actions.export')}
-                      onClick={() => handleExport(char)}
-                    />
-                  </div>
-                  <StartChatButton character={char} onStart={handleSelectCharacter} />
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

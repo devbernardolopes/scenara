@@ -51,6 +51,8 @@
       "asc": "Crescente",
       "desc": "Decrescente"
     },
+    "chatCount": "{{count}} chat",
+    "chatCount_plural": "{{count}} chat",
     "filter": {
       "title": "Filtri & Ordinamento"
     }

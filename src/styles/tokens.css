@@ -653,6 +653,17 @@
 }
 
 /* ============================================================
+   Image overlay tokens — sit on photographic portraits, not
+   app surfaces, so they do NOT vary by theme.
+   ============================================================ */
+:root {
+  --color-image-scrim: rgba(0, 0, 0, 0.6);
+  --color-image-scrim-fade: rgba(0, 0, 0, 0);
+  --color-on-image: #ffffff;
+  --color-on-image-muted: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================================
    Utility classes
    Use these in JSX className instead of hardcoded color values.
    Example: <div className="bg-surface text-text border-border">
@@ -955,6 +966,17 @@ main {
 }
 *::-webkit-scrollbar {
   display: none;
+}
+
+/* Image overlay */
+.bg-image-scrim {
+  background-color: var(--color-image-scrim);
+}
+.text-on-image {
+  color: var(--color-on-image);
+}
+.text-on-image-muted {
+  color: var(--color-on-image-muted);
 }
 
 /* Delete highlight toggle — when class is absent, delete buttons blend into neutral */
