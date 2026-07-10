@@ -586,77 +586,81 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                     </button>
                   )
                 })}
-              </div>
-              {overflowKeys.length > 0 && (
-                <div className="relative flex-shrink-0">
-                  <button
-                    ref={overflowBtnRef}
-                    type="button"
-                    onClick={() => {
-                      if (overflowBtnRef.current) {
-                        const rect = overflowBtnRef.current.getBoundingClientRect()
-                        setOverflowMenuStyle({
-                          position: 'fixed',
-                          bottom: window.innerHeight - rect.top + 4,
-                          right: window.innerWidth - rect.right,
-                          zIndex: 9999,
-                        })
-                      }
-                      setOverflowOpen((prev) => !prev)
-                    }}
-                    className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-secondary hover:text-text hover:bg-surface-hover"
-                    title={t('moreOptions')}
-                  >
-                    <MoreHorizontal className="w-4 h-4" />
-                  </button>
-                  {overflowOpen && (
-                    <div
-                      ref={quickPanelRef}
-                      style={overflowMenuStyle}
-                      className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px] max-h-[60vh] overflow-y-auto"
+                {overflowKeys.length > 0 && (
+                  <div className="relative flex-shrink-0">
+                    <button
+                      ref={overflowBtnRef}
+                      type="button"
+                      onClick={() => {
+                        if (overflowBtnRef.current) {
+                          const rect = overflowBtnRef.current.getBoundingClientRect()
+                          setOverflowMenuStyle({
+                            position: 'fixed',
+                            bottom: window.innerHeight - rect.top + 4,
+                            right: window.innerWidth - rect.right,
+                            zIndex: 9999,
+                          })
+                        }
+                        setOverflowOpen((prev) => !prev)
+                      }}
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-secondary hover:text-text hover:bg-surface-hover"
+                      title={t('moreOptions')}
                     >
-                      <p className="px-3 py-1.5 text-xs font-medium text-tertiary uppercase tracking-wider">
-                        {t('moreOptions')}
-                      </p>
-                      {overflowKeys.map((key) => {
-                        const def = CHAT_BUTTON_DEFS[key]
-                        if (!def) return null
-                        const Icon = def.icon
-                        const isToggleable = TOGGLEABLE_CHAT_BUTTONS.has(key)
-                        const isToggled = getToggleState(key)
-                        return (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={() => {
-                              if (key === 'memories') openModal('memory', { threadId })
-                              else toggleButton(key)
-                              setOverflowOpen(false)
-                            }}
-                            className="w-full flex items-center justify-between px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
-                          >
-                            <span className="flex items-center gap-2">
-                              <Icon className="w-4 h-4" />
-                              <span>{t(def.labelKey)}</span>
-                            </span>
-                            {isToggleable && (
-                              <div
-                                className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
-                                  isToggled
-                                    ? 'bg-primary text-on-primary'
-                                    : 'bg-surface-secondary border border-border'
-                                }`}
-                              >
-                                {isToggled && <Check className="w-3 h-3" />}
-                              </div>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
+                      <MoreHorizontal className="w-4 h-4" />
+                    </button>
+                    {overflowOpen && (
+                      <div
+                        ref={quickPanelRef}
+                        style={overflowMenuStyle}
+                        className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px] max-h-[60vh] overflow-y-auto"
+                      >
+                        <p className="px-3 py-1.5 text-xs font-medium text-tertiary uppercase tracking-wider">
+                          {t('moreOptions')}
+                        </p>
+                        {overflowKeys.map((key) => {
+                          const def = CHAT_BUTTON_DEFS[key]
+                          if (!def) return null
+                          const Icon = def.icon
+                          const isToggleable = TOGGLEABLE_CHAT_BUTTONS.has(key)
+                          const isToggled = getToggleState(key)
+                          return (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={() => {
+                                if (key === 'memories') {
+                                  openModal('memory', { threadId })
+                                  setOverflowOpen(false)
+                                } else {
+                                  toggleButton(key)
+                                  if (!isToggleable && key !== 'stt') setOverflowOpen(false)
+                                }
+                              }}
+                              className="w-full flex items-center justify-between px-3 py-2 text-sm text-text hover:bg-surface-hover min-h-[44px]"
+                            >
+                              <span className="flex items-center gap-2">
+                                <Icon className="w-4 h-4" />
+                                <span>{t(def.labelKey)}</span>
+                              </span>
+                              {isToggleable && (
+                                <div
+                                  className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
+                                    isToggled
+                                      ? 'bg-primary text-on-primary'
+                                      : 'bg-surface-secondary border border-border'
+                                  }`}
+                                >
+                                  {isToggled && <Check className="w-3 h-3" />}
+                                </div>
+                              )}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
