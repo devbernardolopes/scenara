@@ -459,10 +459,7 @@ function CharacterDiscovery() {
                       <img
                         src={char.avatar}
                         alt={char.name}
-                        data-avatar
-                        // className="w-full h-full object-cover cursor-pointer"
                         className="w-full object-cover cursor-pointer"
-                        onClick={() => handleImageClick(char.avatar)}
                       />
                     ) : (
                       <div className="w-full h-full bg-surface-secondary flex items-center justify-center text-4xl">
