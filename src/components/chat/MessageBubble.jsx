@@ -353,10 +353,11 @@ function MessageBubble({
   function handleOverflowClick() {
     if (overflowBtnRef.current) {
       const rect = overflowBtnRef.current.getBoundingClientRect()
+      const menuMinWidth = 160
       setOverflowMenuStyle({
         position: 'fixed',
         top: rect.top - 4,
-        right: window.innerWidth - rect.right,
+        right: Math.min(window.innerWidth - rect.right, window.innerWidth - menuMinWidth - 4),
         zIndex: 9999,
       })
     }

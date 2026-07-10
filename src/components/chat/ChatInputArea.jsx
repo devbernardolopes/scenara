@@ -640,10 +640,14 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                       onClick={() => {
                         if (overflowBtnRef.current) {
                           const rect = overflowBtnRef.current.getBoundingClientRect()
+                          const menuMinWidth = 220
                           setOverflowMenuStyle({
                             position: 'fixed',
                             bottom: window.innerHeight - rect.top + 4,
-                            right: window.innerWidth - rect.right,
+                            right: Math.min(
+                              window.innerWidth - rect.right,
+                              window.innerWidth - menuMinWidth - 4,
+                            ),
                             zIndex: 9999,
                           })
                         }
