@@ -185,6 +185,10 @@ export async function exportCharacter(id) {
     throw new Error('Character not found')
   }
   const { id: _id, createdAt: _ca, updatedAt: _ua, ...data } = c
+  if (data.tags?.length) {
+    const tagObjs = await Promise.all(data.tags.map((tid) => db.tags.get(tid)))
+    data.tags = tagObjs.filter(Boolean).map((t) => t.name)
+  }
   showToast(i18n.t('common:toast.character.exported', { name: c.name }), { type: 'success' })
   return data
 }

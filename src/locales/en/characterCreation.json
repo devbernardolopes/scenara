@@ -113,5 +113,9 @@
   "confirmDeleteInitialMessage": "Are you sure you want to delete this initial message?",
   "confirmDeleteInitialMessageTitle": "Delete Initial Message",
   "noInitialMessages": "No initial messages yet. Add one to greet the user when a new chat starts.",
-  "permanentTokenCount": "{{count}} permanent tokens"
+  "permanentTokenCount": "{{count}} permanent tokens",
+  "tagsSectionPlaceholder": "Type a tag name or paste comma-separated tags…",
+  "tagsSectionNoTags": "No tags assigned yet.",
+  "tagsSectionBrowseTags": "Browse All Tags",
+  "tagsSectionBrowseActive": "Active"
 }

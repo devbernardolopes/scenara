@@ -11,5 +11,9 @@
   "deleteInitialMessage": "Löschen",
   "confirmDeleteInitialMessage": "Bist du sicher, dass du diese erste Nachricht löschen möchtest?",
   "confirmDeleteInitialMessageTitle": "Erste Nachricht löschen",
-  "noInitialMessages": "Noch keine ersten Nachrichten. Füge eine hinzu, um den Benutzer zu begrüßen, wenn ein neuer Chat startet."
+  "noInitialMessages": "Noch keine ersten Nachrichten. Füge eine hinzu, um den Benutzer zu begrüßen, wenn ein neuer Chat startet.",
+  "tagsSectionPlaceholder": "Gib einen Tag-Namen ein oder füge kommagetrennte Tags ein…",
+  "tagsSectionNoTags": "Noch keine Tags zugewiesen.",
+  "tagsSectionBrowseTags": "Alle Tags durchsuchen",
+  "tagsSectionBrowseActive": "Aktiv"
 }

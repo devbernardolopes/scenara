@@ -11,5 +11,9 @@
   "deleteInitialMessage": "Supprimer",
   "confirmDeleteInitialMessage": "Êtes-vous sûr de vouloir supprimer ce message initial ?",
   "confirmDeleteInitialMessageTitle": "Supprimer le Message Initial",
-  "noInitialMessages": "Pas encore de messages initiaux. Ajoutez-en un pour saluer l'utilisateur lorsqu'un nouveau chat commence."
+  "noInitialMessages": "Pas encore de messages initiaux. Ajoutez-en un pour saluer l'utilisateur lorsqu'un nouveau chat commence.",
+  "tagsSectionPlaceholder": "Tapez un nom de tag ou collez des tags séparés par des virgules…",
+  "tagsSectionNoTags": "Aucun tag attribué pour le moment.",
+  "tagsSectionBrowseTags": "Parcourir Tous les Tags",
+  "tagsSectionBrowseActive": "Actif"
 }

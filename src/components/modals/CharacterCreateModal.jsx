@@ -4,6 +4,7 @@ import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import { createCharacter, updateCharacter } from '../../services/characters'
 import { getSetting } from '../../services/settings'
+import { getAllTags, createTag } from '../../services/tags'
 import { estimateTokens } from '../../services/tokenEstimator'
 import { getWritingInstruction } from '../../services/writingInstructions'
 import { getPersona } from '../../services/personas'
@@ -13,6 +14,7 @@ import CharacterSection from './character/CharacterSection'
 import OverridesSection from './character/OverridesSection'
 import PlaceholderSection from './character/PlaceholderSection'
 import InitialMessagesSection from './character/InitialMessagesSection'
+import TagsSection from './character/TagsSection'
 
 const INITIAL_FORM = {
   name: '',
@@ -47,6 +49,7 @@ const INITIAL_FORM = {
   personaInjectionTiming: 'always',
   personaInjectionPlacement: 'endOfSystemPrompt',
   personaInjectionMessageRole: 'system',
+  tags: [],
 }
 
 const DEFAULTS_MAP = {
@@ -121,7 +124,7 @@ const SECTION_COMPONENTS = {
   overrides: OverridesSection,
   initialMessages: InitialMessagesSection,
   lorebooks: PlaceholderSection,
-  tags: PlaceholderSection,
+  tags: TagsSection,
   '3d': PlaceholderSection,
   sfx: PlaceholderSection,
 }
@@ -229,14 +232,38 @@ function CharacterCreateModal({ character: existing, initialData }) {
     })
   }, [isEditing]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isDirty = Object.keys(initialRef.current).some(
-    (key) => form[key] !== initialRef.current[key],
-  )
+  useEffect(() => {
+    if (!isImport) return
+    const tags = form.tags
+    if (!tags?.length || typeof tags[0] !== 'string') return
+    getAllTags().then(async (existing) => {
+      const nameToId = new Map(existing.map((t) => [t.name.toLowerCase(), t.id]))
+      const resolved = []
+      for (const name of tags) {
+        const id = nameToId.get(name.toLowerCase())
+        if (id) {
+          resolved.push(id)
+        } else {
+          const newId = await createTag(name)
+          resolved.push(newId)
+        }
+      }
+      setForm((prev) => ({ ...prev, tags: resolved }))
+    })
+  }, [isImport]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const isDirty = Object.keys(initialRef.current).some((key) => {
+    const val = form[key]
+    const init = initialRef.current[key]
+    if (Array.isArray(val)) return JSON.stringify(val) !== JSON.stringify(init)
+    return val !== init
+  })
 
   const sectionHighlights = useMemo(() => {
     const highlights = {
       character: form.writingInstruction != null,
       initialMessages: (form.initialMessages || []).some((m) => m.content?.trim()),
+      tags: (form.tags || []).length > 0,
       overrides: false,
     }
     if (overrideDefaults) {

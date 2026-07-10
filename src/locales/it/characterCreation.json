@@ -11,5 +11,9 @@
   "deleteInitialMessage": "Elimina",
   "confirmDeleteInitialMessage": "Sei sicuro di voler eliminare questo messaggio iniziale?",
   "confirmDeleteInitialMessageTitle": "Elimina Messaggio Iniziale",
-  "noInitialMessages": "Ancora nessun messaggio iniziale. Aggiungine uno per salutare l'utente quando inizia una nuova chat."
+  "noInitialMessages": "Ancora nessun messaggio iniziale. Aggiungine uno per salutare l'utente quando inizia una nuova chat.",
+  "tagsSectionPlaceholder": "Digita il nome di un tag o incolla tag separati da virgola…",
+  "tagsSectionNoTags": "Nessun tag assegnato ancora.",
+  "tagsSectionBrowseTags": "Sfoglia Tutti i Tag",
+  "tagsSectionBrowseActive": "Attivo"
 }

@@ -40,5 +40,9 @@
   "messagesToKeep": "Mensagens a Manter",
   "memorySlots": "Slots de Memória",
   "messagesToKeepDesc": "Quantas das mensagens mais recentes que fizerem parte da última solicitação de resumo ainda serão passadas para as requisições de API de um chat até o próximo evento de resumo.",
-  "memorySlotsDesc": "Quantas entradas de memória (slots) o chat terá por nível de memória."
+  "memorySlotsDesc": "Quantas entradas de memória (slots) o chat terá por nível de memória.",
+  "tagsSectionPlaceholder": "Digite o nome de uma tag ou cole tags separadas por vírgula…",
+  "tagsSectionNoTags": "Nenhuma tag atribuída ainda.",
+  "tagsSectionBrowseTags": "Explorar Todas as Tags",
+  "tagsSectionBrowseActive": "Ativo"
 }
