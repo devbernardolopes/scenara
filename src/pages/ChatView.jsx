@@ -269,7 +269,6 @@ function ChatView() {
 
     if (prevId && Number(prevId) !== Number(threadId)) {
       generatingRef.current = false
-      stopGenerating(prevId)
     }
 
     scrollStickyCleanupRef.current?.()
