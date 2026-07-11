@@ -270,6 +270,7 @@
       "summarization": "Summarization",
       "ooc": "OOC",
       "director": "Director",
+      "interface": "Interface",
       "none": "Not assigned"
     },
     "requestCooldown": {
@@ -336,6 +337,10 @@
     "directorProfile": {
       "label": "Director profile",
       "desc": "Profile used for director requests."
+    },
+    "interfaceProfile": {
+      "label": "Interface profile",
+      "desc": "Profile used for interface requests."
     },
     "testConnection": "Test Connection",
     "serverUrl": {

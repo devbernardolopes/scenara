@@ -2,7 +2,7 @@ import db from '../db'
 import { getSetting, setSetting } from './settings'
 import { getActiveKey, getActiveProvider, getModel, PROVIDERS } from './apiProviders'
 
-export const REQUEST_KINDS = ['chat', 'autoTitle', 'summarization', 'ooc', 'director']
+export const REQUEST_KINDS = ['chat', 'autoTitle', 'summarization', 'ooc', 'director', 'interface']
 
 async function getOrderIds(orderKey) {
   let order = await getSetting(orderKey)

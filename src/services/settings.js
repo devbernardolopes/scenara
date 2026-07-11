@@ -744,6 +744,14 @@ export const SETTINGS = [
     descKey: 'settings:api.directorProfile.desc',
   },
   {
+    key: 'requestKind.interface.profileId',
+    category: 'api',
+    type: 'text',
+    default: null,
+    labelKey: 'settings:api.interfaceProfile.label',
+    descKey: 'settings:api.interfaceProfile.desc',
+  },
+  {
     key: 'api.requestCooldown',
     category: 'api',
     type: 'slider',

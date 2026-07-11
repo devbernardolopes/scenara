@@ -14,6 +14,7 @@ const REQUEST_KINDS = [
   { id: 'summarization', labelKey: 'settings:api.profileAssignment.summarization' },
   { id: 'ooc', labelKey: 'settings:api.profileAssignment.ooc' },
   { id: 'director', labelKey: 'settings:api.profileAssignment.director' },
+  { id: 'interface', labelKey: 'settings:api.profileAssignment.interface' },
 ]
 
 function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle, onClose }) {
