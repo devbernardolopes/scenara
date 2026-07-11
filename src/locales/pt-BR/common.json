@@ -19,7 +19,7 @@
     "importFromFile": "Do arquivo",
     "importUrlPrompt": "Digite a URL do personagem para importar:",
     "importUrlComingSoon": "Importação por URL ainda não implementada",
-    "characterNameWithId": "{{name}} · #{{id}}"
+    "characterNameWithId": "{{name}}"
   },
   "topbar": {
     "toggleSidebar": "Alternar barra lateral",

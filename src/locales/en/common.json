@@ -37,7 +37,7 @@
     "importUrlComingSoon": "URL import is not yet implemented",
     "color": "Color",
     "colorNone": "None",
-    "characterNameWithId": "{{name}} · #{{id}}"
+    "characterNameWithId": "{{name}}"
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",

@@ -1,6 +1,15 @@
 import db from '../db'
 import { updateThreadTimestamp } from './threads'
 
+export async function getThreadMessageCounts() {
+  const all = await db.messages.toArray()
+  const counts = new Map()
+  for (const m of all) {
+    counts.set(m.threadId, (counts.get(m.threadId) || 0) + 1)
+  }
+  return counts
+}
+
 export async function getMessagesByThread(threadId) {
   return db.messages.where('threadId').equals(Number(threadId)).sortBy('createdAt')
 }
@@ -24,6 +33,7 @@ export async function createMessage(threadId, role, content, personaId, isOOC = 
     })
   }
   await updateThreadTimestamp(threadId)
+  window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId } }))
   return id
 }
 
@@ -38,6 +48,7 @@ export async function createAssistantMessage(threadId, content, createdAt, isOOC
     summarizedAt: null,
   })
   await updateThreadTimestamp(threadId)
+  window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId } }))
   return id
 }
 
@@ -90,7 +101,9 @@ export async function deleteMessagesFrom(id) {
 }
 
 export async function deleteMessagesByThread(threadId) {
-  return db.messages.where('threadId').equals(Number(threadId)).delete()
+  const result = await db.messages.where('threadId').equals(Number(threadId)).delete()
+  window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId } }))
+  return result
 }
 
 export function trimLeadingTrailingNewlines(text) {
