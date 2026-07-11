@@ -178,7 +178,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       const charName = form.name || ''
       const userName = defaultPersonaName || ''
       const replaceVars = (text) =>
-        text.replace(/{{char}}/g, charName).replace(/{{user}}/g, userName)
+        text.replace(/{{char}}/gi, charName).replace(/{{user}}/gi, userName)
 
       let total = 0
 

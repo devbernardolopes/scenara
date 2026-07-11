@@ -128,7 +128,7 @@ function MessageBubble({
 }) {
   function renderContent(text) {
     if (!text) return text
-    return text.replace(/{{char}}/g, charName || '').replace(/{{user}}/g, personaName || '')
+    return text.replace(/{{char}}/gi, charName || '').replace(/{{user}}/gi, personaName || '')
   }
   const { t } = useTranslation('chat')
   const { openModal } = useModal()

@@ -14,9 +14,9 @@ export function getChatBaseUrl(providerId) {
 export function replaceVars(text, { charName, personaName, currentPersonaName }) {
   if (!text) return text
   return text
-    .replace(/{{char}}/g, charName || '')
-    .replace(/{{user}}/g, personaName || '')
-    .replace(/{{name}}/g, currentPersonaName || personaName || '')
+    .replace(/{{char}}/gi, charName || '')
+    .replace(/{{user}}/gi, personaName || '')
+    .replace(/{{name}}/gi, currentPersonaName || personaName || '')
 }
 
 export function appendMemoryToPayload(payload, memoryText, memoryHeader) {
@@ -58,7 +58,7 @@ export async function buildMessagesPayload({
   const replaceVarsWithDesc = (text) => {
     if (!text) return text
     const desc = chatPersona?.description || ''
-    return replaceVarsIn(text).replace(/{{description}}/g, desc)
+    return replaceVarsIn(text).replace(/{{description}}/gi, desc)
   }
 
   const prefixAssistant = await getSetting('prompting.prefixAssistantRole')
@@ -229,8 +229,8 @@ export function buildTranscript({
           if (userPersonaPrefixOverride && msg.personaId) {
             const pName = personaMap?.[msg.personaId]?.name || currentPersonaName || personaName
             prefix = (userRolePrefixWithPersona || '[USER as {{name}}]:')
-              .replace(/{{name}}/g, pName)
-              .replace(/{{persona_name}}/g, pName)
+              .replace(/{{name}}/gi, pName)
+              .replace(/{{persona_name}}/gi, pName)
           } else {
             prefix = userRolePrefix || '[USER]:'
           }
@@ -317,7 +317,7 @@ export async function buildOOCMessagesPayload({
       if (oocUserInstr.includes('{{content}}')) {
         result.push({
           role: 'user',
-          content: replaceVarsIn(oocUserInstr).replace(/\{\{content\}\}/g, userMessage),
+          content: replaceVarsIn(oocUserInstr).replace(/\{\{content\}\}/gi, userMessage),
         })
       } else {
         result.push({ role: 'user', content: replaceVarsIn(oocUserInstr) + '\n\n' + userMessage })

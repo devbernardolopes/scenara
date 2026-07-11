@@ -153,11 +153,11 @@ export async function buildSummarizationPayload({
     : transcript
   const fullContent = memorySection ? `${memorySection}\n\n${transcriptSection}` : transcriptSection
 
-  systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/g, fullContent)
+  systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, fullContent)
 
   const payload = [{ role: 'system', content: systemContent }]
   if (userContent) {
-    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/g, fullContent)
+    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/gi, fullContent)
     payload.push({ role: 'user', content: userContent })
   } else {
     payload.push({ role: 'user', content: fullContent })
