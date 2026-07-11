@@ -276,7 +276,13 @@ function CharacterCreateModal({ character: existing, initialData }) {
 
   const sectionHighlights = useMemo(() => {
     const highlights = {
-      character: form.writingInstruction != null,
+      character:
+        form.name?.trim() ||
+        form.avatar?.trim() ||
+        form.prompt?.trim() ||
+        form.extraPrompt?.trim() ||
+        form.postHistoryInstructions?.trim() ||
+        form.tagline?.trim(),
       initialMessages: (form.initialMessages || []).some((m) => m.content?.trim()),
       exampleMessages: (form.exampleMessages || []).some((m) => m.content?.trim()),
       tags: (form.tags || []).length > 0,

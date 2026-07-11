@@ -44,6 +44,30 @@ const PERSONA_MESSAGE_ROLE_OPTIONS = [
   { value: 'assistant', labelKey: 'personaInjectionMessageRoleOptions.assistant' },
 ]
 
+function ToggleRow({ label, checked, onChange }) {
+  return (
+    <label className="flex items-center justify-between gap-3 min-h-[44px] cursor-pointer">
+      <span className="text-sm text-text">{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={!!checked}
+        aria-label={label}
+        onClick={() => onChange(!checked)}
+        className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ${
+          checked ? 'bg-primary' : 'bg-gray-300'
+        }`}
+      >
+        <span
+          className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition-transform duration-200 ${
+            checked ? 'translate-x-5' : 'translate-x-0'
+          }`}
+        />
+      </button>
+    </label>
+  )
+}
+
 function ButtonGroup({ options, value, onChange, disabled }) {
   const { t } = useTranslation('characterCreation')
   return (
@@ -275,45 +299,29 @@ function OverridesSection({ form, onChange, characterId }) {
 
       <hr className="border-border" />
 
-      <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">
-        <input
-          type="checkbox"
-          checked={form.firstMessage}
-          onChange={(e) => onChange('firstMessage', e.target.checked)}
-          className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-        />
-        <span className="text-sm text-text">{t('firstMessage')}</span>
-      </label>
+      <ToggleRow
+        label={t('firstMessage')}
+        checked={form.firstMessage}
+        onChange={(v) => onChange('firstMessage', v)}
+      />
 
-      <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">
-        <input
-          type="checkbox"
-          checked={form.userPersonaPrefix}
-          onChange={(e) => onChange('userPersonaPrefix', e.target.checked)}
-          className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-        />
-        <span className="text-sm text-text">{t('userPersonaPrefix')}</span>
-      </label>
+      <ToggleRow
+        label={t('userPersonaPrefix')}
+        checked={form.userPersonaPrefix}
+        onChange={(v) => onChange('userPersonaPrefix', v)}
+      />
 
-      <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">
-        <input
-          type="checkbox"
-          checked={form.includeOOC}
-          onChange={(e) => onChange('includeOOC', e.target.checked)}
-          className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-        />
-        <span className="text-sm text-text">{t('includeOOC')}</span>
-      </label>
+      <ToggleRow
+        label={t('includeOOC')}
+        checked={form.includeOOC}
+        onChange={(v) => onChange('includeOOC', v)}
+      />
 
-      <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">
-        <input
-          type="checkbox"
-          checked={form.postProcessing}
-          onChange={(e) => onChange('postProcessing', e.target.checked)}
-          className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-        />
-        <span className="text-sm text-text">{t('postProcessing')}</span>
-      </label>
+      <ToggleRow
+        label={t('postProcessing')}
+        checked={form.postProcessing}
+        onChange={(v) => onChange('postProcessing', v)}
+      />
 
       <hr className="border-border" />
 
