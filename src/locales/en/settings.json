@@ -586,7 +586,7 @@
       "message": "Are you sure you want to delete \"{{name}}\"?",
       "messageMultiple": "Are you sure you want to delete {{count}} writing instructions?",
       "linkedCharacters": "This writing instruction is used by {{count}} character:",
-      "linkedCharacters_plural": "This writing instruction is used by {{count}} characters:"
+      "linkedCharacters_other": "This writing instruction is used by {{count}} characters:"
     },
     "form": {
       "title": "Create Writing Instruction",

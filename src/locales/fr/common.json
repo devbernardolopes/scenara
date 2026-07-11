@@ -53,7 +53,7 @@
       "desc": "Décroissant"
     },
     "chatCount": "{{count}} discussion",
-    "chatCount_plural": "{{count}} discussions",
+    "chatCount_other": "{{count}} discussions",
     "filter": {
       "title": "Filtres & Tri"
     }

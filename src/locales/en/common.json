@@ -85,7 +85,7 @@
       "active": "Active"
     },
     "chatCount": "{{count}} chat",
-    "chatCount_plural": "{{count}} chats",
+    "chatCount_other": "{{count}} chats",
     "confirmDelete": {
       "title": "Delete Character",
       "message": "Are you sure you want to delete {{name}}? All associated chats will be permanently deleted.",

@@ -53,7 +53,7 @@
       "desc": "Descendente"
     },
     "chatCount": "{{count}} chat",
-    "chatCount_plural": "{{count}} chats",
+    "chatCount_other": "{{count}} chats",
     "filter": {
       "title": "Filtros & Ordenación"
     }
