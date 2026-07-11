@@ -233,6 +233,10 @@
       "label": "USER Summarization Instructions",
       "desc": "User prompt for summarization."
     },
+    "directorSystem": {
+      "label": "SYSTEM Director Instructions",
+      "desc": "System prompt for the director review pass during chats."
+    },
     "oocDelimiters": {
       "label": "Use OOC Delimiters",
       "desc": "Enable custom delimiters to mark out-of-character messages.",

@@ -799,6 +799,16 @@ export const SETTINGS = [
     descKey: 'settings:prompting.summarizationUser.desc',
   },
   {
+    key: 'prompting.directorSystem',
+    category: 'prompting',
+    type: 'textarea',
+    default:
+      "You are a rigorous director reviewing an AI roleplay response before it is shown to the user.\n\nYour task is to evaluate the response strictly against the character prompt and the defined writing style, and to rewrite it so that it fully complies.\n\nRules:\n- Enforce strict adherence to the character's personality, knowledge, motivations, and constraints from the character prompt.\n- Enforce the specified writing style: tone, POV, tense, prose density, formatting, and any style directives.\n- Remove or correct any content that breaks character, contradicts established facts, or violates the style definition.\n- Preserve the original meaning, intent, and narrative events unless they conflict with the above.\n- Output ONLY the corrected response text. No explanations, labels, or commentary.",
+    props: { rows: 6, collapsible: true, summary: 'tokens' },
+    labelKey: 'settings:prompting.directorSystem.label',
+    descKey: 'settings:prompting.directorSystem.desc',
+  },
+  {
     key: 'prompting.oocDelimiters',
     category: 'prompting',
     type: 'oocDelimiters',
