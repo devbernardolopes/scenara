@@ -17,6 +17,35 @@ import ColorPicker from '../shared/ColorPicker'
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
 
+function ToggleRow({ label, checked, onChange, disabled = false }) {
+  return (
+    <label
+      className={`flex items-center justify-between gap-3 min-h-[44px] ${
+        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+      }`}
+    >
+      <span className="text-sm text-text">{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={!!checked}
+        aria-label={label}
+        disabled={disabled}
+        onClick={() => !disabled && onChange(!checked)}
+        className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ${
+          checked ? 'bg-primary' : 'bg-gray-300'
+        }`}
+      >
+        <span
+          className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition-transform duration-200 ${
+            checked ? 'translate-x-5' : 'translate-x-0'
+          }`}
+        />
+      </button>
+    </label>
+  )
+}
+
 function PersonaFormModal({ persona }) {
   const { t } = useTranslation('settings')
   const { closeModal, setCloseGuard, openModal } = useModal()
@@ -266,19 +295,15 @@ function PersonaFormModal({ persona }) {
           />
         </div>
 
-        <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">
-          <input
-            type="checkbox"
-            checked={form.isDefault}
-            onChange={(e) => {
-              if (isLastDefault && !e.target.checked) return
-              setForm((prev) => ({ ...prev, isDefault: e.target.checked }))
-            }}
-            className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-            disabled={isLastDefault}
-          />
-          <span className="text-sm text-text">{t('persona.form.setDefault')}</span>
-        </label>
+        <ToggleRow
+          label={t('persona.form.setDefault')}
+          checked={form.isDefault}
+          disabled={isLastDefault}
+          onChange={(v) => {
+            if (isLastDefault && !v) return
+            setForm((prev) => ({ ...prev, isDefault: v }))
+          }}
+        />
       </div>
     </ModalShell>
   )
