@@ -33,7 +33,7 @@ import {
 } from '../services/chatApi'
 import { getSetting } from '../services/settings'
 import * as apiQueue from '../services/apiQueue'
-import { stopGenerating } from '../services/generatingState'
+import { getGeneratingThreads, stopGenerating } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import {
   shouldTriggerSummarization,
@@ -504,6 +504,20 @@ function ChatView() {
     }
   }, [threadId])
 
+  useEffect(() => {
+    if (getGeneratingThreads().has(Number(threadId))) {
+      setGenerating(true)
+    }
+    function handleGeneratingChange(e) {
+      const { threadId: eventThreadId, generating: isGenerating } = e.detail
+      if (Number(eventThreadId) === Number(threadId)) {
+        setGenerating(isGenerating)
+      }
+    }
+    window.addEventListener('generating-state-changed', handleGeneratingChange)
+    return () => window.removeEventListener('generating-state-changed', handleGeneratingChange)
+  }, [threadId])
+
   const handleScroll = useCallback(() => {
     const el = scrollRef.current
     if (!el) return
@@ -870,7 +884,6 @@ function ChatView() {
   async function handleSend(text, personaId, isOOC, autoReply = true) {
     if (generatingRef.current) return
     generatingRef.current = true
-    setGenerating(true)
 
     try {
       let currentMsgs = messages
@@ -1081,9 +1094,6 @@ function ChatView() {
 
     if (generatingRef.current) return
     generatingRef.current = true
-    if (Number(currentThreadIdRef.current) === Number(threadId)) {
-      setGenerating(true)
-    }
 
     let slotIndex = 0
     let completedNormally = false
