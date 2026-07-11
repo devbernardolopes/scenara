@@ -10,7 +10,7 @@ import ExportItemRow from '../shared/ExportItemRow'
 
 function ExportDatabaseModal() {
   const { t } = useTranslation('settings')
-  const { openModal, closeModal } = useModal()
+  const { openModal, closeModal, updateModal } = useModal()
 
   const [loading, setLoading] = useState(true)
   const [isExporting, setIsExporting] = useState(false)
@@ -113,9 +113,9 @@ function ExportDatabaseModal() {
       const ts = now.toISOString().replace(/[:.]/g, '-').slice(0, 19)
       downloadJson(data, `scenara-export-${ts}.json`)
 
-      openModal('progress', { status: 'exported', label: t('database.exportModal.exported') })
+      updateModal({ status: 'exported', label: t('database.exportModal.exported') })
     } catch (err) {
-      openModal('progress', { status: 'error', label: err.message || 'Export failed' })
+      updateModal({ status: 'error', label: err.message || 'Export failed' })
     } finally {
       setIsExporting(false)
     }

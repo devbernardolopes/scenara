@@ -18,6 +18,18 @@ export function ModalProvider({ children }) {
     setModalStack((prev) => [...prev, { type, props }])
   }, [])
 
+  const updateModal = useCallback((props) => {
+    setModalStack((prev) => {
+      if (prev.length === 0) return prev
+      const updated = [...prev]
+      updated[updated.length - 1] = {
+        ...updated[updated.length - 1],
+        props: { ...updated[updated.length - 1].props, ...props },
+      }
+      return updated
+    })
+  }, [])
+
   const closeModal = useCallback(() => {
     closeGuardRef.current = null
     setModalStack((prev) => prev.slice(0, -1))
@@ -49,6 +61,7 @@ export function ModalProvider({ children }) {
       value={{
         openModal,
         closeModal,
+        updateModal,
         setCloseGuard,
         activeModal,
         modalProps,

@@ -8,7 +8,7 @@ import { Download, Upload, AlertTriangle, RefreshCw } from '../../../lib/icons'
 
 function DatabaseSettingsPanel() {
   const { confirm } = useConfirm()
-  const { openModal } = useModal()
+  const { openModal, updateModal } = useModal()
   const { t } = useTranslation('settings')
   const [resetting, setResetting] = useState(false)
   const [resettingSettings, setResettingSettings] = useState(false)
@@ -37,7 +37,7 @@ function DatabaseSettingsPanel() {
       try {
         data = JSON.parse(text)
       } catch {
-        openModal('progress', {
+        updateModal({
           status: 'error',
           label: t('database.importModal.invalidFile'),
         })
@@ -45,9 +45,9 @@ function DatabaseSettingsPanel() {
       }
 
       await importDatabase(data)
-      openModal('progress', { status: 'imported', label: t('database.importModal.imported') })
+      updateModal({ status: 'imported', label: t('database.importModal.imported') })
     } catch (err) {
-      openModal('progress', {
+      updateModal({
         status: 'error',
         label: err.message || t('database.importModal.failedImport'),
       })
