@@ -5,6 +5,7 @@ const SECTIONS = [
   { id: 'overrides', labelKey: 'sectionOverrides' },
   { id: 'initialMessages', labelKey: 'sectionInitialMessages' },
   { id: 'exampleMessages', labelKey: 'sectionExampleMessages' },
+  { id: 'director', labelKey: 'sectionDirector' },
   { id: 'lorebooks', labelKey: 'sectionLorebooks' },
   { id: 'tags', labelKey: 'sectionTags' },
   { id: '3d', labelKey: 'section3d' },

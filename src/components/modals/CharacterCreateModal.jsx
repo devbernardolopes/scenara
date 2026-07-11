@@ -16,6 +16,7 @@ import OverridesSection from './character/OverridesSection'
 import PlaceholderSection from './character/PlaceholderSection'
 import InitialMessagesSection from './character/InitialMessagesSection'
 import ExampleMessagesSection from './character/ExampleMessagesSection'
+import DirectorSection from './character/DirectorSection'
 import TagsSection from './character/TagsSection'
 
 const INITIAL_FORM = {
@@ -39,6 +40,15 @@ const INITIAL_FORM = {
   memorySlots: 3,
   summarizationSystemInstructions: '',
   summarizationUserInstructions: '',
+  directorEnabled: false,
+  directorAutoTitleEnabled: false,
+  directorAutoTitleInstructions: '',
+  directorSummarizationEnabled: false,
+  directorSummarizationInstructions: '',
+  directorRegularChatEnabled: false,
+  directorRegularChatInstructions: '',
+  directorOOCEnabled: false,
+  directorOOCInstructions: '',
   firstMessage: true,
   userPersonaPrefix: true,
   includeOOC: true,
@@ -127,6 +137,7 @@ const SECTION_COMPONENTS = {
   overrides: OverridesSection,
   initialMessages: InitialMessagesSection,
   exampleMessages: ExampleMessagesSection,
+  director: DirectorSection,
   lorebooks: PlaceholderSection,
   tags: TagsSection,
   '3d': PlaceholderSection,
@@ -365,6 +376,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
             { id: 'overrides', labelKey: 'sectionOverrides' },
             { id: 'initialMessages', labelKey: 'sectionInitialMessages' },
             { id: 'exampleMessages', labelKey: 'sectionExampleMessages' },
+            { id: 'director', labelKey: 'sectionDirector' },
             { id: 'lorebooks', labelKey: 'sectionLorebooks' },
             { id: 'tags', labelKey: 'sectionTags' },
             { id: '3d', labelKey: 'section3d' },
