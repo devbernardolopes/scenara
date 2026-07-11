@@ -36,7 +36,8 @@
     "importUrlPrompt": "Enter the character URL to import:",
     "importUrlComingSoon": "URL import is not yet implemented",
     "color": "Color",
-    "colorNone": "None"
+    "colorNone": "None",
+    "characterNameWithId": "{{name}} · #{{id}}"
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",

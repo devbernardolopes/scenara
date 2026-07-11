@@ -15,7 +15,7 @@ import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
-import { findColorSlot } from '../../config/colorPalettes'
+import { findColorSlot, getColorHex } from '../../config/colorPalettes'
 import { useTheme } from '../../hooks/useTheme'
 import ColorPicker from '../shared/ColorPicker'
 import CloseButton from '../shared/CloseButton'
@@ -430,17 +430,24 @@ function Sidebar({ open, onClose }) {
             threads.map((thread) => {
               const character = characters[thread.characterId]
               const isActive = String(thread.id) === threadId
+              const threadColor =
+                thread.colorSlot >= 0 ? getColorHex(theme, thread.colorSlot) : thread.color
               return (
                 <div
                   key={thread.id}
-                  className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden`}
-                  style={{ backgroundColor: thread.color || undefined }}
+                  className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px]`}
+                  style={{
+                    borderLeftColor: threadColor || undefined,
+                    backgroundColor: threadColor
+                      ? `color-mix(in srgb, ${threadColor} 12%, var(--color-surface))`
+                      : undefined,
+                  }}
                 >
                   <Link to={`/chat/${thread.id}`} onClick={onClose} className="block p-3">
                     <div className="flex items-start gap-3">
                       <Avatar
                         src={character?.avatar}
-                        size="sm"
+                        size="xl"
                         className="flex-shrink-0 mt-0.5"
                         onClick={(e) => handleAvatarClick(e, character?.avatar)}
                       />
@@ -464,26 +471,28 @@ function Sidebar({ open, onClose }) {
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
-                          {unreadBadges && (thread.unreadCount || 0) > 0 && (
-                            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-red-500 rounded-full shrink-0">
-                              {thread.unreadCount > 99 ? '99+' : thread.unreadCount}
-                            </span>
-                          )}
-                          {generatingSet.has(thread.id) && (
-                            <RefreshCw className="w-3.5 h-3.5 text-primary animate-spin shrink-0" />
-                          )}
-                          {queueCounts[thread.id] > 0 && (
-                            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-primary rounded-full shrink-0">
-                              {queueCounts[thread.id]}
-                            </span>
-                          )}
-                          <span className="text-xs text-tertiary shrink-0">
-                            #{thread.threadNumber}
-                          </span>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {unreadBadges && (thread.unreadCount || 0) > 0 && (
+                              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-badge-unread-text bg-badge-unread rounded-full">
+                                {thread.unreadCount > 99 ? '99+' : thread.unreadCount}
+                              </span>
+                            )}
+                            {generatingSet.has(thread.id) && (
+                              <RefreshCw className="w-3.5 h-3.5 text-primary animate-spin" />
+                            )}
+                            {queueCounts[thread.id] > 0 && (
+                              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-badge-queue-text bg-badge-queue rounded-full">
+                                {queueCounts[thread.id]}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="flex items-center justify-between mt-0.5">
                           <p className="text-xs text-secondary truncate">
-                            {character?.name || t('sidebar.unknownCharacter')}
+                            {t('sidebar.characterNameWithId', {
+                              name: character?.name || t('sidebar.unknownCharacter'),
+                              id: thread.threadNumber,
+                            })}
                           </p>
                           <div className="shrink-0">
                             <button
@@ -538,18 +547,6 @@ function Sidebar({ open, onClose }) {
                       type="button"
                       onClick={(e) => {
                         e.preventDefault()
-                        handleDelete(thread)
-                      }}
-                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-delete text-on-delete hover:bg-delete-hover"
-                      aria-label={t('sidebar.deleteThread')}
-                      title={t('sidebar.deleteThread')}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault()
                         handleEditCharacter(thread)
                       }}
                       className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
@@ -585,6 +582,18 @@ function Sidebar({ open, onClose }) {
                       <Star
                         className={`w-3.5 h-3.5 ${thread.isFavorite ? 'fill-yellow-500' : ''}`}
                       />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handleDelete(thread)
+                      }}
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-delete text-on-delete hover:bg-delete-hover"
+                      aria-label={t('sidebar.deleteThread')}
+                      title={t('sidebar.deleteThread')}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>

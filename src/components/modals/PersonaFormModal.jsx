@@ -195,7 +195,7 @@ function PersonaFormModal({ persona }) {
           <div className="flex items-center gap-2">
             <Avatar
               src={form.avatar}
-              size="xl"
+              size="2xl"
               className="shrink-0 cursor-pointer"
               onClick={() =>
                 openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })

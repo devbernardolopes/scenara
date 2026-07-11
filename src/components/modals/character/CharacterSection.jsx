@@ -66,7 +66,7 @@ function CharacterSection({ form, onChange, characterId }) {
         <div className="flex items-center gap-2">
           <Avatar
             src={form.avatar}
-            size="xl"
+            size="2xl"
             className="shrink-0"
             onClick={() => openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })}
           />

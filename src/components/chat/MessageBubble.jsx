@@ -71,7 +71,7 @@ const VIS_KEY = {
   },
 }
 
-const AVATAR_SIZE_MAP = { '1x': 'sm', '2x': 'md', '3x': 'lg', '4x': 'xl' }
+const AVATAR_SIZE_MAP = { '1x': 'sm', '2x': 'md', '3x': 'lg', '4x': '2xl' }
 
 const CHAT_FONTS = {
   system: undefined,

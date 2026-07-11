@@ -661,6 +661,11 @@
   --color-image-scrim-fade: rgba(0, 0, 0, 0);
   --color-on-image: #ffffff;
   --color-on-image-muted: rgba(255, 255, 255, 0.7);
+
+  --color-badge-unread-bg: #e5484d;
+  --color-badge-unread-text: #ffffff;
+  --color-badge-queue-bg: #7c3aed;
+  --color-badge-queue-text: #ffffff;
 }
 
 /* ============================================================
@@ -785,6 +790,20 @@
 }
 .text-delete {
   color: var(--color-delete);
+}
+
+/* Badge (thread status indicators — fixed across themes) */
+.bg-badge-unread {
+  background-color: var(--color-badge-unread-bg);
+}
+.text-badge-unread-text {
+  color: var(--color-badge-unread-text);
+}
+.bg-badge-queue {
+  background-color: var(--color-badge-queue-bg);
+}
+.text-badge-queue-text {
+  color: var(--color-badge-queue-text);
 }
 
 /* Placeholder (theme-aware — Tailwind v4 doesn't generate placeholder-tertiary natively) */

@@ -24,7 +24,7 @@ function SettingAvatarPicker({ value, onChange, disabled }) {
 
   return (
     <div className="flex items-center gap-2">
-      <Avatar src={value} size="xl" className="shrink-0" />
+      <Avatar src={value} size="2xl" className="shrink-0" />
       <input
         className={`${inputClass} flex-1`}
         value={value ?? ''}
