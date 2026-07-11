@@ -9,7 +9,7 @@ function ShellLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex h-screen bg-surface text-text">
+    <div className="flex h-full bg-surface text-text">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <main className="flex-1 overflow-auto min-w-0">
         <Outlet />

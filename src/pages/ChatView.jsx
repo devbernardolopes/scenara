@@ -365,7 +365,7 @@ function ChatView() {
 
   useEffect(() => {
     if (messages.length > 0 && scrollCommits.current > 1 && messagesGrewRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+      scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
     }
   }, [messages])
 
