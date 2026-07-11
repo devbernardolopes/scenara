@@ -314,10 +314,10 @@ export async function buildOOCMessagesPayload({
   if (userMessage) {
     const oocUserInstr = oocSettings.oocUserInstructions
     if (oocUserInstr) {
-      if (oocUserInstr.includes('{content}')) {
+      if (oocUserInstr.includes('{{content}}')) {
         result.push({
           role: 'user',
-          content: replaceVarsIn(oocUserInstr).replace(/\{content\}/g, userMessage),
+          content: replaceVarsIn(oocUserInstr).replace(/\{\{content\}\}/g, userMessage),
         })
       } else {
         result.push({ role: 'user', content: replaceVarsIn(oocUserInstr) + '\n\n' + userMessage })
