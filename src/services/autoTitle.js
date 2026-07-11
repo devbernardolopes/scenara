@@ -3,6 +3,15 @@ import { getEffectiveProfileFor } from './connectionProfiles'
 import { sendChatCompletion, replaceVars, buildTranscript, appendMemoryToPayload } from './chatApi'
 import { getSetting } from './settings'
 import { updateThread } from './threads'
+import {
+  getDirectorConfig,
+  applyDirectorTemplate,
+  buildDirectorMessages,
+  getAutoTitleTemplateValues,
+} from './director'
+import { waitForCooldown } from './apiQueue'
+import { showToast } from '../lib/toast'
+import i18n from '../lib/i18n'
 
 const DEFAULT_SYSTEM_INSTRUCTION = 'You are a title generator for conversational AI.'
 
@@ -92,7 +101,38 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
 
   if (!title?.trim()) throw new Error('Empty title generated')
 
-  const cleanTitle = title.trim()
+  let cleanTitle = title.trim()
+
+  const directorConfig = await getDirectorConfig(character, 'autoTitle')
+  if (directorConfig) {
+    try {
+      const dProfile = await getEffectiveProfileFor('director')
+      if (!dProfile?.model) throw new Error('No Director profile configured')
+      await waitForCooldown()
+      showToast(i18n.t('chat:directorReviewing'), { type: 'info' })
+      const { system_autotitle, user_autotitle } = await getAutoTitleTemplateValues(character)
+      const templateVars = {
+        message: cleanTitle,
+        writingInstructions: '',
+        char: charName,
+        user: personaName,
+        name: currentPersonaName,
+        system_autotitle,
+        user_autotitle,
+      }
+      const systemInstructions = applyDirectorTemplate(
+        directorConfig.systemInstructions,
+        templateVars,
+      )
+      const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
+      const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
+      const reviewed = await sendChatCompletion({ profile: dProfile, messages: dPayload, signal })
+      if (reviewed?.trim()) cleanTitle = reviewed.trim()
+    } catch {
+      showToast(i18n.t('chat:directorFailed'), { type: 'warning' })
+    }
+  }
+
   await updateThread(thread.id, { title: cleanTitle, autoTitleGenerated: true })
 
   return cleanTitle
