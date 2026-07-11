@@ -525,7 +525,7 @@ function MessageBubble({
                 )}
                 <div
                   ref={headerBtnRef}
-                  className="flex-1 min-w-0 items-center justify-end gap-1 overflow-hidden"
+                  className="flex flex-1 min-w-0 items-center justify-end gap-1 overflow-hidden"
                 >
                   {headerKeys.map((key) => {
                     const def = BUTTON_DEFS[key]
