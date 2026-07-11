@@ -16,3 +16,10 @@ export function buildDirectorMessages({ systemInstructions, userInstructions }) 
     { role: 'user', content: userInstructions },
   ]
 }
+
+export function applyDirectorTemplate(text, { message, writingInstructions }) {
+  if (!text) return text
+  return text
+    .replace(/\{\{message\}\}/gi, message || '')
+    .replace(/\{\{writing_instructions\}\}/gi, writingInstructions || '')
+}

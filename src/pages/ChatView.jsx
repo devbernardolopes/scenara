@@ -32,7 +32,11 @@ import {
   getActiveParams,
 } from '../services/chatApi'
 import { getSetting } from '../services/settings'
-import { getDirectorReviewConfig, buildDirectorMessages } from '../services/director'
+import {
+  getDirectorReviewConfig,
+  buildDirectorMessages,
+  applyDirectorTemplate,
+} from '../services/director'
 import * as apiQueue from '../services/apiQueue'
 import {
   getGeneratingThreads,
@@ -845,14 +849,22 @@ function ChatView() {
       }
     }
 
-    async function runDirectorReview(originalContent) {
+    async function runDirectorReview(originalContent, writingInstructionContent) {
       const dProfile = await getEffectiveProfileFor('director')
       if (!dProfile?.model) {
         throw new Error(t('noProfileModel', { ns: 'chat' }))
       }
       await apiQueue.waitForCooldown()
       showToast(t('directorReviewing', { ns: 'chat' }), { type: 'info' })
-      const dPayload = buildDirectorMessages(directorConfig)
+      const systemInstructions = applyDirectorTemplate(directorConfig.systemInstructions, {
+        message: originalContent,
+        writingInstructions: writingInstructionContent,
+      })
+      const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, {
+        message: originalContent,
+        writingInstructions: writingInstructionContent,
+      })
+      const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
       const reviewed = await sendChatCompletion({
         profile: dProfile,
         messages: dPayload,
@@ -904,7 +916,12 @@ function ChatView() {
 
         if (directorConfig) {
           try {
-            const reviewed = await runDirectorReview(content)
+            let writingInstructionContent = ''
+            if (character?.writingInstruction) {
+              const wi = await getWritingInstruction(Number(character.writingInstruction))
+              writingInstructionContent = wi?.content || ''
+            }
+            const reviewed = await runDirectorReview(content, writingInstructionContent)
             finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
           } catch {
             showToast(t('directorFailed', { ns: 'chat' }), { type: 'warning' })
