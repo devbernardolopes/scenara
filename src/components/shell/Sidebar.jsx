@@ -106,12 +106,6 @@ function Sidebar({ open, onClose }) {
   const fileInputRef = useRef(null)
   useUnread()
 
-  function handleAvatarClick(e, src) {
-    e.preventDefault()
-    e.stopPropagation()
-    if (src) openModal('imageViewer', { src, modalSize: 'fullscreen' })
-  }
-
   function handleCreateCharacter() {
     openModal('characterCreate')
   }
@@ -440,7 +434,7 @@ function Sidebar({ open, onClose }) {
               return (
                 <div
                   key={thread.id}
-                  className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px] p-2 flex items-stretch`}
+                  className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px] p-2 flex flex-col`}
                   style={{
                     borderLeftColor: threadColor || undefined,
                     backgroundColor: threadColor
@@ -448,31 +442,32 @@ function Sidebar({ open, onClose }) {
                       : undefined,
                   }}
                 >
-                  <div
-                    className="w-22 flex-shrink-0 self-stretch rounded-l-lg overflow-hidden relative bg-surface-hover cursor-pointer"
-                    onClick={(e) => handleAvatarClick(e, character?.avatar)}
+                  <Link
+                    to={`/chat/${thread.id}`}
+                    onClick={onClose}
+                    className="flex items-stretch gap-0 min-w-0"
                   >
-                    {character?.avatar &&
-                    (/^https?:\/\//.test(character.avatar) ||
-                      character.avatar.startsWith('data:image/')) ? (
-                      <img
-                        src={character.avatar}
-                        alt={character?.name || ''}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <span className="flex items-center justify-center h-full w-full text-3xl">
-                        {character?.avatar || '👤'}
-                      </span>
-                    )}
-                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-1 py-0.5">
-                      <p className="text-center text-[10px] text-on-image-muted leading-none truncate">
-                        #{thread.threadNumber} · {messageCounts.get(thread.id) || 0}
-                      </p>
+                    <div className="w-22 flex-shrink-0 self-stretch rounded-l-lg overflow-hidden relative bg-surface-hover">
+                      {character?.avatar &&
+                      (/^https?:\/\//.test(character.avatar) ||
+                        character.avatar.startsWith('data:image/')) ? (
+                        <img
+                          src={character.avatar}
+                          alt={character?.name || ''}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex items-center justify-center h-full w-full text-3xl">
+                          {character?.avatar || '👤'}
+                        </span>
+                      )}
+                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-1 py-0.5">
+                        <p className="text-center text-[10px] text-on-image-muted leading-none truncate">
+                          #{thread.threadNumber} · {messageCounts.get(thread.id) || 0}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex-1 min-w-0 flex flex-col gap-1 pl-2">
-                    <Link to={`/chat/${thread.id}`} onClick={onClose} className="block">
+                    <div className="flex-1 min-w-0 flex flex-col gap-1 pl-2">
                       <div className="flex items-center gap-1">
                         <div className="flex-1 min-w-0 flex items-center gap-1.5">
                           <ThreadCardTitle
@@ -547,78 +542,84 @@ function Sidebar({ open, onClose }) {
                           </button>
                         </div>
                       </div>
-                    </Link>
-                    <div className="flex items-center gap-1 mt-auto">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          toggleSelect(thread.id)
-                        }}
-                        className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover flex-shrink-0"
-                        aria-label={t('sidebar.selectThreads')}
-                      >
-                        {selectedIds.has(thread.id) ? (
-                          <CheckSquare className="w-4 h-4" />
-                        ) : (
-                          <Square className="w-4 h-4" />
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handleEditCharacter(thread)
-                        }}
-                        className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
-                        aria-label={t('sidebar.editCharacter')}
-                        title={t('sidebar.editCharacter')}
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handleDuplicate(thread)
-                        }}
-                        className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
-                        aria-label={t('sidebar.duplicateThread')}
-                        title={t('sidebar.duplicateThread')}
-                      >
-                        <Copy className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handleToggleFavorite(thread)
-                        }}
-                        className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-surface-hover ${thread.isFavorite ? 'text-yellow-500' : 'text-tertiary hover:text-text'}`}
-                        aria-label={
-                          thread.isFavorite ? t('sidebar.unfavorite') : t('sidebar.favorite')
-                        }
-                        title={thread.isFavorite ? t('sidebar.unfavorite') : t('sidebar.favorite')}
-                      >
-                        <Star
-                          className={`w-3.5 h-3.5 ${thread.isFavorite ? 'fill-yellow-500' : ''}`}
-                        />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handleDelete(thread)
-                        }}
-                        className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-delete text-on-delete hover:bg-delete-hover"
-                        aria-label={t('sidebar.deleteThread')}
-                        title={t('sidebar.deleteThread')}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center gap-1 mt-auto">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            toggleSelect(thread.id)
+                          }}
+                          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover flex-shrink-0"
+                          aria-label={t('sidebar.selectThreads')}
+                        >
+                          {selectedIds.has(thread.id) ? (
+                            <CheckSquare className="w-4 h-4" />
+                          ) : (
+                            <Square className="w-4 h-4" />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handleEditCharacter(thread)
+                          }}
+                          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                          aria-label={t('sidebar.editCharacter')}
+                          title={t('sidebar.editCharacter')}
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handleDuplicate(thread)
+                          }}
+                          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                          aria-label={t('sidebar.duplicateThread')}
+                          title={t('sidebar.duplicateThread')}
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handleToggleFavorite(thread)
+                          }}
+                          className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-surface-hover ${thread.isFavorite ? 'text-yellow-500' : 'text-tertiary hover:text-text'}`}
+                          aria-label={
+                            thread.isFavorite ? t('sidebar.unfavorite') : t('sidebar.favorite')
+                          }
+                          title={
+                            thread.isFavorite ? t('sidebar.unfavorite') : t('sidebar.favorite')
+                          }
+                        >
+                          <Star
+                            className={`w-3.5 h-3.5 ${thread.isFavorite ? 'fill-yellow-500' : ''}`}
+                          />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handleDelete(thread)
+                          }}
+                          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-delete text-on-delete hover:bg-delete-hover"
+                          aria-label={t('sidebar.deleteThread')}
+                          title={t('sidebar.deleteThread')}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               )
             })
