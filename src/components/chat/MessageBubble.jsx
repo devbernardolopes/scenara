@@ -111,6 +111,7 @@ function MessageBubble({
   streaming,
   bundleMessages,
   bundleIndex,
+  streamingSlotIndex,
   currentOrigin,
   onBundleNavigate,
   onDeleteRequest,
@@ -694,7 +695,7 @@ function MessageBubble({
               >
                 {displayContent}
               </ReactMarkdown>
-              {streaming && (
+              {streaming && (!bundleMessages || bundleIndex === streamingSlotIndex) && (
                 <span className="inline-block w-0.5 h-4 bg-current ml-0.5 animate-pulse align-text-bottom" />
               )}
             </div>

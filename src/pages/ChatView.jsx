@@ -220,6 +220,7 @@ function ChatView() {
   const [visibleStartIndex, setVisibleStartIndex] = useState(0)
   const [messageThreshold, setMessageThreshold] = useState(0)
   const [activeSlotIndices, setActiveSlotIndices] = useState({})
+  const [streamingSlotIndices, setStreamingSlotIndices] = useState({})
   const [isTabVisible, setIsTabVisible] = useState(true)
   const [systemAvatar, setSystemAvatar] = useState('')
   const [oocMessageRole, setOocMessageRole] = useState('system')
@@ -259,6 +260,7 @@ function ChatView() {
 
       const { slots } = rebuildFailedState(msgs)
       setActiveSlotIndices(slots)
+      setStreamingSlotIndices({})
 
       const threshold = Number(await getSetting('defaultMessageThreshold')) || 0
       setMessageThreshold(threshold)
@@ -1163,6 +1165,7 @@ function ChatView() {
 
       slotIndex = regenEntries.length
       regenEntries.push({ content: '', promptData: null, createdAt: new Date().toISOString() })
+      setStreamingSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
       }
@@ -1430,6 +1433,11 @@ function ChatView() {
     } finally {
       clearStreamingMessageId(threadId)
       isLocalStreamerRef.current = false
+      setStreamingSlotIndices((prev) => {
+        const next = { ...prev }
+        delete next[messageId]
+        return next
+      })
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setStreamingMsgId(null)
       }
@@ -1697,6 +1705,7 @@ function ChatView() {
                       personaMap={personaMap}
                       nameLabel={getMessageName(msg)}
                       streaming={msg.id === streamingMsgId}
+                      streamingSlotIndex={streamingSlotIndices[msg.id]}
                       bundleMessages={bundleMessages}
                       bundleIndex={bundleIndex}
                       currentOrigin={currentOrigin}
