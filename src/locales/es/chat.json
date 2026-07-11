@@ -2,6 +2,7 @@
   "title": "Chat {{id}}",
   "placeholder": "Los mensajes aparecerán aquí.",
   "inputPlaceholder": "Escriba un mensaje…",
+  "clearInput": "Limpiar entrada",
   "send": "Enviar",
   "ooc": "Modo OOC",
   "attachFile": "Adjuntar archivo",

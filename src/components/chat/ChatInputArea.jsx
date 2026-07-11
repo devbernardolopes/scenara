@@ -16,6 +16,7 @@ import {
   CornerDownLeft,
   Reply,
   Forward,
+  X,
 } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 import PersonaPicker from '../shared/PersonaPicker'
@@ -565,39 +566,58 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
         )}
 
         {/* Textarea */}
-        <textarea
-          ref={textareaRef}
-          data-no-autoresize
-          rows={2}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          disabled={summarizing}
-          onInput={(e) => autoResize(e.target)}
-          onDoubleClick={() => {
-            if (shortcutsActive) {
-              setShortcutsActive(false)
-              setPromptHistoryOpen(true)
-            } else {
-              setPromptHistoryOpen((prev) => !prev)
+        <div className="relative">
+          <textarea
+            ref={textareaRef}
+            data-no-autoresize
+            rows={2}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            disabled={summarizing}
+            onInput={(e) => autoResize(e.target)}
+            onDoubleClick={() => {
+              if (shortcutsActive) {
+                setShortcutsActive(false)
+                setPromptHistoryOpen(true)
+              } else {
+                setPromptHistoryOpen((prev) => !prev)
+              }
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder={t('inputPlaceholder')}
+            style={
+              selectedPersona?.color && !oocActive
+                ? {
+                    borderLeftColor: selectedPersona.color,
+                    borderLeftWidth: '3px',
+                    backgroundColor: `color-mix(in srgb, ${selectedPersona.color} 12%, var(--color-surface))`,
+                  }
+                : undefined
             }
-          }}
-          onKeyDown={handleKeyDown}
-          placeholder={t('inputPlaceholder')}
-          style={
-            selectedPersona?.color && !oocActive
-              ? {
-                  borderLeftColor: selectedPersona.color,
-                  borderLeftWidth: '3px',
-                  backgroundColor: `color-mix(in srgb, ${selectedPersona.color} 12%, var(--color-surface))`,
+            className={`w-full resize-none rounded-lg border px-4 py-3 pr-12 text-sm leading-relaxed transition-colors duration-150 min-h-[56px] max-h-48 focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+              oocActive
+                ? 'bg-ooc text-ooc border-ooc placeholder-ooc'
+                : 'bg-surface border-border text-text placeholder-tertiary'
+            }`}
+          />
+          {inputValue && (
+            <button
+              type="button"
+              onClick={() => {
+                setInputValue('')
+                if (textareaRef.current) {
+                  textareaRef.current.style.height = 'auto'
+                  textareaRef.current.focus()
                 }
-              : undefined
-          }
-          className={`w-full resize-none rounded-lg border px-4 py-3 pr-12 text-sm leading-relaxed transition-colors duration-150 min-h-[56px] max-h-48 focus:outline-none focus:ring-2 focus:ring-primary/30 ${
-            oocActive
-              ? 'bg-ooc text-ooc border-ooc placeholder-ooc'
-              : 'bg-surface border-border text-text placeholder-tertiary'
-          }`}
-        />
+              }}
+              className="absolute top-2 right-2 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md text-tertiary hover:text-text hover:bg-surface-hover transition-colors"
+              aria-label={t('clearInput')}
+              title={t('clearInput')}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
 
         {/* Bottom bar */}
         <div className="flex flex-nowrap items-center gap-1.5 mt-2">

@@ -2,6 +2,7 @@
   "title": "Discussion {{id}}",
   "placeholder": "Les messages apparaîtront ici.",
   "inputPlaceholder": "Tapez un message…",
+  "clearInput": "Effacer le texte",
   "send": "Envoyer",
   "ooc": "Mode OOC",
   "attachFile": "Joindre un fichier",

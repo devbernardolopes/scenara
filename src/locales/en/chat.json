@@ -2,6 +2,7 @@
   "title": "Chat",
   "placeholder": "Start the conversation by sending a message.",
   "inputPlaceholder": "Type a message…",
+  "clearInput": "Clear input",
   "send": "Send",
   "loading": "Loading…",
   "deleteTitle": "Delete conversation",

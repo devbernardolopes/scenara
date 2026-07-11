@@ -2,6 +2,7 @@
   "title": "Chat {{id}}",
   "placeholder": "As mensagens aparecerão aqui.",
   "inputPlaceholder": "Digite uma mensagem…",
+  "clearInput": "Limpar entrada",
   "send": "Enviar",
   "loading": "Carregando…",
   "deleteTitle": "Excluir conversa",
