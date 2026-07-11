@@ -17,9 +17,12 @@ export function buildDirectorMessages({ systemInstructions, userInstructions }) 
   ]
 }
 
-export function applyDirectorTemplate(text, { message, writingInstructions }) {
+export function applyDirectorTemplate(text, { message, writingInstructions, char, user, name }) {
   if (!text) return text
   return text
     .replace(/\{\{message\}\}/gi, message || '')
     .replace(/\{\{writing_instructions\}\}/gi, writingInstructions || '')
+    .replace(/\{\{char\}\}/gi, char || '')
+    .replace(/\{\{user\}\}/gi, user || '')
+    .replace(/\{\{name\}\}/gi, name || '')
 }
