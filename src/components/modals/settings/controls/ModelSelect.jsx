@@ -13,7 +13,8 @@ import { getFavModels, toggleFavModel } from '../../../../services/apiProviders'
 import { getUIState, setUIState } from '../../../../services/uiState'
 import CollapsibleSection from '../../../shared/CollapsibleSection'
 
-const SORT_OPTIONS = ['name']
+const HORDE_SORT_OPTIONS = ['name', 'count', 'queued', 'eta', 'performance']
+const DEFAULT_SORT_OPTIONS = ['name']
 
 function formatEta(seconds) {
   if (seconds >= 60) {
@@ -247,8 +248,10 @@ function ModelSelect({
   useEffect(() => {
     if (providerId) {
       getFavModels(providerId).then(setFavModels)
+      const validOptions = providerId === 'ai-horde' ? HORDE_SORT_OPTIONS : DEFAULT_SORT_OPTIONS
       getUIState(`modelSelect.${providerId}.sortBy`).then((val) => {
-        if (val && SORT_OPTIONS.includes(val)) setSortBy(val)
+        if (val && validOptions.includes(val)) setSortBy(val)
+        else setSortBy('name')
       })
       getUIState(`modelSelect.${providerId}.sortOrder`).then((val) => {
         if (val === 'asc' || val === 'desc') setSortOrder(val)
@@ -295,21 +298,32 @@ function ModelSelect({
     if (providerId) setUIState(`modelSelect.${providerId}.filter`, val)
   }
 
+  const sortOptions = providerId === 'ai-horde' ? HORDE_SORT_OPTIONS : DEFAULT_SORT_OPTIONS
+
   const processedModels = useMemo(() => {
     let list = [...new Set([...models])]
     const q = filter.toLowerCase().trim()
     if (q) {
       list = list.filter((m) => (modelNames[m] || m).toLowerCase().includes(q))
     }
-    if (sortBy === 'name') {
-      list.sort((a, b) => {
+    list.sort((a, b) => {
+      const aFav = favModels.includes(a) ? 0 : 1
+      const bFav = favModels.includes(b) ? 0 : 1
+      if (aFav !== bFav) return aFav - bFav
+      if (sortBy === 'name') {
         const nameA = modelNames[a] || a
         const nameB = modelNames[b] || b
         return sortOrder === 'desc' ? nameB.localeCompare(nameA) : nameA.localeCompare(nameB)
-      })
-    }
+      }
+      const metaA = modelMeta[a]?.[sortBy]
+      const metaB = modelMeta[b]?.[sortBy]
+      const aHas = metaA !== undefined ? 0 : 1
+      const bHas = metaB !== undefined ? 0 : 1
+      if (aHas !== bHas) return aHas - bHas
+      return sortOrder === 'desc' ? (metaB ?? 0) - (metaA ?? 0) : (metaA ?? 0) - (metaB ?? 0)
+    })
     return list
-  }, [models, filter, sortBy, sortOrder, modelNames])
+  }, [models, filter, sortBy, sortOrder, modelNames, favModels, modelMeta])
 
   async function handleToggleFav(modelName) {
     const updated = await toggleFavModel(providerId, modelName)
@@ -325,7 +339,7 @@ function ModelSelect({
           onChange={(e) => persistSortBy(e.target.value)}
           className="min-h-[44px] px-3 py-2 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
         >
-          {SORT_OPTIONS.map((key) => (
+          {sortOptions.map((key) => (
             <option key={key} value={key}>
               {t(`api.modelSort.${key}`)}
             </option>
