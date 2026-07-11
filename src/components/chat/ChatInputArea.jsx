@@ -583,6 +583,15 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
           }}
           onKeyDown={handleKeyDown}
           placeholder={t('inputPlaceholder')}
+          style={
+            selectedPersona?.color && !oocActive
+              ? {
+                  borderLeftColor: selectedPersona.color,
+                  borderLeftWidth: '3px',
+                  backgroundColor: `color-mix(in srgb, ${selectedPersona.color} 12%, var(--color-surface))`,
+                }
+              : undefined
+          }
           className={`w-full resize-none rounded-lg border px-4 py-3 pr-12 text-sm leading-relaxed transition-colors duration-150 min-h-[56px] max-h-48 focus:outline-none focus:ring-2 focus:ring-primary/30 ${
             oocActive
               ? 'bg-ooc text-ooc border-ooc placeholder-ooc'
