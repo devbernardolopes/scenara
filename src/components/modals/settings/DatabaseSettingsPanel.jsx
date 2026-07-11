@@ -4,6 +4,7 @@ import { useConfirm } from '../../../lib/confirm'
 import { useModal } from '../../../hooks/useModal'
 import { showToast } from '../../../lib/toast'
 import { resetDatabase, resetSettings, importDatabase } from '../../../services/database'
+import { jsonReviver } from '../../../lib/download'
 import { Download, Upload, AlertTriangle, RefreshCw } from '../../../lib/icons'
 
 function DatabaseSettingsPanel() {
@@ -35,7 +36,7 @@ function DatabaseSettingsPanel() {
       const text = await file.text()
       let data
       try {
-        data = JSON.parse(text)
+        data = JSON.parse(text, jsonReviver)
       } catch {
         updateModal({
           status: 'error',

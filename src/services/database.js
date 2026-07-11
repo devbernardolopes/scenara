@@ -16,7 +16,7 @@ export async function exportDatabase(selection) {
     const filtered = characters.filter((c) => selection.characterIds.has(c.id))
     data.characters = await Promise.all(
       filtered.map(async (c) => {
-        const { id: _id, createdAt: _ca, updatedAt: _ua, ...rest } = c
+        const { id: _id, ...rest } = c
         if (rest.tags?.length) {
           const tagObjs = await Promise.all(rest.tags.map((tid) => db.tags.get(tid)))
           rest.tags = tagObjs.filter(Boolean).map((t) => t.name)
@@ -29,31 +29,31 @@ export async function exportDatabase(selection) {
   if (selection.personaIds?.size > 0) {
     const personas = await db.personas.toArray()
     const filtered = personas.filter((p) => selection.personaIds.has(p.id))
-    data.personas = filtered.map(({ id: _id, createdAt: _ca, ...rest }) => rest)
+    data.personas = filtered.map(({ id: _id, ...rest }) => rest)
   }
 
   if (selection.threadIds?.size > 0) {
     const threads = await db.threads.toArray()
     const filtered = threads.filter((t) => selection.threadIds.has(t.id))
-    data.threads = filtered.map(({ id: _id, createdAt: _ca, updatedAt: _ua, ...rest }) => rest)
+    data.threads = filtered.map(({ id: _id, ...rest }) => rest)
   }
 
   if (selection.writingInstructionIds?.size > 0) {
     const items = await db.writingInstructions.toArray()
     const filtered = items.filter((w) => selection.writingInstructionIds.has(w.id))
-    data.writingInstructions = filtered.map(({ id: _id, createdAt: _ca, ...rest }) => rest)
+    data.writingInstructions = filtered.map(({ id: _id, ...rest }) => rest)
   }
 
   if (selection.connectionProfileIds?.size > 0) {
     const profiles = await db.connectionProfiles.toArray()
     const filtered = profiles.filter((p) => selection.connectionProfileIds.has(p.id))
-    data.connectionProfiles = filtered.map(({ id: _id, createdAt: _ca, ...rest }) => rest)
+    data.connectionProfiles = filtered.map(({ id: _id, ...rest }) => rest)
   }
 
   if (selection.inChatShortcutIds?.size > 0) {
     const items = await db.inChatShortcuts.toArray()
     const filtered = items.filter((i) => selection.inChatShortcutIds.has(i.id))
-    data.inChatShortcuts = filtered.map(({ id: _id, createdAt: _ca, ...rest }) => rest)
+    data.inChatShortcuts = filtered.map(({ id: _id, ...rest }) => rest)
   }
 
   if (selection.settings) {
@@ -108,7 +108,16 @@ export async function importDatabase(data) {
     'inChatShortcuts',
     'promptHistory',
     'tags',
+    'threadMemories',
   ]
+
+  function addWithId(table, record) {
+    const { id: oldId, ...rest } = record
+    if (oldId != null) {
+      return table.add({ id: oldId, ...rest })
+    }
+    return table.add(rest)
+  }
 
   await db.transaction(
     'rw',
@@ -122,78 +131,75 @@ export async function importDatabase(data) {
 
       if (Array.isArray(data.tags)) {
         for (const tag of data.tags) {
-          const { id: _oldId, ...tagData } = tag
-          const newId = await db.tags.add(tagData)
+          const { id: oldId, ...tagData } = tag
+          const addData = oldId != null ? { id: oldId, ...tagData } : tagData
+          const newId = await db.tags.add(addData)
           if (tag.name) tagIdMap[tag.name] = newId
         }
       }
 
       if (Array.isArray(data.personas)) {
         for (const persona of data.personas) {
-          const { id: _oldId, ...personaData } = persona
-          await db.personas.add(personaData)
+          await addWithId(db.personas, persona)
         }
       }
 
       if (Array.isArray(data.characters)) {
         for (const character of data.characters) {
-          const { id: _oldId, tags: tagNames, ...characterData } = character
+          const { id: oldId, tags: tagNames, ...characterData } = character
           if (Array.isArray(tagNames) && tagNames.length > 0) {
             const resolvedTags = tagNames.map((name) => tagIdMap[name]).filter(Boolean)
             if (resolvedTags.length > 0) {
               characterData.tags = resolvedTags
             }
           }
-          await db.characters.add(characterData)
+          if (oldId != null) {
+            await db.characters.add({ id: oldId, ...characterData })
+          } else {
+            await db.characters.add(characterData)
+          }
         }
       }
 
       if (Array.isArray(data.threads)) {
         for (const thread of data.threads) {
-          const { id: _oldId, ...threadData } = thread
-          await db.threads.add(threadData)
+          await addWithId(db.threads, thread)
         }
       }
 
       if (Array.isArray(data.writingInstructions)) {
         for (const item of data.writingInstructions) {
-          const { id: _oldId, ...itemData } = item
-          await db.writingInstructions.add(itemData)
+          await addWithId(db.writingInstructions, item)
         }
       }
 
       if (Array.isArray(data.connectionProfiles)) {
         for (const profile of data.connectionProfiles) {
-          const { id: _oldId, ...profileData } = profile
-          await db.connectionProfiles.add(profileData)
+          await addWithId(db.connectionProfiles, profile)
         }
       }
 
       if (Array.isArray(data.inChatShortcuts)) {
         for (const item of data.inChatShortcuts) {
-          const { id: _oldId, ...itemData } = item
-          await db.inChatShortcuts.add(itemData)
+          await addWithId(db.inChatShortcuts, item)
         }
       }
 
       if (Array.isArray(data.settings)) {
         for (const setting of data.settings) {
-          const { id: _oldId, ...settingData } = setting
-          await db.settings.add(settingData)
+          await addWithId(db.settings, setting)
         }
       }
 
       if (Array.isArray(data.messages)) {
         for (const message of data.messages) {
-          const { id: _oldId, ...messageData } = message
-          await db.messages.add(messageData)
+          await addWithId(db.messages, message)
         }
       }
 
       if (Array.isArray(data.promptHistory)) {
         for (const item of data.promptHistory) {
-          const { id: _oldId, ...itemData } = item
-          await db.promptHistory.add(itemData)
+          await addWithId(db.promptHistory, item)
         }
       }
     },
