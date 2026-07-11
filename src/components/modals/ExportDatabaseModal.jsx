@@ -7,13 +7,16 @@ import db from '../../db'
 import ModalShell from '../shared/ModalShell'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import ExportItemRow from '../shared/ExportItemRow'
+import ProgressModal from './ProgressModal'
 
 function ExportDatabaseModal() {
   const { t } = useTranslation('settings')
-  const { openModal, closeModal, updateModal } = useModal()
+  const { closeModal } = useModal()
 
   const [loading, setLoading] = useState(true)
   const [isExporting, setIsExporting] = useState(false)
+  const [phase, setPhase] = useState('select')
+  const [errorLabel, setErrorLabel] = useState('')
 
   const [characters, setCharacters] = useState([])
   const [personas, setPersonas] = useState([])
@@ -95,7 +98,7 @@ function ExportDatabaseModal() {
 
   async function handleExport() {
     setIsExporting(true)
-    openModal('progress', { status: 'exporting', label: t('database.exportModal.exporting') })
+    setPhase('exporting')
 
     try {
       const data = await exportDatabase({
@@ -113,9 +116,10 @@ function ExportDatabaseModal() {
       const ts = now.toISOString().replace(/[:.]/g, '-').slice(0, 19)
       downloadJson(data, `scenara-export-${ts}.json`)
 
-      updateModal({ status: 'exported', label: t('database.exportModal.exported') })
+      setPhase('exported')
     } catch (err) {
-      updateModal({ status: 'error', label: err.message || 'Export failed' })
+      setErrorLabel(err.message || 'Export failed')
+      setPhase('error')
     } finally {
       setIsExporting(false)
     }
@@ -129,6 +133,10 @@ function ExportDatabaseModal() {
         </div>
       </ModalShell>
     )
+  }
+
+  if (phase !== 'select') {
+    return <ProgressModal status={phase} label={errorLabel} />
   }
 
   const allCharacterIds = characters.map((c) => c.id)
