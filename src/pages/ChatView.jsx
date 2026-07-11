@@ -926,9 +926,6 @@ function ChatView() {
       const msgs = await getMessagesByThread(threadId)
       setMessages(msgs)
       const nonFailedMsgs = withoutFailedMessages(msgs)
-      generatingRef.current = false
-      setGenerating(false)
-      stopGenerating(threadId)
 
       const thr = await getThread(threadId)
       const chr = await getCharacter(thr.characterId)
