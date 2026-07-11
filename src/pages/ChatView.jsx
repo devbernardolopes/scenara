@@ -33,7 +33,7 @@ import {
 } from '../services/chatApi'
 import { getSetting } from '../services/settings'
 import * as apiQueue from '../services/apiQueue'
-import { getGeneratingThreads, stopGenerating } from '../services/generatingState'
+import { getGeneratingThreads } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import {
   shouldTriggerSummarization,
@@ -307,7 +307,6 @@ function ChatView() {
 
     if (prevId && Number(prevId) !== Number(threadId)) {
       generatingRef.current = false
-      stopGenerating(prevId)
     }
 
     scrollStickyCleanupRef.current?.()
