@@ -5,8 +5,6 @@ import { estimateTokens } from '../../../services/tokenEstimator'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
-const numberClass =
-  'w-24 px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
 
 const AVATAR_SCALE_OPTIONS = ['1x', '2x', '3x', '4x']
 
@@ -96,15 +94,18 @@ function OverridesSection({ form, onChange, characterId }) {
         <div className="flex items-center gap-3">
           <label className="text-sm text-secondary shrink-0">{t('autoTitleThreshold')}</label>
           <input
-            type="number"
-            className={numberClass}
+            type="range"
+            min={1}
+            max={10}
+            step={1}
             value={form.autoTitleThreshold}
             onChange={(e) => onChange('autoTitleThreshold', Number(e.target.value))}
             disabled={!form.autoTitle}
-            min={3}
-            max={10}
-            step={1}
+            className="w-48 accent-primary"
           />
+          <span className="text-sm text-text font-medium w-14 text-right">
+            {form.autoTitleThreshold}
+          </span>
         </div>
 
         <CollapsibleSection
@@ -161,15 +162,18 @@ function OverridesSection({ form, onChange, characterId }) {
         <div className="flex items-center gap-3">
           <label className="text-sm text-secondary shrink-0">{t('messagesThreshold')}</label>
           <input
-            type="number"
-            className={numberClass}
-            value={form.messagesThreshold}
-            onChange={(e) => onChange('messagesThreshold', Number(e.target.value))}
-            disabled={form.memory !== 'messages'}
+            type="range"
             min={3}
             max={50}
             step={1}
+            value={form.messagesThreshold}
+            onChange={(e) => onChange('messagesThreshold', Number(e.target.value))}
+            disabled={form.memory !== 'messages'}
+            className="w-48 accent-primary"
           />
+          <span className="text-sm text-text font-medium w-14 text-right">
+            {form.messagesThreshold}
+          </span>
         </div>
       </div>
 
@@ -195,29 +199,33 @@ function OverridesSection({ form, onChange, characterId }) {
         <div className="flex items-center gap-3">
           <label className="text-sm text-secondary shrink-0">{t('messagesToKeep')}</label>
           <input
-            type="number"
-            className={numberClass}
-            value={form.messagesToKeep}
-            onChange={(e) => onChange('messagesToKeep', Number(e.target.value))}
-            disabled={form.memory === 'never'}
+            type="range"
             min={0}
             max={25}
             step={1}
+            value={form.messagesToKeep}
+            onChange={(e) => onChange('messagesToKeep', Number(e.target.value))}
+            disabled={form.memory === 'never'}
+            className="w-48 accent-primary"
           />
+          <span className="text-sm text-text font-medium w-14 text-right">
+            {form.messagesToKeep}
+          </span>
         </div>
 
         <div className="flex items-center gap-3">
           <label className="text-sm text-secondary shrink-0">{t('memorySlots')}</label>
           <input
-            type="number"
-            className={numberClass}
-            value={form.memorySlots}
-            onChange={(e) => onChange('memorySlots', Number(e.target.value))}
-            disabled={form.memory === 'never'}
+            type="range"
             min={1}
             max={5}
             step={1}
+            value={form.memorySlots}
+            onChange={(e) => onChange('memorySlots', Number(e.target.value))}
+            disabled={form.memory === 'never'}
+            className="w-48 accent-primary"
           />
+          <span className="text-sm text-text font-medium w-14 text-right">{form.memorySlots}</span>
         </div>
       </div>
 

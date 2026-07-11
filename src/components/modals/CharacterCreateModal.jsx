@@ -29,7 +29,7 @@ const INITIAL_FORM = {
   initialMessages: [],
   exampleMessages: [],
   autoTitle: true,
-  autoTitleThreshold: 3,
+  autoTitleThreshold: 1,
   autoTitleSystemInstructions: '',
   autoTitleUserInstructions: '',
   memory: 'messages',
