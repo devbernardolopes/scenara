@@ -36,17 +36,53 @@ export function buildDirectorMessages({ systemInstructions, userInstructions }) 
 
 export function applyDirectorTemplate(
   text,
-  { message, writingInstructions, char, user, name, system_autotitle, user_autotitle },
+  {
+    message,
+    message_response,
+    message_system,
+    message_user,
+    writingInstructions,
+    char,
+    user,
+    name,
+    system_autotitle,
+    user_autotitle,
+  } = {},
 ) {
   if (!text) return text
-  return text
-    .replace(/\{\{message\}\}/gi, message || '')
-    .replace(/\{\{writing_instructions\}\}/gi, writingInstructions || '')
-    .replace(/\{\{char\}\}/gi, char || '')
-    .replace(/\{\{user\}\}/gi, user || '')
-    .replace(/\{\{name\}\}/gi, name || '')
-    .replace(/\{\{system_autotitle\}\}/gi, system_autotitle || '')
-    .replace(/\{\{user_autotitle\}\}/gi, user_autotitle || '')
+
+  const rules = [
+    ['message', message],
+    ['message_response', message_response ?? message],
+    ['message_system', message_system],
+    ['message_user', message_user],
+    ['writing_instructions', writingInstructions],
+    ['system_autotitle', system_autotitle],
+    ['user_autotitle', user_autotitle],
+    ['char', char],
+    ['user', user],
+    ['name', name],
+  ]
+
+  const replaceOnce = (s) => {
+    let out = s
+    for (const [key, val] of rules) {
+      out = out.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'gi'), val ?? '')
+    }
+    return out
+  }
+
+  let prev = text
+  let next = replaceOnce(prev)
+  let passes = 0
+  const MAX_PASSES = 10
+  while (next !== prev && passes < MAX_PASSES) {
+    prev = next
+    next = replaceOnce(prev)
+    passes++
+  }
+
+  return next
 }
 
 const DEFAULT_AUTO_TITLE_SYSTEM = 'You are a title generator for conversational AI.'

@@ -114,6 +114,9 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
       const { system_autotitle, user_autotitle } = await getAutoTitleTemplateValues(character)
       const templateVars = {
         message: cleanTitle,
+        message_response: cleanTitle,
+        message_system: payloadWithMemory.find((m) => m.role === 'system')?.content || '',
+        message_user: payloadWithMemory.find((m) => m.role === 'user')?.content || '',
         writingInstructions: '',
         char: charName,
         user: personaName,

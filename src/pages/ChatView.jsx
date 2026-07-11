@@ -864,6 +864,9 @@ function ChatView() {
       const currentPersonaName = currentPersona?.name || userPersonaName
       const templateVars = {
         message: originalContent,
+        message_response: originalContent,
+        message_system: payload.find((m) => m.role === 'system')?.content || '',
+        message_user: payload.find((m) => m.role === 'user')?.content || '',
         writingInstructions: writingInstructionContent,
         char: charName,
         user: userPersonaName,
@@ -1301,6 +1304,9 @@ function ChatView() {
         const currentPersonaName = regenCurrentPersona?.name || userPersonaName
         const templateVars = {
           message: originalContent,
+          message_response: originalContent,
+          message_system: payload.find((m) => m.role === 'system')?.content || '',
+          message_user: payload.find((m) => m.role === 'user')?.content || '',
           writingInstructions: writingInstructionContent,
           char: charName,
           user: userPersonaName,
