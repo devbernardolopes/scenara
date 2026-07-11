@@ -115,6 +115,16 @@ const OVERRIDE_FIELDS = [
   'personaInjectionMessageRole',
 ]
 
+const DIRECTOR_GROUP_FIELDS = [
+  { enabledKey: 'directorAutoTitleEnabled', instructionsKey: 'directorAutoTitleInstructions' },
+  {
+    enabledKey: 'directorSummarizationEnabled',
+    instructionsKey: 'directorSummarizationInstructions',
+  },
+  { enabledKey: 'directorRegularChatEnabled', instructionsKey: 'directorRegularChatInstructions' },
+  { enabledKey: 'directorOOCEnabled', instructionsKey: 'directorOOCInstructions' },
+]
+
 function buildInitialForm(existing) {
   if (!existing) return { ...INITIAL_FORM }
   const result = {}
@@ -287,6 +297,9 @@ function CharacterCreateModal({ character: existing, initialData }) {
       exampleMessages: (form.exampleMessages || []).some((m) => m.content?.trim()),
       tags: (form.tags || []).length > 0,
       overrides: false,
+      director:
+        form.directorEnabled &&
+        DIRECTOR_GROUP_FIELDS.some((g) => form[g.enabledKey] && form[g.instructionsKey]?.trim()),
     }
     if (overrideDefaults) {
       highlights.overrides = OVERRIDE_FIELDS.some((key) => {

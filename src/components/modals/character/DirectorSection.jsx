@@ -45,18 +45,33 @@ const GROUPS = [
   },
 ]
 
-function Toggle({ checked, onChange, disabled, label }) {
+function Switch({ checked, onChange, ariaLabel }) {
   return (
-    <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        disabled={disabled}
-        className="w-4 h-4 rounded border-border text-primary focus:ring-primary disabled:cursor-not-allowed"
+    <button
+      type="button"
+      role="switch"
+      aria-checked={!!checked}
+      aria-label={ariaLabel}
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ${
+        checked ? 'bg-primary' : 'bg-gray-300'
+      }`}
+    >
+      <span
+        className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition-transform duration-200 ${
+          checked ? 'translate-x-5' : 'translate-x-0'
+        }`}
       />
+    </button>
+  )
+}
+
+function SwitchRow({ label, checked, onChange }) {
+  return (
+    <div className="flex items-center justify-between gap-3 min-h-[44px]">
       <span className="text-sm text-text">{label}</span>
-    </label>
+      <Switch checked={checked} onChange={onChange} ariaLabel={label} />
+    </div>
   )
 }
 
@@ -66,41 +81,36 @@ function Group({ group, form, onChange, characterId }) {
   const instructions = form[group.instructionsKey]
 
   return (
-    <CollapsibleSection
-      label={t(group.labelKey)}
-      storageKey={characterId ? `${group.storageBase}.${characterId}` : undefined}
-      defaultExpanded={false}
-    >
-      <div className="space-y-3">
-        <Toggle
+    <div className="border border-border rounded-md">
+      <div className="flex items-center justify-between gap-3 px-3 py-2">
+        <span className="text-sm font-medium text-text">{t(group.labelKey)}</span>
+        <Switch
           checked={groupEnabled}
           onChange={(val) => onChange(group.enabledKey, val)}
-          label={t('directorGroupEnable')}
+          ariaLabel={t(group.labelKey)}
         />
-
-        <div className={`${!groupEnabled ? 'opacity-40 pointer-events-none' : ''}`}>
-          <CollapsibleSection
-            label={t(group.instructionsLabelKey)}
-            summary={
-              instructions ? t('common:tokenCount', { count: estimateTokens(instructions) }) : null
-            }
-            hasContent={!!instructions}
-            storageKey={
-              characterId ? `${group.storageBase}.instructions.${characterId}` : undefined
-            }
-            defaultExpanded={false}
-          >
-            <AutoResizeTextarea
-              className={`${inputClass} resize-none mt-2`}
-              value={instructions}
-              onChange={(e) => onChange(group.instructionsKey, e.target.value)}
-              placeholder={t(group.placeholderKey)}
-              disabled={!groupEnabled}
-            />
-          </CollapsibleSection>
-        </div>
       </div>
-    </CollapsibleSection>
+
+      <div className={`px-3 pb-3 ${!groupEnabled ? 'opacity-40 pointer-events-none' : ''}`}>
+        <CollapsibleSection
+          label={t(group.instructionsLabelKey)}
+          summary={
+            instructions ? t('common:tokenCount', { count: estimateTokens(instructions) }) : null
+          }
+          hasContent={!!instructions}
+          storageKey={characterId ? `${group.storageBase}.instructions.${characterId}` : undefined}
+          defaultExpanded={false}
+        >
+          <AutoResizeTextarea
+            className={`${inputClass} resize-none mt-2`}
+            value={instructions}
+            onChange={(e) => onChange(group.instructionsKey, e.target.value)}
+            placeholder={t(group.placeholderKey)}
+            disabled={!groupEnabled}
+          />
+        </CollapsibleSection>
+      </div>
+    </div>
   )
 }
 
@@ -111,10 +121,10 @@ function DirectorSection({ form, onChange, characterId }) {
 
   return (
     <div className="space-y-5">
-      <Toggle
+      <SwitchRow
+        label={t('directorEnable')}
         checked={directorEnabled}
         onChange={(val) => onChange('directorEnabled', val)}
-        label={t('directorEnable')}
       />
 
       <div className={disabledCls(!directorEnabled)}>
