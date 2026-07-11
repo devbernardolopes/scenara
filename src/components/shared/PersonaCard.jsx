@@ -86,6 +86,10 @@ function PersonaCard({
           icon={Star}
           label={t('persona.actions.setDefault')}
           onClick={() => onSetDefault(persona)}
+          className={
+            persona.isDefault ? 'text-yellow-500 hover:text-yellow-600 hover:bg-surface-hover' : ''
+          }
+          iconClassName={persona.isDefault ? 'fill-yellow-500' : ''}
         />
         <IconButton
           icon={Copy}

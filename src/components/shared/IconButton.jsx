@@ -1,4 +1,4 @@
-function IconButton({ icon: Icon, label, onClick, disabled, className = '' }) {
+function IconButton({ icon: Icon, label, onClick, disabled, className = '', iconClassName = '' }) {
   return (
     <button
       type="button"
@@ -15,7 +15,7 @@ function IconButton({ icon: Icon, label, onClick, disabled, className = '' }) {
       aria-label={label}
       title={label}
     >
-      <Icon className="w-4 h-4" />
+      <Icon className={`w-4 h-4 ${iconClassName}`} />
     </button>
   )
 }
