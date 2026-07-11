@@ -1059,6 +1059,14 @@ export const SETTINGS = [
     labelKey: 'settings:prompting.apiRequestSectionHeaders.characterPrompt.label',
   },
   {
+    key: 'prompting.apiRequestSectionHeaders.writingInstruction',
+    category: 'prompting',
+    type: 'text',
+    default: '**Writing Instructions:**',
+    group: 'apiRequestSectionHeaders',
+    labelKey: 'settings:prompting.apiRequestSectionHeaders.writingInstruction.label',
+  },
+  {
     key: 'prompting.apiRequestSectionHeaders.messages',
     category: 'prompting',
     type: 'text',

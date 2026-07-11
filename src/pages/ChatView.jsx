@@ -788,9 +788,12 @@ function ChatView() {
         writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
         writingPlacement: await getSetting('prompting.writingPlacement'),
         writingMessageRole: await getSetting('prompting.writingMessageRole'),
+        writingInstructionHeader: await getSetting(
+          'prompting.apiRequestSectionHeaders.writingInstruction',
+        ),
         personaInjectionTiming: await getSetting('prompting.personaInjectionTiming'),
-        personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
-        personaInjectionMessageRole: await getSetting('personaInjectionMessageRole'),
+        personaInjectionPlacement: await getSetting('prompting.personaInjectionPlacement'),
+        personaInjectionMessageRole: await getSetting('prompting.personaInjectionMessageRole'),
       }
 
       const chatResult = await buildMessagesPayload({
@@ -1403,9 +1406,12 @@ function ChatView() {
           writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
           writingPlacement: await getSetting('prompting.writingPlacement'),
           writingMessageRole: await getSetting('prompting.writingMessageRole'),
+          writingInstructionHeader: await getSetting(
+            'prompting.apiRequestSectionHeaders.writingInstruction',
+          ),
           personaInjectionTiming: await getSetting('prompting.personaInjectionTiming'),
-          personaInjectionPlacement: await getSetting('personaInjectionPlacement'),
-          personaInjectionMessageRole: await getSetting('personaInjectionMessageRole'),
+          personaInjectionPlacement: await getSetting('prompting.personaInjectionPlacement'),
+          personaInjectionMessageRole: await getSetting('prompting.personaInjectionMessageRole'),
         }
 
         const includeOOCRegen = character?.includeOOC !== false

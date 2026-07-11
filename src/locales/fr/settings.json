@@ -354,6 +354,9 @@
       },
       "loreContext": {
         "label": "Lore Context"
+      },
+      "writingInstruction": {
+        "label": "Writing Instruction"
       }
     }
   },

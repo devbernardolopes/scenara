@@ -80,7 +80,12 @@ export async function buildMessagesPayload({
     writingTiming === 'always' &&
     writingPlacement === 'endOfSystemPrompt'
   ) {
-    systemParts.push(replaceVarsIn(writingInstruction.content))
+    const wiContent = replaceVarsIn(writingInstruction.content)
+    systemParts.push(
+      settings.writingInstructionHeader
+        ? `${replaceVarsIn(settings.writingInstructionHeader)}\n\n${wiContent}`
+        : wiContent,
+    )
   }
 
   const personaTiming = character?.personaInjectionTiming || settings.personaInjectionTiming
@@ -139,7 +144,13 @@ export async function buildMessagesPayload({
     writingTiming === 'always' &&
     writingPlacement === 'endOfMessages'
   if (writingEndOfMessages) {
-    result.push({ role: writingMessageRole, content: replaceVarsIn(writingInstruction.content) })
+    const wiContent = replaceVarsIn(writingInstruction.content)
+    result.push({
+      role: writingMessageRole,
+      content: settings.writingInstructionHeader
+        ? `${replaceVarsIn(settings.writingInstructionHeader)}\n\n${wiContent}`
+        : wiContent,
+    })
     entryTypes.push('writing')
   }
 
