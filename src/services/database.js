@@ -16,12 +16,11 @@ export async function exportDatabase(selection) {
     const filtered = characters.filter((c) => selection.characterIds.has(c.id))
     data.characters = await Promise.all(
       filtered.map(async (c) => {
-        const { id: _id, ...rest } = c
-        if (rest.tags?.length) {
-          const tagObjs = await Promise.all(rest.tags.map((tid) => db.tags.get(tid)))
-          rest.tags = tagObjs.filter(Boolean).map((t) => t.name)
+        if (c.tags?.length) {
+          const tagObjs = await Promise.all(c.tags.map((tid) => db.tags.get(tid)))
+          return { ...c, tags: tagObjs.filter(Boolean).map((t) => t.name) }
         }
-        return rest
+        return c
       }),
     )
   }
@@ -29,31 +28,31 @@ export async function exportDatabase(selection) {
   if (selection.personaIds?.size > 0) {
     const personas = await db.personas.toArray()
     const filtered = personas.filter((p) => selection.personaIds.has(p.id))
-    data.personas = filtered.map(({ id: _id, ...rest }) => rest)
+    data.personas = [...filtered]
   }
 
   if (selection.threadIds?.size > 0) {
     const threads = await db.threads.toArray()
     const filtered = threads.filter((t) => selection.threadIds.has(t.id))
-    data.threads = filtered.map(({ id: _id, ...rest }) => rest)
+    data.threads = [...filtered]
   }
 
   if (selection.writingInstructionIds?.size > 0) {
     const items = await db.writingInstructions.toArray()
     const filtered = items.filter((w) => selection.writingInstructionIds.has(w.id))
-    data.writingInstructions = filtered.map(({ id: _id, ...rest }) => rest)
+    data.writingInstructions = [...filtered]
   }
 
   if (selection.connectionProfileIds?.size > 0) {
     const profiles = await db.connectionProfiles.toArray()
     const filtered = profiles.filter((p) => selection.connectionProfileIds.has(p.id))
-    data.connectionProfiles = filtered.map(({ id: _id, ...rest }) => rest)
+    data.connectionProfiles = [...filtered]
   }
 
   if (selection.inChatShortcutIds?.size > 0) {
     const items = await db.inChatShortcuts.toArray()
     const filtered = items.filter((i) => selection.inChatShortcutIds.has(i.id))
-    data.inChatShortcuts = filtered.map(({ id: _id, ...rest }) => rest)
+    data.inChatShortcuts = [...filtered]
   }
 
   if (selection.settings) {
