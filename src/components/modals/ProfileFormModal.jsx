@@ -5,6 +5,7 @@ import { useSaveConfirm } from '../../lib/saveConfirm'
 import { useConfirm } from '../../lib/confirm'
 import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
+import Label from '../shared/Label'
 import {
   PROVIDERS,
   getKeys,
@@ -310,9 +311,7 @@ function ProfileFormModal({ profile }) {
     >
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-text mb-1">
-            {t('api.profile.form.name')} <span className="text-error">*</span>
-          </label>
+          <Label required>{t('api.profile.form.name')}</Label>
           <input
             className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
             value={form.name}
@@ -323,9 +322,7 @@ function ProfileFormModal({ profile }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text mb-1">
-            {t('api.profile.form.provider')} <span className="text-error">*</span>
-          </label>
+          <Label required>{t('api.profile.form.provider')}</Label>
           <select
             value={form.providerId}
             onChange={(e) => {

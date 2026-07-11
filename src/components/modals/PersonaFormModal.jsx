@@ -6,6 +6,7 @@ import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
+import Label from '../shared/Label'
 import Avatar from '../shared/Avatar'
 import { createPersona, updatePersona, getAllPersonas } from '../../services/personas'
 import { estimateTokens } from '../../services/tokenEstimator'
@@ -161,9 +162,7 @@ function PersonaFormModal({ persona }) {
     >
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-text mb-1">
-            {t('persona.form.inChatName')} <span className="text-error">*</span>
-          </label>
+          <Label required>{t('persona.form.inChatName')}</Label>
           <div className="relative">
             <input
               className={`${inputClass} pr-20`}

@@ -6,6 +6,7 @@ import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
+import Label from '../shared/Label'
 import { createInChatShortcut, updateInChatShortcut } from '../../services/inChatShortcuts'
 import { estimateTokens } from '../../services/tokenEstimator'
 
@@ -116,9 +117,7 @@ function InChatShortcutFormModal({ inChatShortcut }) {
     >
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-text mb-1">
-            {t('inChatShortcut.form.nameLabel')} <span className="text-error">*</span>
-          </label>
+          <Label required>{t('inChatShortcut.form.nameLabel')}</Label>
           <input
             className={inputClass}
             value={form.name}

@@ -6,6 +6,7 @@ import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
+import Label from '../shared/Label'
 import {
   createWritingInstruction,
   updateWritingInstruction,
@@ -119,9 +120,7 @@ function WritingInstructionFormModal({ writingInstruction }) {
     >
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-text mb-1">
-            {t('writingInstruction.form.nameLabel')} <span className="text-error">*</span>
-          </label>
+          <Label required>{t('writingInstruction.form.nameLabel')}</Label>
           <input
             className={inputClass}
             value={form.name}
