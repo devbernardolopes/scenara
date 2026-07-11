@@ -434,7 +434,7 @@ function Sidebar({ open, onClose }) {
               return (
                 <div
                   key={thread.id}
-                  className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px] p-2 flex flex-col`}
+                  className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px] p-2 flex flex-col w-full aspect-[2.3/1]`}
                   style={{
                     borderLeftColor: threadColor || undefined,
                     backgroundColor: threadColor
@@ -445,7 +445,7 @@ function Sidebar({ open, onClose }) {
                   <Link
                     to={`/chat/${thread.id}`}
                     onClick={onClose}
-                    className="flex items-stretch gap-0 min-w-0"
+                    className="flex items-stretch gap-0 min-w-0 flex-1 min-h-0"
                   >
                     <div className="w-22 flex-shrink-0 self-stretch rounded-l-lg overflow-hidden relative bg-surface-hover">
                       {character?.avatar &&
