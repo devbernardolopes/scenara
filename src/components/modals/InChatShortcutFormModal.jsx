@@ -4,11 +4,9 @@ import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
-import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import Label from '../shared/Label'
 import { createInChatShortcut, updateInChatShortcut } from '../../services/inChatShortcuts'
-import { estimateTokens } from '../../services/tokenEstimator'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
@@ -75,7 +73,7 @@ function InChatShortcutFormModal({ inChatShortcut }) {
   }
 
   async function handleSave() {
-    if (!form.name.trim() || saving) return
+    if (!form.name.trim() || !form.content.trim() || saving) return
     await saveShortcut()
     closeModal()
   }
@@ -106,7 +104,7 @@ function InChatShortcutFormModal({ inChatShortcut }) {
           <SaveButton
             isDirty={isDirty}
             saving={saving}
-            disabled={!form.name.trim()}
+            disabled={!form.name.trim() || !form.content.trim()}
             onClick={handleSave}
             savingText={t('inChatShortcut.form.saving')}
           >
@@ -128,21 +126,18 @@ function InChatShortcutFormModal({ inChatShortcut }) {
           />
         </div>
 
-        <CollapsibleSection
-          label={t('inChatShortcut.form.contentLabel')}
-          summary={
-            form.content ? t('common:tokenCount', { count: estimateTokens(form.content) }) : null
-          }
-          storageKey="inChatShortcutContent"
-          defaultExpanded={true}
-        >
+        <div>
+          <Label required highlight={Boolean(form.content?.trim())}>
+            {t('inChatShortcut.form.contentLabel')}
+          </Label>
           <AutoResizeTextarea
-            className={`${inputClass} resize-none mt-2`}
+            className={`${inputClass} resize-none mt-1`}
             value={form.content}
             onChange={update('content')}
             placeholder={t('inChatShortcut.form.contentPlaceholder')}
+            required
           />
-        </CollapsibleSection>
+        </div>
       </div>
     </ModalShell>
   )

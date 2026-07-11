@@ -1,8 +1,15 @@
-export default function Label({ required = false, htmlFor, className = '', children, ...rest }) {
+export default function Label({
+  required = false,
+  highlight = false,
+  htmlFor,
+  className = '',
+  children,
+  ...rest
+}) {
   return (
     <label
       htmlFor={htmlFor}
-      className={`block text-sm font-medium text-text mb-1 ${className}`}
+      className={`block text-sm font-medium mb-1 ${highlight ? 'text-highlight' : 'text-text'} ${className}`}
       {...rest}
     >
       {children}
