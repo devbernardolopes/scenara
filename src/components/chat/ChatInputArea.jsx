@@ -27,6 +27,7 @@ import { useModal } from '../../hooks/useModal'
 import { getSetting } from '../../services/settings'
 import { getAllInChatShortcuts } from '../../services/inChatShortcuts'
 import db from '../../db'
+import { autoResize as autoResizeTextarea } from '../../lib/autoResizeTextarea'
 
 const DEFAULT_QUICK_SETTINGS = {
   autoTTS: false,
@@ -374,8 +375,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
   }, [overflowOpen])
 
   const autoResize = useCallback((el) => {
-    el.style.height = 'auto'
-    el.style.height = el.scrollHeight + 'px'
+    autoResizeTextarea(el)
   }, [])
 
   function handleSend() {
@@ -407,7 +407,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
     }
 
     setInputValue('')
-    if (textareaRef.current) textareaRef.current.style.height = 'auto'
+    if (textareaRef.current) autoResizeTextarea(textareaRef.current)
     persistNow({ inputValue: '' })
   }
 
@@ -606,7 +606,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
               onClick={() => {
                 setInputValue('')
                 if (textareaRef.current) {
-                  textareaRef.current.style.height = 'auto'
+                  autoResizeTextarea(textareaRef.current)
                   textareaRef.current.focus()
                 }
               }}

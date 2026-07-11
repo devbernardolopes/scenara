@@ -1,9 +1,5 @@
 import { useRef, useEffect, useCallback } from 'react'
-
-function autoResize(el) {
-  el.style.height = 'auto'
-  el.style.height = el.scrollHeight + 'px'
-}
+import { autoResize } from '../../lib/autoResizeTextarea'
 
 export default function AutoResizeTextarea(props) {
   const ref = useRef(null)
