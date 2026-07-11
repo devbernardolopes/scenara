@@ -105,17 +105,24 @@ function computeMessageFlags(entryTypes, msgNumbers, currentMsgs) {
       flags.push('OOC')
     } else if (type === 'oocUser') {
       flags.push('OOC')
-    } else if (type === 'chatMessage') {
-      // no synthetic flag
-    } else {
+    } else if (type !== 'chatMessage') {
       flags.push('TMP')
-    }
-    if (type === 'firstMessage') {
-      flags.push('INI')
     }
     const num = msgNumbers?.[i]
     if (num != null) {
       const dbMsg = currentMsgs[num - 1]
+      if (dbMsg?.bundleMessages) {
+        try {
+          const entries = JSON.parse(dbMsg.bundleMessages)
+          if (
+            Array.isArray(entries) &&
+            entries.length > 0 &&
+            entries.every((e) => e.origin === 'initial')
+          ) {
+            flags.push('INI')
+          }
+        } catch {}
+      }
       if (dbMsg?.summarizedAt) {
         flags.push('SUM')
         flags.push('KEP')
