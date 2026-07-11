@@ -37,6 +37,9 @@ import {
   getGeneratingThreads,
   markFirstMessageTriggered,
   hasFirstMessageTriggered,
+  getStreamingMessageId,
+  setStreamingMessageId,
+  clearStreamingMessageId,
 } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import {
@@ -190,6 +193,7 @@ function ChatView() {
   const generatingRef = useRef(false)
   const isAtBottomRef = useRef(true)
   const autoTriggeredRef = useRef(false)
+  const isLocalStreamerRef = useRef(false)
   const currentThreadIdRef = useRef(threadId)
   const handleSendRef = useRef(null)
   const scrollCommits = useRef(0)
@@ -517,11 +521,50 @@ function ChatView() {
       const { threadId: eventThreadId, generating: isGenerating } = e.detail
       if (Number(eventThreadId) === Number(threadId)) {
         setGenerating(isGenerating)
+        if (!isGenerating) {
+          getMessagesByThread(threadId).then((msgs) => {
+            if (Number(currentThreadIdRef.current) === Number(threadId)) {
+              setMessages(msgs)
+            }
+          })
+        }
       }
     }
     window.addEventListener('generating-state-changed', handleGeneratingChange)
     return () => window.removeEventListener('generating-state-changed', handleGeneratingChange)
   }, [threadId])
+
+  useEffect(() => {
+    const id = getStreamingMessageId(threadId)
+    if (id != null) setStreamingMsgId(id)
+    function handleStreamingChange(e) {
+      const { threadId: eventThreadId, messageId } = e.detail
+      if (Number(eventThreadId) === Number(threadId)) {
+        setStreamingMsgId(messageId != null ? messageId : null)
+      }
+    }
+    window.addEventListener('streaming-message-changed', handleStreamingChange)
+    return () => window.removeEventListener('streaming-message-changed', handleStreamingChange)
+  }, [threadId])
+
+  useEffect(() => {
+    if (!generating) return
+    let cancelled = false
+    const poll = async () => {
+      if (cancelled || isLocalStreamerRef.current) return
+      const msgs = await getMessagesByThread(threadId)
+      if (cancelled || isLocalStreamerRef.current) return
+      if (Number(currentThreadIdRef.current) === Number(threadId)) {
+        setMessages(msgs)
+      }
+    }
+    poll()
+    const interval = setInterval(poll, 400)
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [generating, threadId])
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current
@@ -769,7 +812,9 @@ function ChatView() {
 
     const assistantMsgId = await createAssistantMessage(threadId, '', null, isOOC)
     await updateMessage(assistantMsgId, { promptData })
+    setStreamingMessageId(threadId, assistantMsgId)
     if (Number(currentThreadIdRef.current) === Number(threadId)) {
+      isLocalStreamerRef.current = true
       setStreamingMsgId(assistantMsgId)
       setMessages((prev) => [
         ...prev,
@@ -865,6 +910,8 @@ function ChatView() {
         completedNormally = true
       }
     } finally {
+      clearStreamingMessageId(threadId)
+      isLocalStreamerRef.current = false
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setStreamingMsgId(null)
       }
@@ -1122,7 +1169,9 @@ function ChatView() {
       const bundleJson = JSON.stringify(regenEntries)
 
       await updateMessage(messageId, { bundleMessages: bundleJson, content: '' })
+      setStreamingMessageId(threadId, messageId)
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
+        isLocalStreamerRef.current = true
         setStreamingMsgId(messageId)
         setMessages((prev) =>
           prev.map((m) =>
@@ -1379,6 +1428,8 @@ function ChatView() {
         completedNormally = true
       }
     } finally {
+      clearStreamingMessageId(threadId)
+      isLocalStreamerRef.current = false
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setStreamingMsgId(null)
       }
