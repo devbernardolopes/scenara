@@ -1,4 +1,5 @@
 import { getSetting } from './settings'
+import { startGenerating, stopGenerating } from './generatingState'
 
 let queue = []
 let currentRequest = null
@@ -62,6 +63,7 @@ async function processNext() {
     }
 
     currentRequest = item
+    startGenerating(item.threadId)
     notify()
 
     try {
@@ -71,7 +73,9 @@ async function processNext() {
       item.reject?.(err)
     } finally {
       lastRequestEndTime = Date.now()
+      const tid = item.threadId
       currentRequest = null
+      stopGenerating(tid)
       notify()
     }
   }
@@ -172,9 +176,7 @@ export function cancelThreadRequests(threadId) {
 
 export function getThreadQueueCount(threadId) {
   const tid = Number(threadId)
-  let count = queue.filter((item) => item.threadId === tid).length
-  if (currentRequest?.threadId === tid) count++
-  return count
+  return queue.filter((item) => item.threadId === tid).length
 }
 
 export function subscribe(fn) {

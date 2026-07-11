@@ -32,8 +32,8 @@ import {
   getActiveParams,
 } from '../services/chatApi'
 import { getSetting } from '../services/settings'
-import { startGenerating, stopGenerating } from '../services/generatingState'
 import * as apiQueue from '../services/apiQueue'
+import { stopGenerating } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import {
   shouldTriggerSummarization,
@@ -307,6 +307,7 @@ function ChatView() {
 
     if (prevId && Number(prevId) !== Number(threadId)) {
       generatingRef.current = false
+      stopGenerating(prevId)
     }
 
     scrollStickyCleanupRef.current?.()
@@ -870,7 +871,6 @@ function ChatView() {
     if (generatingRef.current) return
     generatingRef.current = true
     setGenerating(true)
-    startGenerating(threadId)
 
     try {
       let currentMsgs = messages
@@ -897,7 +897,6 @@ function ChatView() {
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setGenerating(false)
         }
-        stopGenerating(threadId)
         return
       }
 
@@ -1051,7 +1050,6 @@ function ChatView() {
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setGenerating(false)
       }
-      stopGenerating(threadId)
     }
   }
 
@@ -1086,7 +1084,6 @@ function ChatView() {
     if (Number(currentThreadIdRef.current) === Number(threadId)) {
       setGenerating(true)
     }
-    startGenerating(threadId)
 
     let slotIndex = 0
     let completedNormally = false
@@ -1374,7 +1371,6 @@ function ChatView() {
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setGenerating(false)
       }
-      stopGenerating(threadId)
       if (completedNormally) {
         try {
           const away = isAwayFromThread(threadId) || !isAtBottomRef.current
@@ -1534,7 +1530,7 @@ function ChatView() {
               />
             </div>
             {generating && <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />}
-            {queuedCount > 1 && (
+            {queuedCount > 0 && (
               <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-primary rounded-full shrink-0">
                 {queuedCount}
               </span>
