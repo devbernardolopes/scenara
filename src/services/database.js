@@ -76,6 +76,9 @@ export async function exportDatabase(selection) {
 
     const allPh = await db.promptHistory.toArray()
     data.promptHistory = allPh.filter((p) => threadIds.has(p.threadId))
+
+    const allTm = await db.threadMemories.toArray()
+    data.threadMemories = allTm.filter((tm) => threadIds.has(tm.threadId))
   }
 
   return data
@@ -199,6 +202,12 @@ export async function importDatabase(data) {
       if (Array.isArray(data.promptHistory)) {
         for (const item of data.promptHistory) {
           await addWithId(db.promptHistory, item)
+        }
+      }
+
+      if (Array.isArray(data.threadMemories)) {
+        for (const item of data.threadMemories) {
+          await addWithId(db.threadMemories, item)
         }
       }
     },
