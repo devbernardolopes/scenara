@@ -45,10 +45,20 @@ export function useOverflowButtons(allButtonKeys, { gapPx = 2, buttonWidthPx = 4
         setHeaderCount((n) => Math.max(1, n - 1))
       }
     } else if (currentCount < total) {
-      const free = el.clientWidth - contentWidth
-      const canFit = Math.floor(free / buttonWidthPx)
-      if (canFit > 0) {
-        setHeaderCount((n) => Math.min(total, n + canFit))
+      const perBtn = buttonWidthPx + gapPx
+      const remaining = total - currentCount
+      // The More button occupies space but vanishes once the overflow
+      // becomes empty, so credit it when deciding whether all remaining
+      // buttons fit back into the header.
+      const fitsAll = contentWidth - buttonWidthPx + remaining * perBtn <= el.clientWidth
+      if (fitsAll) {
+        setHeaderCount(total)
+      } else {
+        const free = el.clientWidth - contentWidth
+        const addPlain = Math.floor(free / perBtn)
+        if (addPlain > 0) {
+          setHeaderCount((n) => Math.min(total, n + addPlain))
+        }
       }
     }
   }, [gapPx, buttonWidthPx])

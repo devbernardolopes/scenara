@@ -460,7 +460,7 @@ function MessageBubble({
                 />
                 {nameLabel && (
                   <span
-                    className={`text-xs font-medium truncate max-w-[100px] ${
+                    className={`text-xs font-medium truncate min-w-0 ${
                       isUser
                         ? userMutedClass || 'text-on-primary-muted'
                         : isOOC
