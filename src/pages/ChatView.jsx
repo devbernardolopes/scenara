@@ -94,6 +94,28 @@ function buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload)
   return numbers
 }
 
+function computeMessageFlags(entryTypes, msgNumbers, currentMsgs) {
+  if (!entryTypes) return null
+  return entryTypes.map((type, i) => {
+    const flags = []
+    if (type !== 'chatMessage') {
+      flags.push('TMP')
+    }
+    if (type === 'firstMessage') {
+      flags.push('INI')
+    }
+    const num = msgNumbers?.[i]
+    if (num != null) {
+      const dbMsg = currentMsgs[num - 1]
+      if (dbMsg?.summarizedAt) {
+        flags.push('SUM')
+        flags.push('KEP')
+      }
+    }
+    return flags
+  })
+}
+
 function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
   const wrapperRef = useRef(null)
   const [overflows, setOverflows] = useState(false)
@@ -615,6 +637,7 @@ function ChatView() {
     const memoryText = latestThread?.memory || ''
 
     let payload
+    let entryTypes = null
     let msgNumbers = null
     if (isOOC) {
       const oocSystemInstructions = await getSetting('prompting.oocSystem')
@@ -637,7 +660,7 @@ function ChatView() {
           : ''
       const transcriptMsgs = currentMsgs.slice(0, -1)
 
-      payload = await buildOOCMessagesPayload({
+      const oocResult = await buildOOCMessagesPayload({
         character,
         chatPersona,
         currentPersona,
@@ -660,6 +683,8 @@ function ChatView() {
           userRolePrefixOoc,
         },
       })
+      payload = oocResult.payload
+      entryTypes = oocResult.entryTypes
     } else {
       let writingInstruction = null
       if (character?.writingInstruction) {
@@ -680,7 +705,7 @@ function ChatView() {
         personaInjectionMessageRole: await getSetting('personaInjectionMessageRole'),
       }
 
-      payload = await buildMessagesPayload({
+      const chatResult = await buildMessagesPayload({
         character,
         chatPersona,
         currentPersona,
@@ -691,15 +716,19 @@ function ChatView() {
         memoryText,
         memoryHeader,
       })
+      payload = chatResult.payload
+      entryTypes = chatResult.entryTypes
       msgNumbers = buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload)
     }
 
     const activeParams = getActiveParams(profile)
+    const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
     const promptData = JSON.stringify({
       payload,
       model: profile.model,
       params: activeParams,
       msgNumbers,
+      messageFlags,
     })
 
     const assistantMsgId = await createAssistantMessage(threadId, '', null, isOOC)
@@ -1096,6 +1125,7 @@ function ChatView() {
       }
 
       let payload
+      let entryTypes = null
       let promptDataStr
       let msgNumbers = null
 
@@ -1130,7 +1160,7 @@ function ChatView() {
             ? currentMsgs[currentMsgs.length - 1].content
             : ''
 
-        payload = await buildOOCMessagesPayload({
+        const oocResultRegen = await buildOOCMessagesPayload({
           character,
           chatPersona,
           currentPersona: null,
@@ -1153,6 +1183,8 @@ function ChatView() {
             userRolePrefixOoc,
           },
         })
+        payload = oocResultRegen.payload
+        entryTypes = oocResultRegen.entryTypes
       } else {
         let writingInstruction = null
         if (character?.writingInstruction) {
@@ -1184,7 +1216,7 @@ function ChatView() {
         const memoryHeaderRegen = await getSetting('prompting.apiRequestSectionHeaders.memories')
         const memoryTextRegen = thread?.memory || ''
 
-        payload = await buildMessagesPayload({
+        const chatResultRegen = await buildMessagesPayload({
           character,
           chatPersona,
           currentPersona: null,
@@ -1195,15 +1227,19 @@ function ChatView() {
           memoryText: memoryTextRegen,
           memoryHeader: memoryHeaderRegen,
         })
+        payload = chatResultRegen.payload
+        entryTypes = chatResultRegen.entryTypes
         msgNumbers = buildMsgNumbersArray(isFirstMessage, apiMessagesRegen, currentMsgs, payload)
       }
 
       const activeParams = getActiveParams(profile)
+      const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
       promptDataStr = JSON.stringify({
         payload,
         model: profile.model,
         params: activeParams,
         msgNumbers,
+        messageFlags,
       })
 
       regenEntries[slotIndex].promptData = promptDataStr

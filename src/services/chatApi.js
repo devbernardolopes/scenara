@@ -92,6 +92,7 @@ export async function buildMessagesPayload({
   }
 
   const result = [{ role: 'system', content: systemParts.join('\n\n') }]
+  const entryTypes = ['system']
 
   const postHistoryInstructions = replaceVarsIn(character?.postHistoryInstructions)
 
@@ -107,6 +108,7 @@ export async function buildMessagesPayload({
       } else {
         result.push({ role: firstMessageRole, content: firstMessageContent })
       }
+      entryTypes.push('firstMessage')
     }
   } else {
     for (const msg of messages) {
@@ -120,6 +122,7 @@ export async function buildMessagesPayload({
         }
       }
       result.push({ role: msg.role, content })
+      entryTypes.push('chatMessage')
     }
 
     const lastMsg = messages[messages.length - 1]
@@ -127,6 +130,7 @@ export async function buildMessagesPayload({
     const continueRole = settings.continueRole || 'user'
     if (lastMsg && lastMsg.role !== 'user' && continuePrompt) {
       result.push({ role: continueRole, content: continuePrompt })
+      entryTypes.push('continue')
     }
   }
 
@@ -136,24 +140,29 @@ export async function buildMessagesPayload({
     writingPlacement === 'endOfMessages'
   if (writingEndOfMessages) {
     result.push({ role: writingMessageRole, content: replaceVarsIn(writingInstruction.content) })
+    entryTypes.push('writing')
   }
 
   const personaEndOfMessages =
     personaTiming !== 'never' && personaTemplate && personaPlacement === 'endOfMessages'
   if (personaEndOfMessages) {
     result.push({ role: personaInjectionMessageRole, content: personaTemplate })
+    entryTypes.push('persona')
   }
 
   if (memoryText) {
-    return appendMemoryToPayload(result, memoryText, memoryHeader)
+    return {
+      payload: appendMemoryToPayload(result, memoryText, memoryHeader),
+      entryTypes,
+    }
   }
 
-  // const postHistoryInstructions = replaceVarsIn(character?.postHistoryInstructions)
   if (!isFirstMessage && postHistoryInstructions) {
     result.push({ role: 'system', content: postHistoryInstructions })
+    entryTypes.push('postHistory')
   }
 
-  return result
+  return { payload: result, entryTypes }
 }
 
 export function getActiveParams(profile) {
@@ -310,6 +319,7 @@ export async function buildOOCMessagesPayload({
   }
 
   const result = [{ role: 'system', content: systemParts.join('\n\n') }]
+  const entryTypes = ['system']
 
   if (userMessage) {
     const oocUserInstr = oocSettings.oocUserInstructions
@@ -325,13 +335,17 @@ export async function buildOOCMessagesPayload({
     } else {
       result.push({ role: 'user', content: userMessage })
     }
+    entryTypes.push('userMessage')
   }
 
   if (memoryText) {
-    return appendMemoryToPayload(result, memoryText, memoryHeader)
+    return {
+      payload: appendMemoryToPayload(result, memoryText, memoryHeader),
+      entryTypes,
+    }
   }
 
-  return result
+  return { payload: result, entryTypes }
 }
 
 export async function sendChatCompletion({ profile, messages, signal, onToken, onFinish }) {

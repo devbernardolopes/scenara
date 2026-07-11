@@ -323,6 +323,7 @@ function MessageBubble({
       model: promptData.model,
       params: promptData.params,
       msgNumbers: promptData.msgNumbers || null,
+      messageFlags: promptData.messageFlags || null,
     })
   }
 
