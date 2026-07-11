@@ -349,8 +349,13 @@ function CharacterCreateModal({ character: existing, initialData }) {
   }
 
   async function handleCloseAttempt() {
-    const result = await promptSave()
+    const canSave = Boolean(form.name.trim())
+    const result = await promptSave({
+      saveDisabled: !canSave,
+      message: canSave ? undefined : t('common:saveDialog.nameRequired'),
+    })
     if (result === 'save') {
+      if (!form.name.trim()) return
       await saveCharacter()
       closeModal()
     } else if (result === 'discard') {

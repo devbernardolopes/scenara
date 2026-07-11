@@ -177,6 +177,7 @@
   "saveDialog": {
     "title": "Unsaved changes",
     "message": "You have unsaved changes. What would you like to do?",
+    "nameRequired": "Name is required to save. Add a name, or discard your changes.",
     "save": "Save",
     "discard": "Discard",
     "cancel": "Cancel"

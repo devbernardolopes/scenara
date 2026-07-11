@@ -11,11 +11,13 @@ export function useSaveConfirm() {
 
 export function SaveConfirmProvider({ children }) {
   const [open, setOpen] = useState(false)
+  const [options, setOptions] = useState({})
   const resolveRef = useRef(null)
 
-  const promptSave = useCallback(() => {
+  const promptSave = useCallback((opts = {}) => {
     return new Promise((resolve) => {
       resolveRef.current = resolve
+      setOptions(opts)
       setOpen(true)
     })
   }, [])
@@ -24,6 +26,7 @@ export function SaveConfirmProvider({ children }) {
     resolveRef.current?.(action)
     resolveRef.current = null
     setOpen(false)
+    setOptions({})
   }
 
   return (
@@ -31,6 +34,8 @@ export function SaveConfirmProvider({ children }) {
       {children}
       {open && (
         <SaveDialog
+          saveDisabled={options.saveDisabled}
+          message={options.message}
           onSave={() => handleAction('save')}
           onDiscard={() => handleAction('discard')}
           onCancel={() => handleAction('cancel')}

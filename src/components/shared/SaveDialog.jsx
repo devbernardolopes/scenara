@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-function SaveDialog({ onSave, onDiscard, onCancel }) {
+function SaveDialog({ onSave, onDiscard, onCancel, saveDisabled = false, message }) {
   const { t } = useTranslation('common')
 
   useEffect(() => {
@@ -25,7 +25,7 @@ function SaveDialog({ onSave, onDiscard, onCancel }) {
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-semibold text-text mb-2">{t('saveDialog.title')}</h2>
-        <p className="text-sm text-secondary mb-6">{t('saveDialog.message')}</p>
+        <p className="text-sm text-secondary mb-6">{message ?? t('saveDialog.message')}</p>
         <div className="flex justify-end gap-3">
           <button
             type="button"
@@ -44,7 +44,10 @@ function SaveDialog({ onSave, onDiscard, onCancel }) {
           <button
             type="button"
             onClick={onSave}
-            className="min-h-[44px] px-4 rounded-md text-sm bg-primary text-on-primary hover:bg-primary-hover"
+            disabled={saveDisabled}
+            className={`min-h-[44px] px-4 rounded-md text-sm bg-primary text-on-primary hover:bg-primary-hover ${
+              saveDisabled ? 'opacity-50 cursor-not-allowed hover:bg-primary' : ''
+            }`}
           >
             {t('saveDialog.save')}
           </button>

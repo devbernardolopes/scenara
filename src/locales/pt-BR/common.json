@@ -136,6 +136,7 @@
   "saveDialog": {
     "title": "Alterações não salvas",
     "message": "Você tem alterações não salvas. O que deseja fazer?",
+    "nameRequired": "O nome é obrigatório para salvar. Adicione um nome ou descarte as alterações.",
     "save": "Salvar",
     "discard": "Descartar",
     "cancel": "Cancelar"
