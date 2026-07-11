@@ -15,6 +15,7 @@ import CharacterSection from './character/CharacterSection'
 import OverridesSection from './character/OverridesSection'
 import PlaceholderSection from './character/PlaceholderSection'
 import InitialMessagesSection from './character/InitialMessagesSection'
+import ExampleMessagesSection from './character/ExampleMessagesSection'
 import TagsSection from './character/TagsSection'
 
 const INITIAL_FORM = {
@@ -26,6 +27,7 @@ const INITIAL_FORM = {
   extraPrompt: '',
   postHistoryInstructions: '',
   initialMessages: [],
+  exampleMessages: [],
   autoTitle: true,
   autoTitleThreshold: 3,
   autoTitleSystemInstructions: '',
@@ -124,6 +126,7 @@ const SECTION_COMPONENTS = {
   character: CharacterSection,
   overrides: OverridesSection,
   initialMessages: InitialMessagesSection,
+  exampleMessages: ExampleMessagesSection,
   lorebooks: PlaceholderSection,
   tags: TagsSection,
   '3d': PlaceholderSection,
@@ -264,6 +267,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
     const highlights = {
       character: form.writingInstruction != null,
       initialMessages: (form.initialMessages || []).some((m) => m.content?.trim()),
+      exampleMessages: (form.exampleMessages || []).some((m) => m.content?.trim()),
       tags: (form.tags || []).length > 0,
       overrides: false,
     }
@@ -309,6 +313,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       const data = {
         ...form,
         initialMessages: (form.initialMessages || []).filter((m) => m.content?.trim()),
+        exampleMessages: (form.exampleMessages || []).filter((m) => m.content?.trim()),
       }
       if (isEditing) {
         await updateCharacter(existing.id, data)
@@ -359,6 +364,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
             { id: 'character', labelKey: 'sectionCharacter' },
             { id: 'overrides', labelKey: 'sectionOverrides' },
             { id: 'initialMessages', labelKey: 'sectionInitialMessages' },
+            { id: 'exampleMessages', labelKey: 'sectionExampleMessages' },
             { id: 'lorebooks', labelKey: 'sectionLorebooks' },
             { id: 'tags', labelKey: 'sectionTags' },
             { id: '3d', labelKey: 'section3d' },
