@@ -7,6 +7,7 @@ import { SlidersHorizontal } from '../../lib/icons'
 function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
   const { t } = useTranslation('common')
   const [profiles, setProfiles] = useState([])
+  const [dropUp, setDropUp] = useState(false)
   const ref = useRef(null)
 
   useEffect(() => {
@@ -40,12 +41,28 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
     return () => document.removeEventListener('keydown', handleKey)
   }, [open, onClose])
 
+  useEffect(() => {
+    if (!open || !ref.current) return
+    const el = ref.current
+    const trigger = el.parentElement
+    if (!trigger) return
+    const scroller = trigger.closest('.overflow-y-auto') || trigger
+    const triggerRect = trigger.getBoundingClientRect()
+    const scrollerRect = scroller.getBoundingClientRect()
+    const panelHeight = el.offsetHeight || 256
+    const spaceBelow = scrollerRect.bottom - triggerRect.bottom
+    const spaceAbove = triggerRect.top - scrollerRect.top
+    setDropUp(spaceBelow < panelHeight + 8 && spaceAbove > spaceBelow)
+  }, [open, profiles])
+
   if (!open) return null
 
   return (
     <div
       ref={ref}
-      className="absolute top-full mt-1 right-0 w-72 max-h-64 overflow-y-auto bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1"
+      className={`absolute right-0 w-72 max-h-64 overflow-y-auto bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1 ${
+        dropUp ? 'bottom-full mb-1' : 'top-full mt-1'
+      }`}
     >
       <p className="px-3 py-2 text-xs font-medium text-tertiary uppercase tracking-wider">
         {label || t('profilePicker.title')}
@@ -73,7 +90,7 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
               <div className="truncate flex-1">
                 <span className="truncate block">{p.name}</span>
                 <span className="text-xs text-tertiary truncate block">
-                  {provider ? t(provider.nameKey.replace('settings:', '')) : p.providerId}
+                  {provider ? t(provider.nameKey) : p.providerId}
                   {p.model ? ` · ${p.model}` : ''}
                 </span>
               </div>

@@ -108,6 +108,15 @@ function ApiSettingsPanel() {
     await setSetting(`requestKind.${kindId}.profileId`, profileId)
   }
 
+  async function handleClearAll() {
+    const assignments = {}
+    for (const kind of REQUEST_KINDS) {
+      assignments[kind.id] = null
+      await setSetting(`requestKind.${kind.id}.profileId`, null)
+    }
+    setProfileAssignments(assignments)
+  }
+
   async function handleCooldownChange(val) {
     setCooldown(val)
     await setSetting('api.requestCooldown', val)
@@ -124,7 +133,16 @@ function ApiSettingsPanel() {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-text">{t('api.profileAssignment.title')}</h3>
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-sm font-semibold text-text">{t('api.profileAssignment.title')}</h3>
+          <button
+            type="button"
+            onClick={handleClearAll}
+            className="min-h-[44px] px-3 text-sm border border-border rounded-md bg-surface text-secondary hover:bg-surface-hover whitespace-nowrap"
+          >
+            {t('api.profileAssignment.clearAll')}
+          </button>
+        </div>
         {REQUEST_KINDS.map((kind) => (
           <ProfileAssignmentRow
             key={kind.id}
