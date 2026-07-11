@@ -5,6 +5,7 @@ export async function getThreadMessageCounts() {
   const all = await db.messages.toArray()
   const counts = new Map()
   for (const m of all) {
+    if (m?.isSummaryMarker || m?.isAutoTitleMarker) continue
     counts.set(m.threadId, (counts.get(m.threadId) || 0) + 1)
   }
   return counts
