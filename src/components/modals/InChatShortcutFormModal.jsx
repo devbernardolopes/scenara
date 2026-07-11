@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
+import SaveButton from '../shared/SaveButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { createInChatShortcut, updateInChatShortcut } from '../../services/inChatShortcuts'
@@ -101,14 +102,15 @@ function InChatShortcutFormModal({ inChatShortcut }) {
           >
             {t('inChatShortcut.form.cancel')}
           </button>
-          <button
-            type="button"
+          <SaveButton
+            isDirty={isDirty}
+            saving={saving}
+            disabled={!form.name.trim()}
             onClick={handleSave}
-            disabled={!form.name.trim() || saving}
-            className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
+            savingText={t('inChatShortcut.form.saving')}
           >
-            {saving ? t('inChatShortcut.form.saving') : t('inChatShortcut.form.save')}
-          </button>
+            {t('inChatShortcut.form.save')}
+          </SaveButton>
         </>
       }
     >

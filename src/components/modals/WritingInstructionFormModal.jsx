@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
+import SaveButton from '../shared/SaveButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import {
@@ -104,14 +105,15 @@ function WritingInstructionFormModal({ writingInstruction }) {
           >
             {t('writingInstruction.form.cancel')}
           </button>
-          <button
-            type="button"
+          <SaveButton
+            isDirty={isDirty}
+            saving={saving}
+            disabled={!form.name.trim()}
             onClick={handleSave}
-            disabled={!form.name.trim() || saving}
-            className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
+            savingText={t('writingInstruction.form.saving')}
           >
-            {saving ? t('writingInstruction.form.saving') : t('writingInstruction.form.save')}
-          </button>
+            {t('writingInstruction.form.save')}
+          </SaveButton>
         </>
       }
     >

@@ -4,6 +4,7 @@ import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import { useConfirm } from '../../lib/confirm'
 import ModalShell from '../shared/ModalShell'
+import SaveButton from '../shared/SaveButton'
 import {
   PROVIDERS,
   getKeys,
@@ -295,14 +296,15 @@ function ProfileFormModal({ profile }) {
           >
             {t('cancel', { ns: 'common' })}
           </button>
-          <button
-            type="button"
+          <SaveButton
+            isDirty={isDirty}
+            saving={saving}
+            disabled={!form.name.trim() || !form.providerId}
             onClick={handleSave}
-            disabled={!form.name.trim() || !form.providerId || saving}
-            className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
+            savingText={t('saving', { ns: 'common' })}
           >
-            {saving ? t('saving', { ns: 'common' }) : t('save', { ns: 'common' })}
-          </button>
+            {t('save', { ns: 'common' })}
+          </SaveButton>
         </>
       }
     >

@@ -3,12 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { updateThreadTitle } from '../../services/threads'
 import ModalShell from '../shared/ModalShell'
+import SaveButton from '../shared/SaveButton'
 
 function EditThreadTitleModal({ thread }) {
   const { t } = useTranslation('common')
   const { closeModal } = useModal()
-  const [title, setTitle] = useState(thread?.title || '')
+  const initialTitle = thread?.title || ''
+  const [title, setTitle] = useState(initialTitle)
   const [saving, setSaving] = useState(false)
+  const isDirty = title !== initialTitle
 
   async function handleSave() {
     if (!title.trim() || saving) return
@@ -34,14 +37,15 @@ function EditThreadTitleModal({ thread }) {
           >
             {t('cancel')}
           </button>
-          <button
-            type="button"
+          <SaveButton
+            isDirty={isDirty}
+            saving={saving}
+            disabled={!title.trim()}
             onClick={handleSave}
-            disabled={!title.trim() || saving}
-            className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
+            savingText={t('editThreadTitle.saving')}
           >
-            {saving ? t('editThreadTitle.saving') : t('editThreadTitle.save')}
-          </button>
+            {t('editThreadTitle.save')}
+          </SaveButton>
         </>
       }
     >

@@ -9,6 +9,7 @@ import { estimateTokens } from '../../services/tokenEstimator'
 import { getWritingInstruction } from '../../services/writingInstructions'
 import { getPersona } from '../../services/personas'
 import CloseButton from '../shared/CloseButton'
+import SaveButton from '../shared/SaveButton'
 import CharacterSidebar from './character/CharacterSidebar'
 import CharacterSection from './character/CharacterSection'
 import OverridesSection from './character/OverridesSection'
@@ -393,14 +394,15 @@ function CharacterCreateModal({ character: existing, initialData }) {
           >
             {t('cancel')}
           </button>
-          <button
-            type="button"
+          <SaveButton
+            isDirty={isDirty}
+            saving={saving}
+            disabled={!form.name.trim()}
             onClick={handleSave}
-            disabled={saving || !form.name.trim()}
-            className="min-h-[44px] px-6 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50"
+            savingText={t('saving')}
           >
-            {saving ? t('saving') : t('save')}
-          </button>
+            {t('save')}
+          </SaveButton>
         </div>
       </div>
     </div>
