@@ -13,6 +13,8 @@ export {
   Edit3,
   Heart,
   Copy,
+  Layers,
+  ChevronsDown,
   Download,
   Upload,
   UserPlus,

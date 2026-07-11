@@ -88,7 +88,13 @@ export async function updateMessage(id, updates) {
 }
 
 export async function deleteMessage(id) {
-  return db.messages.delete(Number(id))
+  const msg = await db.messages.get(Number(id))
+  const threadId = msg?.threadId
+  await db.messages.delete(Number(id))
+  if (threadId != null) {
+    await updateThreadTimestamp(threadId)
+    window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId } }))
+  }
 }
 
 export async function deleteMessagesFrom(id) {
@@ -98,7 +104,9 @@ export async function deleteMessagesFrom(id) {
   const idx = allInThread.findIndex((m) => m.id === msg.id)
   if (idx === -1) return
   const toDelete = allInThread.slice(idx).map((m) => m.id)
-  return db.messages.bulkDelete(toDelete)
+  await db.messages.bulkDelete(toDelete)
+  await updateThreadTimestamp(msg.threadId)
+  window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId: msg.threadId } }))
 }
 
 export async function deleteMessagesByThread(threadId) {

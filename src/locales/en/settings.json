@@ -78,6 +78,14 @@
       "label": "Assistant/System – Prompt",
       "desc": "Show the prompt button on assistant and system message bubbles."
     },
+    "showAssistantDeleteAll": {
+      "label": "Assistant/System – Delete All Slots",
+      "desc": "Show the button that deletes every slot of a multi-slot message bubble."
+    },
+    "showAssistantDeleteFromHere": {
+      "label": "Assistant/System – Delete From Here",
+      "desc": "Show the button that deletes this message and every message below it."
+    },
     "showUserDelete": {
       "label": "User – Delete",
       "desc": "Show the delete button on user message bubbles."
@@ -93,6 +101,14 @@
     "showUserFork": {
       "label": "User – Fork",
       "desc": "Show the fork button on user message bubbles."
+    },
+    "showUserDeleteAll": {
+      "label": "User – Delete All Slots",
+      "desc": "Show the button that deletes every slot of a multi-slot message bubble."
+    },
+    "showUserDeleteFromHere": {
+      "label": "User – Delete From Here",
+      "desc": "Show the button that deletes this message and every message below it."
     },
     "characterCardMarquee": {
       "label": "Character Card Marquee",

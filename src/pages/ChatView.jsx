@@ -21,6 +21,7 @@ import {
   createAutoTitleMarker,
   updateMessage,
   deleteMessage,
+  deleteMessagesFrom,
   trimLeadingTrailingNewlines,
 } from '../services/messages'
 import { getWritingInstruction } from '../services/writingInstructions'
@@ -1676,6 +1677,44 @@ function ChatView() {
 
   const { confirm } = useConfirm()
 
+  async function handleDeleteAllSlots(id) {
+    const ok = await confirm({
+      title: t('deleteAllConfirmTitle'),
+      message: t('deleteAllConfirmMessage'),
+      confirmLabel: t('delete'),
+      variant: 'danger',
+    })
+    if (!ok) return
+    await deleteMessage(id)
+    setActiveSlotIndices((prev) => {
+      const next = { ...prev }
+      delete next[id]
+      return next
+    })
+    setMessages(await getMessagesByThread(threadId))
+    showToast(t('messageDeleted'), { type: 'success' })
+  }
+
+  async function handleDeleteFromHere(id) {
+    const ok = await confirm({
+      title: t('deleteFromHereConfirmTitle'),
+      message: t('deleteFromHereConfirmMessage'),
+      confirmLabel: t('delete'),
+      variant: 'danger',
+    })
+    if (!ok) return
+    const idx = messages.findIndex((m) => m.id === id)
+    const deletedIds = idx === -1 ? new Set() : new Set(messages.slice(idx).map((m) => m.id))
+    await deleteMessagesFrom(id)
+    setActiveSlotIndices((prev) => {
+      const next = { ...prev }
+      deletedIds.forEach((d) => delete next[d])
+      return next
+    })
+    setMessages(await getMessagesByThread(threadId))
+    showToast(t('messageDeleted'), { type: 'success' })
+  }
+
   async function handleForkMessage(messageId) {
     const ok = await confirm({
       title: t('forkConfirmTitle'),
@@ -1866,6 +1905,8 @@ function ChatView() {
                       slotCreatedAt={slotCreatedAt}
                       onBundleNavigate={handleBundleNavigate}
                       onDeleteRequest={(id) => setConfirmDeleteId(id)}
+                      onDeleteAllSlots={handleDeleteAllSlots}
+                      onDeleteFromHere={handleDeleteFromHere}
                       onEdit={handleEditMessage}
                       onFork={handleForkMessage}
                       onRegenerate={handleRegenerate}
