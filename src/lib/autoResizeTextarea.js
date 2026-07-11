@@ -1,5 +1,7 @@
-export function autoResize(el) {
+export function autoResize(el, options = {}) {
   if (!el) return
+
+  const { adjustScroll = true } = options
 
   const selection = typeof document !== 'undefined' ? document.getSelection() : null
   let range = null
@@ -29,7 +31,7 @@ export function autoResize(el) {
   el.style.height = 'auto'
   el.style.height = el.scrollHeight + 'px'
 
-  if (scrollEl && caretY != null && range) {
+  if (adjustScroll && scrollEl && caretY != null && range) {
     const afterRect = range.getBoundingClientRect()
     const delta = afterRect.top - caretY
     if (delta) scrollEl.scrollTop = scrollTopBefore + delta

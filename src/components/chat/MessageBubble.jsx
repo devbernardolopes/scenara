@@ -136,6 +136,7 @@ function MessageBubble({
   const [editing, setEditing] = useState(false)
   const [editedContent, setEditedContent] = useState('')
   const editRef = useRef(null)
+  const [editWidth, setEditWidth] = useState(null)
   const [overflowOpen, setOverflowOpen] = useState(false)
   const overflowRef = useRef(null)
   const overflowBtnRef = useRef(null)
@@ -287,6 +288,7 @@ function MessageBubble({
   }
 
   function handleStartEdit() {
+    setEditWidth(bubbleRef.current?.getBoundingClientRect().width ?? null)
     setEditedContent(message.content)
     setEditing(true)
   }
@@ -295,17 +297,29 @@ function MessageBubble({
     if (editedContent !== message.content) {
       if (!editedContent?.trim()) {
         setEditing(false)
+        setEditWidth(null)
         onDeleteRequest?.(message.id)
         return
       }
       onEdit?.(message.id, editedContent)
     }
     setEditing(false)
+    setEditWidth(null)
   }
 
   function handleCancelEdit() {
     setEditing(false)
+    setEditWidth(null)
   }
+
+  useEffect(() => {
+    if (editing && editRef.current) {
+      const ta = editRef.current
+      ta.focus({ preventScroll: true })
+      const len = ta.value.length
+      ta.setSelectionRange(len, len)
+    }
+  }, [editing])
 
   function handleEditKeyDown(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -419,7 +433,10 @@ function MessageBubble({
                 ? 'bg-surface-secondary text-secondary text-sm italic'
                 : 'bg-surface-secondary text-text'
         }`}
-        style={isUser ? userBgStyle : undefined}
+        style={{
+          ...(isUser ? userBgStyle : {}),
+          ...(editing && editWidth ? { minWidth: editWidth } : {}),
+        }}
       >
         {/* Header */}
         {(() => {
@@ -600,16 +617,16 @@ function MessageBubble({
           onDoubleClick={
             streaming || requestFailed || !message.content?.trim() ? undefined : handleStartEdit
           }
-          className="px-3 py-2"
+          className={editing ? '' : 'px-3 py-2'}
         >
           {editing ? (
             <AutoResizeTextarea
+              ref={editRef}
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
               onBlur={handleSaveEdit}
               onKeyDown={handleEditKeyDown}
-              autoFocus
-              className={`w-full resize-none rounded border p-2 text-sm focus:outline-none focus:ring-1 ${
+              className={`w-full resize-none rounded border whitespace-pre-wrap break-words px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
                 isOOC
                   ? 'bg-ooc text-ooc border-ooc focus:ring-ooc'
                   : isUser
