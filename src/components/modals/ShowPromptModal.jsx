@@ -12,6 +12,8 @@ function formatTokenCount(count) {
 }
 
 const PILL_STYLES = {
+  SYS: 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300',
+  OOC: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
   SUM: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
   KEP: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
   INI: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',

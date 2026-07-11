@@ -98,7 +98,16 @@ function computeMessageFlags(entryTypes, msgNumbers, currentMsgs) {
   if (!entryTypes) return null
   return entryTypes.map((type, i) => {
     const flags = []
-    if (type !== 'chatMessage') {
+    if (type === 'system') {
+      flags.push('SYS')
+    } else if (type === 'oocSystem') {
+      flags.push('SYS')
+      flags.push('OOC')
+    } else if (type === 'oocUser') {
+      flags.push('OOC')
+    } else if (type === 'chatMessage') {
+      // no synthetic flag
+    } else {
       flags.push('TMP')
     }
     if (type === 'firstMessage') {

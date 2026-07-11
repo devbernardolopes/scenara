@@ -319,7 +319,7 @@ export async function buildOOCMessagesPayload({
   }
 
   const result = [{ role: 'system', content: systemParts.join('\n\n') }]
-  const entryTypes = ['system']
+  const entryTypes = ['oocSystem']
 
   if (userMessage) {
     const oocUserInstr = oocSettings.oocUserInstructions
@@ -335,7 +335,7 @@ export async function buildOOCMessagesPayload({
     } else {
       result.push({ role: 'user', content: userMessage })
     }
-    entryTypes.push('userMessage')
+    entryTypes.push('oocUser')
   }
 
   if (memoryText) {
