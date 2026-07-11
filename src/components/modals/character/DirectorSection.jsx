@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
+import { setUIState } from '../../../services/uiState'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
@@ -79,6 +81,17 @@ function Group({ group, form, onChange, characterId }) {
   const { t } = useTranslation('characterCreation')
   const groupEnabled = form[group.enabledKey]
   const instructions = form[group.instructionsKey]
+  const storageKey = characterId ? `${group.storageBase}.instructions.${characterId}` : undefined
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    setOpen(groupEnabled)
+  }, [groupEnabled])
+
+  const handleOpenChange = (val) => {
+    setOpen(val)
+    if (storageKey) setUIState(`collapsed.${storageKey}`, !val)
+  }
 
   return (
     <div className="border border-border rounded-md">
@@ -98,8 +111,10 @@ function Group({ group, form, onChange, characterId }) {
             instructions ? t('common:tokenCount', { count: estimateTokens(instructions) }) : null
           }
           hasContent={!!instructions}
-          storageKey={characterId ? `${group.storageBase}.instructions.${characterId}` : undefined}
+          storageKey={storageKey}
           defaultExpanded={false}
+          open={open}
+          onOpenChange={handleOpenChange}
         >
           <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}

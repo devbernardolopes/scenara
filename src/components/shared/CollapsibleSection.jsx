@@ -8,18 +8,22 @@ function CollapsibleSection({
   hasContent,
   storageKey,
   defaultExpanded = true,
+  open: controlledOpen,
+  onOpenChange,
   children,
 }) {
-  const [open, setOpen] = useState(defaultExpanded)
+  const isControlled = controlledOpen !== undefined
+  const [internalOpen, setInternalOpen] = useState(defaultExpanded)
+  const open = isControlled ? controlledOpen : internalOpen
   const contentRef = useRef(null)
   const [contentHeight, setContentHeight] = useState(0)
 
   useEffect(() => {
-    if (!storageKey) return
+    if (!storageKey || isControlled) return
     getUIState(`collapsed.${storageKey}`).then((val) => {
-      if (val !== null) setOpen(!val)
+      if (val !== null) setInternalOpen(!val)
     })
-  }, [storageKey])
+  }, [storageKey, isControlled])
 
   useEffect(() => {
     const el = contentRef.current
@@ -38,8 +42,11 @@ function CollapsibleSection({
 
   const toggle = () => {
     const next = !open
-    setOpen(next)
-    if (storageKey) setUIState(`collapsed.${storageKey}`, !next)
+    if (!isControlled) {
+      setInternalOpen(next)
+      if (storageKey) setUIState(`collapsed.${storageKey}`, !next)
+    }
+    if (onOpenChange) onOpenChange(next)
   }
 
   return (
