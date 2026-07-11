@@ -3,6 +3,7 @@ import { getEffectiveProfileFor } from './connectionProfiles'
 import { sendChatCompletion, replaceVars, buildTranscript, appendMemoryToPayload } from './chatApi'
 import { getSetting } from './settings'
 import { updateThread } from './threads'
+import { trimLeadingTrailingNewlines } from './messages'
 import {
   getDirectorConfig,
   applyDirectorTemplate,
@@ -127,7 +128,9 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
       const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
       const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
       const reviewed = await sendChatCompletion({ profile: dProfile, messages: dPayload, signal })
-      if (reviewed?.trim()) cleanTitle = reviewed.trim()
+      const trimMsgs = await getSetting('prompting.trimMessages')
+      const reviewedTrimmed = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
+      if (reviewedTrimmed?.trim()) cleanTitle = reviewedTrimmed.trim()
     } catch {
       showToast(i18n.t('chat:directorFailed'), { type: 'warning' })
     }
