@@ -41,8 +41,8 @@ export function useOverflowButtons(allButtonKeys, { gapPx = 2, buttonWidthPx = 4
     const contentWidth = getContentWidth(el, gapPx)
 
     if (contentWidth > el.clientWidth) {
-      if (currentCount > 1) {
-        setHeaderCount((n) => Math.max(1, n - 1))
+      if (currentCount > 0) {
+        setHeaderCount((n) => Math.max(0, n - 1))
       }
     } else if (currentCount < total) {
       const perBtn = buttonWidthPx + gapPx
