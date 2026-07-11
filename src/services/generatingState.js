@@ -4,6 +4,16 @@ export function getGeneratingThreads() {
   return new Set(generatingThreads)
 }
 
+const firstMessageTriggered = new Set()
+
+export function markFirstMessageTriggered(threadId) {
+  firstMessageTriggered.add(Number(threadId))
+}
+
+export function hasFirstMessageTriggered(threadId) {
+  return firstMessageTriggered.has(Number(threadId))
+}
+
 export function startGenerating(threadId) {
   const id = Number(threadId)
   generatingThreads.add(id)

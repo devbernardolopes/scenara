@@ -33,7 +33,11 @@ import {
 } from '../services/chatApi'
 import { getSetting } from '../services/settings'
 import * as apiQueue from '../services/apiQueue'
-import { getGeneratingThreads } from '../services/generatingState'
+import {
+  getGeneratingThreads,
+  markFirstMessageTriggered,
+  hasFirstMessageTriggered,
+} from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import {
   shouldTriggerSummarization,
@@ -469,14 +473,16 @@ function ChatView() {
     if (loading || !character || noChatProfile) return
     if (
       !autoTriggeredRef.current &&
+      !hasFirstMessageTriggered(threadId) &&
       messages.length === 0 &&
       !thread?.initialMessages?.length &&
       character.firstMessage
     ) {
       autoTriggeredRef.current = true
+      markFirstMessageTriggered(threadId)
       handleSendRef.current?.('', null, false)
     }
-  }, [loading, character, noChatProfile, thread?.initialMessages])
+  }, [loading, character, noChatProfile, thread?.initialMessages, threadId, messages.length])
 
   useEffect(() => {
     function handleVisibility() {
