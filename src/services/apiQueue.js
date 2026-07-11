@@ -183,3 +183,11 @@ export function subscribe(fn) {
   listeners.add(fn)
   return () => listeners.delete(fn)
 }
+
+export async function waitForCooldown() {
+  const cooldownMs = await getCooldownMs()
+  const elapsed = Date.now() - lastRequestEndTime
+  if (elapsed < cooldownMs) {
+    await new Promise((r) => setTimeout(r, cooldownMs - elapsed))
+  }
+}

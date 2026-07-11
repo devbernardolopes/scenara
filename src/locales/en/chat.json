@@ -72,6 +72,8 @@
   "requestType_summarization": "Summarization",
   "requestStatus_executing": "Executing",
   "requestStatus_queued": "Queued",
+  "directorReviewing": "Director is reviewing the response…",
+  "directorFailed": "Director review failed — using original response.",
   "requestNoLongerActive": "All requests have completed.",
   "cancelConfirmHint": "If requests finish while this dialog is open, the confirm button will disable automatically.",
   "cancelConfirmDoneHint": "You can close this dialog — the requests completed on their own.",

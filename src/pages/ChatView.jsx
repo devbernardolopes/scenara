@@ -32,6 +32,7 @@ import {
   getActiveParams,
 } from '../services/chatApi'
 import { getSetting } from '../services/settings'
+import { getDirectorReviewConfig, buildDirectorMessages } from '../services/director'
 import * as apiQueue from '../services/apiQueue'
 import {
   getGeneratingThreads,
@@ -705,6 +706,8 @@ function ChatView() {
       return
     }
 
+    const directorConfig = !isOOC ? await getDirectorReviewConfig(character) : null
+
     const includeOOC = character?.includeOOC !== false
     const keepMessages = Number(
       character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0,
@@ -833,19 +836,44 @@ function ChatView() {
 
     let completedNormally = false
 
+    const streamIntoBubble = (fullContent) => {
+      updateMessage(assistantMsgId, { content: fullContent })
+      if (Number(currentThreadIdRef.current) === Number(threadId)) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === assistantMsgId ? { ...m, content: fullContent } : m)),
+        )
+      }
+    }
+
+    async function runDirectorReview(originalContent) {
+      const dProfile = await getEffectiveProfileFor('director')
+      if (!dProfile?.model) {
+        throw new Error(t('noProfileModel', { ns: 'chat' }))
+      }
+      await apiQueue.waitForCooldown()
+      showToast(t('directorReviewing', { ns: 'chat' }), { type: 'info' })
+      const dPayload = buildDirectorMessages(directorConfig)
+      const reviewed = await sendChatCompletion({
+        profile: dProfile,
+        messages: dPayload,
+        signal,
+        onToken: (full) => streamIntoBubble(full),
+        onFinish: (reason) => {
+          if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
+            showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
+          }
+        },
+      })
+      if (!reviewed) return originalContent
+      return reviewed
+    }
+
     try {
       const content = await sendChatCompletion({
         profile,
         messages: payload,
         signal,
-        onToken: (fullContent) => {
-          updateMessage(assistantMsgId, { content: fullContent })
-          if (Number(currentThreadIdRef.current) === Number(threadId)) {
-            setMessages((prev) =>
-              prev.map((m) => (m.id === assistantMsgId ? { ...m, content: fullContent } : m)),
-            )
-          }
-        },
+        onToken: directorConfig ? undefined : streamIntoBubble,
         onFinish: (reason) => {
           if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
             showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
@@ -872,7 +900,17 @@ function ChatView() {
 
       if (content) {
         const trimMsgs = await getSetting('prompting.trimMessages')
-        const finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
+        let finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
+
+        if (directorConfig) {
+          try {
+            const reviewed = await runDirectorReview(content)
+            finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
+          } catch {
+            showToast(t('directorFailed', { ns: 'chat' }), { type: 'warning' })
+          }
+        }
+
         await updateMessage(assistantMsgId, { content: finalContent })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages((prev) =>
