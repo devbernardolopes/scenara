@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../../hooks/useModal'
 import CollapsibleSection from '../../shared/CollapsibleSection'
+import Label from '../../shared/Label'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { getAllWritingInstructions } from '../../../services/writingInstructions'
@@ -46,7 +47,7 @@ function CharacterSection({ form, onChange, characterId }) {
   return (
     <div className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-text mb-1">{t('nameLabel')}</label>
+        <Label required>{t('nameLabel')}</Label>
         <div className="relative">
           <input
             className={`${inputClass} pr-20`}
