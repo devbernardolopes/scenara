@@ -1,11 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { getAllPersonas } from '../../services/personas'
 import Avatar from './Avatar'
 
-function PersonaPicker({ open, onClose, onSelect, titleKey = 'personaPicker.title' }) {
+const PANEL_WIDTH = 256
+const GAP = 8
+const MARGIN = 8
+
+function PersonaPicker({ open, onClose, onSelect, anchorRef, titleKey = 'personaPicker.title' }) {
   const { t } = useTranslation('common')
   const [personas, setPersonas] = useState([])
+  const [coords, setCoords] = useState(null)
   const ref = useRef(null)
   const onCloseRef = useRef(onClose)
   const onSelectRef = useRef(onSelect)
@@ -39,12 +45,40 @@ function PersonaPicker({ open, onClose, onSelect, titleKey = 'personaPicker.titl
     return () => document.removeEventListener('keydown', handleKey)
   }, [open])
 
+  useEffect(() => {
+    if (!open || !anchorRef) {
+      setCoords(null)
+      return
+    }
+    function compute() {
+      const el = anchorRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      let left = rect.right - PANEL_WIDTH
+      left = Math.max(MARGIN, Math.min(left, window.innerWidth - PANEL_WIDTH - MARGIN))
+      let top = rect.top - GAP
+      let above = true
+      if (top < MARGIN) {
+        top = rect.bottom + GAP
+        above = false
+      }
+      setCoords({ left, top, above })
+    }
+    compute()
+    window.addEventListener('scroll', compute, true)
+    window.addEventListener('resize', compute)
+    return () => {
+      window.removeEventListener('scroll', compute, true)
+      window.removeEventListener('resize', compute)
+    }
+  }, [anchorRef, open])
+
   if (!open) return null
 
-  return (
+  const content = (
     <div
       ref={ref}
-      className="absolute bottom-full mb-2 right-0 w-64 max-h-64 overflow-y-auto bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1"
+      className="w-64 max-h-64 overflow-y-auto bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1"
     >
       <p className="px-3 py-2 text-xs font-medium text-tertiary uppercase tracking-wider">
         {t(titleKey)}
@@ -68,6 +102,27 @@ function PersonaPicker({ open, onClose, onSelect, titleKey = 'personaPicker.titl
         ))
       )}
     </div>
+  )
+
+  if (!anchorRef) {
+    return <div className="absolute bottom-full mb-2 right-0">{content}</div>
+  }
+
+  if (!coords) return null
+
+  return createPortal(
+    <div
+      style={{
+        position: 'fixed',
+        left: coords.left,
+        top: coords.top,
+        width: PANEL_WIDTH,
+        transform: coords.above ? 'translateY(-100%)' : 'none',
+      }}
+    >
+      {content}
+    </div>,
+    document.body,
   )
 }
 

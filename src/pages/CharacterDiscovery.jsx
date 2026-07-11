@@ -37,12 +37,12 @@ import {
 
 const SORT_OPTIONS = ['createdAt', 'updatedAt', 'lastUsed', 'chatCount', 'name']
 
-function StartChatButton({ character, onStart }) {
+function StartChatButton({ character, onStart, open, onToggle, onClose }) {
   const { t } = useTranslation('common')
-  const [open, setOpen] = useState(false)
+  const anchorRef = useRef(null)
 
   return (
-    <div className="relative">
+    <div className="relative" ref={anchorRef}>
       <div className="flex border border-border rounded-md overflow-hidden">
         <button
           type="button"
@@ -54,7 +54,7 @@ function StartChatButton({ character, onStart }) {
         <div className="w-px bg-border self-stretch" />
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={onToggle}
           onMouseDown={(e) => e.stopPropagation()}
           className="min-h-[44px] min-w-[44px] flex items-center justify-center text-secondary hover:text-text hover:bg-surface-hover"
           aria-label={t('discovery.actions.selectPersona')}
@@ -65,9 +65,10 @@ function StartChatButton({ character, onStart }) {
       </div>
       <PersonaPicker
         open={open}
-        onClose={() => setOpen(false)}
+        anchorRef={anchorRef}
+        onClose={onClose}
         onSelect={(persona) => {
-          setOpen(false)
+          onClose()
           onStart(character, persona)
         }}
       />
@@ -158,6 +159,7 @@ function CharacterDiscovery() {
   const [loading, setLoading] = useState(true)
   const [characterCardMarquee, setCharacterCardMarquee] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
+  const [openPersonaFor, setOpenPersonaFor] = useState(null)
   const [cardsPerPage, setCardsPerPage] = useState(10)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('createdAt')
@@ -506,7 +508,15 @@ function CharacterDiscovery() {
                         onClick={() => handleExport(char)}
                       />
                     </div>
-                    <StartChatButton character={char} onStart={handleSelectCharacter} />
+                    <StartChatButton
+                      character={char}
+                      onStart={handleSelectCharacter}
+                      open={openPersonaFor === char.id}
+                      onToggle={() =>
+                        setOpenPersonaFor((prev) => (prev === char.id ? null : char.id))
+                      }
+                      onClose={() => setOpenPersonaFor(null)}
+                    />
                   </div>
                 </div>
               )
