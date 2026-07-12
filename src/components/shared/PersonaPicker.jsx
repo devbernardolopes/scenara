@@ -65,10 +65,13 @@ function PersonaPicker({ open, onClose, onSelect, anchorRef, titleKey = 'persona
       setCoords({ left, top, above })
     }
     compute()
-    window.addEventListener('scroll', compute, true)
+    function handleScroll() {
+      onCloseRef.current()
+    }
+    window.addEventListener('scroll', handleScroll, true)
     window.addEventListener('resize', compute)
     return () => {
-      window.removeEventListener('scroll', compute, true)
+      window.removeEventListener('scroll', handleScroll, true)
       window.removeEventListener('resize', compute)
     }
   }, [anchorRef, open])
