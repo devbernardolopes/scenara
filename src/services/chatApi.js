@@ -169,7 +169,7 @@ export async function buildMessagesPayload({
   }
 
   if (!isFirstMessage && postHistoryInstructions) {
-    result.push({ role: 'system', content: postHistoryInstructions })
+    result.push({ role: 'user', content: postHistoryInstructions })
     entryTypes.push('postHistory')
   }
 
