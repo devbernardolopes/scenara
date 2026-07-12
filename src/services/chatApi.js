@@ -366,6 +366,7 @@ export async function sendChatCompletion({
   onToken,
   onFinish,
   onStreamingStarted,
+  onTiming,
 }) {
   const baseUrl = getChatBaseUrl(profile.providerId)
   if (!baseUrl) throw new Error(`No base URL for provider "${profile.providerId}"`)
@@ -381,7 +382,91 @@ export async function sendChatCompletion({
     ...activeParams,
   }
 
-  if (profile.params.stream) {
+  const startedAt = performance.now()
+  let timingReported = false
+  const reportTiming = () => {
+    if (timingReported) return
+    timingReported = true
+    onTiming?.(Math.round(performance.now() - startedAt))
+  }
+
+  try {
+    if (profile.params.stream) {
+      const res = await fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+        signal,
+      })
+
+      if (!res.ok) {
+        const errBody = await res.text().catch(() => '')
+        throw new Error(`HTTP ${res.status}${errBody ? `: ${errBody}` : ''}`)
+      }
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+      let fullContent = ''
+      let streamingStarted = false
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
+
+        for (const line of lines) {
+          const trimmed = line.trim()
+          if (!trimmed || !trimmed.startsWith('data: ')) continue
+          const data = trimmed.slice(6)
+          if (data === '[DONE]') continue
+
+          try {
+            const parsed = JSON.parse(data)
+            const choice = parsed.choices?.[0]
+            if (choice?.delta?.content) {
+              if (!streamingStarted) {
+                streamingStarted = true
+                onStreamingStarted?.()
+              }
+              fullContent += choice.delta.content
+              onToken?.(fullContent)
+            }
+            if (choice?.finish_reason) {
+              onFinish?.(choice.finish_reason)
+            }
+          } catch {
+            // skip unparseable chunks
+          }
+        }
+      }
+
+      // Flush: decode remaining bytes and process leftover buffer
+      buffer += decoder.decode()
+      if (buffer.trim()) {
+        const line = buffer.trim()
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6)
+          if (data !== '[DONE]') {
+            try {
+              const parsed = JSON.parse(data)
+              if (parsed.choices?.[0]?.delta?.content) {
+                fullContent += parsed.choices[0].delta.content
+                onToken?.(fullContent)
+              }
+            } catch {
+              /* skip */
+            }
+          }
+        }
+      }
+
+      return fullContent
+    }
+
     const res = await fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers,
@@ -394,84 +479,12 @@ export async function sendChatCompletion({
       throw new Error(`HTTP ${res.status}${errBody ? `: ${errBody}` : ''}`)
     }
 
-    const reader = res.body.getReader()
-    const decoder = new TextDecoder()
-    let buffer = ''
-    let fullContent = ''
-    let streamingStarted = false
-
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-
-      buffer += decoder.decode(value, { stream: true })
-      const lines = buffer.split('\n')
-      buffer = lines.pop() || ''
-
-      for (const line of lines) {
-        const trimmed = line.trim()
-        if (!trimmed || !trimmed.startsWith('data: ')) continue
-        const data = trimmed.slice(6)
-        if (data === '[DONE]') continue
-
-        try {
-          const parsed = JSON.parse(data)
-          const choice = parsed.choices?.[0]
-          if (choice?.delta?.content) {
-            if (!streamingStarted) {
-              streamingStarted = true
-              onStreamingStarted?.()
-            }
-            fullContent += choice.delta.content
-            onToken?.(fullContent)
-          }
-          if (choice?.finish_reason) {
-            onFinish?.(choice.finish_reason)
-          }
-        } catch {
-          // skip unparseable chunks
-        }
-      }
-    }
-
-    // Flush: decode remaining bytes and process leftover buffer
-    buffer += decoder.decode()
-    if (buffer.trim()) {
-      const line = buffer.trim()
-      if (line.startsWith('data: ')) {
-        const data = line.slice(6)
-        if (data !== '[DONE]') {
-          try {
-            const parsed = JSON.parse(data)
-            if (parsed.choices?.[0]?.delta?.content) {
-              fullContent += parsed.choices[0].delta.content
-              onToken?.(fullContent)
-            }
-          } catch {
-            /* skip */
-          }
-        }
-      }
-    }
-
-    return fullContent
+    const json = await res.json()
+    const content = json.choices?.[0]?.message?.content || ''
+    const finishReason = json.choices?.[0]?.finish_reason || null
+    if (finishReason) onFinish?.(finishReason)
+    return content
+  } finally {
+    reportTiming()
   }
-
-  const res = await fetch(`${baseUrl}/chat/completions`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(body),
-    signal,
-  })
-
-  if (!res.ok) {
-    const errBody = await res.text().catch(() => '')
-    throw new Error(`HTTP ${res.status}${errBody ? `: ${errBody}` : ''}`)
-  }
-
-  const json = await res.json()
-  const content = json.choices?.[0]?.message?.content || ''
-  const finishReason = json.choices?.[0]?.finish_reason || null
-  if (finishReason) onFinish?.(finishReason)
-  return content
 }

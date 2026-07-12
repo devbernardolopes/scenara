@@ -114,11 +114,21 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
     throw new Error('No auto-title profile configured')
   }
 
-  const title = await sendChatCompletion({ profile, messages: payloadWithMemory, signal })
+  let autoTitleDurationMs = null
+  let directorDurationMs = null
+  const title = await sendChatCompletion({
+    profile,
+    messages: payloadWithMemory,
+    signal,
+    onTiming: (ms) => {
+      autoTitleDurationMs = ms
+    },
+  })
 
   if (!title?.trim()) throw new Error('Empty title generated')
 
   let cleanTitle = title.trim()
+  let directorReviewed = false
 
   const directorConfig = await getDirectorConfig(character, 'autoTitle')
   if (directorConfig) {
@@ -146,10 +156,20 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
       )
       const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
       const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
-      const reviewed = await sendChatCompletion({ profile: dProfile, messages: dPayload, signal })
+      const reviewed = await sendChatCompletion({
+        profile: dProfile,
+        messages: dPayload,
+        signal,
+        onTiming: (ms) => {
+          directorDurationMs = ms
+        },
+      })
       const trimMsgs = await getSetting('prompting.trimMessages')
       const reviewedTrimmed = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
-      if (reviewedTrimmed?.trim()) cleanTitle = reviewedTrimmed.trim()
+      if (reviewedTrimmed?.trim()) {
+        cleanTitle = reviewedTrimmed.trim()
+        directorReviewed = true
+      }
     } catch {
       showToast(i18n.t('chat:directorFailed'), { type: 'warning' })
     }
@@ -159,7 +179,16 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
     cleanTitle = sanitizeAutoTitle(cleanTitle)
   }
 
-  await updateThread(thread.id, { title: cleanTitle, autoTitleGenerated: true })
+  const apiDurationMs =
+    directorReviewed && autoTitleDurationMs != null && directorDurationMs != null
+      ? autoTitleDurationMs + directorDurationMs
+      : autoTitleDurationMs
+
+  await updateThread(thread.id, {
+    title: cleanTitle,
+    autoTitleGenerated: true,
+    autoTitleApiDurationMs: apiDurationMs,
+  })
 
   return cleanTitle
 }

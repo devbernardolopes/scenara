@@ -33,6 +33,7 @@
   "messageDeleteTitle": "Nachricht löschen",
   "messageDeleteConfirm": "Nachricht #{{number}} löschen?",
   "tokens": "~{{count}} Tokens",
+  "apiDuration": "{{duration}}",
   "edited": "(bearbeitet)",
   "messageCopied": "Nachricht kopiert",
   "messageUpdated": "Nachricht aktualisiert",

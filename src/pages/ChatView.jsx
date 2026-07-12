@@ -839,6 +839,8 @@ function ChatView() {
     const activeParams = getActiveParams(profile)
     const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
     let directorReviewed = false
+    let chatDurationMs = null
+    let directorDurationMs = null
     let promptData = JSON.stringify({
       payload,
       model: profile.model,
@@ -915,6 +917,9 @@ function ChatView() {
           }
         },
         onStreamingStarted: apiQueue.markCurrentRequestStreaming,
+        onTiming: (ms) => {
+          directorDurationMs = ms
+        },
       })
       if (!reviewed) return originalContent
       return reviewed
@@ -932,6 +937,9 @@ function ChatView() {
           }
         },
         onStreamingStarted: apiQueue.markCurrentRequestStreaming,
+        onTiming: (ms) => {
+          chatDurationMs = ms
+        },
       })
 
       if (!content) {
@@ -978,10 +986,16 @@ function ChatView() {
           }
         }
 
-        await updateMessage(assistantMsgId, { content: finalContent, promptData })
+        const apiDurationMs =
+          directorReviewed && chatDurationMs != null && directorDurationMs != null
+            ? chatDurationMs + directorDurationMs
+            : chatDurationMs
+        await updateMessage(assistantMsgId, { content: finalContent, promptData, apiDurationMs })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages((prev) =>
-            prev.map((m) => (m.id === assistantMsgId ? { ...m, content: finalContent } : m)),
+            prev.map((m) =>
+              m.id === assistantMsgId ? { ...m, content: finalContent, apiDurationMs } : m,
+            ),
           )
           showToast(t('messageUpdated'), { type: 'success' })
         }
@@ -1233,6 +1247,7 @@ function ChatView() {
     await updateMessage(messageId, {
       content: entry.content,
       promptData: entry.promptData,
+      apiDurationMs: entry.apiDurationMs ?? null,
       activeSlotIndex: slotIndex,
     })
     setMessages((prev) =>
@@ -1242,6 +1257,7 @@ function ChatView() {
               ...m,
               content: entry.content,
               promptData: entry.promptData,
+              apiDurationMs: entry.apiDurationMs ?? null,
               activeSlotIndex: slotIndex,
             }
           : m,
@@ -1276,7 +1292,13 @@ function ChatView() {
 
       regenEntries = parseBundleEntries(msg.bundleMessages)
       if (!regenEntries) {
-        regenEntries = [{ content: msg.content, promptData: msg.promptData || null }]
+        regenEntries = [
+          {
+            content: msg.content,
+            promptData: msg.promptData || null,
+            apiDurationMs: msg.apiDurationMs ?? null,
+          },
+        ]
       }
 
       slotIndex = regenEntries.length
@@ -1387,6 +1409,9 @@ function ChatView() {
             }
           },
           onStreamingStarted: apiQueue.markCurrentRequestStreaming,
+          onTiming: (ms) => {
+            directorDurationMs = ms
+          },
         })
         if (!reviewed) return originalContent
         return reviewed
@@ -1506,6 +1531,8 @@ function ChatView() {
       const activeParams = getActiveParams(profile)
       const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
       let directorReviewed = false
+      let chatDurationMs = null
+      let directorDurationMs = null
       promptDataStr = JSON.stringify({
         payload,
         model: profile.model,
@@ -1543,6 +1570,9 @@ function ChatView() {
               }
             },
             onStreamingStarted: apiQueue.markCurrentRequestStreaming,
+            onTiming: (ms) => {
+              chatDurationMs = ms
+            },
           })
         },
       }).promise
@@ -1583,11 +1613,16 @@ function ChatView() {
             showToast(t('directorFailed', { ns: 'chat' }), { type: 'warning' })
           }
         }
+        const apiDurationMs =
+          directorReviewed && chatDurationMs != null && directorDurationMs != null
+            ? chatDurationMs + directorDurationMs
+            : chatDurationMs
         const dbMsg = await db.messages.get(Number(messageId))
         const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
         if (finalEntries[slotIndex]) {
           finalEntries[slotIndex].content = finalContent
           finalEntries[slotIndex].promptData = promptDataStr
+          finalEntries[slotIndex].apiDurationMs = apiDurationMs
           finalEntries[slotIndex].isError = false
           finalEntries[slotIndex].error = null
         }
@@ -1595,6 +1630,7 @@ function ChatView() {
           bundleMessages: JSON.stringify(finalEntries),
           content: finalContent,
           promptData: promptDataStr,
+          apiDurationMs,
           activeSlotIndex: slotIndex,
         })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
@@ -1606,6 +1642,7 @@ function ChatView() {
                     content: finalContent,
                     bundleMessages: JSON.stringify(finalEntries),
                     promptData: promptDataStr,
+                    apiDurationMs,
                     activeSlotIndex: slotIndex,
                   }
                 : m,
@@ -1753,17 +1790,25 @@ function ChatView() {
     const msg = messages.find((m) => m.id === id)
     let entries = parseBundleEntries(msg?.bundleMessages)
     if (!entries) {
-      entries = [{ content: msg.content, promptData: msg.promptData || null }]
+      entries = [
+        {
+          content: msg.content,
+          promptData: msg.promptData || null,
+          apiDurationMs: msg.apiDurationMs ?? null,
+        },
+      ]
     }
     entries.push({
       content: finalContent,
       promptData: null,
+      apiDurationMs: null,
       origin: 'edit',
       createdAt: new Date().toISOString(),
     })
     await updateMessage(id, {
       bundleMessages: JSON.stringify(entries),
       content: finalContent,
+      apiDurationMs: null,
       activeSlotIndex: entries.length - 1,
     })
     const msgs = await getMessagesByThread(threadId)
@@ -1790,6 +1835,7 @@ function ChatView() {
         bundleMessages: JSON.stringify(entries),
         content: newContent,
         promptData: newPromptData,
+        apiDurationMs: entries[newIdx].apiDurationMs ?? null,
         activeSlotIndex: newIdx,
       })
       setActiveSlotIndices((prev) => ({ ...prev, [id]: newIdx }))
@@ -2021,6 +2067,9 @@ function ChatView() {
                     : null
                 const slotCreatedAt = entries?.[bundleIndex]?.createdAt || msg.createdAt
                 const bundleEntry = entries?.[bundleIndex]
+                const slotApiDurationMs = entries
+                  ? (bundleEntry?.apiDurationMs ?? null)
+                  : (msg.apiDurationMs ?? null)
                 const isFailedSlot = bundleEntry?.isError === true
                 const errorText = isFailedSlot
                   ? bundleEntry.error || bundleEntry.content || ''
@@ -2045,6 +2094,7 @@ function ChatView() {
                       bundleIndex={bundleIndex}
                       currentOrigin={currentOrigin}
                       slotCreatedAt={slotCreatedAt}
+                      apiDurationMs={slotApiDurationMs}
                       onBundleNavigate={handleBundleNavigate}
                       onDeleteRequest={(id) => setConfirmDeleteId(id)}
                       onDeleteAllSlots={handleDeleteAllSlots}

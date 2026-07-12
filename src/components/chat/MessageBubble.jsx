@@ -140,6 +140,11 @@ function formatTokenCount(count) {
   return String(count)
 }
 
+function formatDuration(ms) {
+  if (ms >= 1000) return `${(ms / 1000).toFixed(2)}s`
+  return `${ms}ms`
+}
+
 function MessageBubble({
   message,
   messageNumber,
@@ -168,6 +173,7 @@ function MessageBubble({
   personaName,
   isUnread,
   slotCreatedAt,
+  apiDurationMs,
 }) {
   function renderContent(text) {
     if (!text) return text
@@ -820,6 +826,11 @@ function MessageBubble({
             )}
             {currentOrigin === 'edit' && (
               <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>{t('edited')}</span>
+            )}
+            {!streaming && typeof apiDurationMs === 'number' && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
+                {t('apiDuration', { duration: formatDuration(apiDurationMs) })}
+              </span>
             )}
             <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
               {t('tokens', { count: formatTokenCount(tokenCount) })}

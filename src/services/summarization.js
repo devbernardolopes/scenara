@@ -209,7 +209,15 @@ export async function triggerSummarization({
     throw new Error('No summarization profile configured')
   }
 
-  const summary = await sendChatCompletion({ profile, messages: payload, signal })
+  let apiDurationMs = null
+  const summary = await sendChatCompletion({
+    profile,
+    messages: payload,
+    signal,
+    onTiming: (ms) => {
+      apiDurationMs = ms
+    },
+  })
   if (!summary?.trim()) throw new Error('Empty summary generated')
 
   const cleanedSummary = summary.trim()
@@ -223,6 +231,7 @@ export async function triggerSummarization({
     payload,
     model: profile.model,
     params: profile.params,
+    apiDurationMs,
   })
   await updateThread(thread.id, { memory: cleanedSummary, lastSummarizationAt: timestamp })
 

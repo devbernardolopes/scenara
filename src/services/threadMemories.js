@@ -11,7 +11,14 @@ export async function getLatestThreadMemory(threadId) {
   return memories[0] || null
 }
 
-export async function createThreadMemory({ threadId, content, payload, model, params }) {
+export async function createThreadMemory({
+  threadId,
+  content,
+  payload,
+  model,
+  params,
+  apiDurationMs = null,
+}) {
   const now = new Date()
   const id = await db.threadMemories.add({
     threadId: Number(threadId),
@@ -19,6 +26,7 @@ export async function createThreadMemory({ threadId, content, payload, model, pa
     payload,
     model: model || '',
     params: params || null,
+    apiDurationMs,
     isRead: false,
     createdAt: now,
     updatedAt: now,

@@ -49,6 +49,7 @@
   "deleteFromHereConfirmTitle": "Delete from here",
   "deleteFromHereConfirmMessage": "This will delete this message and every message below it in the conversation. This cannot be undone.",
   "tokens": "~{{count}} tokens",
+  "apiDuration": "{{duration}}",
   "edited": "(edited)",
   "messageCopied": "Message copied",
   "messageUpdated": "Message updated",
