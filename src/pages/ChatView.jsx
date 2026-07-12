@@ -1903,6 +1903,14 @@ function ChatView() {
     )
   }
 
+  const msgNumMap = new Map()
+  let _msgNum = 0
+  for (const m of messages) {
+    if (m.isSummaryMarker || m.isAutoTitleMarker) continue
+    _msgNum++
+    msgNumMap.set(m.id, _msgNum)
+  }
+
   return (
     <div className="flex flex-col h-full">
       <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto relative pb-4">
@@ -2021,7 +2029,7 @@ function ChatView() {
                   >
                     <MessageBubble
                       message={msg}
-                      messageNumber={idx + 1}
+                      messageNumber={msgNumMap.get(msg.id)}
                       avatarSrc={getAvatarSrc(msg)}
                       avatarScale={getAvatarScale(msg)}
                       role={msg.role}
