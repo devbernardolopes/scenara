@@ -476,7 +476,7 @@ function CharacterDiscovery() {
                       return
                     handleEditCharacter(char)
                   }}
-                  className="character-card border border-border rounded-lg bg-surface hover:shadow-surface-md transition-shadow cursor-pointer flex flex-col overflow-hidden"
+                  className="character-card border border-border rounded-lg bg-surface cursor-pointer flex flex-col overflow-hidden"
                 >
                   <div className="relative h-[250px] overflow-hidden">
                     {char.avatar ? (
