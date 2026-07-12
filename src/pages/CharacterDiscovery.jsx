@@ -442,6 +442,16 @@ function CharacterDiscovery() {
             {visibleCharacters.map((char) => {
               const displayTags = (char.tags || []).map((id) => tagsMap.get(id)).filter(Boolean)
               const chatCount = chatCounts.get(char.id) || 0
+              const has1st = char.firstMessage === true
+              const hasMem = char.memory && char.memory !== 'never'
+              const hasDir =
+                char.directorEnabled &&
+                ((char.directorAutoTitleEnabled && char.directorAutoTitleInstructions?.trim()) ||
+                  (char.directorSummarizationEnabled &&
+                    char.directorSummarizationInstructions?.trim()) ||
+                  (char.directorRegularChatEnabled &&
+                    char.directorRegularChatInstructions?.trim()) ||
+                  (char.directorOOCEnabled && char.directorOOCInstructions?.trim()))
               return (
                 <div
                   key={char.id}
@@ -474,12 +484,19 @@ function CharacterDiscovery() {
                         characterCardMarquee={characterCardMarquee}
                       />
                       {displayTags.length > 0 && <TagRow tags={displayTags} />}
-                      {chatCount > 0 && (
+                      {(chatCount > 0 || has1st || hasMem || hasDir) && (
                         <div className="flex items-center gap-1 text-on-image-muted">
-                          <MessageSquare className="w-3 h-3" />
-                          <span className="text-xs">
-                            {t('discovery.chatCount', { count: chatCount })}
-                          </span>
+                          {chatCount > 0 && (
+                            <>
+                              <MessageSquare className="w-3 h-3" />
+                              <span className="text-xs">
+                                {t('discovery.chatCount', { count: chatCount })}
+                              </span>
+                            </>
+                          )}
+                          {has1st && <span className="text-xs">1st</span>}
+                          {hasMem && <span className="text-xs">Mem</span>}
+                          {hasDir && <span className="text-xs">Dir</span>}
                         </div>
                       )}
                     </div>
