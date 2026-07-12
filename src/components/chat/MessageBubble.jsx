@@ -6,7 +6,6 @@ import { useIsMobile } from '../../hooks/useIsMobile'
 import { useOverflowButtons } from '../../hooks/useOverflowButtons'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
-import { getContrastColor, isLightColor } from '../../lib/color'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSanitize from 'rehype-sanitize'
@@ -301,11 +300,11 @@ function MessageBubble({
 
   let userMutedClass = 'text-tertiary'
   let userMutedStyle = undefined
-  let userHoverBg = 'hover:bg-black/10'
+  let userHoverBg = 'hover:bg-white/10'
   if (isUser && !isOOC) {
     if (personaColor) {
-      userMutedStyle = { color: getContrastColor(personaColor) }
-      userHoverBg = isLightColor(personaColor) ? 'hover:bg-black/10' : 'hover:bg-white/10'
+      userMutedClass = 'text-secondary'
+      userHoverBg = 'hover:bg-white/10'
     } else {
       userMutedClass = 'text-on-primary-muted'
       userHoverBg = 'hover:bg-white/10'
@@ -322,13 +321,17 @@ function MessageBubble({
     promptData = null
   }
 
-  let userBgClass = 'bg-primary'
+  let userBgClass = 'bg-primary text-on-primary'
   let userBgStyle = null
   if (isOOC) {
     userBgClass = 'bg-ooc text-ooc border border-ooc'
   } else if (personaColor) {
-    userBgStyle = { backgroundColor: personaColor }
-    userBgClass = ''
+    userBgStyle = {
+      borderLeftColor: personaColor,
+      borderLeftWidth: '3px',
+      backgroundColor: `color-mix(in srgb, ${personaColor} 12%, var(--color-surface))`,
+    }
+    userBgClass = 'text-text border border-border'
   }
 
   function handleAvatarClick() {
@@ -503,7 +506,7 @@ function MessageBubble({
         ref={bubbleRef}
         className={`max-w-[80%] md:max-w-[65%] rounded-lg ${unreadClass} ${
           isUser
-            ? `${userBgClass} text-on-primary`
+            ? userBgClass
             : isOOC
               ? 'bg-ooc text-ooc border border-ooc'
               : isSystem
@@ -717,7 +720,7 @@ function MessageBubble({
                 isOOC
                   ? 'bg-ooc text-ooc border-ooc focus:ring-ooc'
                   : isUser
-                    ? `${userBgClass || 'bg-transparent'} text-on-primary border-white/20 focus:ring-white/40`
+                    ? `${userBgClass || 'bg-transparent'} border-white/20 focus:ring-white/40`
                     : 'bg-surface text-text border-border focus:ring-primary/40'
               }`}
               style={{
