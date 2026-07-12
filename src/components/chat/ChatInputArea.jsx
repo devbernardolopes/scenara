@@ -233,6 +233,13 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
     schedulePersist()
   }, [inputValue, ready, schedulePersist])
 
+  // Reset textarea height when input is cleared
+  useEffect(() => {
+    if (!inputValue) {
+      requestAnimationFrame(() => resetTextareaHeight())
+    }
+  }, [inputValue])
+
   // Immediate save for toggles
   useEffect(() => {
     if (!ready) return
@@ -378,6 +385,23 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
     autoResizeTextarea(el)
   }, [])
 
+  function resetTextareaHeight() {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = ''
+  }
+
+  function handleTextareaFocus() {
+    const el = textareaRef.current
+    if (el && el.value) {
+      requestAnimationFrame(() => autoResizeTextarea(el))
+    }
+  }
+
+  function handleTextareaBlur() {
+    resetTextareaHeight()
+  }
+
   function handleSend() {
     if (generating || summarizing || hasQueued) {
       onCancel?.()
@@ -407,7 +431,6 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
     }
 
     setInputValue('')
-    if (textareaRef.current) autoResizeTextarea(textareaRef.current)
     persistNow({ inputValue: '' })
   }
 
@@ -575,6 +598,8 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
             onChange={(e) => setInputValue(e.target.value)}
             disabled={summarizing}
             onInput={(e) => autoResize(e.target)}
+            onFocus={handleTextareaFocus}
+            onBlur={handleTextareaBlur}
             onDoubleClick={() => {
               if (shortcutsActive) {
                 setShortcutsActive(false)
@@ -605,10 +630,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
               type="button"
               onClick={() => {
                 setInputValue('')
-                if (textareaRef.current) {
-                  autoResizeTextarea(textareaRef.current)
-                  textareaRef.current.focus()
-                }
+                if (textareaRef.current) textareaRef.current.focus()
               }}
               className="absolute top-2 right-2 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md text-tertiary hover:text-text hover:bg-surface-hover transition-colors"
               aria-label={t('clearInput')}
