@@ -145,6 +145,11 @@ function formatDuration(ms) {
   return `${ms}ms`
 }
 
+function countWords(text) {
+  const trimmed = (text || '').trim()
+  return trimmed ? trimmed.split(/\s+/).length : 0
+}
+
 function MessageBubble({
   message,
   messageNumber,
@@ -289,6 +294,7 @@ function MessageBubble({
 
   const avatarSize = AVATAR_SIZE_MAP[avatarScale] || 'sm'
   const tokenCount = estimateTokens(displayContent)
+  const wordCount = countWords(displayContent)
   const persona = personaMap?.[message.personaId]
   const personaColor = persona?.color
   const isOOC = message.isOOC
@@ -835,6 +841,11 @@ function MessageBubble({
             <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
               {t('tokens', { count: formatTokenCount(tokenCount) })}
             </span>
+            {!streaming && typeof apiDurationMs === 'number' && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
+                {t('words', { count: wordCount })}
+              </span>
+            )}
           </span>
         </div>
       </div>

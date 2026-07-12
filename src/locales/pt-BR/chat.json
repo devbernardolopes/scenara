@@ -39,6 +39,7 @@
   "messageDeleteConfirm": "Excluir mensagem #{{number}}?",
   "tokens": "~{{count}} tokens",
   "apiDuration": "{{duration}}",
+  "words": "{{count}} palavras",
   "edited": "(editado)",
   "messageCopied": "Mensagem copiada",
   "messageUpdated": "Mensagem atualizada",
