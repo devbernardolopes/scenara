@@ -144,6 +144,7 @@ function WritingInstructionFormModal({ writingInstruction }) {
             value={form.content}
             onChange={update('content')}
             placeholder={t('writingInstruction.form.contentPlaceholder')}
+            extraHeight={8}
           />
         </CollapsibleSection>
       </div>

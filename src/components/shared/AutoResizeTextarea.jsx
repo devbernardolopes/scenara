@@ -2,6 +2,7 @@ import { useRef, useEffect, useCallback, forwardRef } from 'react'
 import { autoResize } from '../../lib/autoResizeTextarea'
 
 const AutoResizeTextarea = forwardRef(function AutoResizeTextarea(props, forwardedRef) {
+  const { extraHeight = 0, value, onInput, ...rest } = props
   const innerRef = useRef(null)
 
   const setRef = useCallback(
@@ -14,18 +15,18 @@ const AutoResizeTextarea = forwardRef(function AutoResizeTextarea(props, forward
   )
 
   useEffect(() => {
-    if (innerRef.current) autoResize(innerRef.current, { adjustScroll: false })
-  }, [props.value])
+    if (innerRef.current) autoResize(innerRef.current, { adjustScroll: false, extraHeight })
+  }, [value, extraHeight])
 
   const handleInput = useCallback(
     (e) => {
-      autoResize(e.target, { adjustScroll: true })
-      props.onInput?.(e)
+      autoResize(e.target, { adjustScroll: true, extraHeight })
+      onInput?.(e)
     },
-    [props.onInput],
+    [onInput, extraHeight],
   )
 
-  return <textarea ref={setRef} {...props} onInput={handleInput} />
+  return <textarea ref={setRef} value={value} onInput={handleInput} {...rest} />
 })
 
 export default AutoResizeTextarea

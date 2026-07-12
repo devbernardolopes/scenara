@@ -148,6 +148,7 @@ function OverridesSection({ form, onChange, characterId }) {
             onChange={(e) => onChange('autoTitleSystemInstructions', e.target.value)}
             placeholder={t('autoTitleSystemInstructionsPlaceholder')}
             disabled={!form.autoTitle}
+            extraHeight={8}
           />
         </CollapsibleSection>
 
@@ -167,6 +168,7 @@ function OverridesSection({ form, onChange, characterId }) {
             onChange={(e) => onChange('autoTitleUserInstructions', e.target.value)}
             placeholder={t('autoTitleUserInstructionsPlaceholder')}
             disabled={!form.autoTitle}
+            extraHeight={8}
           />
         </CollapsibleSection>
       </div>
@@ -272,6 +274,7 @@ function OverridesSection({ form, onChange, characterId }) {
             onChange={(e) => onChange('summarizationSystemInstructions', e.target.value)}
             placeholder={t('summarizationSystemInstructionsPlaceholder')}
             disabled={form.memory === 'never'}
+            extraHeight={8}
           />
         </CollapsibleSection>
 
@@ -293,6 +296,7 @@ function OverridesSection({ form, onChange, characterId }) {
             onChange={(e) => onChange('summarizationUserInstructions', e.target.value)}
             placeholder={t('summarizationUserInstructionsPlaceholder')}
             disabled={form.memory === 'never'}
+            extraHeight={8}
           />
         </CollapsibleSection>
       </div>

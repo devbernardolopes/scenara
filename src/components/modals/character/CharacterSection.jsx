@@ -116,6 +116,7 @@ function CharacterSection({ form, onChange, characterId }) {
           value={form.prompt || ''}
           onChange={(e) => onChange('prompt', e.target.value)}
           placeholder={t('promptPlaceholder')}
+          extraHeight={8}
         />
       </CollapsibleSection>
 
@@ -134,6 +135,7 @@ function CharacterSection({ form, onChange, characterId }) {
           value={form.extraPrompt || ''}
           onChange={(e) => onChange('extraPrompt', e.target.value)}
           placeholder={t('extraPromptPlaceholder')}
+          extraHeight={8}
         />
       </CollapsibleSection>
 
@@ -152,6 +154,7 @@ function CharacterSection({ form, onChange, characterId }) {
           value={form.postHistoryInstructions || ''}
           onChange={(e) => onChange('postHistoryInstructions', e.target.value)}
           placeholder={t('postHistoryInstructionsPlaceholder')}
+          extraHeight={8}
         />
       </CollapsibleSection>
 

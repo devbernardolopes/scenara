@@ -139,6 +139,7 @@ function PersonaEditorModal() {
                 value={form.description}
                 onChange={update('description')}
                 placeholder={t('personaDescriptionPlaceholder')}
+                extraHeight={8}
               />
             </CollapsibleSection>
           </div>

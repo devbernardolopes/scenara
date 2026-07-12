@@ -81,6 +81,7 @@ function InitialMessagesSection({ form, onChange, characterId }) {
                 value={msg.content}
                 onChange={(e) => handleContentChange(msg.id, e.target.value)}
                 placeholder={t('initialMessagePlaceholder')}
+                extraHeight={8}
               />
               <button
                 type="button"

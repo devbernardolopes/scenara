@@ -30,6 +30,7 @@ function SettingTextarea({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm resize-y"
+      extraHeight={8}
     />
   )
 

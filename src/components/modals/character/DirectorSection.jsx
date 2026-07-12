@@ -130,6 +130,7 @@ function Group({ group, form, onChange, characterId, directorEnabled }) {
             onChange={(e) => onChange(group.instructionsKey, e.target.value)}
             placeholder={t(group.placeholderKey)}
             disabled={!groupEnabled}
+            extraHeight={8}
           />
         </CollapsibleSection>
       </div>

@@ -81,6 +81,7 @@ function ExampleMessagesSection({ form, onChange, characterId }) {
                 value={msg.content}
                 onChange={(e) => handleContentChange(msg.id, e.target.value)}
                 placeholder={t('exampleMessagePlaceholder')}
+                extraHeight={8}
               />
               <button
                 type="button"

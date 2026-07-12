@@ -90,6 +90,7 @@ function MemoryRegenerationModal({ threadId, entry }) {
             value={userContent}
             onChange={handleContentChange}
             className="w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none"
+            extraHeight={8}
           />
         </CollapsibleSection>
       </div>
