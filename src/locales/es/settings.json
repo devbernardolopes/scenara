@@ -34,15 +34,15 @@
       "infinity": "∞"
     },
     "discoveryCardSize": {
-      "label": "Card size",
-      "desc": "Size of character cards in the discovery view."
+      "label": "Tamaño de tarjeta",
+      "desc": "Tamaño de las tarjetas de personajes en la vista de descubrimiento."
     },
     "discoveryCardSizeOptions": {
-      "smaller": "Smaller",
-      "small": "Small",
-      "regular": "Regular",
-      "large": "Large",
-      "xlarge": "Extra Large"
+      "smaller": "Más pequeño",
+      "small": "Pequeño",
+      "regular": "Normal",
+      "large": "Grande",
+      "xlarge": "Extra grande"
     },
     "toastPosition": {
       "label": "Toast Position",
