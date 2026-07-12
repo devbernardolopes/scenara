@@ -439,8 +439,14 @@ function ChatView() {
   }, [messages])
 
   useEffect(() => {
-    setVisibleStartIndex((prev) => Math.min(prev, messages.length))
-  }, [messages])
+    setVisibleStartIndex((prev) => {
+      let next = Math.min(prev, messages.length)
+      if (messageThreshold > 0 && isAtBottomRef.current) {
+        next = Math.max(next, messages.length - messageThreshold)
+      }
+      return next
+    })
+  }, [messages, messageThreshold])
 
   useEffect(() => {
     messagesRef.current = messages
@@ -606,8 +612,13 @@ function ChatView() {
     if (atBottom) {
       clearUnread(threadId)
       setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
+      if (messageThreshold > 0) {
+        setVisibleStartIndex((prev) =>
+          Math.max(prev, messagesRef.current.length - messageThreshold),
+        )
+      }
     }
-  }, [threadId])
+  }, [threadId, messageThreshold])
 
   useEffect(() => {
     const container = scrollRef.current
@@ -1971,6 +1982,8 @@ function ChatView() {
     msgNumMap.set(m.id, _msgNum)
   }
 
+  const visibleMessages = visibleStartIndex > 0 ? messages.slice(visibleStartIndex) : messages
+
   return (
     <div className="flex flex-col h-full">
       <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto relative pb-4">
@@ -2021,7 +2034,8 @@ function ChatView() {
                   </button>
                 </div>
               )}
-              {messages.map((msg, idx) => {
+              {visibleMessages.map((msg, sliceIdx) => {
+                const idx = visibleStartIndex + sliceIdx
                 if (msg.isSummaryMarker) {
                   const isVisible = idx >= visibleStartIndex
                   let nextIdx = idx + 1
@@ -2059,8 +2073,6 @@ function ChatView() {
                     </div>
                   )
                 }
-
-                if (idx < visibleStartIndex) return null
 
                 const entries = parseBundleEntries(msg.bundleMessages)
                 const bundleMessages = entries ? entries.map((e) => e.content) : null
