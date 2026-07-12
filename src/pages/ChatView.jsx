@@ -26,12 +26,7 @@ import {
 } from '../services/messages'
 import { getWritingInstruction } from '../services/writingInstructions'
 import { getEffectiveProfileFor } from '../services/connectionProfiles'
-import {
-  sendChatCompletion,
-  buildMessagesPayload,
-  buildOOCMessagesPayload,
-  getActiveParams,
-} from '../services/chatApi'
+import { sendChatCompletion, getActiveParams, buildChatRequestPayload } from '../services/chatApi'
 import { getSetting } from '../services/settings'
 import {
   getDirectorReviewConfig,
@@ -55,7 +50,6 @@ import {
   shouldTriggerSummarization,
   triggerSummarization,
   getUnsummarizedMessages,
-  getMessagesForApiRequest,
 } from '../services/summarization'
 import { setBaseTitle } from '../services/titleManager'
 import {
@@ -98,20 +92,6 @@ function rebuildFailedState(msgs) {
     }
   }
   return { slots }
-}
-
-function buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload) {
-  const numMap = new Map(currentMsgs.map((m, i) => [m.id, i + 1]))
-  const numbers = [null]
-  if (isFirstMessage) {
-    if (payload.length > 1) numbers.push(null)
-  } else {
-    for (const msg of apiMessages) {
-      numbers.push(numMap.get(msg.id) || null)
-    }
-    if (payload.length > numbers.length) numbers.push(null)
-  }
-  return numbers
 }
 
 function computeMessageFlags(entryTypes, msgNumbers, currentMsgs) {
@@ -219,6 +199,7 @@ function ChatView() {
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
+  const [selectedPersonaId, setSelectedPersonaId] = useState(null)
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
@@ -728,6 +709,65 @@ function ChatView() {
     return ids.size > 0 ? msgs.filter((m) => !ids.has(m.id)) : msgs
   }
 
+  async function runDirectorReview({
+    payload,
+    originalContent,
+    writingInstructionContent,
+    character,
+    chatPersona,
+    currentPersona,
+    directorConfig,
+    signal,
+    streamInto,
+    onTiming,
+  }) {
+    const dProfile = await getEffectiveProfileFor('director')
+    if (!dProfile?.model) {
+      throw new Error(t('noProfileModel', { ns: 'chat' }))
+    }
+    await apiQueue.waitForCooldown()
+    showToast(t('directorReviewing', { ns: 'chat' }), { type: 'info' })
+    const charName = character?.name || ''
+    const userPersonaName = chatPersona?.name || ''
+    const currentPersonaName = currentPersona?.name || userPersonaName
+    const templateVars = {
+      message: originalContent,
+      message_response: originalContent,
+      message_system: payload.find((m) => m.role === 'system')?.content || '',
+      message_user: payload.find((m) => m.role === 'user')?.content || '',
+      writingInstructions: writingInstructionContent,
+      char: charName,
+      user: userPersonaName,
+      name: currentPersonaName,
+    }
+    const systemInstructions = applyDirectorTemplate(
+      directorConfig.systemInstructions,
+      templateVars,
+    )
+    const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
+    const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
+    apiQueue.setCurrentRequestDirectorPhase(true)
+    try {
+      const reviewed = await sendChatCompletion({
+        profile: dProfile,
+        messages: dPayload,
+        signal,
+        onToken: streamInto,
+        onFinish: (reason) => {
+          if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
+            showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
+          }
+        },
+        onStreamingStarted: apiQueue.markCurrentRequestStreaming,
+        onTiming,
+      })
+      if (!reviewed) return originalContent
+      return reviewed
+    } finally {
+      apiQueue.setCurrentRequestDirectorPhase(false)
+    }
+  }
+
   async function doChatRequest(
     isFirstMessage,
     currentMsgs,
@@ -747,105 +787,16 @@ function ChatView() {
 
     const directorConfig = !isOOC ? await getDirectorReviewConfig(character) : null
 
-    const includeOOC = character?.includeOOC !== false
-    const keepMessages = Number(
-      character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0,
-    )
-    const apiMessages = getMessagesForApiRequest(currentMsgs, {
-      includeOOC,
-      keepMessages,
+    const { payload, entryTypes, msgNumbers } = await buildChatRequestPayload({
+      character,
+      chatPersona,
+      currentPersona,
+      messages: currentMsgs,
+      isFirstMessage,
+      isOOC,
+      threadId,
+      personaMap,
     })
-    const latestThread = await getThread(threadId)
-    const memoryHeader = await getSetting('prompting.apiRequestSectionHeaders.memories')
-    const memoryText = latestThread?.memory || ''
-
-    let payload
-    let entryTypes = null
-    let msgNumbers = null
-    if (isOOC) {
-      const oocSystemInstructions = await getSetting('prompting.oocSystem')
-      const oocUserInstructions = await getSetting('prompting.oocUser')
-      const characterPromptHeader = await getSetting(
-        'prompting.apiRequestSectionHeaders.characterPrompt',
-      )
-      const messagesHeader = await getSetting('prompting.apiRequestSectionHeaders.messages')
-      const systemRolePrefix = await getSetting('prompting.systemRolePrefix')
-      const assistantRolePrefix = await getSetting('prompting.assistantRolePrefix')
-      const userRolePrefix = await getSetting('prompting.userRolePrefix')
-      const userRolePrefixWithPersona = await getSetting('prompting.userRolePrefixWithPersona')
-      const systemRolePrefixOoc = await getSetting('prompting.systemRolePrefixOoc')
-      const assistantRolePrefixOoc = await getSetting('prompting.assistantRolePrefixOoc')
-      const userRolePrefixOoc = await getSetting('prompting.userRolePrefixOoc')
-
-      const lastUserMsg =
-        currentMsgs.length > 0 && currentMsgs[currentMsgs.length - 1].role === 'user'
-          ? currentMsgs[currentMsgs.length - 1].content
-          : ''
-      const transcriptMsgs = currentMsgs.slice(0, -1)
-
-      const oocResult = await buildOOCMessagesPayload({
-        character,
-        chatPersona,
-        currentPersona,
-        messages: apiMessages.slice(0, -1),
-        userMessage: lastUserMsg,
-        personaMap,
-        memoryText,
-        memoryHeader,
-        oocSettings: {
-          oocSystemInstructions,
-          oocUserInstructions,
-          characterPromptHeader,
-          messagesHeader,
-          systemRolePrefix,
-          assistantRolePrefix,
-          userRolePrefix,
-          userRolePrefixWithPersona,
-          systemRolePrefixOoc,
-          assistantRolePrefixOoc,
-          userRolePrefixOoc,
-        },
-      })
-      payload = oocResult.payload
-      entryTypes = oocResult.entryTypes
-    } else {
-      let writingInstruction = null
-      if (character?.writingInstruction) {
-        writingInstruction = await getWritingInstruction(Number(character.writingInstruction))
-      }
-
-      const settings = {
-        firstMessageRole: await getSetting('prompting.firstMessageRole'),
-        firstMessagePrompt: await getSetting('prompting.firstMessagePrompt'),
-        continueRole: await getSetting('prompting.continueRole'),
-        continuePrompt: await getSetting('prompting.continuePrompt'),
-        personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
-        writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
-        writingPlacement: await getSetting('prompting.writingPlacement'),
-        writingMessageRole: await getSetting('prompting.writingMessageRole'),
-        writingInstructionHeader: await getSetting(
-          'prompting.apiRequestSectionHeaders.writingInstruction',
-        ),
-        personaInjectionTiming: await getSetting('prompting.personaInjectionTiming'),
-        personaInjectionPlacement: await getSetting('prompting.personaInjectionPlacement'),
-        personaInjectionMessageRole: await getSetting('prompting.personaInjectionMessageRole'),
-      }
-
-      const chatResult = await buildMessagesPayload({
-        character,
-        chatPersona,
-        currentPersona,
-        messages: apiMessages,
-        isFirstMessage,
-        settings,
-        writingInstruction,
-        memoryText,
-        memoryHeader,
-      })
-      payload = chatResult.payload
-      entryTypes = chatResult.entryTypes
-      msgNumbers = buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload)
-    }
 
     const activeParams = getActiveParams(profile)
     const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
@@ -888,56 +839,6 @@ function ChatView() {
         setMessages((prev) =>
           prev.map((m) => (m.id === assistantMsgId ? { ...m, content: fullContent } : m)),
         )
-      }
-    }
-
-    async function runDirectorReview(originalContent, writingInstructionContent) {
-      const dProfile = await getEffectiveProfileFor('director')
-      if (!dProfile?.model) {
-        throw new Error(t('noProfileModel', { ns: 'chat' }))
-      }
-      await apiQueue.waitForCooldown()
-      showToast(t('directorReviewing', { ns: 'chat' }), { type: 'info' })
-      const charName = character?.name || ''
-      const userPersonaName = chatPersona?.name || ''
-      const currentPersonaName = currentPersona?.name || userPersonaName
-      const templateVars = {
-        message: originalContent,
-        message_response: originalContent,
-        message_system: payload.find((m) => m.role === 'system')?.content || '',
-        message_user: payload.find((m) => m.role === 'user')?.content || '',
-        writingInstructions: writingInstructionContent,
-        char: charName,
-        user: userPersonaName,
-        name: currentPersonaName,
-      }
-      const systemInstructions = applyDirectorTemplate(
-        directorConfig.systemInstructions,
-        templateVars,
-      )
-      const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
-      const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
-      apiQueue.setCurrentRequestDirectorPhase(true)
-      try {
-        const reviewed = await sendChatCompletion({
-          profile: dProfile,
-          messages: dPayload,
-          signal,
-          onToken: (full) => streamIntoBubble(full),
-          onFinish: (reason) => {
-            if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
-              showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
-            }
-          },
-          onStreamingStarted: apiQueue.markCurrentRequestStreaming,
-          onTiming: (ms) => {
-            directorDurationMs = ms
-          },
-        })
-        if (!reviewed) return originalContent
-        return reviewed
-      } finally {
-        apiQueue.setCurrentRequestDirectorPhase(false)
       }
     }
 
@@ -986,7 +887,20 @@ function ChatView() {
               const wi = await getWritingInstruction(Number(character.writingInstruction))
               writingInstructionContent = wi?.content || ''
             }
-            const reviewed = await runDirectorReview(content, writingInstructionContent)
+            const reviewed = await runDirectorReview({
+              payload,
+              originalContent: content,
+              writingInstructionContent,
+              character,
+              chatPersona,
+              currentPersona,
+              directorConfig,
+              signal,
+              streamInto: streamIntoBubble,
+              onTiming: (ms) => {
+                directorDurationMs = ms
+              },
+            })
             finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
             directorReviewed = true
             promptData = JSON.stringify({
@@ -1351,6 +1265,8 @@ function ChatView() {
         chatPersona = await getPersona(thread.personaId)
       }
 
+      const currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : null
+
       const isFirstMessage = currentMsgs.length === 0 && character?.firstMessage
       const isOOCRegen = !!msg.isOOC
 
@@ -1381,173 +1297,24 @@ function ChatView() {
         }
       }
 
-      async function runDirectorReviewRegen(originalContent, writingInstructionContent) {
-        const dProfile = await getEffectiveProfileFor('director')
-        if (!dProfile?.model) {
-          throw new Error(t('noProfileModel', { ns: 'chat' }))
-        }
-        await apiQueue.waitForCooldown()
-        showToast(t('directorReviewing', { ns: 'chat' }), { type: 'info' })
-        const regenChatPersona = thread?.personaId ? await getPersona(thread.personaId) : null
-        const regenCurrentPersona = msg.personaId
-          ? await getPersona(msg.personaId)
-          : regenChatPersona
-        const charName = character?.name || ''
-        const userPersonaName = regenChatPersona?.name || ''
-        const currentPersonaName = regenCurrentPersona?.name || userPersonaName
-        const templateVars = {
-          message: originalContent,
-          message_response: originalContent,
-          message_system: payload.find((m) => m.role === 'system')?.content || '',
-          message_user: payload.find((m) => m.role === 'user')?.content || '',
-          writingInstructions: writingInstructionContent,
-          char: charName,
-          user: userPersonaName,
-          name: currentPersonaName,
-        }
-        const systemInstructions = applyDirectorTemplate(
-          directorConfig.systemInstructions,
-          templateVars,
-        )
-        const userInstructions = applyDirectorTemplate(
-          directorConfig.userInstructions,
-          templateVars,
-        )
-        const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
-        apiQueue.setCurrentRequestDirectorPhase(true)
-        try {
-          const reviewed = await sendChatCompletion({
-            profile: dProfile,
-            messages: dPayload,
-            signal: regenAbortController.signal,
-            onToken: (full) => streamSlotIntoBubble(full),
-            onFinish: (reason) => {
-              if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
-                showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
-              }
-            },
-            onStreamingStarted: apiQueue.markCurrentRequestStreaming,
-            onTiming: (ms) => {
-              directorDurationMs = ms
-            },
-          })
-          if (!reviewed) return originalContent
-          return reviewed
-        } finally {
-          apiQueue.setCurrentRequestDirectorPhase(false)
-        }
-      }
-
       let payload
       let entryTypes = null
       let promptDataStr
       let msgNumbers = null
 
-      if (isOOCRegen) {
-        const oocSystemInstructions = await getSetting('prompting.oocSystem')
-        const oocUserInstructions = await getSetting('prompting.oocUser')
-        const characterPromptHeader = await getSetting(
-          'prompting.apiRequestSectionHeaders.characterPrompt',
-        )
-        const messagesHeader = await getSetting('prompting.apiRequestSectionHeaders.messages')
-        const systemRolePrefix = await getSetting('prompting.systemRolePrefix')
-        const assistantRolePrefix = await getSetting('prompting.assistantRolePrefix')
-        const userRolePrefix = await getSetting('prompting.userRolePrefix')
-        const userRolePrefixWithPersona = await getSetting('prompting.userRolePrefixWithPersona')
-        const systemRolePrefixOoc = await getSetting('prompting.systemRolePrefixOoc')
-        const assistantRolePrefixOoc = await getSetting('prompting.assistantRolePrefixOoc')
-        const userRolePrefixOoc = await getSetting('prompting.userRolePrefixOoc')
-
-        const includeOOCRegen = character?.includeOOC !== false
-        const keepMessagesRegen = Number(
-          character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0,
-        )
-        const apiMessagesRegen = getMessagesForApiRequest(currentMsgs, {
-          includeOOC: includeOOCRegen,
-          keepMessages: keepMessagesRegen,
-        })
-        const memoryHeaderRegen = await getSetting('prompting.apiRequestSectionHeaders.memories')
-        const memoryTextRegen = thread?.memory || ''
-
-        const lastUserMsg =
-          currentMsgs.length > 0 && currentMsgs[currentMsgs.length - 1].role === 'user'
-            ? currentMsgs[currentMsgs.length - 1].content
-            : ''
-
-        const oocResultRegen = await buildOOCMessagesPayload({
-          character,
-          chatPersona,
-          currentPersona: null,
-          messages: apiMessagesRegen.slice(0, -1),
-          userMessage: lastUserMsg,
-          personaMap,
-          memoryText: memoryTextRegen,
-          memoryHeader: memoryHeaderRegen,
-          oocSettings: {
-            oocSystemInstructions,
-            oocUserInstructions,
-            characterPromptHeader,
-            messagesHeader,
-            systemRolePrefix,
-            assistantRolePrefix,
-            userRolePrefix,
-            userRolePrefixWithPersona,
-            systemRolePrefixOoc,
-            assistantRolePrefixOoc,
-            userRolePrefixOoc,
-          },
-        })
-        payload = oocResultRegen.payload
-        entryTypes = oocResultRegen.entryTypes
-      } else {
-        let writingInstruction = null
-        if (character?.writingInstruction) {
-          writingInstruction = await getWritingInstruction(Number(character.writingInstruction))
-        }
-
-        const settings = {
-          firstMessageRole: await getSetting('prompting.firstMessageRole'),
-          firstMessagePrompt: await getSetting('prompting.firstMessagePrompt'),
-          continueRole: await getSetting('prompting.continueRole'),
-          continuePrompt: await getSetting('prompting.continuePrompt'),
-          personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
-          writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
-          writingPlacement: await getSetting('prompting.writingPlacement'),
-          writingMessageRole: await getSetting('prompting.writingMessageRole'),
-          writingInstructionHeader: await getSetting(
-            'prompting.apiRequestSectionHeaders.writingInstruction',
-          ),
-          personaInjectionTiming: await getSetting('prompting.personaInjectionTiming'),
-          personaInjectionPlacement: await getSetting('prompting.personaInjectionPlacement'),
-          personaInjectionMessageRole: await getSetting('prompting.personaInjectionMessageRole'),
-        }
-
-        const includeOOCRegen = character?.includeOOC !== false
-        const keepMessagesRegen = Number(
-          character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0,
-        )
-        const apiMessagesRegen = getMessagesForApiRequest(currentMsgs, {
-          includeOOC: includeOOCRegen,
-          keepMessages: keepMessagesRegen,
-        })
-        const memoryHeaderRegen = await getSetting('prompting.apiRequestSectionHeaders.memories')
-        const memoryTextRegen = thread?.memory || ''
-
-        const chatResultRegen = await buildMessagesPayload({
-          character,
-          chatPersona,
-          currentPersona: null,
-          messages: apiMessagesRegen,
-          isFirstMessage,
-          settings,
-          writingInstruction,
-          memoryText: memoryTextRegen,
-          memoryHeader: memoryHeaderRegen,
-        })
-        payload = chatResultRegen.payload
-        entryTypes = chatResultRegen.entryTypes
-        msgNumbers = buildMsgNumbersArray(isFirstMessage, apiMessagesRegen, currentMsgs, payload)
-      }
+      const chatRequest = await buildChatRequestPayload({
+        character,
+        chatPersona,
+        currentPersona,
+        messages: currentMsgs,
+        isFirstMessage,
+        isOOC: isOOCRegen,
+        threadId,
+        personaMap,
+      })
+      payload = chatRequest.payload
+      entryTypes = chatRequest.entryTypes
+      msgNumbers = chatRequest.msgNumbers
 
       const activeParams = getActiveParams(profile)
       const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
@@ -1619,7 +1386,20 @@ function ChatView() {
               const wi = await getWritingInstruction(Number(character.writingInstruction))
               writingInstructionContent = wi?.content || ''
             }
-            const reviewed = await runDirectorReviewRegen(content, writingInstructionContent)
+            const reviewed = await runDirectorReview({
+              payload,
+              originalContent: content,
+              writingInstructionContent,
+              character,
+              chatPersona,
+              currentPersona,
+              directorConfig,
+              signal: regenAbortController.signal,
+              streamInto: streamSlotIntoBubble,
+              onTiming: (ms) => {
+                directorDurationMs = ms
+              },
+            })
             finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
             directorReviewed = true
             promptDataStr = JSON.stringify({
@@ -2162,6 +1942,7 @@ function ChatView() {
           generating={generating}
           summarizing={summarizing}
           hasQueued={queuedCount > 0}
+          onPersonaChange={setSelectedPersonaId}
         />
       </div>
 

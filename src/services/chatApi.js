@@ -1,5 +1,7 @@
 import { PROVIDERS } from './apiProviders'
 import { getSetting } from './settings'
+import { getThread } from './threads'
+import { getWritingInstruction } from './writingInstructions'
 
 const BASE_URLS = {
   groq: 'https://api.groq.com/openai/v1',
@@ -17,6 +19,37 @@ export function replaceVars(text, { charName, personaName, currentPersonaName })
     .replace(/{{char}}/gi, charName || '')
     .replace(/{{user}}/gi, personaName || '')
     .replace(/{{name}}/gi, currentPersonaName || personaName || '')
+}
+
+export function getMessagesForApiRequest(messages, { includeOOC = true, keepMessages = 0 } = {}) {
+  if (!Array.isArray(messages)) return []
+
+  const eligible = messages.filter(
+    (message) =>
+      !message?.isSummaryMarker && !message?.isAutoTitleMarker && (includeOOC || !message?.isOOC),
+  )
+  if (keepMessages <= 0) {
+    return eligible.filter((message) => !message?.summarizedAt)
+  }
+
+  let maxTs = null
+  for (const m of eligible) {
+    if (m?.summarizedAt) {
+      const ts = new Date(m.summarizedAt).getTime()
+      if (maxTs === null || ts > maxTs) maxTs = ts
+    }
+  }
+
+  const keptIds = new Set()
+  if (maxTs !== null) {
+    const block = eligible.filter(
+      (m) => m?.summarizedAt && new Date(m.summarizedAt).getTime() === maxTs,
+    )
+    const kept = block.slice(-keepMessages)
+    kept.forEach((m) => keptIds.add(m.id))
+  }
+
+  return eligible.filter((m) => !m.summarizedAt || keptIds.has(m.id))
 }
 
 export function appendMemoryToPayload(payload, memoryText, memoryHeader) {
@@ -357,6 +390,133 @@ export async function buildOOCMessagesPayload({
   }
 
   return { payload: result, entryTypes }
+}
+
+// Mirrors buildMsgNumbersArray formerly defined in ChatView: maps each payload
+// entry back to the originating message number for prompt-data inspection.
+export function buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload) {
+  const numMap = new Map(currentMsgs.map((m, i) => [m.id, i + 1]))
+  const numbers = [null]
+  if (isFirstMessage) {
+    if (payload.length > 1) numbers.push(null)
+  } else {
+    for (const msg of apiMessages) {
+      numbers.push(numMap.get(msg.id) || null)
+    }
+    if (payload.length > numbers.length) numbers.push(null)
+  }
+  return numbers
+}
+
+export async function buildChatRequestPayload({
+  character,
+  chatPersona,
+  currentPersona,
+  messages,
+  isFirstMessage,
+  isOOC,
+  threadId,
+  personaMap,
+}) {
+  const includeOOC = character?.includeOOC !== false
+  const keepMessages = Number(
+    character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0,
+  )
+  const apiMessages = getMessagesForApiRequest(messages, { includeOOC, keepMessages })
+
+  const latestThread = await getThread(threadId)
+  const memoryHeader = await getSetting('prompting.apiRequestSectionHeaders.memories')
+  const memoryText = latestThread?.memory || ''
+
+  let payload
+  let entryTypes = null
+
+  if (isOOC) {
+    const oocSystemInstructions = await getSetting('prompting.oocSystem')
+    const oocUserInstructions = await getSetting('prompting.oocUser')
+    const characterPromptHeader = await getSetting(
+      'prompting.apiRequestSectionHeaders.characterPrompt',
+    )
+    const messagesHeader = await getSetting('prompting.apiRequestSectionHeaders.messages')
+    const systemRolePrefix = await getSetting('prompting.systemRolePrefix')
+    const assistantRolePrefix = await getSetting('prompting.assistantRolePrefix')
+    const userRolePrefix = await getSetting('prompting.userRolePrefix')
+    const userRolePrefixWithPersona = await getSetting('prompting.userRolePrefixWithPersona')
+    const systemRolePrefixOoc = await getSetting('prompting.systemRolePrefixOoc')
+    const assistantRolePrefixOoc = await getSetting('prompting.assistantRolePrefixOoc')
+    const userRolePrefixOoc = await getSetting('prompting.userRolePrefixOoc')
+
+    const lastUserMsg =
+      messages.length > 0 && messages[messages.length - 1].role === 'user'
+        ? messages[messages.length - 1].content
+        : ''
+
+    const oocResult = await buildOOCMessagesPayload({
+      character,
+      chatPersona,
+      currentPersona,
+      messages: apiMessages.slice(0, -1),
+      userMessage: lastUserMsg,
+      personaMap,
+      memoryText,
+      memoryHeader,
+      oocSettings: {
+        oocSystemInstructions,
+        oocUserInstructions,
+        characterPromptHeader,
+        messagesHeader,
+        systemRolePrefix,
+        assistantRolePrefix,
+        userRolePrefix,
+        userRolePrefixWithPersona,
+        systemRolePrefixOoc,
+        assistantRolePrefixOoc,
+        userRolePrefixOoc,
+      },
+    })
+    payload = oocResult.payload
+    entryTypes = oocResult.entryTypes
+  } else {
+    let writingInstruction = null
+    if (character?.writingInstruction) {
+      writingInstruction = await getWritingInstruction(Number(character.writingInstruction))
+    }
+
+    const settings = {
+      firstMessageRole: await getSetting('prompting.firstMessageRole'),
+      firstMessagePrompt: await getSetting('prompting.firstMessagePrompt'),
+      continueRole: await getSetting('prompting.continueRole'),
+      continuePrompt: await getSetting('prompting.continuePrompt'),
+      personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
+      writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
+      writingPlacement: await getSetting('prompting.writingPlacement'),
+      writingMessageRole: await getSetting('prompting.writingMessageRole'),
+      writingInstructionHeader: await getSetting(
+        'prompting.apiRequestSectionHeaders.writingInstruction',
+      ),
+      personaInjectionTiming: await getSetting('prompting.personaInjectionTiming'),
+      personaInjectionPlacement: await getSetting('prompting.personaInjectionPlacement'),
+      personaInjectionMessageRole: await getSetting('prompting.personaInjectionMessageRole'),
+    }
+
+    const chatResult = await buildMessagesPayload({
+      character,
+      chatPersona,
+      currentPersona,
+      messages: apiMessages,
+      isFirstMessage,
+      settings,
+      writingInstruction,
+      memoryText,
+      memoryHeader,
+    })
+    payload = chatResult.payload
+    entryTypes = chatResult.entryTypes
+  }
+
+  const msgNumbers = buildMsgNumbersArray(isFirstMessage, apiMessages, messages, payload)
+
+  return { payload, entryTypes, msgNumbers }
 }
 
 export async function sendChatCompletion({

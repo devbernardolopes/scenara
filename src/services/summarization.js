@@ -20,37 +20,6 @@ export function getUnsummarizedMessages(messages, { includeOOC = true } = {}) {
   )
 }
 
-export function getMessagesForApiRequest(messages, { includeOOC = true, keepMessages = 0 } = {}) {
-  if (!Array.isArray(messages)) return []
-
-  const eligible = messages.filter(
-    (message) =>
-      !message?.isSummaryMarker && !message?.isAutoTitleMarker && (includeOOC || !message?.isOOC),
-  )
-  if (keepMessages <= 0) {
-    return eligible.filter((message) => !message?.summarizedAt)
-  }
-
-  let maxTs = null
-  for (const m of eligible) {
-    if (m?.summarizedAt) {
-      const ts = new Date(m.summarizedAt).getTime()
-      if (maxTs === null || ts > maxTs) maxTs = ts
-    }
-  }
-
-  const keptIds = new Set()
-  if (maxTs !== null) {
-    const block = eligible.filter(
-      (m) => m?.summarizedAt && new Date(m.summarizedAt).getTime() === maxTs,
-    )
-    const kept = block.slice(-keepMessages)
-    kept.forEach((m) => keptIds.add(m.id))
-  }
-
-  return eligible.filter((m) => !m.summarizedAt || keptIds.has(m.id))
-}
-
 export async function shouldTriggerSummarization({ character, messages, includeOOC = true }) {
   if (!character) return false
 

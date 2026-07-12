@@ -107,7 +107,15 @@ function parseShortcuts(content) {
   return result.length > 0 ? result : null
 }
 
-function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, hasQueued }) {
+function ChatInputArea({
+  threadId,
+  onSend,
+  onCancel,
+  generating,
+  summarizing,
+  hasQueued,
+  onPersonaChange,
+}) {
   const { t } = useTranslation('chat')
   const { openModal } = useModal()
   const textareaRef = useRef(null)
@@ -115,6 +123,8 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
   const quickPanelRef = useRef(null)
   const saveTimerRef = useRef(null)
   const initializedRef = useRef(false)
+  const onPersonaChangeRef = useRef(onPersonaChange)
+  onPersonaChangeRef.current = onPersonaChange
   const latestRef = useRef({
     personaId: null,
     oocActive: false,
@@ -185,7 +195,10 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
         setQuickSettings(saved.quickSettings || DEFAULT_QUICK_SETTINGS)
         if (saved.personaId) {
           const p = await getPersona(saved.personaId)
-          if (!cancelled) setSelectedPersona(p || null)
+          if (!cancelled) {
+            setSelectedPersona(p || null)
+            onPersonaChangeRef.current?.(p?.id ?? null)
+          }
         }
       }
       if (!saved?.personaId) {
@@ -193,10 +206,16 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
         const fallbackPersonaId = thread?.personaId
         if (fallbackPersonaId) {
           const p = await getPersona(fallbackPersonaId)
-          if (!cancelled) setSelectedPersona(p || null)
+          if (!cancelled) {
+            setSelectedPersona(p || null)
+            onPersonaChangeRef.current?.(p?.id ?? null)
+          }
         } else {
           const list = await getAllPersonas()
-          if (!cancelled && list.length > 0) setSelectedPersona(list[0])
+          if (!cancelled && list.length > 0) {
+            setSelectedPersona(list[0])
+            onPersonaChangeRef.current?.(list[0].id)
+          }
         }
       }
       if (!cancelled) {
@@ -295,7 +314,10 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
       const id = latestRef.current?.personaId
       if (id) {
         getPersona(id).then((p) => {
-          if (p) setSelectedPersona(p)
+          if (p) {
+            setSelectedPersona(p)
+            onPersonaChangeRef.current?.(p.id)
+          }
         })
       }
     }
@@ -836,6 +858,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
               onClose={() => setPersonaPickerOpen(false)}
               onSelect={(p) => {
                 setSelectedPersona(p)
+                onPersonaChangeRef.current?.(p?.id ?? null)
                 setPersonaPickerOpen(false)
               }}
             />
