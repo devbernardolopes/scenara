@@ -316,10 +316,11 @@ function Sidebar({ open, onClose }) {
   }
 
   function toggleSelectAll() {
-    if (selectedIds.size === threads.length) {
+    const selectable = threads.filter((t) => !t.isLocked)
+    if (selectedIds.size === selectable.length) {
       setSelectedIds(new Set())
     } else {
-      setSelectedIds(new Set(threads.map((t) => t.id)))
+      setSelectedIds(new Set(selectable.map((t) => t.id)))
     }
   }
 
