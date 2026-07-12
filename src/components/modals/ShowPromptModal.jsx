@@ -121,6 +121,7 @@ function ShowPromptModal({ payload, model, params, msgNumbers, messageFlags, dir
                       readOnly
                       value={msg.content || ''}
                       className="w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none cursor-default"
+                      extraHeight={8}
                     />
                   </div>
                 )}

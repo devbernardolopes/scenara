@@ -268,6 +268,7 @@ function MemoryModal({ threadId }) {
                       value={(drafts[entry.id] ?? entry.content) || ''}
                       onChange={(e) => updateDraft(entry.id, e.target.value)}
                       className="w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none"
+                      extraHeight={8}
                     />
                   </div>
                 )}

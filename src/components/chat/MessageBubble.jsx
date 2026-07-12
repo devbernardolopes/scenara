@@ -700,6 +700,7 @@ function MessageBubble({
               onChange={(e) => setEditedContent(e.target.value)}
               onBlur={handleSaveEdit}
               onKeyDown={handleEditKeyDown}
+              extraHeight={8}
               className={`w-full resize-none rounded border whitespace-pre-wrap break-words px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
                 isOOC
                   ? 'bg-ooc text-ooc border-ooc focus:ring-ooc'

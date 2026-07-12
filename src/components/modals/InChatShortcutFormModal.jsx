@@ -136,6 +136,7 @@ function InChatShortcutFormModal({ inChatShortcut }) {
             onChange={update('content')}
             placeholder={t('inChatShortcut.form.contentPlaceholder')}
             required
+            extraHeight={8}
           />
         </div>
       </div>

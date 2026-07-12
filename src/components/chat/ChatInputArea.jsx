@@ -403,7 +403,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
   }, [overflowOpen])
 
   const autoResize = useCallback((el) => {
-    autoResizeTextarea(el)
+    autoResizeTextarea(el, { extraHeight: 8 })
   }, [])
 
   function resetTextareaHeight() {
@@ -415,7 +415,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
   function handleTextareaFocus() {
     const el = textareaRef.current
     if (el && el.value) {
-      requestAnimationFrame(() => autoResizeTextarea(el))
+      requestAnimationFrame(() => autoResizeTextarea(el, { extraHeight: 8 }))
     }
   }
 
