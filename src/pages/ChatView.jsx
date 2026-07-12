@@ -46,6 +46,9 @@ import {
   getStreamingMessageId,
   setStreamingMessageId,
   clearStreamingMessageId,
+  setStreamingSlotIndex,
+  getStreamingSlotIndex,
+  clearStreamingSlotIndex,
 } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import {
@@ -267,6 +270,14 @@ function ChatView() {
       const { slots } = rebuildFailedState(msgs)
       setActiveSlotIndices(slots)
       setStreamingSlotIndices({})
+
+      const streamingMsgId = getStreamingMessageId(threadId)
+      if (streamingMsgId != null) {
+        const savedSlot = getStreamingSlotIndex(threadId)
+        if (savedSlot != null) {
+          setStreamingSlotIndices({ [streamingMsgId]: savedSlot })
+        }
+      }
 
       const threshold = Number(await getSetting('defaultMessageThreshold')) || 0
       setMessageThreshold(threshold)
@@ -544,7 +555,13 @@ function ChatView() {
 
   useEffect(() => {
     const id = getStreamingMessageId(threadId)
-    if (id != null) setStreamingMsgId(id)
+    if (id != null) {
+      setStreamingMsgId(id)
+      const savedSlot = getStreamingSlotIndex(threadId)
+      if (savedSlot != null) {
+        setStreamingSlotIndices((prev) => ({ ...prev, [id]: savedSlot }))
+      }
+    }
     function handleStreamingChange(e) {
       const { threadId: eventThreadId, messageId } = e.detail
       if (Number(eventThreadId) === Number(threadId)) {
@@ -1235,6 +1252,7 @@ function ChatView() {
       slotIndex = regenEntries.length
       regenEntries.push({ content: '', promptData: null, createdAt: new Date().toISOString() })
       setStreamingSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
+      setStreamingSlotIndex(threadId, slotIndex)
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
       }
@@ -1479,14 +1497,7 @@ function ChatView() {
             signal: regenAbortController.signal,
             onToken: directorConfig
               ? undefined
-              : (fullContent) => {
-                  updateMessage(messageId, { content: fullContent })
-                  if (Number(currentThreadIdRef.current) === Number(threadId)) {
-                    setMessages((prev) =>
-                      prev.map((m) => (m.id === messageId ? { ...m, content: fullContent } : m)),
-                    )
-                  }
-                },
+              : (fullContent) => streamSlotIntoBubble(fullContent),
             onFinish: (reason) => {
               if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
                 showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
@@ -1587,6 +1598,7 @@ function ChatView() {
       }
     } finally {
       clearStreamingMessageId(threadId)
+      clearStreamingSlotIndex(threadId)
       isLocalStreamerRef.current = false
       setStreamingSlotIndices((prev) => {
         const next = { ...prev }

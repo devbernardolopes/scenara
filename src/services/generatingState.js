@@ -39,6 +39,31 @@ export function clearStreamingMessageId(threadId) {
   )
 }
 
+const streamingSlotIndices = new Map()
+
+export function setStreamingSlotIndex(threadId, slotIndex) {
+  streamingSlotIndices.set(Number(threadId), Number(slotIndex))
+  window.dispatchEvent(
+    new CustomEvent('streaming-slot-index-changed', {
+      detail: { threadId: Number(threadId), slotIndex: Number(slotIndex) },
+    }),
+  )
+}
+
+export function getStreamingSlotIndex(threadId) {
+  const idx = streamingSlotIndices.get(Number(threadId))
+  return idx == null ? null : Number(idx)
+}
+
+export function clearStreamingSlotIndex(threadId) {
+  streamingSlotIndices.delete(Number(threadId))
+  window.dispatchEvent(
+    new CustomEvent('streaming-slot-index-changed', {
+      detail: { threadId: Number(threadId), slotIndex: null },
+    }),
+  )
+}
+
 export function startGenerating(threadId) {
   const id = Number(threadId)
   generatingThreads.add(id)
