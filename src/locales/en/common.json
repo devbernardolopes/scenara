@@ -19,6 +19,8 @@
     "confirmDuplicateMessage": "Are you sure you want to duplicate this thread?",
     "favorite": "Favorite",
     "unfavorite": "Unfavorite",
+    "lock": "Lock thread",
+    "unlock": "Unlock thread",
     "confirmDeleteTitle": "Delete Thread",
     "confirmDeleteMessage": "Are you sure you want to delete this thread? This action cannot be undone.",
     "unknownCharacter": "Unknown",

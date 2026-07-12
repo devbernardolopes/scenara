@@ -58,4 +58,6 @@ export {
   CornerDownLeft,
   Reply,
   Forward,
+  Lock,
+  Unlock,
 } from 'lucide-react'

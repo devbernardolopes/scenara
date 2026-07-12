@@ -47,6 +47,7 @@ export async function createThread({ characterId, personaId, title, initialMessa
     createdAt: now,
     updatedAt: now,
     isFavorite: false,
+    isLocked: false,
     color: '',
     threadNumber,
     memory: null,
@@ -103,6 +104,13 @@ export async function toggleFavorite(id) {
   window.dispatchEvent(new CustomEvent('threads-changed'))
 }
 
+export async function toggleLock(id) {
+  const thread = await db.threads.get(Number(id))
+  if (!thread) throw new Error('Thread not found')
+  await db.threads.update(Number(id), { isLocked: !thread.isLocked })
+  window.dispatchEvent(new CustomEvent('threads-changed'))
+}
+
 export async function markAutoTitleGenerated(id) {
   await db.threads.update(Number(id), { autoTitleGenerated: true })
 }
@@ -154,6 +162,7 @@ export async function duplicateThread(id) {
     createdAt: now,
     updatedAt: now,
     isFavorite: false,
+    isLocked: false,
     color: '',
     threadNumber,
     titleEdited: original.titleEdited || false,
@@ -213,6 +222,7 @@ export async function forkThread(id, messageId) {
     createdAt: now,
     updatedAt: now,
     isFavorite: false,
+    isLocked: false,
     color: '',
     threadNumber,
     titleEdited: original.titleEdited || false,

@@ -10,6 +10,8 @@
     "duplicateThread": "Dupliquer la discussion",
     "favorite": "Favori",
     "unfavorite": "Ne plus favori",
+    "lock": "Verrouiller la conversation",
+    "unlock": "Déverrouiller la conversation",
     "confirmDeleteTitle": "Supprimer la Discussion",
     "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer cette discussion ? Cette action est irréversible.",
     "unknownCharacter": "Inconnu",

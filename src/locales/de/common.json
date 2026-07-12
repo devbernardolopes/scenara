@@ -10,6 +10,8 @@
     "duplicateThread": "Unterhaltung duplizieren",
     "favorite": "Favorit",
     "unfavorite": "Kein Favorit",
+    "lock": "Unterhaltung sperren",
+    "unlock": "Unterhaltung entsperren",
     "confirmDeleteTitle": "Unterhaltung löschen",
     "confirmDeleteMessage": "Bist du sicher, dass du diese Unterhaltung löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
     "unknownCharacter": "Unbekannt",

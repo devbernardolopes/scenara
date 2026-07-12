@@ -154,4 +154,19 @@ db.version(13).stores({
   threadMemories: '++id, threadId, createdAt',
 })
 
+db.version(14).stores({
+  threads: '++id, title, characterId, personaId, updatedAt, isFavorite, isLocked, threadNumber',
+  characters: '++id, name, createdAt, updatedAt, characterNumber, *tags',
+  personas: '++id, name, title, createdAt, isDefault',
+  settings: '++id, key',
+  uiState: '++id, key',
+  messages: '++id, threadId, role, personaId, createdAt, summarizedAt',
+  writingInstructions: '++id, name, createdAt',
+  connectionProfiles: '++id, name, createdAt',
+  inChatShortcuts: '++id, name, createdAt',
+  promptHistory: '++id, threadId, createdAt',
+  tags: '++id, &name, createdAt',
+  threadMemories: '++id, threadId, createdAt',
+})
+
 export default db

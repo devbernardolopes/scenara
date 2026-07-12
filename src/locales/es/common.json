@@ -10,6 +10,8 @@
     "duplicateThread": "Duplicar conversación",
     "favorite": "Favorito",
     "unfavorite": "No favorito",
+    "lock": "Bloquear conversación",
+    "unlock": "Desbloquear conversación",
     "confirmDeleteTitle": "Eliminar Conversación",
     "confirmDeleteMessage": "¿Estás seguro de que deseas eliminar esta conversación? Esta acción no se puede deshacer.",
     "unknownCharacter": "Desconocido",

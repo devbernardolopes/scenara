@@ -7,6 +7,7 @@ import {
   deleteThread,
   deleteThreads,
   toggleFavorite,
+  toggleLock,
   updateThreadColor,
   duplicateThread,
 } from '../../services/threads'
@@ -27,6 +28,8 @@ import {
   Trash2,
   Copy,
   Star,
+  Lock,
+  Unlock,
   Palette,
   CheckSquare,
   Square,
@@ -259,6 +262,7 @@ function Sidebar({ open, onClose }) {
   }
 
   async function handleDelete(thread) {
+    if (thread.isLocked) return
     const ok = await confirm({
       title: t('sidebar.confirmDeleteTitle'),
       message: t('sidebar.confirmDeleteMessage'),
@@ -286,6 +290,10 @@ function Sidebar({ open, onClose }) {
 
   async function handleToggleFavorite(thread) {
     await toggleFavorite(thread.id)
+  }
+
+  async function handleToggleLock(thread) {
+    await toggleLock(thread.id)
   }
 
   async function handleColorSelect(thread, color) {
@@ -316,16 +324,19 @@ function Sidebar({ open, onClose }) {
   }
 
   async function handleBatchDelete() {
+    const lockedIds = new Set(threads.filter((t) => t.isLocked).map((t) => t.id))
+    const deletableIds = [...selectedIds].filter((id) => !lockedIds.has(id))
+    if (deletableIds.length === 0) return
     const ok = await confirm({
       title: t('sidebar.confirmBatchDeleteTitle'),
-      message: t('sidebar.confirmBatchDeleteMessage', { count: selectedIds.size }),
+      message: t('sidebar.confirmBatchDeleteMessage', { count: deletableIds.length }),
       confirmLabel: t('sidebar.deleteSelected'),
       cancelLabel: t('cancel'),
       variant: 'danger',
     })
     if (!ok) return
-    const hadActive = [...selectedIds].some((id) => String(id) === threadId)
-    await deleteThreads([...selectedIds])
+    const hadActive = deletableIds.some((id) => String(id) === threadId)
+    await deleteThreads(deletableIds)
     setSelectedIds(new Set())
     if (hadActive) navigate('/')
   }
@@ -519,6 +530,25 @@ function Sidebar({ open, onClose }) {
                             onClick={(e) => {
                               e.preventDefault()
                               e.stopPropagation()
+                              handleToggleLock(thread)
+                            }}
+                            className={`w-[26px] h-[26px] flex items-center justify-center rounded hover:bg-surface-hover ${thread.isLocked ? 'text-primary' : 'text-tertiary hover:text-text'}`}
+                            aria-label={thread.isLocked ? t('sidebar.unlock') : t('sidebar.lock')}
+                            title={thread.isLocked ? t('sidebar.unlock') : t('sidebar.lock')}
+                          >
+                            {thread.isLocked ? (
+                              <Lock className="w-3.5 h-3.5" />
+                            ) : (
+                              <Unlock className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                        <div className="w-[26px] shrink-0 flex justify-center">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
                               if (colorPickerId === thread.id) {
                                 setColorPickerId(null)
                                 setColorPickerPos(null)
@@ -543,22 +573,24 @@ function Sidebar({ open, onClose }) {
                         </div>
                       </div>
                       <div className="flex items-center gap-1 mt-auto">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            toggleSelect(thread.id)
-                          }}
-                          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover flex-shrink-0"
-                          aria-label={t('sidebar.selectThreads')}
-                        >
-                          {selectedIds.has(thread.id) ? (
-                            <CheckSquare className="w-4 h-4" />
-                          ) : (
-                            <Square className="w-4 h-4" />
-                          )}
-                        </button>
+                        {!thread.isLocked && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              toggleSelect(thread.id)
+                            }}
+                            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover flex-shrink-0"
+                            aria-label={t('sidebar.selectThreads')}
+                          >
+                            {selectedIds.has(thread.id) ? (
+                              <CheckSquare className="w-4 h-4" />
+                            ) : (
+                              <Square className="w-4 h-4" />
+                            )}
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={(e) => {
@@ -604,19 +636,21 @@ function Sidebar({ open, onClose }) {
                             className={`w-3.5 h-3.5 ${thread.isFavorite ? 'fill-yellow-500' : ''}`}
                           />
                         </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            handleDelete(thread)
-                          }}
-                          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-delete text-on-delete hover:bg-delete-hover"
-                          aria-label={t('sidebar.deleteThread')}
-                          title={t('sidebar.deleteThread')}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        {!thread.isLocked && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleDelete(thread)
+                            }}
+                            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-delete text-on-delete hover:bg-delete-hover"
+                            aria-label={t('sidebar.deleteThread')}
+                            title={t('sidebar.deleteThread')}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </Link>
