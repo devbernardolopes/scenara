@@ -26,7 +26,7 @@
 /* @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) { */
 @media (hover: hover) and (pointer: fine) {
   .character-card:hover .character-card__start-btn {
-    animation: scenara-pulse-ring 1.75s ease-in-out infinite;
+    animation: scenara-pulse-ring 2.75s ease-in-out infinite;
   }
 
   @keyframes scenara-pulse-ring {
@@ -35,7 +35,7 @@
       box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.5);
     }
     50% {
-      box-shadow: 0 0 0 7px rgba(var(--color-primary-rgb), 0);
+      box-shadow: 0 0 0 14px rgba(var(--color-primary-rgb), 0);
     }
   }
 }
