@@ -77,7 +77,7 @@ function SwitchRow({ label, checked, onChange }) {
   )
 }
 
-function Group({ group, form, onChange, characterId }) {
+function Group({ group, form, onChange, characterId, directorEnabled }) {
   const { t } = useTranslation('characterCreation')
   const groupEnabled = form[group.enabledKey]
   const instructions = form[group.instructionsKey]
@@ -87,6 +87,14 @@ function Group({ group, form, onChange, characterId }) {
   useEffect(() => {
     setOpen(groupEnabled)
   }, [groupEnabled])
+
+  useEffect(() => {
+    if (!directorEnabled) {
+      setOpen(false)
+      if (storageKey) setUIState(`collapsed.${storageKey}`, true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [directorEnabled])
 
   const handleOpenChange = (val) => {
     setOpen(val)
@@ -150,6 +158,7 @@ function DirectorSection({ form, onChange, characterId }) {
             form={form}
             onChange={onChange}
             characterId={characterId}
+            directorEnabled={directorEnabled}
           />
         ))}
       </div>
