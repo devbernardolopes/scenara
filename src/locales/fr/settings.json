@@ -15,7 +15,8 @@
     "assistantButtons": "Assistant/System Message Bubbles Buttons",
     "userButtons": "User Message Bubbles Buttons",
     "apiRequestSectionHeaders": "API Request Section Headers",
-    "chatButtons": "User Chat Buttons"
+    "chatButtons": "User Chat Buttons",
+    "rolePrefixes": "Préfixes de rôle"
   },
   "appearance": {
     "theme": {
