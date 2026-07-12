@@ -846,6 +846,15 @@ export const SETTINGS = [
     descKey: 'settings:api.requestCooldown.desc',
   },
   {
+    key: 'api.requestTimeout',
+    category: 'api',
+    type: 'slider',
+    default: 150,
+    props: { min: 30, max: 300, step: 30 },
+    labelKey: 'settings:api.requestTimeout.label',
+    descKey: 'settings:api.requestTimeout.desc',
+  },
+  {
     key: 'prompting.autoTitleSystem',
     category: 'prompting',
     type: 'textarea',

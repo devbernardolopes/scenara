@@ -317,6 +317,10 @@
       "label": "API Request Cooldown",
       "desc": "Minimum waiting time (in seconds) between API requests to providers."
     },
+    "requestTimeout": {
+      "label": "API Timeout",
+      "desc": "Maximum time (in seconds) to wait for an API response before cancelling the request. Streaming responses that have already started are exempt."
+    },
     "profile": {
       "createProfile": "Create Profile",
       "noProfiles": "No connection profiles yet. Create one to bundle a provider, key, model, and parameters together.",

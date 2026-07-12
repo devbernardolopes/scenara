@@ -914,6 +914,7 @@ function ChatView() {
             showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
           }
         },
+        onStreamingStarted: apiQueue.markCurrentRequestStreaming,
       })
       if (!reviewed) return originalContent
       return reviewed
@@ -930,6 +931,7 @@ function ChatView() {
             showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
           }
         },
+        onStreamingStarted: apiQueue.markCurrentRequestStreaming,
       })
 
       if (!content) {
@@ -1384,6 +1386,7 @@ function ChatView() {
               showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
             }
           },
+          onStreamingStarted: apiQueue.markCurrentRequestStreaming,
         })
         if (!reviewed) return originalContent
         return reviewed
@@ -1539,6 +1542,7 @@ function ChatView() {
                 showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
               }
             },
+            onStreamingStarted: apiQueue.markCurrentRequestStreaming,
           })
         },
       }).promise

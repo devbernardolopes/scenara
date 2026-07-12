@@ -17,6 +17,11 @@ async function getCooldownMs() {
   return seconds * 1000
 }
 
+async function getTimeoutMs() {
+  const seconds = (await getSetting('api.requestTimeout')) ?? 150
+  return seconds * 1000
+}
+
 function notify() {
   const state = getState()
   window.dispatchEvent(new CustomEvent('api-queue-changed', { detail: state }))
@@ -66,12 +71,20 @@ async function processNext() {
     startGenerating(item.threadId)
     notify()
 
+    const timeoutMs = await getTimeoutMs()
+    const timeoutId = setTimeout(() => {
+      if (!item.streamingStarted && !item.signal?.aborted) {
+        item.controller?.abort()
+      }
+    }, timeoutMs)
+
     try {
       const result = await item.execute()
       item.resolve?.(result)
     } catch (err) {
       item.reject?.(err)
     } finally {
+      clearTimeout(timeoutId)
       lastRequestEndTime = Date.now()
       const tid = item.threadId
       currentRequest = null
@@ -124,6 +137,7 @@ export function enqueue({ threadId, type, execute, signal, controller }) {
     controller,
     resolve,
     reject,
+    streamingStarted: false,
   }
 
   queue.push(item)
@@ -182,6 +196,12 @@ export function getThreadQueueCount(threadId) {
 export function subscribe(fn) {
   listeners.add(fn)
   return () => listeners.delete(fn)
+}
+
+export function markCurrentRequestStreaming() {
+  if (currentRequest) {
+    currentRequest.streamingStarted = true
+  }
 }
 
 export async function waitForCooldown() {

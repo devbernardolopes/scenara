@@ -359,7 +359,14 @@ export async function buildOOCMessagesPayload({
   return { payload: result, entryTypes }
 }
 
-export async function sendChatCompletion({ profile, messages, signal, onToken, onFinish }) {
+export async function sendChatCompletion({
+  profile,
+  messages,
+  signal,
+  onToken,
+  onFinish,
+  onStreamingStarted,
+}) {
   const baseUrl = getChatBaseUrl(profile.providerId)
   if (!baseUrl) throw new Error(`No base URL for provider "${profile.providerId}"`)
 
@@ -391,6 +398,7 @@ export async function sendChatCompletion({ profile, messages, signal, onToken, o
     const decoder = new TextDecoder()
     let buffer = ''
     let fullContent = ''
+    let streamingStarted = false
 
     while (true) {
       const { done, value } = await reader.read()
@@ -410,6 +418,10 @@ export async function sendChatCompletion({ profile, messages, signal, onToken, o
           const parsed = JSON.parse(data)
           const choice = parsed.choices?.[0]
           if (choice?.delta?.content) {
+            if (!streamingStarted) {
+              streamingStarted = true
+              onStreamingStarted?.()
+            }
             fullContent += choice.delta.content
             onToken?.(fullContent)
           }
