@@ -26,7 +26,8 @@ const MODEL_REGISTRY = {
   },
   'title-generation-distilbart': {
     task: 'summarization',
-    modelId: 'Xenova/distilbart-xsum-1-1-3',
+    modelId: 'Xenova/distilbart-xsum-12-6',
+    // modelId: 'Xenova/distilbart-xsum-1-1-3',
     dtype: 'q8',
     promptTemplate: TITLE_PROMPT_TEMPLATE,
     generationOptions: {
