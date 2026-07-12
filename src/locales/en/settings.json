@@ -227,6 +227,10 @@
     "trimAutoTitle": {
       "label": "Trim Auto-title",
       "desc": "Remove leading/trailing newlines and enclosing quotes from auto-generated titles."
+    },
+    "renderMarkdown": {
+      "label": "Render Markdown",
+      "desc": "Render Markdown formatting in chat messages and thread titles."
     }
   },
   "themeOptions": {

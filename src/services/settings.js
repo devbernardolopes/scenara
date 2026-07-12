@@ -618,6 +618,14 @@ export const SETTINGS = [
     descKey: 'settings:appearance.trimAutoTitle.desc',
   },
   {
+    key: 'renderMarkdown',
+    category: 'appearance',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.renderMarkdown.label',
+    descKey: 'settings:appearance.renderMarkdown.desc',
+  },
+  {
     key: 'defaultAutoTitle',
     category: 'defaults',
     type: 'toggle',

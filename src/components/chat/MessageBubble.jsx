@@ -189,6 +189,7 @@ function MessageBubble({
   )
   const [chatFontFamily, setChatFontFamily] = useState('system')
   const [chatFontSize, setChatFontSize] = useState('sm')
+  const [renderMarkdown, setRenderMarkdown] = useState(true)
   const [order, setOrder] = useState({ assistantButtonOrder: null, userButtonOrder: null })
 
   useEffect(() => {
@@ -223,17 +224,20 @@ function MessageBubble({
 
   useEffect(() => {
     async function load() {
-      const [family, size] = await Promise.all([
+      const [family, size, md] = await Promise.all([
         getSetting('chatFontFamily'),
         getSetting('chatFontSize'),
+        getSetting('renderMarkdown'),
       ])
       setChatFontFamily(family || 'system')
       setChatFontSize(size || 'sm')
+      setRenderMarkdown(md !== false)
     }
     load()
     function handler(e) {
       if (e.detail?.key === 'chatFontFamily') setChatFontFamily(e.detail.value || 'system')
       if (e.detail?.key === 'chatFontSize') setChatFontSize(e.detail.value || 'sm')
+      if (e.detail?.key === 'renderMarkdown') setRenderMarkdown(e.detail.value !== false)
       if (ORDER_KEYS.includes(e.detail?.key)) {
         getSetting(e.detail.key).then((v) => setOrder((prev) => ({ ...prev, [e.detail.key]: v })))
       }
@@ -724,64 +728,68 @@ function MessageBubble({
                 fontSize: CHAT_FONT_SIZES[chatFontSize],
               }}
             >
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeSanitize]}
-                components={{
-                  p: ({ children }) => (
-                    <p className="mb-2 last:mb-0 whitespace-pre-wrap">{children}</p>
-                  ),
-                  code: ({ children, className }) => (
-                    <code
-                      className={`font-mono text-[0.85em] px-1.5 py-0.5 rounded bg-code border border-border ${className || ''} break-words`}
-                    >
-                      {children}
-                    </code>
-                  ),
-                  pre: ({ children }) => {
-                    // Extract code text without React.isValidElement
-                    let codeText = ''
+              {renderMarkdown ? (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeSanitize]}
+                  components={{
+                    p: ({ children }) => (
+                      <p className="mb-2 last:mb-0 whitespace-pre-wrap">{children}</p>
+                    ),
+                    code: ({ children, className }) => (
+                      <code
+                        className={`font-mono text-[0.85em] px-1.5 py-0.5 rounded bg-code border border-border ${className || ''} break-words`}
+                      >
+                        {children}
+                      </code>
+                    ),
+                    pre: ({ children }) => {
+                      // Extract code text without React.isValidElement
+                      let codeText = ''
 
-                    if (typeof children === 'string') {
-                      codeText = children
-                    } else if (children && children.props && children.props.children) {
-                      // <pre><code>text</code></pre> case
-                      const inner = children.props.children
-                      codeText =
-                        typeof inner === 'string'
-                          ? inner
-                          : Array.isArray(inner)
-                            ? inner.join('')
-                            : String(inner || '')
-                    } else if (Array.isArray(children)) {
-                      codeText = children
-                        .map((c) => (typeof c === 'string' ? c : c?.props?.children || ''))
-                        .join('')
-                    }
+                      if (typeof children === 'string') {
+                        codeText = children
+                      } else if (children && children.props && children.props.children) {
+                        // <pre><code>text</code></pre> case
+                        const inner = children.props.children
+                        codeText =
+                          typeof inner === 'string'
+                            ? inner
+                            : Array.isArray(inner)
+                              ? inner.join('')
+                              : String(inner || '')
+                      } else if (Array.isArray(children)) {
+                        codeText = children
+                          .map((c) => (typeof c === 'string' ? c : c?.props?.children || ''))
+                          .join('')
+                      }
 
-                    return (
-                      <div className="relative group">
-                        <pre className="bg-code border border-border rounded-md p-3 my-2 overflow-x-auto max-w-full whitespace-pre-wrap break-words pr-12">
-                          {children}
-                        </pre>
+                      return (
+                        <div className="relative group">
+                          <pre className="bg-code border border-border rounded-md p-3 my-2 overflow-x-auto max-w-full whitespace-pre-wrap break-words pr-12">
+                            {children}
+                          </pre>
 
-                        {codeText && (
-                          <button
-                            onClick={() => handleCodeCopy(codeText)}
-                            className="absolute top-3 right-3 p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border transition-all active:scale-95 focus:opacity-100"
-                            title={t('copy') || 'Copy code'}
-                            aria-label="Copy code"
-                          >
-                            <Copy className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    )
-                  },
-                }}
-              >
-                {displayContent}
-              </ReactMarkdown>
+                          {codeText && (
+                            <button
+                              onClick={() => handleCodeCopy(codeText)}
+                              className="absolute top-3 right-3 p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border transition-all active:scale-95 focus:opacity-100"
+                              title={t('copy') || 'Copy code'}
+                              aria-label="Copy code"
+                            >
+                              <Copy className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      )
+                    },
+                  }}
+                >
+                  {displayContent}
+                </ReactMarkdown>
+              ) : (
+                <p className="mb-2 last:mb-0 whitespace-pre-wrap">{displayContent}</p>
+              )}
               {streaming && (!bundleMessages || bundleIndex === streamingSlotIndex) && (
                 <span className="inline-block w-0.5 h-4 bg-current ml-0.5 animate-pulse align-text-bottom" />
               )}
