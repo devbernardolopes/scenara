@@ -1685,6 +1685,60 @@ function ChatView() {
             if (soundEnabled) playNotificationSound()
           }
         } catch {}
+
+        try {
+          const msgs = await getMessagesByThread(threadId)
+          const nonFailedMsgs = withoutFailedMessages(msgs)
+          const thr = await getThread(threadId)
+          const chr = await getCharacter(thr.characterId)
+
+          if (await shouldAutoTitle(thr, chr, nonFailedMsgs)) {
+            showToast(t('autoTitleGenerating'), { type: 'info' })
+            const atAbort = new AbortController()
+            autoTitleAbortRef.current = atAbort
+            try {
+              await apiQueue.enqueue({
+                threadId,
+                type: 'autoTitle',
+                signal: atAbort.signal,
+                controller: atAbort,
+                execute: async () => {
+                  return await triggerAutoTitle({
+                    thread: thr,
+                    character: chr,
+                    messages: nonFailedMsgs,
+                    personaMap,
+                    signal: atAbort.signal,
+                  })
+                },
+              }).promise
+              const updatedThr = await getThread(threadId)
+              setThread((prev) => ({ ...prev, title: updatedThr.title, autoTitleGenerated: true }))
+              showToast(t('autoTitleGenerated'), { type: 'success' })
+
+              const markerEnabled = await getSetting('autoTitleMarker')
+              if (markerEnabled) {
+                const postMsgs = await getMessagesByThread(threadId)
+                if (postMsgs.length > 0) {
+                  const lastMsg = postMsgs[postMsgs.length - 1]
+                  if (!lastMsg.isAutoTitleMarker) {
+                    await createAutoTitleMarker(threadId, lastMsg.createdAt)
+                    const updated = await getMessagesByThread(threadId)
+                    if (Number(currentThreadIdRef.current) === Number(threadId)) {
+                      setMessages(updated)
+                    }
+                  }
+                }
+              }
+            } catch (err) {
+              if (err.name !== 'AbortError') {
+                showToast(err.message, { type: 'error' })
+              }
+            } finally {
+              autoTitleAbortRef.current = null
+            }
+          }
+        } catch {}
       }
     }
   }
