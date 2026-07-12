@@ -237,6 +237,12 @@
       "label": "USER Auto-title Instructions",
       "desc": "User prompt for auto-title generation."
     },
+    "localInference": {
+      "autoTitle": {
+        "label": "Auto-titre local (expérimental)",
+        "desc": "Génère les titres de conversation sur l'appareil avec un modèle ML local au lieu d'un appel API. Retombe sur l'API si l'inférence locale échoue."
+      }
+    },
     "summarizationSystem": {
       "label": "SYSTEM Summarization Instructions",
       "desc": "System prompt for summarization."

@@ -874,6 +874,14 @@ export const SETTINGS = [
     descKey: 'settings:prompting.autoTitleUser.desc',
   },
   {
+    key: 'localInference.autoTitle',
+    category: 'prompting',
+    type: 'toggle',
+    default: false,
+    labelKey: 'settings:localInference.autoTitle.label',
+    descKey: 'settings:localInference.autoTitle.desc',
+  },
+  {
     key: 'prompting.summarizationSystem',
     category: 'prompting',
     type: 'textarea',

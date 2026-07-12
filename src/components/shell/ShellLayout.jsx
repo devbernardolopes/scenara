@@ -1,12 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import SidebarToggle from './SidebarToggle'
 import ToastContainer from '../shared/ToastContainer'
 import ToastObserver from '../shared/ToastObserver'
+import { initInferenceWorker } from '../../lib/inferenceClient'
 
 function ShellLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    initInferenceWorker()
+  }, [])
 
   return (
     <div className="flex h-full bg-surface text-text">

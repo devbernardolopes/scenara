@@ -12,7 +12,22 @@ import {
 } from './director'
 import { waitForCooldown, setCurrentRequestDirectorPhase } from './apiQueue'
 import { showToast } from '../lib/toast'
+import { run } from '../lib/inferenceClient'
 import i18n from '../lib/i18n'
+
+const LOCAL_TITLE_TIMEOUT_MS = 30000
+
+async function tryLocalTitle(text) {
+  const result = await run(
+    'title-generation',
+    { text },
+    { maxNewTokens: 20 },
+    { timeout: LOCAL_TITLE_TIMEOUT_MS },
+  )
+  if (typeof result === 'string') return result.trim()
+  if (result && typeof result.title === 'string') return result.title.trim()
+  return ''
+}
 
 const DEFAULT_SYSTEM_INSTRUCTION =
   'You are a title generator for conversational AI.\n\n{{transcript}}'
@@ -109,21 +124,33 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
     payloadWithMemory.push({ role: 'user', content: transcript })
   }
 
-  const profile = await getEffectiveProfileFor('autoTitle')
-  if (!profile?.model) {
-    throw new Error('No auto-title profile configured')
-  }
-
+  let title = ''
   let autoTitleDurationMs = null
   let directorDurationMs = null
-  const title = await sendChatCompletion({
-    profile,
-    messages: payloadWithMemory,
-    signal,
-    onTiming: (ms) => {
-      autoTitleDurationMs = ms
-    },
-  })
+  const useLocalInference = await getSetting('localInference.autoTitle')
+  if (useLocalInference) {
+    try {
+      title = await tryLocalTitle(transcript)
+    } catch {
+      title = ''
+    }
+  }
+
+  if (!title) {
+    const profile = await getEffectiveProfileFor('autoTitle')
+    if (!profile?.model) {
+      throw new Error('No auto-title profile configured')
+    }
+
+    title = await sendChatCompletion({
+      profile,
+      messages: payloadWithMemory,
+      signal,
+      onTiming: (ms) => {
+        autoTitleDurationMs = ms
+      },
+    })
+  }
 
   if (!title?.trim()) throw new Error('Empty title generated')
 

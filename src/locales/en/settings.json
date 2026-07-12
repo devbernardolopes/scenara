@@ -422,6 +422,12 @@
       "label": "USER Auto-title Instructions",
       "desc": "User prompt for auto-title generation."
     },
+    "localInference": {
+      "autoTitle": {
+        "label": "Local auto-title (experimental)",
+        "desc": "Generate conversation titles on-device with a local ML model instead of an API call. Falls back to the API if local inference fails."
+      }
+    },
     "summarizationSystem": {
       "label": "SYSTEM Summarization Instructions",
       "desc": "System prompt for summarization."
