@@ -14,7 +14,22 @@ import { waitForCooldown } from './apiQueue'
 import { showToast } from '../lib/toast'
 import i18n from '../lib/i18n'
 
-const DEFAULT_SYSTEM_INSTRUCTION = 'You are a title generator for conversational AI.\n\n{{transcript}}'
+const DEFAULT_SYSTEM_INSTRUCTION =
+  'You are a title generator for conversational AI.\n\n{{transcript}}'
+
+function sanitizeAutoTitle(text) {
+  if (!text) return text
+  let result = text.replace(/^\n+|\n+$/g, '')
+  if (result.length >= 2) {
+    const first = result[0]
+    const last = result[result.length - 1]
+    const isQuote = (ch) => ch === '"' || ch === '\u201c' || ch === '\u201d'
+    if (isQuote(first) && isQuote(last)) {
+      result = result.slice(1, -1)
+    }
+  }
+  return result
+}
 
 export function getCountedMessageCount(messages, includeOOC) {
   const counted = messages.filter((m) => !m?.isSummaryMarker && !m?.isAutoTitleMarker)
@@ -138,6 +153,10 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
     } catch {
       showToast(i18n.t('chat:directorFailed'), { type: 'warning' })
     }
+  }
+
+  if (await getSetting('trimAutoTitle')) {
+    cleanTitle = sanitizeAutoTitle(cleanTitle)
   }
 
   await updateThread(thread.id, { title: cleanTitle, autoTitleGenerated: true })

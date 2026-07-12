@@ -222,7 +222,11 @@
     },
     "summarizationMarker": {
       "label": "Summarization Marker",
-      "desc": "Show a divider labeled “Summarization” in the chat after a summary is generated."
+      "desc": "Show a divider labeled \u201cSummarization\u201d in the chat after a summary is generated."
+    },
+    "trimAutoTitle": {
+      "label": "Trim Auto-title",
+      "desc": "Remove leading/trailing newlines and enclosing quotes from auto-generated titles."
     }
   },
   "themeOptions": {

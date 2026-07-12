@@ -610,6 +610,14 @@ export const SETTINGS = [
     descKey: 'settings:appearance.summarizationMarker.desc',
   },
   {
+    key: 'trimAutoTitle',
+    category: 'appearance',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.trimAutoTitle.label',
+    descKey: 'settings:appearance.trimAutoTitle.desc',
+  },
+  {
     key: 'defaultAutoTitle',
     category: 'defaults',
     type: 'toggle',
@@ -817,8 +825,7 @@ export const SETTINGS = [
     key: 'prompting.autoTitleSystem',
     category: 'prompting',
     type: 'textarea',
-    default:
-      'You are a title generator for conversational AI.\n\n{{transcript}}',
+    default: 'You are a title generator for conversational AI.\n\n{{transcript}}',
     props: { rows: 6, collapsible: true, summary: 'tokens' },
     labelKey: 'settings:prompting.autoTitleSystem.label',
     descKey: 'settings:prompting.autoTitleSystem.desc',
