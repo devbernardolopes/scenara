@@ -57,7 +57,7 @@ export async function buildMessagesPayload({
 
   const replaceVarsWithDesc = (text) => {
     if (!text) return text
-    const desc = chatPersona?.description || ''
+    const desc = currentPersona?.description || chatPersona?.description || ''
     return replaceVarsIn(text).replace(/{{description}}/gi, desc)
   }
 
