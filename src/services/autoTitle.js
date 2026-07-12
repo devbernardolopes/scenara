@@ -12,18 +12,36 @@ import {
 } from './director'
 import { waitForCooldown, setCurrentRequestDirectorPhase } from './apiQueue'
 import { showToast } from '../lib/toast'
-import { run } from '../lib/inferenceClient'
+import { run, disposeModel } from '../lib/inferenceClient'
 import i18n from '../lib/i18n'
 
 const LOCAL_TITLE_TIMEOUT_MS = 30000
 
 async function tryLocalTitle(text) {
+  const modelKey = (await getSetting('localInference.titleModel')) || 'title-generation'
+  const freeMemory = await getSetting('localInference.freeMemory')
+
+  const generationOptions = {
+    max_new_tokens: (await getSetting('localInference.maxNewTokens')) ?? 16,
+    repetition_penalty: (await getSetting('localInference.repetitionPenalty')) ?? 1.3,
+    no_repeat_ngram_size: (await getSetting('localInference.noRepeatNgramSize')) ?? 3,
+  }
+
   const result = await run(
     'title-generation',
     { text },
-    { maxNewTokens: 20 },
+    { modelKey, generationOptions },
     { timeout: LOCAL_TITLE_TIMEOUT_MS },
   )
+
+  if (freeMemory) {
+    try {
+      await disposeModel(modelKey)
+    } catch {
+      // best-effort cleanup
+    }
+  }
+
   if (typeof result === 'string') return result.trim()
   if (result && typeof result.title === 'string') return result.title.trim()
   return ''

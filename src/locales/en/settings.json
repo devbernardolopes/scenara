@@ -17,7 +17,9 @@
     "userButtons": "User Message Bubbles Buttons",
     "apiRequestSectionHeaders": "API Request Section Headers",
     "chatButtons": "User Chat Buttons",
-    "rolePrefixes": "Role Prefixes"
+    "rolePrefixes": "Role Prefixes",
+    "localInference": "Local Inference",
+    "localInferenceAdvanced": "Advanced"
   },
   "appearance": {
     "theme": {
@@ -426,6 +428,30 @@
       "autoTitle": {
         "label": "Local auto-title (experimental)",
         "desc": "Generate conversation titles on-device with a local ML model instead of an API call. Falls back to the API if local inference fails."
+      },
+      "titleModel": {
+        "label": "Title model",
+        "desc": "Which local model generates conversation titles."
+      },
+      "models": {
+        "flanT5": "Flan-T5 Small",
+        "distilbart": "DistilBART XSum"
+      },
+      "freeMemory": {
+        "label": "Free memory after use",
+        "desc": "Unload the model immediately after each title instead of keeping it resident for faster repeat generations. Use on memory-constrained devices."
+      },
+      "repetitionPenalty": {
+        "label": "Repetition penalty",
+        "desc": "Higher values discourage the model from repeating tokens. Helps avoid degenerate loops on small models."
+      },
+      "noRepeatNgramSize": {
+        "label": "No-repeat n-gram size",
+        "desc": "Prevents the model from repeating any sequence of this many consecutive tokens."
+      },
+      "maxNewTokens": {
+        "label": "Max new tokens",
+        "desc": "Maximum length of the generated title in tokens."
       }
     },
     "summarizationSystem": {

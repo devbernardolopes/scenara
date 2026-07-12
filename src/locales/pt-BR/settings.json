@@ -16,7 +16,9 @@
     "userButtons": "User Message Bubbles Buttons",
     "apiRequestSectionHeaders": "API Request Section Headers",
     "chatButtons": "User Chat Buttons",
-    "rolePrefixes": "Prefixos de função"
+    "rolePrefixes": "Prefixos de função",
+    "localInference": "Inferência local",
+    "localInferenceAdvanced": "Avançado"
   },
   "appearance": {
     "theme": {
@@ -241,6 +243,30 @@
       "autoTitle": {
         "label": "Auto-título local (experimental)",
         "desc": "Gera títulos de conversas no dispositivo com um modelo ML local em vez de uma chamada de API. Volta para a API se a inferência local falhar."
+      },
+      "titleModel": {
+        "label": "Modelo de título",
+        "desc": "Qual modelo local gera os títulos das conversas."
+      },
+      "models": {
+        "flanT5": "Flan-T5 Small",
+        "distilbart": "DistilBART XSum"
+      },
+      "freeMemory": {
+        "label": "Liberar memória após o uso",
+        "desc": "Descarrega o modelo imediatamente após cada título em vez de mantê-lo residente para gerações repetidas mais rápidas. Use em dispositivos com pouca memória."
+      },
+      "repetitionPenalty": {
+        "label": "Penalidade de repetição",
+        "desc": "Valores maiores desencorajam o modelo a repetir tokens. Ajuda a evitar loops degenerados em modelos pequenos."
+      },
+      "noRepeatNgramSize": {
+        "label": "Tamanho de n-gramas sem repetição",
+        "desc": "Impede o modelo de repetir qualquer sequência desta quantidade de tokens consecutivos."
+      },
+      "maxNewTokens": {
+        "label": "Máximo de novos tokens",
+        "desc": "Comprimento máximo do título gerado em tokens."
       }
     },
     "summarizationSystem": {

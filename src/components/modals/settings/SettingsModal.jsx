@@ -103,6 +103,7 @@ function SettingsModal() {
                       key={g.group}
                       label={groupDef ? t(groupDef.labelKey.replace('settings:', '')) : g.group}
                       storageKey={`settings.group.${g.group}`}
+                      defaultExpanded={groupDef?.defaultExpanded ?? true}
                     >
                       <div className="space-y-4">
                         {g.items.map((setting) => (

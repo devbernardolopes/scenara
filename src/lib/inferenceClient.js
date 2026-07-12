@@ -2,9 +2,18 @@ const DEFAULT_TIMEOUT_MS = 30000
 
 let worker = null
 let idCounter = 0
+let debugEnabled = false
 
 const pending = new Map()
 const progressListeners = new Set()
+
+export function setDebug(enabled) {
+  debugEnabled = !!enabled
+}
+
+export function isDebugEnabled() {
+  return debugEnabled
+}
 
 function getWorker() {
   if (!worker) {
@@ -39,6 +48,14 @@ function handleWorkerMessage(message) {
         // listener errors must not break the message loop
       }
     })
+    return
+  }
+
+  if (type === 'debug') {
+    if (debugEnabled) {
+      // eslint-disable-next-line no-console
+      console.debug('[inference:debug]', data)
+    }
     return
   }
 
