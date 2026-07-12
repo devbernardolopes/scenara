@@ -292,6 +292,12 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
     load()
     function handler() {
       load()
+      const id = latestRef.current?.personaId
+      if (id) {
+        getPersona(id).then((p) => {
+          if (p) setSelectedPersona(p)
+        })
+      }
     }
     window.addEventListener('personas-changed', handler)
     return () => window.removeEventListener('personas-changed', handler)
