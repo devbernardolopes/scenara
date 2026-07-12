@@ -129,9 +129,6 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
     rolePrefixes,
   })
 
-  // TODO: We shouldn't replace {{char}} with charName here, instead it should be where the prefix is being used = chatApi.js -> buildTranscript()
-  transcript = transcript.replace(/{{char}}/gi, charName)
-
   systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, transcript)
 
   const payload = [{ role: 'system', content: systemContent }]
