@@ -694,8 +694,8 @@ function ChatView() {
     for (const msg of messages) {
       const entries = parseBundleEntries(msg.bundleMessages)
       if (!entries) continue
-      const activeIdx = activeSlotIndices[msg.id]
-      if (activeIdx === undefined || activeIdx < 0 || activeIdx >= entries.length) continue
+      const activeIdx = msg.activeSlotIndex ?? activeSlotIndices[msg.id] ?? 0
+      if (activeIdx < 0 || activeIdx >= entries.length) continue
       if (entries[activeIdx]?.isError) {
         ids.add(msg.id)
       }
