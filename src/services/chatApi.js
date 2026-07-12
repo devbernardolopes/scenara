@@ -258,7 +258,7 @@ export function buildTranscript({
       }
     }
 
-    if (prefix && !prefix.endsWith(' ')) prefix += ' '
+    if (prefix && !/\s$/.test(prefix)) prefix += '\n'
 
     lines.push(prefix + (msg.content || ''))
   }
