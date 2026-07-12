@@ -78,6 +78,8 @@
   "requestType_chat": "Chat message",
   "requestType_autoTitle": "Auto-title",
   "requestType_summarization": "Summarization",
+  "requestType_regenerate": "Regenerate",
+  "requestType_directorSuffix": "- Director",
   "requestStatus_executing": "Executing",
   "requestStatus_queued": "Queued",
   "directorReviewing": "Director is reviewing the response…",

@@ -40,6 +40,7 @@ export function getState() {
     currentRequestId: currentRequest?.id ?? null,
     currentThreadId: currentRequest?.threadId ?? null,
     currentRequestType: currentRequest?.type ?? null,
+    currentRequestDirector: currentRequest?.directorPhase ?? false,
     queue: queue.map((item) => ({ id: item.id, threadId: item.threadId, type: item.type })),
   }
 }
@@ -201,6 +202,13 @@ export function subscribe(fn) {
 export function markCurrentRequestStreaming() {
   if (currentRequest) {
     currentRequest.streamingStarted = true
+  }
+}
+
+export function setCurrentRequestDirectorPhase(active) {
+  if (currentRequest) {
+    currentRequest.directorPhase = !!active
+    notify()
   }
 }
 

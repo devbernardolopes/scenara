@@ -906,23 +906,28 @@ function ChatView() {
       )
       const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
       const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
-      const reviewed = await sendChatCompletion({
-        profile: dProfile,
-        messages: dPayload,
-        signal,
-        onToken: (full) => streamIntoBubble(full),
-        onFinish: (reason) => {
-          if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
-            showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
-          }
-        },
-        onStreamingStarted: apiQueue.markCurrentRequestStreaming,
-        onTiming: (ms) => {
-          directorDurationMs = ms
-        },
-      })
-      if (!reviewed) return originalContent
-      return reviewed
+      apiQueue.setCurrentRequestDirectorPhase(true)
+      try {
+        const reviewed = await sendChatCompletion({
+          profile: dProfile,
+          messages: dPayload,
+          signal,
+          onToken: (full) => streamIntoBubble(full),
+          onFinish: (reason) => {
+            if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
+              showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
+            }
+          },
+          onStreamingStarted: apiQueue.markCurrentRequestStreaming,
+          onTiming: (ms) => {
+            directorDurationMs = ms
+          },
+        })
+        if (!reviewed) return originalContent
+        return reviewed
+      } finally {
+        apiQueue.setCurrentRequestDirectorPhase(false)
+      }
     }
 
     try {
@@ -1398,23 +1403,28 @@ function ChatView() {
           templateVars,
         )
         const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
-        const reviewed = await sendChatCompletion({
-          profile: dProfile,
-          messages: dPayload,
-          signal: regenAbortController.signal,
-          onToken: (full) => streamSlotIntoBubble(full),
-          onFinish: (reason) => {
-            if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
-              showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
-            }
-          },
-          onStreamingStarted: apiQueue.markCurrentRequestStreaming,
-          onTiming: (ms) => {
-            directorDurationMs = ms
-          },
-        })
-        if (!reviewed) return originalContent
-        return reviewed
+        apiQueue.setCurrentRequestDirectorPhase(true)
+        try {
+          const reviewed = await sendChatCompletion({
+            profile: dProfile,
+            messages: dPayload,
+            signal: regenAbortController.signal,
+            onToken: (full) => streamSlotIntoBubble(full),
+            onFinish: (reason) => {
+              if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
+                showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
+              }
+            },
+            onStreamingStarted: apiQueue.markCurrentRequestStreaming,
+            onTiming: (ms) => {
+              directorDurationMs = ms
+            },
+          })
+          if (!reviewed) return originalContent
+          return reviewed
+        } finally {
+          apiQueue.setCurrentRequestDirectorPhase(false)
+        }
       }
 
       let payload

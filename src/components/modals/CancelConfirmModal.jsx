@@ -16,7 +16,11 @@ function CancelConfirmModal({ threadId }) {
     const items = []
 
     if (state.currentThreadId === tid && state.currentRequestType) {
-      items.push({ type: state.currentRequestType, status: 'executing' })
+      items.push({
+        type: state.currentRequestType,
+        status: 'executing',
+        director: state.currentRequestDirector,
+      })
     }
 
     for (const item of state.queue) {
@@ -85,6 +89,7 @@ function CancelConfirmModal({ threadId }) {
               >
                 <span className="text-text">
                   {t(`requestType_${req.type}`, { defaultValue: req.type })}
+                  {req.director ? ` ${t('requestType_directorSuffix')}` : ''}
                 </span>
                 <span
                   className={`text-xs px-2 py-0.5 rounded-full ${

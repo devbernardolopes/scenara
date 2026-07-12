@@ -10,7 +10,7 @@ import {
   buildDirectorMessages,
   getAutoTitleTemplateValues,
 } from './director'
-import { waitForCooldown } from './apiQueue'
+import { waitForCooldown, setCurrentRequestDirectorPhase } from './apiQueue'
 import { showToast } from '../lib/toast'
 import i18n from '../lib/i18n'
 
@@ -156,14 +156,20 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
       )
       const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
       const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
-      const reviewed = await sendChatCompletion({
-        profile: dProfile,
-        messages: dPayload,
-        signal,
-        onTiming: (ms) => {
-          directorDurationMs = ms
-        },
-      })
+      setCurrentRequestDirectorPhase(true)
+      let reviewed
+      try {
+        reviewed = await sendChatCompletion({
+          profile: dProfile,
+          messages: dPayload,
+          signal,
+          onTiming: (ms) => {
+            directorDurationMs = ms
+          },
+        })
+      } finally {
+        setCurrentRequestDirectorPhase(false)
+      }
       const trimMsgs = await getSetting('prompting.trimMessages')
       const reviewedTrimmed = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
       if (reviewedTrimmed?.trim()) {
