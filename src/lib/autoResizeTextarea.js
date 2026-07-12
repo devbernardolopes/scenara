@@ -29,7 +29,7 @@ export function autoResize(el, options = {}) {
 
   const prevScrollTop = el.scrollTop
   el.style.height = 'auto'
-  el.style.height = el.scrollHeight + 'px'
+  el.style.height = el.scrollHeight + 1 + 'px'
 
   if (adjustScroll && scrollEl && caretY != null && range) {
     const afterRect = range.getBoundingClientRect()
