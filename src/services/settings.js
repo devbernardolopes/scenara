@@ -107,6 +107,22 @@ export const SETTINGS = [
     },
   },
   {
+    key: 'discoveryCardSize',
+    category: 'appearance',
+    type: 'select',
+    default: 'regular',
+    options: ['smaller', 'small', 'regular', 'large', 'xlarge'],
+    labelKey: 'settings:appearance.discoveryCardSize.label',
+    descKey: 'settings:appearance.discoveryCardSize.desc',
+    optionLabels: {
+      smaller: 'settings:appearance.discoveryCardSizeOptions.smaller',
+      small: 'settings:appearance.discoveryCardSizeOptions.small',
+      regular: 'settings:appearance.discoveryCardSizeOptions.regular',
+      large: 'settings:appearance.discoveryCardSizeOptions.large',
+      xlarge: 'settings:appearance.discoveryCardSizeOptions.xlarge',
+    },
+  },
+  {
     key: 'language',
     category: 'appearance',
     type: 'select',

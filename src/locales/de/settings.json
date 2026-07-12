@@ -33,6 +33,17 @@
     "cardsPerPageOptions": {
       "infinity": "∞"
     },
+    "discoveryCardSize": {
+      "label": "Card size",
+      "desc": "Size of character cards in the discovery view."
+    },
+    "discoveryCardSizeOptions": {
+      "smaller": "Smaller",
+      "small": "Small",
+      "regular": "Regular",
+      "large": "Large",
+      "xlarge": "Extra Large"
+    },
     "toastPosition": {
       "label": "Toast Position",
       "desc": "Where toast notifications appear on screen."

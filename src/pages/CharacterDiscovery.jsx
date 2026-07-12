@@ -37,6 +37,14 @@ import {
 
 const SORT_OPTIONS = ['createdAt', 'updatedAt', 'lastUsed', 'chatCount', 'name']
 
+const CARD_SIZE_GRID = {
+  smaller: 'grid gap-3 sm:grid-cols-3 lg:grid-cols-4',
+  small: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3',
+  regular: 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3',
+  large: 'grid gap-4 sm:grid-cols-1 lg:grid-cols-2',
+  xlarge: 'grid gap-5 sm:grid-cols-1 lg:grid-cols-1',
+}
+
 function StartChatButton({ character, onStart, open, onToggle, onClose }) {
   const { t } = useTranslation('common')
   const anchorRef = useRef(null)
@@ -178,6 +186,7 @@ function CharacterDiscovery() {
   const [sortOrder, setSortOrder] = useState('desc')
   const [chatCounts, setChatCounts] = useState(new Map())
   const [tagsMap, setTagsMap] = useState(new Map())
+  const [cardSize, setCardSize] = useState('regular')
 
   const filteredCharacters = useMemo(() => {
     const q = searchQuery.toLowerCase().trim()
@@ -262,6 +271,7 @@ function CharacterDiscovery() {
     loadCharacters()
     getSetting('cardsPerPage').then((val) => setCardsPerPage(val || 10))
     getSetting('characterCardMarquee').then((val) => setCharacterCardMarquee(val !== false))
+    getSetting('discoveryCardSize').then((val) => setCardSize(val || 'regular'))
     getUIState('discovery.sortBy').then((val) => val && setSortBy(val))
     getUIState('discovery.sortOrder').then((val) => val && setSortOrder(val))
     getUIState('discovery.searchQuery').then((val) => val && setSearchQuery(val))
@@ -282,6 +292,9 @@ function CharacterDiscovery() {
       }
       if (e.detail?.key === 'characterCardMarquee') {
         setCharacterCardMarquee(e.detail.value !== false)
+      }
+      if (e.detail?.key === 'discoveryCardSize') {
+        setCardSize(e.detail.value || 'regular')
       }
     }
     window.addEventListener('settings-changed', handleSettingsChanged)
@@ -450,7 +463,7 @@ function CharacterDiscovery() {
             {searchQuery ? t('discovery.search.noResults') : t('discovery.noCharacters')}
           </p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className={CARD_SIZE_GRID[cardSize]}>
             {visibleCharacters.map((char) => {
               const displayTags = (char.tags || []).map((id) => tagsMap.get(id)).filter(Boolean)
               const chatCount = chatCounts.get(char.id) || 0
