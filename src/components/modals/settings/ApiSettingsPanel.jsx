@@ -72,6 +72,7 @@ function ApiSettingsPanel() {
   const [profileAssignments, setProfileAssignments] = useState({})
   const [selectedKind, setSelectedKind] = useState(null)
   const [cooldown, setCooldown] = useState(2)
+  const [requestTimeout, setRequestTimeout] = useState(150)
 
   useEffect(() => {
     async function load() {
@@ -92,6 +93,7 @@ function ApiSettingsPanel() {
       setProfileAssignments(assignments)
 
       setCooldown(await getSetting('api.requestCooldown'))
+      setRequestTimeout(await getSetting('api.requestTimeout'))
 
       setLoading(false)
     }
@@ -120,6 +122,11 @@ function ApiSettingsPanel() {
   async function handleCooldownChange(val) {
     setCooldown(val)
     await setSetting('api.requestCooldown', val)
+  }
+
+  async function handleTimeoutChange(val) {
+    setRequestTimeout(val)
+    await setSetting('api.requestTimeout', val)
   }
 
   if (loading) {
@@ -168,6 +175,22 @@ function ApiSettingsPanel() {
             min={2}
             max={10}
             step={0.5}
+          />
+        </div>
+      </div>
+
+      <div className="border-t border-border pt-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-text">{t('api.requestTimeout.label')}</h3>
+            <p className="text-xs text-secondary mt-0.5">{t('api.requestTimeout.desc')}</p>
+          </div>
+          <SettingSlider
+            value={requestTimeout}
+            onChange={handleTimeoutChange}
+            min={30}
+            max={300}
+            step={30}
           />
         </div>
       </div>
