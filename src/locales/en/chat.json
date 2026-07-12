@@ -100,5 +100,7 @@
     "noProfile": "No summarization profile configured",
     "error": "An error occurred during regeneration",
     "accept": "Accept"
-  }
+  },
+  "memoryDeleteTitle": "Delete memory entry",
+  "memoryDeleteConfirm": "Delete this memory entry? This cannot be undone."
 }

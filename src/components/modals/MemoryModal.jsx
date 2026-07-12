@@ -6,8 +6,13 @@ import { useConfirm } from '../../lib/confirm'
 import ModalShell from '../shared/ModalShell'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../services/tokenEstimator'
-import { getThreadMemories, updateThreadMemory } from '../../services/threadMemories'
-import { updateThread } from '../../services/threads'
+import {
+  getThreadMemories,
+  updateThreadMemory,
+  deleteThreadMemory,
+  markMemoryRead,
+} from '../../services/threadMemories'
+import { getThread, updateThread } from '../../services/threads'
 import { ChevronDown, Trash2, RefreshCw, Eye } from '../../lib/icons'
 import db from '../../db'
 import { replaceVars } from '../../services/chatApi'
@@ -50,6 +55,22 @@ function MemoryModal({ threadId }) {
     return () => window.removeEventListener('memory-regenerated', handleRegenerated)
   }, [threadId, loadMemories])
 
+  const sortedMemories = useMemo(
+    () => [...memories].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
+    [memories],
+  )
+
+  useEffect(() => {
+    if (!expandedId) return
+    const entry = sortedMemories.find((m) => m.id === expandedId)
+    if (entry && entry.isRead === false) {
+      markMemoryRead(entry.id)
+      window.dispatchEvent(
+        new CustomEvent('memories-changed', { detail: { threadId: Number(threadId) } }),
+      )
+    }
+  }, [expandedId, sortedMemories, threadId])
+
   const handleClose = async () => {
     if (!dirty) {
       closeModal()
@@ -79,11 +100,6 @@ function MemoryModal({ threadId }) {
     return () => setCloseGuard(null)
   }, [dirty, handleClose, setCloseGuard])
 
-  const sortedMemories = useMemo(
-    () => [...memories].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [memories],
-  )
-
   function updateDraft(id, value) {
     setDrafts((prev) => ({ ...prev, [id]: value }))
     setDirty(true)
@@ -107,18 +123,27 @@ function MemoryModal({ threadId }) {
     }
   }
 
-  async function handleDelete() {
-    const latest = sortedMemories[0]
-    if (!latest) return
+  async function handleDelete(entry) {
+    if (!entry) return
     const ok = await confirm({
-      title: t('deleteTitle'),
-      message: t('messageDeleteConfirm', { number: 1 }),
-      confirmLabel: t('delete'),
-      cancelLabel: t('cancel'),
+      title: t('memoryDeleteTitle'),
+      message: t('memoryDeleteConfirm'),
+      confirmLabel: t('delete', { ns: 'common' }),
+      cancelLabel: t('cancel', { ns: 'common' }),
       variant: 'danger',
     })
     if (!ok) return
-    // delete not implemented yet
+
+    const isLatest = sortedMemories[0]?.id === entry.id
+    await deleteThreadMemory(entry.id, threadId)
+
+    if (isLatest) {
+      const refreshed = await getThreadMemories(threadId)
+      const nextMemory = refreshed[0]?.content || null
+      await updateThread(threadId, { memory: nextMemory })
+    }
+
+    await loadMemories()
   }
 
   function handleRegenerate(entry) {
@@ -163,7 +188,7 @@ function MemoryModal({ threadId }) {
             onClick={handleClose}
             className="min-h-[44px] px-4 rounded-md text-sm text-secondary hover:text-text"
           >
-            {t('cancel')}
+            {t('cancel', { ns: 'common' })}
           </button>
           <button
             type="button"
@@ -183,8 +208,8 @@ function MemoryModal({ threadId }) {
           </div>
         ) : (
           sortedMemories.map((entry, index) => {
-            const isLatest = index === 0
             const isOpen = expandedId === entry.id
+            const isUnread = entry.isRead === false
             const tokenCount = estimateTokens((drafts[entry.id] ?? entry.content) || '')
             return (
               <div key={entry.id} className="border border-border rounded-lg overflow-hidden">
@@ -197,12 +222,17 @@ function MemoryModal({ threadId }) {
                     <ChevronDown
                       className={`w-4 h-4 text-tertiary transition-transform ${isOpen ? 'rotate-180' : ''}`}
                     />
-                    <span className="text-sm font-medium text-text">
+                    <span
+                      className={`text-sm font-medium ${isUnread ? 'text-primary' : 'text-text'}`}
+                    >
                       {t('memoryEntry', { number: sortedMemories.length - index })}
                     </span>
                     <span className="text-xs text-tertiary">
                       {t('tokens', { count: formatTokenCount(tokenCount) })}
                     </span>
+                    {isUnread && (
+                      <span className="inline-block w-2 h-2 rounded-full bg-primary shrink-0" />
+                    )}
                   </button>
                   <div className="flex items-center gap-1">
                     <button
@@ -213,32 +243,28 @@ function MemoryModal({ threadId }) {
                     >
                       <Eye className="w-4 h-4" />
                     </button>
-                    {isLatest && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => handleRegenerate(entry)}
-                          className="p-2 rounded-md hover:bg-surface-hover text-tertiary"
-                          title={t('regenerate')}
-                        >
-                          <RefreshCw className="w-4 h-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleDelete}
-                          className="p-2 rounded-md hover:bg-surface-hover text-error"
-                          title={t('delete')}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleRegenerate(entry)}
+                      className="p-2 rounded-md hover:bg-surface-hover text-tertiary"
+                      title={t('regenerate')}
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(entry)}
+                      className="p-2 rounded-md hover:bg-surface-hover text-error"
+                      title={t('delete', { ns: 'common' })}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
                 {isOpen && (
                   <div className="px-3 pb-3 pt-1">
                     <AutoResizeTextarea
-                      readOnly={!isLatest}
+                      readOnly={index !== 0}
                       value={(drafts[entry.id] ?? entry.content) || ''}
                       onChange={(e) => updateDraft(entry.id, e.target.value)}
                       className="w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none"

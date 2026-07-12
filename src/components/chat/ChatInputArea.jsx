@@ -25,6 +25,7 @@ import { getThread } from '../../services/threads'
 import { getUIState, setUIState } from '../../services/uiState'
 import { useModal } from '../../hooks/useModal'
 import { getSetting } from '../../services/settings'
+import { getUnreadMemoryCount } from '../../services/threadMemories'
 import { getAllInChatShortcuts } from '../../services/inChatShortcuts'
 import db from '../../db'
 import { autoResize as autoResizeTextarea } from '../../lib/autoResizeTextarea'
@@ -142,6 +143,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
   const [overflowOpen, setOverflowOpen] = useState(false)
   const [overflowMenuStyle, setOverflowMenuStyle] = useState(null)
   const overflowBtnRef = useRef(null)
+  const [unreadMemoryCount, setUnreadMemoryCount] = useState(0)
 
   const storageKey = `${STORAGE_PREFIX}${threadId}`
 
@@ -258,6 +260,25 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
         setPromptHistory(entries)
       })
   }, [promptHistoryOpen, threadId])
+
+  useEffect(() => {
+    if (!threadId) return
+    let cancelled = false
+    async function load() {
+      const count = await getUnreadMemoryCount(threadId)
+      if (!cancelled) setUnreadMemoryCount(count)
+    }
+    load()
+    function handleChange(e) {
+      if (e.detail?.threadId !== Number(threadId)) return
+      load()
+    }
+    window.addEventListener('memories-changed', handleChange)
+    return () => {
+      cancelled = true
+      window.removeEventListener('memories-changed', handleChange)
+    }
+  }, [threadId])
 
   useEffect(() => {
     async function load() {
@@ -668,6 +689,7 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                         : isToggleable && isToggled
                           ? '!text-on-primary !bg-primary hover:!bg-primary-hover ring-1 ring-primary-hover shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)]'
                           : ''
+                  const showBadge = key === 'memories' && unreadMemoryCount > 0
                   return (
                     <button
                       key={key}
@@ -679,7 +701,14 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                       className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md shrink-0 text-secondary hover:text-text hover:bg-surface-hover ${btnClass}`}
                       title={t(def.labelKey)}
                     >
-                      <Icon className="w-4 h-4" />
+                      <span className="relative">
+                        <Icon className={`w-4 h-4 ${showBadge ? 'animate-icon-pulse' : ''}`} />
+                        {showBadge && (
+                          <span className="absolute -top-1.5 -right-1.5 inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-badge-unread-text bg-badge-unread rounded-full leading-none">
+                            {unreadMemoryCount > 9 ? '9+' : unreadMemoryCount}
+                          </span>
+                        )}
+                      </span>
                     </button>
                   )
                 })}
@@ -707,7 +736,16 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                       className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-secondary hover:text-text hover:bg-surface-hover"
                       title={t('moreOptions')}
                     >
-                      <MoreHorizontal className="w-4 h-4" />
+                      <span className="relative">
+                        <MoreHorizontal
+                          className={`w-4 h-4 ${overflowKeys.includes('memories') && unreadMemoryCount > 0 ? 'animate-icon-pulse' : ''}`}
+                        />
+                        {overflowKeys.includes('memories') && unreadMemoryCount > 0 && (
+                          <span className="absolute -top-1.5 -right-1.5 inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-badge-unread-text bg-badge-unread rounded-full leading-none">
+                            {unreadMemoryCount > 9 ? '9+' : unreadMemoryCount}
+                          </span>
+                        )}
+                      </span>
                     </button>
                     {overflowOpen && (
                       <div
@@ -746,6 +784,11 @@ function ChatInputArea({ threadId, onSend, onCancel, generating, summarizing, ha
                               <span className="flex items-center gap-2">
                                 <Icon className="w-4 h-4" />
                                 <span>{t(def.labelKey)}</span>
+                                {key === 'memories' && unreadMemoryCount > 0 && (
+                                  <span className="inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-badge-unread-text bg-badge-unread rounded-full leading-none">
+                                    {unreadMemoryCount > 9 ? '9+' : unreadMemoryCount}
+                                  </span>
+                                )}
                               </span>
                               {isToggleable && (
                                 <div

@@ -967,6 +967,20 @@
   font-weight: 600;
 }
 
+/* Icon pulse animation (unread indicators) */
+@keyframes icon-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.animate-icon-pulse {
+  animation: icon-pulse 2s ease-in-out infinite;
+}
+
 /* Safe area handling for iOS/Android dynamic toolbars */
 html,
 body,
