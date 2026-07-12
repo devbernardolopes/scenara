@@ -70,6 +70,9 @@ export async function buildMessagesPayload({
   const prompt = replaceVarsIn(character?.prompt)
   if (prompt) systemParts.push(prompt)
 
+  const extraPrompt = replaceVarsIn(character?.extraPrompt)
+  if (isFirstMessage && extraPrompt) systemParts.push(extraPrompt)
+
   const personaTiming = character?.personaInjectionTiming || settings.personaInjectionTiming
   const personaPlacement =
     character?.personaInjectionPlacement || settings.personaInjectionPlacement
@@ -95,9 +98,6 @@ export async function buildMessagesPayload({
 
   const result = [{ role: 'system', content: systemParts.join('\n\n') }]
   const entryTypes = ['system']
-
-  const extraPrompt = replaceVarsIn(character?.extraPrompt)
-  if (isFirstMessage && extraPrompt) systemParts.push(extraPrompt)
 
   const postHistoryInstructions = replaceVarsIn(character?.postHistoryInstructions)
 
