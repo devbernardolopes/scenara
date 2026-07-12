@@ -122,7 +122,7 @@ function InChatShortcutFormModal({ inChatShortcut }) {
             onChange={update('name')}
             placeholder={t('inChatShortcut.form.namePlaceholder')}
             required
-            autoFocus
+            // autoFocus
           />
         </div>
 
