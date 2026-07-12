@@ -804,7 +804,7 @@ function MessageBubble({
                 <p className="mb-2 last:mb-0 whitespace-pre-wrap">{displayContent}</p>
               )}
               {streaming && (!bundleMessages || bundleIndex === streamingSlotIndex) && (
-                <span className="inline-block w-0.5 h-4 bg-current ml-0.5 animate-pulse align-text-bottom" />
+                <RefreshCw className="inline-block w-4 h-4 text-primary animate-spin ml-0.5 align-text-bottom" />
               )}
             </div>
           )}
