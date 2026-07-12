@@ -294,6 +294,14 @@ function Sidebar({ open, onClose }) {
 
   async function handleToggleLock(thread) {
     await toggleLock(thread.id)
+    if (!thread.isLocked) {
+      setSelectedIds((prev) => {
+        if (!prev.has(thread.id)) return prev
+        const next = new Set(prev)
+        next.delete(thread.id)
+        return next
+      })
+    }
   }
 
   async function handleColorSelect(thread, color) {
