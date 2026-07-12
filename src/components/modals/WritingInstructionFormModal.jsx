@@ -127,7 +127,7 @@ function WritingInstructionFormModal({ writingInstruction }) {
             onChange={update('name')}
             placeholder={t('writingInstruction.form.namePlaceholder')}
             required
-            autoFocus
+            // autoFocus
           />
         </div>
 
