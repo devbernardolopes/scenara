@@ -818,7 +818,7 @@ export const SETTINGS = [
     category: 'prompting',
     type: 'textarea',
     default:
-      'You are a title generator for conversational AI.\n\nCreate one concise title in Title Case capturing the core topic in plain-text, outputting only the title, of the provided content.',
+      'You are a title generator for conversational AI.\n\n{{transcript}}',
     props: { rows: 6, collapsible: true, summary: 'tokens' },
     labelKey: 'settings:prompting.autoTitleSystem.label',
     descKey: 'settings:prompting.autoTitleSystem.desc',
@@ -827,7 +827,7 @@ export const SETTINGS = [
     key: 'prompting.autoTitleUser',
     category: 'prompting',
     type: 'textarea',
-    default: '{{transcript}}',
+    default: 'Create a title for the provided message exchange.',
     props: { rows: 6, collapsible: true, summary: 'tokens' },
     labelKey: 'settings:prompting.autoTitleUser.label',
     descKey: 'settings:prompting.autoTitleUser.desc',
@@ -906,7 +906,7 @@ export const SETTINGS = [
     category: 'prompting',
     type: 'textarea',
     default:
-      '**User Persona**:\n\n- Name: {{name}}.\n- Description: {{description}}.\n- Remember: Do not control or speak for the user.',
+      '**User Persona:**\n\n- Name: {{name}}.\n- Description: {{description}}.\n- Remember: Do not control or speak for the user.',
     props: { rows: 6, collapsible: true, summary: 'tokens' },
     labelKey: 'settings:prompting.personaInjectionTemplate.label',
     descKey: 'settings:prompting.personaInjectionTemplate.desc',

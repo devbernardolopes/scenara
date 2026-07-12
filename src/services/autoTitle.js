@@ -14,7 +14,7 @@ import { waitForCooldown } from './apiQueue'
 import { showToast } from '../lib/toast'
 import i18n from '../lib/i18n'
 
-const DEFAULT_SYSTEM_INSTRUCTION = 'You are a title generator for conversational AI.'
+const DEFAULT_SYSTEM_INSTRUCTION = 'You are a title generator for conversational AI.\n\n{{transcript}}'
 
 export function getCountedMessageCount(messages, includeOOC) {
   const counted = messages.filter((m) => !m?.isSummaryMarker && !m?.isAutoTitleMarker)
@@ -54,7 +54,8 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
 
   let userContent = character.autoTitleUserInstructions
   if (!userContent) {
-    userContent = await getSetting('prompting.autoTitleUser')
+    userContent = (await getSetting('prompting.autoTitleUser'))?.trim()
+    if (!userContent) userContent = 'Create a title for the provided message exchange.'
   }
 
   const includeOOC = character.includeOOC !== false

@@ -85,7 +85,7 @@ export function applyDirectorTemplate(
   return next
 }
 
-const DEFAULT_AUTO_TITLE_SYSTEM = 'You are a title generator for conversational AI.'
+const DEFAULT_AUTO_TITLE_SYSTEM = 'You are a title generator for conversational AI.\n\n{{transcript}}'
 
 export async function getAutoTitleTemplateValues(character) {
   let systemAutoTitle = character?.autoTitleSystemInstructions?.trim()
@@ -94,7 +94,7 @@ export async function getAutoTitleTemplateValues(character) {
 
   let userAutoTitle = character?.autoTitleUserInstructions?.trim()
   if (!userAutoTitle) userAutoTitle = (await getSetting('prompting.autoTitleUser'))?.trim()
-  if (!userAutoTitle) userAutoTitle = '{{transcript}}'
+  if (!userAutoTitle) userAutoTitle = 'Create a title for the provided message exchange.'
 
   return { system_autotitle: systemAutoTitle, user_autotitle: userAutoTitle }
 }
