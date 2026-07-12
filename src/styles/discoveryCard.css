@@ -23,7 +23,8 @@
 }
 
 /* Pulse animation — additionally gated behind reduced-motion */
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+/* @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) { */
+@media (hover: hover) and (pointer: fine) {
   .character-card:hover .character-card__start-btn {
     animation: scenara-pulse-ring 1.3s ease-in-out infinite;
   }
