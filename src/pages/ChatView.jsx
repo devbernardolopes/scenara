@@ -86,12 +86,16 @@ function rebuildFailedState(msgs) {
   for (const msg of msgs || []) {
     const entries = parseBundleEntries(msg.bundleMessages)
     if (!entries) continue
-    let idx = 0
-    if (msg.content) {
-      const found = entries.findIndex((e) => e.content === msg.content)
-      if (found !== -1) idx = found
+    if (msg.activeSlotIndex != null && msg.activeSlotIndex < entries.length) {
+      slots[msg.id] = msg.activeSlotIndex
+    } else {
+      let idx = 0
+      if (msg.content) {
+        const found = entries.findIndex((e) => e.content === msg.content)
+        if (found !== -1) idx = found
+      }
+      slots[msg.id] = idx
     }
-    slots[msg.id] = idx
   }
   return { slots }
 }
@@ -544,6 +548,8 @@ function ChatView() {
           getMessagesByThread(threadId).then((msgs) => {
             if (Number(currentThreadIdRef.current) === Number(threadId)) {
               setMessages(msgs)
+              const { slots } = rebuildFailedState(msgs)
+              setActiveSlotIndices(slots)
             }
           })
         }
@@ -1222,10 +1228,21 @@ function ChatView() {
     const entries = parseBundleEntries(msg?.bundleMessages)
     if (!entries || slotIndex < 0 || slotIndex >= entries.length) return
     const entry = entries[slotIndex]
-    await updateMessage(messageId, { content: entry.content, promptData: entry.promptData })
+    await updateMessage(messageId, {
+      content: entry.content,
+      promptData: entry.promptData,
+      activeSlotIndex: slotIndex,
+    })
     setMessages((prev) =>
       prev.map((m) =>
-        m.id === messageId ? { ...m, content: entry.content, promptData: entry.promptData } : m,
+        m.id === messageId
+          ? {
+              ...m,
+              content: entry.content,
+              promptData: entry.promptData,
+              activeSlotIndex: slotIndex,
+            }
+          : m,
       ),
     )
     setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
@@ -1269,14 +1286,20 @@ function ChatView() {
       }
       const bundleJson = JSON.stringify(regenEntries)
 
-      await updateMessage(messageId, { bundleMessages: bundleJson, content: '' })
+      await updateMessage(messageId, {
+        bundleMessages: bundleJson,
+        content: '',
+        activeSlotIndex: slotIndex,
+      })
       setStreamingMessageId(threadId, messageId)
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         isLocalStreamerRef.current = true
         setStreamingMsgId(messageId)
         setMessages((prev) =>
           prev.map((m) =>
-            m.id === messageId ? { ...m, bundleMessages: bundleJson, content: '' } : m,
+            m.id === messageId
+              ? { ...m, bundleMessages: bundleJson, content: '', activeSlotIndex: slotIndex }
+              : m,
           ),
         )
       }
@@ -1568,6 +1591,7 @@ function ChatView() {
           bundleMessages: JSON.stringify(finalEntries),
           content: finalContent,
           promptData: promptDataStr,
+          activeSlotIndex: slotIndex,
         })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages((prev) =>
@@ -1578,6 +1602,7 @@ function ChatView() {
                     content: finalContent,
                     bundleMessages: JSON.stringify(finalEntries),
                     promptData: promptDataStr,
+                    activeSlotIndex: slotIndex,
                   }
                 : m,
             ),
@@ -1592,10 +1617,21 @@ function ChatView() {
         if (regenEntries) {
           regenEntries.pop()
           const cleanedBundle = JSON.stringify(regenEntries)
-          await updateMessage(messageId, { bundleMessages: cleanedBundle })
+          await updateMessage(messageId, {
+            bundleMessages: cleanedBundle,
+            activeSlotIndex: regenEntries.length - 1,
+          })
           if (Number(currentThreadIdRef.current) === Number(threadId)) {
             setMessages((prev) =>
-              prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: cleanedBundle } : m)),
+              prev.map((m) =>
+                m.id === messageId
+                  ? {
+                      ...m,
+                      bundleMessages: cleanedBundle,
+                      activeSlotIndex: regenEntries.length - 1,
+                    }
+                  : m,
+              ),
             )
           }
         }
@@ -1610,6 +1646,7 @@ function ChatView() {
         await updateMessage(messageId, {
           bundleMessages: JSON.stringify(finalEntries),
           content: finalEntries[slotIndex]?.content ?? '',
+          activeSlotIndex: slotIndex,
         })
         const msgs = await getMessagesByThread(threadId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
@@ -1666,7 +1703,11 @@ function ChatView() {
       origin: 'edit',
       createdAt: new Date().toISOString(),
     })
-    await updateMessage(id, { bundleMessages: JSON.stringify(entries), content: finalContent })
+    await updateMessage(id, {
+      bundleMessages: JSON.stringify(entries),
+      content: finalContent,
+      activeSlotIndex: entries.length - 1,
+    })
     const msgs = await getMessagesByThread(threadId)
     setMessages(msgs)
     setActiveSlotIndices((prev) => ({ ...prev, [id]: entries.length - 1 }))
@@ -1691,6 +1732,7 @@ function ChatView() {
         bundleMessages: JSON.stringify(entries),
         content: newContent,
         promptData: newPromptData,
+        activeSlotIndex: newIdx,
       })
       setActiveSlotIndices((prev) => ({ ...prev, [id]: newIdx }))
       const msgs = await getMessagesByThread(threadId)
@@ -1900,9 +1942,9 @@ function ChatView() {
 
                 const entries = parseBundleEntries(msg.bundleMessages)
                 const bundleMessages = entries ? entries.map((e) => e.content) : null
-                const trackIdx = activeSlotIndices[msg.id]
+                const trackIdx = msg.activeSlotIndex ?? activeSlotIndices[msg.id]
                 const bundleIndex =
-                  trackIdx !== undefined && bundleMessages
+                  trackIdx != null && bundleMessages
                     ? Math.min(trackIdx, bundleMessages.length - 1)
                     : bundleMessages && msg.content
                       ? Math.max(0, bundleMessages.indexOf(msg.content))
