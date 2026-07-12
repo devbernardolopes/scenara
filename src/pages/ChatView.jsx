@@ -832,12 +832,14 @@ function ChatView() {
 
     const activeParams = getActiveParams(profile)
     const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
-    const promptData = JSON.stringify({
+    let directorReviewed = false
+    let promptData = JSON.stringify({
       payload,
       model: profile.model,
       params: activeParams,
       msgNumbers,
       messageFlags,
+      directorReviewed,
     })
 
     const assistantMsgId = await createAssistantMessage(threadId, '', null, isOOC)
@@ -954,12 +956,21 @@ function ChatView() {
             }
             const reviewed = await runDirectorReview(content, writingInstructionContent)
             finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
+            directorReviewed = true
+            promptData = JSON.stringify({
+              payload,
+              model: profile.model,
+              params: activeParams,
+              msgNumbers,
+              messageFlags,
+              directorReviewed,
+            })
           } catch {
             showToast(t('directorFailed', { ns: 'chat' }), { type: 'warning' })
           }
         }
 
-        await updateMessage(assistantMsgId, { content: finalContent })
+        await updateMessage(assistantMsgId, { content: finalContent, promptData })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages((prev) =>
             prev.map((m) => (m.id === assistantMsgId ? { ...m, content: finalContent } : m)),
@@ -1468,12 +1479,14 @@ function ChatView() {
 
       const activeParams = getActiveParams(profile)
       const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
+      let directorReviewed = false
       promptDataStr = JSON.stringify({
         payload,
         model: profile.model,
         params: activeParams,
         msgNumbers,
         messageFlags,
+        directorReviewed,
       })
 
       regenEntries[slotIndex].promptData = promptDataStr
@@ -1530,6 +1543,15 @@ function ChatView() {
             }
             const reviewed = await runDirectorReviewRegen(content, writingInstructionContent)
             finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
+            directorReviewed = true
+            promptDataStr = JSON.stringify({
+              payload,
+              model: profile.model,
+              params: activeParams,
+              msgNumbers,
+              messageFlags,
+              directorReviewed,
+            })
           } catch {
             showToast(t('directorFailed', { ns: 'chat' }), { type: 'warning' })
           }

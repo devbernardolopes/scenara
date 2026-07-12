@@ -386,6 +386,7 @@ function MessageBubble({
       params: promptData.params,
       msgNumbers: promptData.msgNumbers || null,
       messageFlags: promptData.messageFlags || null,
+      directorReviewed: promptData.directorReviewed || false,
     })
   }
 

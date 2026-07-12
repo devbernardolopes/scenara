@@ -19,6 +19,7 @@ const PILL_STYLES = {
   INI: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
   TMP: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
   EDT: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+  DIR: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
 }
 
 function MessagePills({ flags, onToggleExpand }) {
@@ -41,7 +42,7 @@ function MessagePills({ flags, onToggleExpand }) {
   )
 }
 
-function ShowPromptModal({ payload, model, params, msgNumbers, messageFlags }) {
+function ShowPromptModal({ payload, model, params, msgNumbers, messageFlags, directorReviewed }) {
   const { t } = useTranslation('chat')
   const { closeModal } = useModal()
   const [expandedIdx, setExpandedIdx] = useState(null)
@@ -85,7 +86,8 @@ function ShowPromptModal({ payload, model, params, msgNumbers, messageFlags }) {
           {(payload || []).map((msg, idx) => {
             const tokenCount = estimateTokens(msg.content || '')
             const isOpen = expandedIdx === idx
-            const flags = messageFlags?.[idx]
+            const baseFlags = messageFlags?.[idx] || []
+            const flags = directorReviewed ? ['DIR', ...baseFlags] : baseFlags
             return (
               <div key={idx} className="border border-border rounded-lg overflow-hidden">
                 <button
