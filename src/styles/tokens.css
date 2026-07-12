@@ -8,6 +8,7 @@
 :root,
 .theme-light {
   --color-primary: #2563eb;
+  --color-primary-rgb: 37, 99, 235;
   --color-primary-hover: #1d4ed8;
   --color-primary-subtle: #dbeafe;
   --color-on-primary: #ffffff;
@@ -63,6 +64,7 @@
 /* --- Dark --- */
 .theme-dark {
   --color-primary: #3b82f6;
+  --color-primary-rgb: 59, 130, 246;
   --color-primary-hover: #60a5fa;
   --color-primary-subtle: #1e3a5f;
   --color-on-primary: #ffffff;
@@ -112,6 +114,7 @@
 /* --- Sepia --- */
 .theme-sepia {
   --color-primary: #b45309;
+  --color-primary-rgb: 180, 83, 9;
   --color-primary-hover: #d97706;
   --color-primary-subtle: #fef3c7;
   --color-on-primary: #ffffff;
@@ -161,6 +164,7 @@
 /* --- Pastel --- */
 .theme-pastel {
   --color-primary: #a78bfa;
+  --color-primary-rgb: 167, 139, 250;
   --color-primary-hover: #c4b5fd;
   --color-primary-subtle: #ede9fe;
   --color-on-primary: #ffffff;
@@ -210,6 +214,7 @@
 /* --- High Contrast --- */
 .theme-high-contrast {
   --color-primary: #1d4ed8;
+  --color-primary-rgb: 29, 78, 216;
   --color-primary-hover: #1e40af;
   --color-primary-subtle: #bfdbfe;
   --color-on-primary: #ffffff;
@@ -259,6 +264,7 @@
 /* --- High Contrast Dark (black + yellow) --- */
 .theme-high-contrast-dark {
   --color-primary: #ffd700;
+  --color-primary-rgb: 255, 215, 0;
   --color-primary-hover: #ffed4a;
   --color-primary-subtle: #3a3000;
   --color-on-primary: #000000;
@@ -308,6 +314,7 @@
 /* --- Terminal (black + green) --- */
 .theme-terminal {
   --color-primary: #00ff00;
+  --color-primary-rgb: 0, 255, 0;
   --color-primary-hover: #33ff33;
   --color-primary-subtle: #003300;
   --color-on-primary: #000000;
@@ -359,6 +366,7 @@
 /* --- Midnight (Deep cosmic dark) --- */
 .theme-midnight {
   --color-primary: #6366f1;
+  --color-primary-rgb: 99, 102, 241;
   --color-primary-hover: #818cf8;
   --color-primary-subtle: #312e81;
   --color-on-primary: #ffffff;
@@ -414,6 +422,7 @@
 /* --- Obsidian (Pure black + electric accents) --- */
 .theme-obsidian {
   --color-primary: #22d3ee;
+  --color-primary-rgb: 34, 211, 238;
   --color-primary-hover: #67e8f9;
   --color-primary-subtle: #164e63;
   --color-on-primary: #0f172a;
@@ -459,6 +468,7 @@
 /* --- Cyberpunk (Neon on dark) --- */
 .theme-cyberpunk {
   --color-primary: #ff00ff;
+  --color-primary-rgb: 255, 0, 255;
   --color-primary-hover: #ff66ff;
   --color-primary-subtle: #4c1d95;
   --color-on-primary: #ffffff;
@@ -503,6 +513,7 @@
 /* --- Vaporwave (Synthwave aesthetic) --- */
 .theme-vaporwave {
   --color-primary: #ff69b4;
+  --color-primary-rgb: 255, 105, 180;
   --color-primary-hover: #ff8ac6;
   --color-primary-subtle: #4c1d95;
   --color-on-primary: #ffffff;
@@ -542,6 +553,7 @@
 /* --- Retro CRT (Warm phosphor) --- */
 .theme-retro-crt {
   --color-primary: #22c55e;
+  --color-primary-rgb: 34, 197, 94;
   --color-primary-hover: #4ade80;
   --color-primary-subtle: #052e16;
   --color-on-primary: #052e16;
@@ -581,6 +593,7 @@
 /* --- Solarized Dark (High contrast, accessible) --- */
 .theme-solarized-dark {
   --color-primary: #268bd2;
+  --color-primary-rgb: 38, 139, 210;
   --color-primary-hover: #2aa1f0;
   --color-primary-subtle: #073642;
   --color-on-primary: #fdf6e3;
@@ -616,6 +629,7 @@
 /* --- Neon Abyss (Extreme high-contrast) --- */
 .theme-neon-abyss {
   --color-primary: #00ffea;
+  --color-primary-rgb: 0, 255, 234;
   --color-primary-hover: #7afff0;
   --color-primary-subtle: #082b2b;
   --color-on-primary: #000000;

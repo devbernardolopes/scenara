@@ -43,7 +43,7 @@ function StartChatButton({ character, onStart, open, onToggle, onClose }) {
 
   return (
     <div className="relative" ref={anchorRef}>
-      <div className="flex border border-border rounded-md overflow-hidden">
+      <div className="character-card__start-btn flex border border-border rounded-md overflow-hidden">
         <button
           type="button"
           onClick={() => onStart(character, null)}
@@ -143,6 +143,18 @@ function CharacterNameCell({ name, characterCardMarquee }) {
     >
       <span className="marquee-text">{name}</span>
     </span>
+  )
+}
+
+function CharacterPortraitImage({ src, alt }) {
+  const [loaded, setLoaded] = useState(false)
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onLoad={() => setLoaded(true)}
+      className={`character-card__portrait-img w-full object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+    />
   )
 }
 
@@ -464,15 +476,11 @@ function CharacterDiscovery() {
                       return
                     handleEditCharacter(char)
                   }}
-                  className="border border-border rounded-lg bg-surface hover:shadow-surface-md transition-shadow cursor-pointer flex flex-col overflow-hidden"
+                  className="character-card border border-border rounded-lg bg-surface hover:shadow-surface-md transition-shadow cursor-pointer flex flex-col overflow-hidden"
                 >
                   <div className="relative h-[250px] overflow-hidden">
                     {char.avatar ? (
-                      <img
-                        src={char.avatar}
-                        alt={char.name}
-                        className="w-full object-cover cursor-pointer"
-                      />
+                      <CharacterPortraitImage src={char.avatar} alt={char.name} />
                     ) : (
                       <div className="w-full h-full bg-surface-secondary flex items-center justify-center text-4xl">
                         {'👤'}

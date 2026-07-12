@@ -1,0 +1,38 @@
+/* ============================================================
+   Discovery Card — hover & entrance polish (desktop only)
+   All interactive effects are gated behind a combined media
+   query so they NEVER fire on touch devices.
+   ============================================================ */
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .character-card {
+    transition:
+      transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 220ms ease;
+  }
+  .character-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+  .character-card:hover .character-card__portrait-img {
+    transform: scale(1.06);
+  }
+  .character-card:hover .character-card__start-btn {
+    animation: scenara-pulse-ring 1.3s ease-in-out infinite;
+  }
+
+  @keyframes scenara-pulse-ring {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.5);
+    }
+    50% {
+      box-shadow: 0 0 0 7px rgba(var(--color-primary-rgb), 0);
+    }
+  }
+}
+
+/* Portrait image scale transition — always active (smooth load-in too) */
+.character-card__portrait-img {
+  transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
