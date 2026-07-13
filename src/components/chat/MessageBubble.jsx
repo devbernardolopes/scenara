@@ -302,6 +302,10 @@ function MessageBubble({
     return globalPPRules
   }, [postProcessingEnabled, character, globalPPRules])
 
+  const isUser = role === 'user'
+  const isSystem = role === 'system'
+  const displayContent = renderContent(message.content)
+
   const displayContentForRender = useMemo(() => {
     if (renderMarkdown && activeRules.length) return injectRuleTags(displayContent, activeRules)
     return displayContent
@@ -329,10 +333,6 @@ function MessageBubble({
     enabled: isMobile && hasMultipleSlots && !streaming,
     threshold: 50,
   })
-
-  const isUser = role === 'user'
-  const isSystem = role === 'system'
-  const displayContent = renderContent(message.content)
 
   const contentSlotCount = bundleMessages
     ? bundleMessages.filter((c) => (c || '').trim()).length

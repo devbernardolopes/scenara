@@ -232,6 +232,10 @@ Settings are code-split: `SettingsModal` uses `React.lazy()` and is bundled sepa
 - **Imports:** Use relative imports within `src/`. No barrel files (`index.js`) — import directly from the file.
 - **No JSX in `lib/` or `services/`.** Keep non-UI modules free of React.
 
+## Constraints
+
+- **No external browser automation tools.** Agents must not install, download, or use Playwright, Puppeteer, Selenium, or any other headless browser tooling. All development, testing, and automation tasks must remain within the existing client-side stack (Vite + React + Dexie.js) and available tools in the sandbox environment. Use existing skills or the sandbox shell for any necessary file or build operations.
+
 ## UI State Persistence
 
 Transient UI state (collapse/expand, scroll positions) lives in the `uiState` Dexie table — separate from user preferences.
