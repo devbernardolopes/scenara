@@ -269,7 +269,7 @@ function MessageBubble({
       const newIdx = (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
       onBundleNavigate?.(message.id, newIdx)
     },
-    enabled: isMobile && hasMultipleSlots,
+    enabled: isMobile && hasMultipleSlots && !streaming,
     threshold: 50,
   })
 
@@ -566,13 +566,14 @@ function MessageBubble({
                           (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
                         onBundleNavigate?.(message.id, newIdx)
                       }}
+                      disabled={streaming}
                       className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                         isUser
                           ? `${userHoverBg} ${userMutedClass}`
                           : isOOC
                             ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
                             : 'hover:bg-black/10 text-tertiary hover:text-text'
-                      }`}
+                      } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''}`}
                       style={isUser ? userMutedStyle : undefined}
                       title={t('previousInitialMessage')}
                     >
@@ -590,13 +591,14 @@ function MessageBubble({
                         const newIdx = (bundleIndex + 1) % bundleMessages.length
                         onBundleNavigate?.(message.id, newIdx)
                       }}
+                      disabled={streaming}
                       className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                         isUser
                           ? `${userHoverBg} ${userMutedClass}`
                           : isOOC
                             ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
                             : 'hover:bg-black/10 text-tertiary hover:text-text'
-                      }`}
+                      } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''}`}
                       style={isUser ? userMutedStyle : undefined}
                       title={t('nextInitialMessage')}
                     >
