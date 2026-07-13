@@ -85,6 +85,15 @@ function scan(text, rules, codeRanges) {
           }
         }
       }
+      // Word-boundary guard: skip if preceded by an alphanumeric character.
+      if (best && i > 0) {
+        const prev = text.charCodeAt(i - 1)
+        const isAlphaNum =
+          (prev >= 0x30 && prev <= 0x39) || // 0-9
+          (prev >= 0x41 && prev <= 0x5a) || // A-Z
+          (prev >= 0x61 && prev <= 0x7a) // a-z
+        if (isAlphaNum) best = null
+      }
       if (best) {
         flushText(i)
         segStart = i
