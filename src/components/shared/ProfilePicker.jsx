@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getAllProfiles } from '../../services/connectionProfiles'
 import { PROVIDERS } from '../../services/apiProviders'
-import { SlidersHorizontal } from '../../lib/icons'
+import ProviderIcon from './ProviderIcon'
 
 function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
   const { t } = useTranslation('common')
@@ -86,7 +86,11 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
               onClick={() => onSelect(p.id)}
               className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left min-h-[44px] ${currentId === p.id ? 'bg-primary-subtle text-primary' : 'text-text hover:bg-surface-hover'}`}
             >
-              <SlidersHorizontal className="w-4 h-4 shrink-0 text-primary" />
+              <ProviderIcon
+                providerId={p.providerId}
+                size={16}
+                className="w-4 h-4 shrink-0 text-primary"
+              />
               <div className="truncate flex-1">
                 <span className="truncate block">{p.name}</span>
                 <span className="text-xs text-tertiary truncate block">

@@ -10,15 +10,8 @@ import {
 } from '../../../services/connectionProfiles'
 import { PROVIDERS } from '../../../services/apiProviders'
 import IconButton from '../../shared/IconButton'
-import {
-  Plus,
-  Copy,
-  Trash2,
-  Edit3,
-  SlidersHorizontal,
-  ChevronUp,
-  ChevronDown,
-} from '../../../lib/icons'
+import ProviderIcon from '../../shared/ProviderIcon'
+import { Plus, Copy, Trash2, Edit3, ChevronUp, ChevronDown } from '../../../lib/icons'
 
 function ProfileSettingsPanel() {
   const { t } = useTranslation('settings')
@@ -115,7 +108,7 @@ function ProfileSettingsPanel() {
               >
                 <div className="flex items-start gap-3">
                   <div className="flex items-center justify-center size-[44px] shrink-0 rounded-md bg-primary-subtle">
-                    <SlidersHorizontal className="w-5 h-5 text-primary" />
+                    <ProviderIcon providerId={p.providerId} size={24} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
