@@ -1,7 +1,7 @@
 import Groq from '@lobehub/icons/es/Groq/components/Mono'
 import LmStudio from '@lobehub/icons/es/LmStudio/components/Mono'
 import OpenRouter from '@lobehub/icons/es/OpenRouter/components/Mono'
-import { SlidersHorizontal } from '../lib/icons'
+import { SlidersHorizontal } from '../../lib/icons'
 import aiHordeIcon from '../../assets/providers/ai-horde.png'
 
 const BRAND_ICONS = {
