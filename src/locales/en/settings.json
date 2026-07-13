@@ -15,7 +15,10 @@
   },
   "postProcessing": {
     "panelDesc": "Apply custom color and font-size styling to delimiter-enclosed spans of text, e.g. *narration* or \"dialogue\". Rules apply globally and can be overridden per character.",
-    "enable": "Enable Post-Processing",
+    "enable": {
+      "label": "Enable Post-Processing",
+      "desc": "Globally enable or disable post-processing styling for all messages."
+    },
     "override": "Override global rules",
     "label": "Label (optional)",
     "opening": "Opening character(s)",

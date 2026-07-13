@@ -14,7 +14,10 @@
   },
   "postProcessing": {
     "panelDesc": "Aplica estilização personalizada de cor e tamanho de fonte a trechos de texto entre delimitadores, ex. *narração* ou \"diálogo\". As regras valem globalmente e podem ser substituídas por personagem.",
-    "enable": "Ativar pós-processamento",
+    "enable": {
+      "label": "Ativar pós-processamento",
+      "desc": "Ativar ou desativar o estilo de pós-processamento para todas as mensagens."
+    },
     "override": "Substituir regras globais",
     "label": "Rótulo (opcional)",
     "opening": "Caractere(s) de abertura",

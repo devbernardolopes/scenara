@@ -14,7 +14,10 @@
   },
   "postProcessing": {
     "panelDesc": "Applica stile personalizzato (colore e dimensione carattere) a porzioni di testo delimitate, es. *narrazione* o \"dialogo\". Le regole valgono globalmente e possono essere sostituite per personaggio.",
-    "enable": "Abilita post-elaborazione",
+    "enable": {
+      "label": "Abilita post-elaborazione",
+      "desc": "Abilita o disabilita lo stile di post-elaborazione per tutti i messaggi."
+    },
     "override": "Sostituisci regole globali",
     "label": "Etichetta (opzionale)",
     "opening": "Carattere/i di apertura",

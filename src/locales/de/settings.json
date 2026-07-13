@@ -14,7 +14,10 @@
   },
   "postProcessing": {
     "panelDesc": "Wendet benutzerdefinierte Farb- und Schriftgrößen-Stile auf durch Trennzeichen eingeschlossene Textteile an, z. B. *Erzählung* oder \"Dialog\". Regeln gelten global und können pro Charakter überschrieben werden.",
-    "enable": "Nachbearbeitung aktivieren",
+    "enable": {
+      "label": "Nachbearbeitung aktivieren",
+      "desc": "Nachbearbeitungs-Stil für alle Nachrichten global aktivieren oder deaktivieren."
+    },
     "override": "Globale Regeln überschreiben",
     "label": "Bezeichnung (optional)",
     "opening": "Öffnende(s) Zeichen",

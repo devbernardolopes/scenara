@@ -14,7 +14,10 @@
   },
   "postProcessing": {
     "panelDesc": "Applique un style personnalisé (couleur et taille de police) aux portions de texte délimitées, ex. *narration* ou \"dialogue\". Les règles s'appliquent globalement et peuvent être remplacées par personnage.",
-    "enable": "Activer le post-traitement",
+    "enable": {
+      "label": "Activer le post-traitement",
+      "desc": "Activer ou désactiver le style de post-traitement pour tous les messages."
+    },
     "override": "Remplacer les règles globales",
     "label": "Libellé (optionnel)",
     "opening": "Caractère(s) d'ouverture",

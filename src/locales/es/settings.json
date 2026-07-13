@@ -14,7 +14,10 @@
   },
   "postProcessing": {
     "panelDesc": "Aplica estilo personalizado (color y tamaño de fuente) a fragmentos de texto entre delimitadores, p. ej. *narración* o \"diálogo\". Las reglas se aplican globalmente y pueden sustituirse por personaje.",
-    "enable": "Activar posprocesamiento",
+    "enable": {
+      "label": "Activar posprocesamiento",
+      "desc": "Activar o desactivar el estilo de posprocesamiento para todos los mensajes."
+    },
     "override": "Sustituir reglas globales",
     "label": "Etiqueta (opcional)",
     "opening": "Caracter(es) de apertura",

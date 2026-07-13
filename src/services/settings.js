@@ -43,7 +43,7 @@ export const CATEGORIES = [
   { id: 'api', labelKey: 'settings:categories.api' },
   { id: 'prompting', labelKey: 'settings:categories.prompting' },
   { id: 'defaults', labelKey: 'settings:categories.defaults' },
-  { id: 'tts', labelKey: 'settings:categories.tts' },
+  // { id: 'tts', labelKey: 'settings:categories.tts' }, // hidden until TTS is implemented
   { id: 'postProcessing', labelKey: 'settings:categories.postProcessing' },
   { id: 'database', labelKey: 'settings:categories.database' },
 ]
@@ -753,14 +753,6 @@ export const SETTINGS = [
     props: { type: 'number', min: 0 },
     labelKey: 'settings:defaults.unloadMessagesThreshold.label',
     descKey: 'settings:defaults.unloadMessagesThreshold.desc',
-  },
-  {
-    key: 'defaultPostProcessing',
-    category: 'defaults',
-    type: 'toggle',
-    default: true,
-    labelKey: 'settings:defaults.postProcessing.label',
-    descKey: 'settings:defaults.postProcessing.desc',
   },
   {
     key: 'defaultSystemAvatar',
