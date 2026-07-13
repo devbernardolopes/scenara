@@ -367,29 +367,36 @@ function Sidebar({ open, onClose }) {
             {t('appName')}
           </Link>
           <div className="flex items-center gap-1">
-            {threads.length > 0 && (
-              <button
-                type="button"
-                onClick={toggleSelectAll}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
-                aria-label={
-                  selectedIds.size === threads.length
-                    ? t('sidebar.deselectAll')
-                    : t('sidebar.selectAll')
-                }
-                title={
-                  selectedIds.size === threads.length
-                    ? t('sidebar.deselectAll')
-                    : t('sidebar.selectAll')
-                }
-              >
-                {selectedIds.size === threads.length ? (
-                  <CheckSquare className="w-4 h-4" />
-                ) : (
-                  <Square className="w-4 h-4" />
-                )}
-              </button>
-            )}
+            {threads.length > 0 &&
+              (() => {
+                const selectableCount = threads.filter((t) => !t.isLocked).length
+                const selectedCount = selectedIds.size
+                const allSelected = selectableCount > 0 && selectedCount === selectableCount
+                const someSelected = selectedCount > 0 && !allSelected
+                const selectAllLabel = allSelected
+                  ? t('sidebar.deselectAll')
+                  : t('sidebar.selectAll')
+                return (
+                  <button
+                    type="button"
+                    onClick={toggleSelectAll}
+                    className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                    aria-label={selectAllLabel}
+                    aria-pressed={allSelected}
+                    title={selectAllLabel}
+                  >
+                    {allSelected ? (
+                      <CheckSquare className="w-4 h-4" />
+                    ) : someSelected ? (
+                      <div className="w-4 h-4 flex items-center justify-center">
+                        <span className="block w-2.5 h-0.5 bg-current rounded-full" />
+                      </div>
+                    ) : (
+                      <Square className="w-4 h-4" />
+                    )}
+                  </button>
+                )
+              })()}
             <button
               onClick={handleCreateCharacter}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
@@ -581,7 +588,7 @@ function Sidebar({ open, onClose }) {
                           </button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 mt-auto">
+                      <div className="flex items-center gap-1 mt-auto justify-end">
                         {!thread.isLocked && (
                           <button
                             type="button"
