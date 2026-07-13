@@ -189,7 +189,7 @@ function ChatView() {
       }
 
       setThread(thr)
-      setMessages(msgs)
+      setMessages(dedupeMessages(msgs))
 
       const { slots } = rebuildFailedState(msgs)
       setActiveSlotIndices(slots)
@@ -479,7 +479,7 @@ function ChatView() {
         if (!isGenerating) {
           getMessagesByThread(threadId).then((msgs) => {
             if (Number(currentThreadIdRef.current) === Number(threadId)) {
-              setMessages(msgs)
+              setMessages(dedupeMessages(msgs))
               const { slots } = rebuildFailedState(msgs)
               setActiveSlotIndices(slots)
             }
@@ -492,25 +492,6 @@ function ChatView() {
   }, [threadId])
 
   useEffect(() => {
-    const id = getStreamingMessageId(threadId)
-    if (id != null) {
-      setStreamingMsgId(id)
-      const savedSlot = getStreamingSlotIndex(threadId)
-      if (savedSlot != null) {
-        setStreamingSlotIndices((prev) => ({ ...prev, [id]: savedSlot }))
-      }
-    }
-    function handleStreamingChange(e) {
-      const { threadId: eventThreadId, messageId } = e.detail
-      if (Number(eventThreadId) === Number(threadId)) {
-        setStreamingMsgId(messageId != null ? messageId : null)
-      }
-    }
-    window.addEventListener('streaming-message-changed', handleStreamingChange)
-    return () => window.removeEventListener('streaming-message-changed', handleStreamingChange)
-  }, [threadId])
-
-  useEffect(() => {
     if (!generating) return
     let cancelled = false
     const poll = async () => {
@@ -518,7 +499,7 @@ function ChatView() {
       const msgs = await getMessagesByThread(threadId)
       if (cancelled || isLocalStreamerRef.current) return
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
-        setMessages(msgs)
+        setMessages(dedupeMessages(msgs))
       }
     }
     poll()
@@ -654,6 +635,15 @@ function ChatView() {
     return ids.size > 0 ? msgs.filter((m) => !ids.has(m.id)) : msgs
   }
 
+  // Defensive: collapse any duplicate ids in a DB-fetched message list so a stale
+  // race between a full-replace setMessages and an optimistic append can never
+  // render two bubbles for the same message.
+  function dedupeMessages(msgs) {
+    const seen = new Map()
+    for (const m of msgs) seen.set(m.id, m)
+    return Array.from(seen.values())
+  }
+
   // Trailing-edge throttle: buffers rapid onToken calls and fires at most once per interval.
   // The caller writes the final content explicitly after generateChatResponse returns, so no
   // flush-on-completion is needed.
@@ -689,7 +679,6 @@ function ChatView() {
     const assistantMsgId = await createAssistantMessage(threadId, '', null, isOOC)
     setStreamingMessageId(threadId, assistantMsgId)
     if (Number(currentThreadIdRef.current) === Number(threadId)) {
-      isLocalStreamerRef.current = true
       setStreamingMsgId(assistantMsgId)
       setMessages((prev) => [
         ...prev,
@@ -775,7 +764,8 @@ function ChatView() {
           bundleMessages: JSON.stringify([failedEntry]),
         })
         const msgs = await getMessagesByThread(threadId)
-        if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
+        if (Number(currentThreadIdRef.current) === Number(threadId))
+          setMessages(dedupeMessages(msgs))
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           showToast(result.error, { type: 'error' })
         }
@@ -823,16 +813,15 @@ function ChatView() {
         bundleMessages: JSON.stringify([failedEntry]),
       })
       const msgs = await getMessagesByThread(threadId)
-      if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
+      if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(dedupeMessages(msgs))
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
-        showToast(err.message, { type: 'error' })
+        showToast(result.error, { type: 'error' })
       }
       const newFailed = new Set(failedIdsRef.current)
       newFailed.add(assistantMsgId)
       failedIdsRef.current = newFailed
     } finally {
       clearStreamingMessageId(threadId)
-      isLocalStreamerRef.current = false
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setStreamingMsgId(null)
       }
@@ -903,7 +892,7 @@ function ChatView() {
                 await createAutoTitleMarker(threadId, lastMsg.createdAt)
                 const updated = await getMessagesByThread(threadId)
                 if (Number(currentThreadIdRef.current) === Number(threadId)) {
-                  setMessages(updated)
+                  setMessages(dedupeMessages(updated))
                 }
               }
             }
@@ -967,7 +956,7 @@ function ChatView() {
                   await createSummaryMarker(threadId, postMsgs[lastSummarizedIdx].createdAt)
                   const updated = await getMessagesByThread(threadId)
                   if (Number(currentThreadIdRef.current) === Number(threadId)) {
-                    setMessages(updated)
+                    setMessages(dedupeMessages(updated))
                   }
                 }
               }
@@ -987,6 +976,7 @@ function ChatView() {
   async function handleSend(text, personaId, isOOC, autoReply = true) {
     if (generatingRef.current) return
     generatingRef.current = true
+    isLocalStreamerRef.current = true
 
     try {
       let currentMsgs = messages
@@ -1002,7 +992,7 @@ function ChatView() {
         await createMessage(threadId, 'user', userText, personaId, isOOC)
         currentMsgs = await getMessagesByThread(threadId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          setMessages(currentMsgs)
+          setMessages(dedupeMessages(currentMsgs))
         }
       }
 
@@ -1048,6 +1038,7 @@ function ChatView() {
       // doChatRequest re-throws AbortError on cancel — handled silently
     } finally {
       generatingRef.current = false
+      isLocalStreamerRef.current = false
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setGenerating(false)
       }
@@ -1095,6 +1086,7 @@ function ChatView() {
 
     if (generatingRef.current) return
     generatingRef.current = true
+    isLocalStreamerRef.current = true
 
     let slotIndex = 0
     let outcome = 'failed'
@@ -1155,7 +1147,6 @@ function ChatView() {
       })
       setStreamingMessageId(threadId, messageId)
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
-        isLocalStreamerRef.current = true
         setStreamingMsgId(messageId)
         setMessages((prev) =>
           prev.map((m) =>
@@ -1257,7 +1248,8 @@ function ChatView() {
           activeSlotIndex: slotIndex,
         })
         const msgs = await getMessagesByThread(threadId)
-        if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
+        if (Number(currentThreadIdRef.current) === Number(threadId))
+          setMessages(dedupeMessages(msgs))
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           showToast(result.error, { type: 'error' })
         }
@@ -1338,7 +1330,8 @@ function ChatView() {
           activeSlotIndex: slotIndex,
         })
         const msgs = await getMessagesByThread(threadId)
-        if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
+        if (Number(currentThreadIdRef.current) === Number(threadId))
+          setMessages(dedupeMessages(msgs))
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           showToast(err.message, { type: 'error' })
         }
@@ -1397,7 +1390,7 @@ function ChatView() {
       activeSlotIndex: entries.length - 1,
     })
     const msgs = await getMessagesByThread(threadId)
-    setMessages(msgs)
+    setMessages(dedupeMessages(msgs))
     setActiveSlotIndices((prev) => ({ ...prev, [id]: entries.length - 1 }))
     showToast(t('messageUpdated'), { type: 'success' })
   }
@@ -1425,7 +1418,7 @@ function ChatView() {
       })
       setActiveSlotIndices((prev) => ({ ...prev, [id]: newIdx }))
       const msgs = await getMessagesByThread(threadId)
-      setMessages(msgs)
+      setMessages(dedupeMessages(msgs))
       showToast(t('messageDeleted'), { type: 'success' })
       return
     }
@@ -1436,7 +1429,7 @@ function ChatView() {
     })
     await deleteMessage(id)
     const msgs = await getMessagesByThread(threadId)
-    setMessages(msgs)
+    setMessages(dedupeMessages(msgs))
     showToast(t('messageDeleted'), { type: 'success' })
   }
 
@@ -1456,7 +1449,7 @@ function ChatView() {
       delete next[id]
       return next
     })
-    setMessages(await getMessagesByThread(threadId))
+    setMessages(dedupeMessages(await getMessagesByThread(threadId)))
     showToast(t('messageDeleted'), { type: 'success' })
   }
 
@@ -1476,7 +1469,7 @@ function ChatView() {
       deletedIds.forEach((d) => delete next[d])
       return next
     })
-    setMessages(await getMessagesByThread(threadId))
+    setMessages(dedupeMessages(await getMessagesByThread(threadId)))
     showToast(t('messageDeleted'), { type: 'success' })
   }
 
