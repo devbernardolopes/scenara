@@ -87,7 +87,7 @@ function PersonaCard({
           label={t('persona.actions.setDefault')}
           onClick={() => onSetDefault(persona)}
           className={
-            persona.isDefault ? 'text-yellow-500 hover:text-yellow-600 hover:bg-surface-hover' : ''
+            persona.isDefault ? 'text-yellow-500 hover:text-yellow-500 hover:bg-surface-hover' : ''
           }
           iconClassName={persona.isDefault ? 'fill-yellow-500' : ''}
         />
