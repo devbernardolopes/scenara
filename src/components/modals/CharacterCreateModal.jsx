@@ -277,12 +277,14 @@ function CharacterCreateModal({ character: existing, initialData }) {
     })
   }, [isImport]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isDirty = Object.keys(initialRef.current).some((key) => {
-    const val = form[key]
-    const init = initialRef.current[key]
-    if (Array.isArray(val)) return JSON.stringify(val) !== JSON.stringify(init)
-    return val !== init
-  })
+  const isDirty =
+    isImport ||
+    Object.keys(initialRef.current).some((key) => {
+      const val = form[key]
+      const init = initialRef.current[key]
+      if (Array.isArray(val)) return JSON.stringify(val) !== JSON.stringify(init)
+      return val !== init
+    })
 
   const sectionHighlights = useMemo(() => {
     const highlights = {
@@ -365,7 +367,11 @@ function CharacterCreateModal({ character: existing, initialData }) {
     const canSave = Boolean(form.name.trim())
     const result = await promptSave({
       saveDisabled: !canSave,
-      message: canSave ? undefined : t('common:saveDialog.nameRequired'),
+      message: !canSave
+        ? t('common:saveDialog.nameRequired')
+        : isImport
+          ? t('common:saveDialog.importMessage')
+          : undefined,
     })
     if (result === 'save') {
       if (!form.name.trim()) return
