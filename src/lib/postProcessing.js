@@ -20,8 +20,8 @@ export const DEFAULT_PP_RULES = [
   {
     id: 'preset-dialogue',
     label: 'Dialogue',
-    openChars: ['"', '“', '‘'],
-    closeChars: ['"', '”', '’'],
+    openChars: ['"', '\u201c', '\u2018', '*"'],
+    closeChars: ['"', '\u201d', '\u2019', '"*'],
     color: '#eab308',
     fontSizePercent: 125,
   },

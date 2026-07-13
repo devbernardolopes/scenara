@@ -175,6 +175,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
   const [defaultPersonaName, setDefaultPersonaName] = useState('')
   const [overrideDefaults, setOverrideDefaults] = useState(null)
   const [wiRevision, setWiRevision] = useState(0)
+  const [ppDiff, setPpDiff] = useState(false)
 
   useEffect(() => {
     getSetting('defaultPersonaId').then((id) => {
@@ -302,10 +303,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       initialMessages: (form.initialMessages || []).some((m) => m.content?.trim()),
       exampleMessages: (form.exampleMessages || []).some((m) => m.content?.trim()),
       tags: (form.tags || []).length > 0,
-      postProcessing: !!(
-        form.postProcessingOverride ||
-        (form.postProcessingRules && form.postProcessingRules.length)
-      ),
+      postProcessing: ppDiff,
       overrides: false,
       director:
         form.directorEnabled &&
@@ -322,7 +320,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       })
     }
     return highlights
-  }, [form, overrideDefaults])
+  }, [form, overrideDefaults, ppDiff])
 
   const handleCloseRef = useRef()
   handleCloseRef.current = handleCloseAttempt
@@ -435,7 +433,12 @@ function CharacterCreateModal({ character: existing, initialData }) {
           highlights={sectionHighlights}
         />
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          <ActivePanel form={form} onChange={handleChange} characterId={characterId} />
+          <ActivePanel
+            form={form}
+            onChange={handleChange}
+            characterId={characterId}
+            onDiffChange={setPpDiff}
+          />
         </div>
       </div>
 

@@ -162,7 +162,7 @@ function RuleRow({ rule, index, total, onChange, onMove, onDelete }) {
   )
 }
 
-export default function PostProcessingRuleEditor({ rules, onChange }) {
+export default function PostProcessingRuleEditor({ rules, onChange, resetToRules }) {
   const { t } = useTranslation('settings')
 
   function updateRule(index, next) {
@@ -199,7 +199,8 @@ export default function PostProcessingRuleEditor({ rules, onChange }) {
   }
 
   function resetDefaults() {
-    onChange(DEFAULT_PP_RULES.map((r) => ({ ...r })))
+    const source = resetToRules || DEFAULT_PP_RULES
+    onChange(source.map((r) => ({ ...r })))
   }
 
   const previewSegments = applyRulesToPlainText(PREVIEW_TEXT, rules)

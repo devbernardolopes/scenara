@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getPostProcessingRules } from '../../../services/settings'
+import { getSetting, getPostProcessingRules } from '../../../services/settings'
 import PostProcessingRuleEditor from '../../shared/PostProcessingRuleEditor'
 
 function ToggleRow({ label, checked, onChange, disabled }) {
@@ -28,13 +28,52 @@ function ToggleRow({ label, checked, onChange, disabled }) {
   )
 }
 
-function PostProcessingSection({ form, onChange }) {
+function rulesDiffer(a, b) {
+  if (a.length !== b.length) return true
+  for (let i = 0; i < a.length; i++) {
+    const ra = a[i]
+    const rb = b[i]
+    if (
+      ra.label !== rb.label ||
+      ra.color !== rb.color ||
+      ra.fontSizePercent !== rb.fontSizePercent ||
+      JSON.stringify(ra.openChars) !== JSON.stringify(rb.openChars) ||
+      JSON.stringify(ra.closeChars) !== JSON.stringify(rb.closeChars)
+    )
+      return true
+  }
+  return false
+}
+
+function PostProcessingSection({ form, onChange, onDiffChange }) {
   const { t } = useTranslation('characterCreation')
   const [globalRules, setGlobalRules] = useState([])
+  const [globalEnabled, setGlobalEnabled] = useState(true)
 
   useEffect(() => {
-    getPostProcessingRules().then(setGlobalRules)
+    Promise.all([getPostProcessingRules(), getSetting('defaultPostProcessing')]).then(
+      ([rules, enabled]) => {
+        setGlobalRules(rules)
+        setGlobalEnabled(enabled !== false)
+      },
+    )
   }, [])
+
+  useEffect(() => {
+    if (!onDiffChange) return
+    const enabledDiff = form.postProcessing !== globalEnabled
+    const overrideDiff = form.postProcessingOverride === true
+    const rulesDiff =
+      form.postProcessingOverride && rulesDiffer(form.postProcessingRules || [], globalRules)
+    onDiffChange(enabledDiff || overrideDiff || rulesDiff)
+  }, [
+    form.postProcessing,
+    form.postProcessingOverride,
+    form.postProcessingRules,
+    globalRules,
+    globalEnabled,
+    onDiffChange,
+  ])
 
   function handleOverrideChange(value) {
     onChange('postProcessingOverride', value)
@@ -66,6 +105,7 @@ function PostProcessingSection({ form, onChange }) {
           <PostProcessingRuleEditor
             rules={form.postProcessingRules || []}
             onChange={(rules) => onChange('postProcessingRules', rules)}
+            resetToRules={globalRules}
           />
         </div>
       )}
