@@ -996,8 +996,6 @@ function ChatView() {
         chatPersona = await getPersona(thread.personaId)
       }
 
-      const isFirstMessage = messages.length === 0
-
       if (text) {
         const trimMsgs = await getSetting('prompting.trimMessages')
         const userText = trimMsgs ? trimLeadingTrailingNewlines(text) : text
@@ -1007,6 +1005,8 @@ function ChatView() {
           setMessages(currentMsgs)
         }
       }
+
+      const isFirstMessage = currentMsgs.length === 0
 
       if (text && !autoReply) {
         generatingRef.current = false
