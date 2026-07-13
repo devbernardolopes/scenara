@@ -293,9 +293,9 @@ function MessageBubble({
   }, [])
 
   const activeRules = useMemo(() => {
-    if (postProcessingEnabled === false) return []
-    const charEnabled = character ? character.postProcessing !== false : true
-    if (!charEnabled) return []
+    const charEnabled = character ? character.postProcessing !== false : undefined
+    const enabled = charEnabled !== undefined ? charEnabled : postProcessingEnabled !== false
+    if (!enabled) return []
     if (character && character.postProcessingOverride) {
       return character.postProcessingRules || []
     }
