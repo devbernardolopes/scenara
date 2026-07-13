@@ -26,13 +26,18 @@ import {
 } from '../services/messages'
 import { getWritingInstruction } from '../services/writingInstructions'
 import { getEffectiveProfileFor } from '../services/connectionProfiles'
-import { sendChatCompletion, getActiveParams, buildChatRequestPayload } from '../services/chatApi'
+import { buildChatRequestPayload, getActiveParams, sendChatCompletion } from '../services/chatApi'
 import { getSetting } from '../services/settings'
 import {
   getDirectorReviewConfig,
   buildDirectorMessages,
   applyDirectorTemplate,
 } from '../services/director'
+import {
+  generateChatResponse,
+  computeMessageFlags,
+  parseBundleEntries,
+} from '../services/chatGeneration'
 import * as apiQueue from '../services/apiQueue'
 import {
   getGeneratingThreads,
@@ -61,20 +66,6 @@ import {
 } from '../services/unread'
 import db from '../db'
 
-function parseBundleEntries(bundleMessages) {
-  if (!bundleMessages) return null
-  try {
-    const parsed = JSON.parse(bundleMessages)
-    if (!Array.isArray(parsed) || parsed.length === 0) return null
-    if (typeof parsed[0] === 'string') {
-      return parsed.map((content) => ({ content, promptData: null }))
-    }
-    return parsed
-  } catch {
-    return null
-  }
-}
-
 function rebuildFailedState(msgs) {
   const slots = {}
   for (const msg of msgs || []) {
@@ -92,44 +83,6 @@ function rebuildFailedState(msgs) {
     }
   }
   return { slots }
-}
-
-function computeMessageFlags(entryTypes, msgNumbers, currentMsgs) {
-  if (!entryTypes) return null
-  return entryTypes.map((type, i) => {
-    const flags = []
-    if (type === 'system') {
-      flags.push('SYS')
-    } else if (type === 'oocSystem') {
-      flags.push('SYS')
-      flags.push('OOC')
-    } else if (type === 'oocUser') {
-      flags.push('OOC')
-    } else if (type !== 'chatMessage') {
-      flags.push('TMP')
-    }
-    const num = msgNumbers?.[i]
-    if (num != null) {
-      const dbMsg = currentMsgs[num - 1]
-      if (dbMsg?.bundleMessages) {
-        try {
-          const entries = JSON.parse(dbMsg.bundleMessages)
-          if (
-            Array.isArray(entries) &&
-            entries.length > 0 &&
-            entries.every((e) => e.origin === 'initial')
-          ) {
-            flags.push('INI')
-          }
-        } catch {}
-      }
-      if (dbMsg?.summarizedAt) {
-        flags.push('SUM')
-        flags.push('KEP')
-      }
-    }
-    return flags
-  })
 }
 
 function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
@@ -712,6 +665,8 @@ function ChatView() {
     return ids.size > 0 ? msgs.filter((m) => !ids.has(m.id)) : msgs
   }
 
+  // Kept as a local function for handleRegenerate — will be removed when handleRegenerate is
+  // migrated onto generateChatResponse in a future prompt.
   async function runDirectorReview({
     payload,
     originalContent,
@@ -772,6 +727,28 @@ function ChatView() {
     }
   }
 
+  // Trailing-edge throttle: buffers rapid onToken calls and fires at most once per interval.
+  // The caller writes the final content explicitly after generateChatResponse returns, so no
+  // flush-on-completion is needed.
+  function createTrailingThrottle(fn, intervalMs) {
+    let timer = null
+    let lastArgs = null
+    function throttled(...args) {
+      lastArgs = args
+      if (!timer) {
+        timer = setTimeout(() => {
+          timer = null
+          fn(...lastArgs)
+        }, intervalMs)
+      }
+    }
+    throttled.cancel = () => {
+      clearTimeout(timer)
+      timer = null
+    }
+    return throttled
+  }
+
   async function doChatRequest(
     isFirstMessage,
     currentMsgs,
@@ -781,43 +758,8 @@ function ChatView() {
     signal,
   ) {
     currentMsgs = withoutFailedMessages(currentMsgs)
-    const profile = isOOC
-      ? await getEffectiveProfileFor('ooc')
-      : await getEffectiveProfileFor('chat')
-    if (!profile?.model) {
-      showToast(t('noProfileModel'), { type: 'error' })
-      return
-    }
-
-    const directorConfig = !isOOC ? await getDirectorReviewConfig(character) : null
-
-    const { payload, entryTypes, msgNumbers } = await buildChatRequestPayload({
-      character,
-      chatPersona,
-      currentPersona,
-      messages: currentMsgs,
-      isFirstMessage,
-      isOOC,
-      threadId,
-      personaMap,
-    })
-
-    const activeParams = getActiveParams(profile)
-    const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
-    let directorReviewed = false
-    let chatDurationMs = null
-    let directorDurationMs = null
-    let promptData = JSON.stringify({
-      payload,
-      model: profile.model,
-      params: activeParams,
-      msgNumbers,
-      messageFlags,
-      directorReviewed,
-    })
 
     const assistantMsgId = await createAssistantMessage(threadId, '', null, isOOC)
-    await updateMessage(assistantMsgId, { promptData })
     setStreamingMessageId(threadId, assistantMsgId)
     if (Number(currentThreadIdRef.current) === Number(threadId)) {
       isLocalStreamerRef.current = true
@@ -835,8 +777,7 @@ function ChatView() {
       ])
     }
 
-    let outcome = 'failed'
-
+    // Throttle intermediate streaming writes to avoid firing updateMessage on every token.
     const streamIntoBubble = (fullContent) => {
       updateMessage(assistantMsgId, { content: fullContent })
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
@@ -845,26 +786,39 @@ function ChatView() {
         )
       }
     }
+    const throttledToken = createTrailingThrottle(streamIntoBubble, 100)
 
+    let outcome = 'failed'
     try {
-      const content = await sendChatCompletion({
-        profile,
-        messages: payload,
+      const result = await generateChatResponse({
+        character,
+        chatPersona,
+        currentPersona,
+        currentMsgs,
+        isFirstMessage,
+        isOOC,
+        threadId,
+        personaMap,
         signal,
-        onToken: directorConfig ? undefined : streamIntoBubble,
+        onToken: throttledToken,
         onFinish: (reason) => {
           if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
             showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
           }
         },
-        onStreamingStarted: apiQueue.markCurrentRequestStreaming,
-        onActivity: apiQueue.markCurrentRequestActivity,
-        onTiming: (ms) => {
-          chatDurationMs = ms
-        },
       })
 
-      if (!content) {
+      throttledToken.cancel()
+
+      if (result.status === 'no-profile') {
+        await deleteMessage(assistantMsgId)
+        if (Number(currentThreadIdRef.current) === Number(threadId)) {
+          setMessages((prev) => prev.filter((m) => m.id !== assistantMsgId))
+        }
+        return { outcome: 'failed', messageId: assistantMsgId }
+      }
+
+      if (result.status === 'empty') {
         const failedEntry = {
           content: '',
           promptData: null,
@@ -881,88 +835,74 @@ function ChatView() {
         failedIdsRef.current = newFailed
       }
 
-      if (content) {
-        const trimMsgs = await getSetting('prompting.trimMessages')
-        let finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
-
-        if (directorConfig) {
-          try {
-            let writingInstructionContent = ''
-            if (character?.writingInstruction) {
-              const wi = await getWritingInstruction(Number(character.writingInstruction))
-              writingInstructionContent = wi?.content || ''
-            }
-            const reviewed = await runDirectorReview({
-              payload,
-              originalContent: content,
-              writingInstructionContent,
-              character,
-              chatPersona,
-              currentPersona,
-              directorConfig,
-              signal,
-              streamInto: streamIntoBubble,
-              onTiming: (ms) => {
-                directorDurationMs = ms
-              },
-            })
-            finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
-            directorReviewed = true
-            promptData = JSON.stringify({
-              payload,
-              model: profile.model,
-              params: activeParams,
-              msgNumbers,
-              messageFlags,
-              directorReviewed,
-            })
-          } catch {
-            showToast(t('directorFailed', { ns: 'chat' }), { type: 'warning' })
-          }
+      if (result.status === 'error') {
+        const failedEntry = {
+          content: result.error || '',
+          promptData: null,
+          isError: true,
+          error: result.error || null,
+          createdAt: new Date().toISOString(),
         }
+        await updateMessage(assistantMsgId, {
+          content: result.error || '',
+          bundleMessages: JSON.stringify([failedEntry]),
+        })
+        const msgs = await getMessagesByThread(threadId)
+        if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
+        if (Number(currentThreadIdRef.current) === Number(threadId)) {
+          showToast(result.error, { type: 'error' })
+        }
+        const newFailed = new Set(failedIdsRef.current)
+        newFailed.add(assistantMsgId)
+        failedIdsRef.current = newFailed
+      }
 
-        const apiDurationMs =
-          directorReviewed && chatDurationMs != null && directorDurationMs != null
-            ? chatDurationMs + directorDurationMs
-            : chatDurationMs
-        await updateMessage(assistantMsgId, { content: finalContent, promptData, apiDurationMs })
+      if (result.status === 'success') {
+        await updateMessage(assistantMsgId, {
+          content: result.content,
+          promptData: result.promptData,
+          apiDurationMs: result.apiDurationMs,
+        })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages((prev) =>
             prev.map((m) =>
-              m.id === assistantMsgId ? { ...m, content: finalContent, apiDurationMs } : m,
+              m.id === assistantMsgId
+                ? { ...m, content: result.content, apiDurationMs: result.apiDurationMs }
+                : m,
             ),
           )
         }
         outcome = 'succeeded'
       }
     } catch (err) {
+      throttledToken.cancel()
       if (err.name === 'AbortError') {
         await deleteMessage(assistantMsgId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages((prev) => prev.filter((m) => m.id !== assistantMsgId))
         }
         throw err
-      } else {
-        const failedEntry = {
-          content: err.message || '',
-          promptData: null,
-          isError: true,
-          error: err.message || null,
-          createdAt: new Date().toISOString(),
-        }
-        await updateMessage(assistantMsgId, {
-          content: err.message || '',
-          bundleMessages: JSON.stringify([failedEntry]),
-        })
-        const msgs = await getMessagesByThread(threadId)
-        if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
-        if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          showToast(err.message, { type: 'error' })
-        }
-        const newFailed = new Set(failedIdsRef.current)
-        newFailed.add(assistantMsgId)
-        failedIdsRef.current = newFailed
       }
+      // Non-abort errors that escape generateChatResponse are unexpected; treat as fatal
+      const failedEntry = {
+        content: err.message || '',
+        promptData: null,
+        isError: true,
+        error: err.message || null,
+        createdAt: new Date().toISOString(),
+      }
+      await updateMessage(assistantMsgId, {
+        content: err.message || '',
+        bundleMessages: JSON.stringify([failedEntry]),
+      })
+      const msgs = await getMessagesByThread(threadId)
+      if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
+      if (Number(currentThreadIdRef.current) === Number(threadId)) {
+        showToast(err.message, { type: 'error' })
+      }
+      const newFailed = new Set(failedIdsRef.current)
+      newFailed.add(assistantMsgId)
+      failedIdsRef.current = newFailed
     } finally {
       clearStreamingMessageId(threadId)
       isLocalStreamerRef.current = false
