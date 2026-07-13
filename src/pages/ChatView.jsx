@@ -1215,6 +1215,28 @@ function ChatView() {
       if (idx === -1) return
 
       const msg = messages[idx]
+      const isOOCRegen = !!msg.isOOC
+
+      const profile = isOOCRegen
+        ? await getEffectiveProfileFor('ooc')
+        : await getEffectiveProfileFor('chat')
+      if (!profile?.model) {
+        showToast(t('noProfileModel'), { type: 'error' })
+        return
+      }
+
+      const directorConfig = !isOOCRegen ? await getDirectorReviewConfig(character) : null
+
+      let currentMsgs = messages.slice(0, idx)
+      currentMsgs = withoutFailedMessages(currentMsgs)
+      let chatPersona = null
+      if (thread?.personaId) {
+        chatPersona = await getPersona(thread.personaId)
+      }
+
+      const currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : null
+
+      const isFirstMessage = currentMsgs.length === 0 && character?.firstMessage
 
       regenEntries = parseBundleEntries(msg.bundleMessages)
       if (!regenEntries) {
@@ -1253,28 +1275,6 @@ function ChatView() {
           ),
         )
       }
-
-      let currentMsgs = messages.slice(0, idx)
-      currentMsgs = withoutFailedMessages(currentMsgs)
-      let chatPersona = null
-      if (thread?.personaId) {
-        chatPersona = await getPersona(thread.personaId)
-      }
-
-      const currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : null
-
-      const isFirstMessage = currentMsgs.length === 0 && character?.firstMessage
-      const isOOCRegen = !!msg.isOOC
-
-      const profile = isOOCRegen
-        ? await getEffectiveProfileFor('ooc')
-        : await getEffectiveProfileFor('chat')
-      if (!profile?.model) {
-        showToast(t('noProfileModel'), { type: 'error' })
-        return
-      }
-
-      const directorConfig = !isOOCRegen ? await getDirectorReviewConfig(character) : null
 
       const streamSlotIntoBubble = (full) => {
         if (regenEntries[slotIndex]) regenEntries[slotIndex].content = full
