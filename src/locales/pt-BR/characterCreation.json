@@ -37,6 +37,7 @@
   "initialMessageLabel": "Mensagem Inicial",
   "initialMessagePlaceholder": "Escreva a primeira mensagem do personagem…",
   "deleteInitialMessage": "Excluir",
+  "generateInitialMessage": "Gerar",
   "confirmDeleteInitialMessage": "Tem certeza que deseja excluir esta mensagem inicial?",
   "confirmDeleteInitialMessageTitle": "Excluir Mensagem Inicial",
   "noInitialMessages": "Nenhuma mensagem inicial ainda. Adicione uma para saudar o usuário quando um novo chat iniciar.",

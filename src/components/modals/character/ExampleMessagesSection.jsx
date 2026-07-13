@@ -8,6 +8,11 @@ import { Plus, Trash2, Edit3 } from '../../../lib/icons'
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
 
+function countWords(text) {
+  const trimmed = (text || '').trim()
+  return trimmed ? trimmed.split(/\s+/).length : 0
+}
+
 function AddButton({ onClick, label }) {
   return (
     <button
@@ -69,7 +74,14 @@ function ExampleMessagesSection({ form, onChange, characterId }) {
           <CollapsibleSection
             label={`${t('exampleMessageLabel')} #${idx + 1}`}
             summary={
-              msg.content ? t('common:tokenCount', { count: estimateTokens(msg.content) }) : null
+              msg.content ? (
+                <>
+                  {t('common:tokenCount', { count: estimateTokens(msg.content) })}
+                  <span className="ml-2">
+                    {t('chat:words', { count: countWords(msg.content) })}
+                  </span>
+                </>
+              ) : null
             }
             hasContent={!!msg.content}
             storageKey={characterId ? `charSection.exampleMsg.${characterId}.${msg.id}` : undefined}
@@ -92,12 +104,10 @@ function ExampleMessagesSection({ form, onChange, characterId }) {
               >
                 <Trash2 className="w-4 h-4" />
               </button>
-            </div>
-            <div className="mt-2">
               <button
                 type="button"
                 onClick={() => {}}
-                className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-primary-subtle text-primary hover:bg-primary-hover transition-colors"
+                className="absolute top-12 right-2 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-primary-subtle text-primary hover:bg-primary-hover transition-colors"
                 aria-label={t('generateExampleMessage')}
                 title={t('generateExampleMessage')}
               >

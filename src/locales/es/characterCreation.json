@@ -12,6 +12,7 @@
   "initialMessageLabel": "Mensaje Inicial",
   "initialMessagePlaceholder": "Escribe el primer mensaje del personaje…",
   "deleteInitialMessage": "Eliminar",
+  "generateInitialMessage": "Generar",
   "confirmDeleteInitialMessage": "¿Estás seguro de que deseas eliminar este mensaje inicial?",
   "confirmDeleteInitialMessageTitle": "Eliminar Mensaje Inicial",
   "noInitialMessages": "Aún no hay mensajes iniciales. Añade uno para saludar al usuario cuando comience un nuevo chat.",

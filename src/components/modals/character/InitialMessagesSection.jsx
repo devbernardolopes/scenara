@@ -3,10 +3,15 @@ import { useConfirm } from '../../../lib/confirm'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
-import { Plus, Trash2 } from '../../../lib/icons'
+import { Plus, Trash2, Edit3 } from '../../../lib/icons'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
+
+function countWords(text) {
+  const trimmed = (text || '').trim()
+  return trimmed ? trimmed.split(/\s+/).length : 0
+}
 
 function AddButton({ onClick, label }) {
   return (
@@ -69,7 +74,14 @@ function InitialMessagesSection({ form, onChange, characterId }) {
           <CollapsibleSection
             label={`${t('initialMessageLabel')} #${idx + 1}`}
             summary={
-              msg.content ? t('common:tokenCount', { count: estimateTokens(msg.content) }) : null
+              msg.content ? (
+                <>
+                  {t('common:tokenCount', { count: estimateTokens(msg.content) })}
+                  <span className="ml-2">
+                    {t('chat:words', { count: countWords(msg.content) })}
+                  </span>
+                </>
+              ) : null
             }
             hasContent={!!msg.content}
             storageKey={characterId ? `charSection.initialMsg.${characterId}.${msg.id}` : undefined}
@@ -91,6 +103,15 @@ function InitialMessagesSection({ form, onChange, characterId }) {
                 title={t('deleteInitialMessage')}
               >
                 <Trash2 className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => {}}
+                className="absolute top-12 right-2 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-primary-subtle text-primary hover:bg-primary-hover transition-colors"
+                aria-label={t('generateInitialMessage')}
+                title={t('generateInitialMessage')}
+              >
+                <Edit3 className="w-4 h-4" />
               </button>
             </div>
           </CollapsibleSection>
