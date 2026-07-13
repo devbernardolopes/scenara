@@ -194,16 +194,16 @@ export async function buildMessagesPayload({
     entryTypes.push('persona')
   }
 
+  if (!isFirstMessage && postHistoryInstructions) {
+    result.push({ role: 'user', content: postHistoryInstructions })
+    entryTypes.push('postHistory')
+  }
+
   if (memoryText) {
     return {
       payload: appendMemoryToPayload(result, memoryText, memoryHeader),
       entryTypes,
     }
-  }
-
-  if (!isFirstMessage && postHistoryInstructions) {
-    result.push({ role: 'user', content: postHistoryInstructions })
-    entryTypes.push('postHistory')
   }
 
   return { payload: result, entryTypes }

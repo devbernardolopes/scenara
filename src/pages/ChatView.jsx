@@ -180,9 +180,6 @@ function ChatView() {
   const { openModal } = useModal()
   const messagesEndRef = useRef(null)
   const scrollRef = useRef(null)
-  const abortRef = useRef(null)
-  const autoTitleAbortRef = useRef(null)
-  const summarizationAbortRef = useRef(null)
   const generatingRef = useRef(false)
   const isAtBottomRef = useRef(true)
   const autoTriggeredRef = useRef(false)
@@ -412,6 +409,12 @@ function ChatView() {
       }
     }
   }, [messages, loading, threadId])
+
+  useEffect(() => {
+    return () => {
+      scrollStickyCleanupRef.current?.()
+    }
+  }, [])
 
   useEffect(() => {
     if (messages.length > 0 && scrollCommits.current > 1 && messagesGrewRef.current) {
@@ -927,7 +930,6 @@ function ChatView() {
               m.id === assistantMsgId ? { ...m, content: finalContent, apiDurationMs } : m,
             ),
           )
-          showToast(t('messageUpdated'), { type: 'success' })
         }
         completedNormally = true
       }
@@ -1018,7 +1020,6 @@ function ChatView() {
 
       const currentPersona = personaId ? await getPersona(personaId) : null
       const abortController = new AbortController()
-      abortRef.current = abortController
 
       await apiQueue.enqueue({
         threadId,
@@ -1048,7 +1049,6 @@ function ChatView() {
       if (await shouldAutoTitle(thr, chr, nonFailedMsgs)) {
         showToast(t('autoTitleGenerating'), { type: 'info' })
         const atAbort = new AbortController()
-        autoTitleAbortRef.current = atAbort
         try {
           await apiQueue.enqueue({
             threadId,
@@ -1087,8 +1087,6 @@ function ChatView() {
           if (err.name !== 'AbortError') {
             showToast(err.message, { type: 'error' })
           }
-        } finally {
-          autoTitleAbortRef.current = null
         }
       }
 
@@ -1106,7 +1104,6 @@ function ChatView() {
         })
         if (unsummarizedMessages.length > 0) {
           const summAbort = new AbortController()
-          summarizationAbortRef.current = summAbort
           setSummarizing(true)
           showToast('Generating summary', { type: 'info' })
           try {
@@ -1154,7 +1151,6 @@ function ChatView() {
               showToast(err.message || 'Summarization failed', { type: 'error' })
             }
           } finally {
-            summarizationAbortRef.current = null
             setSummarizing(false)
           }
         }
@@ -1337,7 +1333,6 @@ function ChatView() {
       })
 
       const regenAbortController = new AbortController()
-      abortRef.current = regenAbortController
 
       const content = await apiQueue.enqueue({
         threadId,
@@ -1450,7 +1445,6 @@ function ChatView() {
             ),
           )
           setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
-          showToast(t('messageUpdated'), { type: 'success' })
         }
         completedNormally = true
       }
@@ -1537,7 +1531,6 @@ function ChatView() {
           if (await shouldAutoTitle(thr, chr, nonFailedMsgs)) {
             showToast(t('autoTitleGenerating'), { type: 'info' })
             const atAbort = new AbortController()
-            autoTitleAbortRef.current = atAbort
             try {
               await apiQueue.enqueue({
                 threadId,
@@ -1576,8 +1569,6 @@ function ChatView() {
               if (err.name !== 'AbortError') {
                 showToast(err.message, { type: 'error' })
               }
-            } finally {
-              autoTitleAbortRef.current = null
             }
           }
         } catch {}
