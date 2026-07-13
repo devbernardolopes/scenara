@@ -835,7 +835,7 @@ function ChatView() {
       ])
     }
 
-    let completedNormally = false
+    let outcome = 'failed'
 
     const streamIntoBubble = (fullContent) => {
       updateMessage(assistantMsgId, { content: fullContent })
@@ -933,7 +933,7 @@ function ChatView() {
             ),
           )
         }
-        completedNormally = true
+        outcome = 'succeeded'
       }
     } catch (err) {
       if (err.name === 'AbortError') {
@@ -962,7 +962,6 @@ function ChatView() {
         const newFailed = new Set(failedIdsRef.current)
         newFailed.add(assistantMsgId)
         failedIdsRef.current = newFailed
-        completedNormally = true
       }
     } finally {
       clearStreamingMessageId(threadId)
@@ -970,81 +969,38 @@ function ChatView() {
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setStreamingMsgId(null)
       }
-      if (completedNormally) {
-        try {
-          const away = isAwayFromThread(threadId) || !isAtBottomRef.current
-          if (away) {
-            await addUnread(threadId, assistantMsgId)
-            if (Number(currentThreadIdRef.current) === Number(threadId)) {
-              setMessages((prev) =>
-                prev.map((m) => (m.id === assistantMsgId ? { ...m, isUnread: true } : m)),
-              )
-            }
-            const soundEnabled = await getSetting('unreadSound')
-            if (soundEnabled) playNotificationSound()
-          }
-        } catch {}
-      }
     }
+    return { outcome, messageId: assistantMsgId }
   }
 
-  async function handleSend(text, personaId, isOOC, autoReply = true) {
-    if (generatingRef.current) return
-    generatingRef.current = true
+  async function runPostGenerationTasks({
+    threadId,
+    character,
+    outcome,
+    notifyMessageId,
+    includeSummarization,
+  }) {
+    if (outcome === 'aborted') return
 
     try {
-      let currentMsgs = messages
-      let chatPersona = null
-
-      if (thread?.personaId) {
-        chatPersona = await getPersona(thread.personaId)
-      }
-
-      if (text) {
-        const trimMsgs = await getSetting('prompting.trimMessages')
-        const userText = trimMsgs ? trimLeadingTrailingNewlines(text) : text
-        await createMessage(threadId, 'user', userText, personaId, isOOC)
-        currentMsgs = await getMessagesByThread(threadId)
+      const away = isAwayFromThread(threadId) || !isAtBottomRef.current
+      if (away) {
+        await addUnread(threadId, notifyMessageId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          setMessages(currentMsgs)
-        }
-      }
-
-      const isFirstMessage = currentMsgs.length === 0
-
-      if (text && !autoReply) {
-        generatingRef.current = false
-        if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          setGenerating(false)
-        }
-        return
-      }
-
-      const currentPersona = personaId ? await getPersona(personaId) : null
-      const abortController = new AbortController()
-
-      await apiQueue.enqueue({
-        threadId,
-        type: 'chat',
-        signal: abortController.signal,
-        controller: abortController,
-        execute: async () => {
-          return await doChatRequest(
-            isFirstMessage,
-            currentMsgs,
-            chatPersona,
-            currentPersona,
-            isOOC,
-            abortController.signal,
+          setMessages((prev) =>
+            prev.map((m) => (m.id === notifyMessageId ? { ...m, isUnread: true } : m)),
           )
-        },
-      }).promise
+        }
+        const soundEnabled = await getSetting('unreadSound')
+        if (soundEnabled) playNotificationSound()
+      }
+    } catch {}
 
-      if (Number(currentThreadIdRef.current) !== Number(threadId)) return
+    if (outcome !== 'succeeded') return
+
+    try {
       const msgs = await getMessagesByThread(threadId)
-      setMessages(msgs)
       const nonFailedMsgs = withoutFailedMessages(msgs)
-
       const thr = await getThread(threadId)
       const chr = await getCharacter(thr.characterId)
 
@@ -1093,6 +1049,7 @@ function ChatView() {
       }
 
       if (
+        includeSummarization &&
         character &&
         (await shouldTriggerSummarization({
           character,
@@ -1157,6 +1114,69 @@ function ChatView() {
           }
         }
       }
+    } catch {}
+  }
+
+  async function handleSend(text, personaId, isOOC, autoReply = true) {
+    if (generatingRef.current) return
+    generatingRef.current = true
+
+    try {
+      let currentMsgs = messages
+      let chatPersona = null
+
+      if (thread?.personaId) {
+        chatPersona = await getPersona(thread.personaId)
+      }
+
+      if (text) {
+        const trimMsgs = await getSetting('prompting.trimMessages')
+        const userText = trimMsgs ? trimLeadingTrailingNewlines(text) : text
+        await createMessage(threadId, 'user', userText, personaId, isOOC)
+        currentMsgs = await getMessagesByThread(threadId)
+        if (Number(currentThreadIdRef.current) === Number(threadId)) {
+          setMessages(currentMsgs)
+        }
+      }
+
+      const isFirstMessage = currentMsgs.length === 0
+
+      if (text && !autoReply) {
+        generatingRef.current = false
+        if (Number(currentThreadIdRef.current) === Number(threadId)) {
+          setGenerating(false)
+        }
+        return
+      }
+
+      const currentPersona = personaId ? await getPersona(personaId) : null
+      const abortController = new AbortController()
+
+      const { outcome, messageId } = await apiQueue.enqueue({
+        threadId,
+        type: 'chat',
+        signal: abortController.signal,
+        controller: abortController,
+        execute: async () => {
+          return await doChatRequest(
+            isFirstMessage,
+            currentMsgs,
+            chatPersona,
+            currentPersona,
+            isOOC,
+            abortController.signal,
+          )
+        },
+      }).promise
+
+      if (Number(currentThreadIdRef.current) !== Number(threadId)) return
+      await runPostGenerationTasks({
+        threadId,
+        character,
+        outcome,
+        notifyMessageId: messageId,
+        includeSummarization: true,
+      })
     } catch {
       // doChatRequest re-throws AbortError on cancel — handled silently
     } finally {
@@ -1210,7 +1230,7 @@ function ChatView() {
     generatingRef.current = true
 
     let slotIndex = 0
-    let completedNormally = false
+    let outcome = 'failed'
     let regenEntries
     try {
       const idx = messages.findIndex((m) => m.id === messageId)
@@ -1449,10 +1469,11 @@ function ChatView() {
           )
           setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
         }
-        completedNormally = true
+        outcome = 'succeeded'
       }
     } catch (err) {
       if (err.name === 'AbortError') {
+        outcome = 'aborted'
         if (regenEntries) {
           regenEntries.pop()
           const cleanedBundle = JSON.stringify(regenEntries)
@@ -1492,7 +1513,7 @@ function ChatView() {
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           showToast(err.message, { type: 'error' })
         }
-        completedNormally = true
+        outcome = 'failed'
       }
     } finally {
       clearStreamingMessageId(threadId)
@@ -1510,72 +1531,13 @@ function ChatView() {
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setGenerating(false)
       }
-      if (completedNormally) {
-        try {
-          const away = isAwayFromThread(threadId) || !isAtBottomRef.current
-          if (away) {
-            await addUnread(threadId, messageId)
-            if (Number(currentThreadIdRef.current) === Number(threadId)) {
-              setMessages((prev) =>
-                prev.map((m) => (m.id === messageId ? { ...m, isUnread: true } : m)),
-              )
-            }
-            const soundEnabled = await getSetting('unreadSound')
-            if (soundEnabled) playNotificationSound()
-          }
-        } catch {}
-
-        try {
-          const msgs = await getMessagesByThread(threadId)
-          const nonFailedMsgs = withoutFailedMessages(msgs)
-          const thr = await getThread(threadId)
-          const chr = await getCharacter(thr.characterId)
-
-          if (await shouldAutoTitle(thr, chr, nonFailedMsgs)) {
-            showToast(t('autoTitleGenerating'), { type: 'info' })
-            const atAbort = new AbortController()
-            try {
-              await apiQueue.enqueue({
-                threadId,
-                type: 'autoTitle',
-                signal: atAbort.signal,
-                controller: atAbort,
-                execute: async () => {
-                  return await triggerAutoTitle({
-                    thread: thr,
-                    character: chr,
-                    messages: nonFailedMsgs,
-                    personaMap,
-                    signal: atAbort.signal,
-                  })
-                },
-              }).promise
-              const updatedThr = await getThread(threadId)
-              setThread((prev) => ({ ...prev, title: updatedThr.title, autoTitleGenerated: true }))
-              showToast(t('autoTitleGenerated'), { type: 'success' })
-
-              const markerEnabled = await getSetting('autoTitleMarker')
-              if (markerEnabled) {
-                const postMsgs = await getMessagesByThread(threadId)
-                if (postMsgs.length > 0) {
-                  const lastMsg = postMsgs[postMsgs.length - 1]
-                  if (!lastMsg.isAutoTitleMarker) {
-                    await createAutoTitleMarker(threadId, lastMsg.createdAt)
-                    const updated = await getMessagesByThread(threadId)
-                    if (Number(currentThreadIdRef.current) === Number(threadId)) {
-                      setMessages(updated)
-                    }
-                  }
-                }
-              }
-            } catch (err) {
-              if (err.name !== 'AbortError') {
-                showToast(err.message, { type: 'error' })
-              }
-            }
-          }
-        } catch {}
-      }
+      await runPostGenerationTasks({
+        threadId,
+        character,
+        outcome,
+        notifyMessageId: messageId,
+        includeSummarization: true,
+      })
     }
   }
 
