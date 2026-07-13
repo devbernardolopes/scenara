@@ -30,14 +30,18 @@ function TagManagementModal() {
   const [characterCounts, setCharacterCounts] = useState(new Map())
   const inputRef = useRef(null)
 
+  const firstLoad = useRef(true)
   const load = useCallback(async () => {
-    setLoading(true)
+    if (firstLoad.current) setLoading(true)
     try {
       const [data, counts] = await Promise.all([getAllTags(), getTagCharacterCounts()])
       setTags(data)
       setCharacterCounts(counts)
     } finally {
-      setLoading(false)
+      if (firstLoad.current) {
+        setLoading(false)
+        firstLoad.current = false
+      }
     }
   }, [])
 

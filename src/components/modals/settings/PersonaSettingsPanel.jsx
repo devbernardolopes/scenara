@@ -28,13 +28,17 @@ function PersonaSettingsPanel() {
   const [loading, setLoading] = useState(true)
   const importRef = useRef(null)
 
+  const firstLoad = useRef(true)
   const load = useCallback(async () => {
-    setLoading(true)
+    if (firstLoad.current) setLoading(true)
     try {
       const p = await getAllPersonas()
       setPersonas(p)
     } finally {
-      setLoading(false)
+      if (firstLoad.current) {
+        setLoading(false)
+        firstLoad.current = false
+      }
     }
   }, [])
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
@@ -19,13 +19,17 @@ function InChatShortcutManagementModal() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
 
+  const firstLoad = useRef(true)
   const load = useCallback(async () => {
-    setLoading(true)
+    if (firstLoad.current) setLoading(true)
     try {
       const data = await getAllInChatShortcuts()
       setItems(data)
     } finally {
-      setLoading(false)
+      if (firstLoad.current) {
+        setLoading(false)
+        firstLoad.current = false
+      }
     }
   }, [])
 
