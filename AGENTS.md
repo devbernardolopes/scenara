@@ -60,19 +60,19 @@ All data lives in the browser via IndexedDB. Dexie.js is the only persistence la
 - Schema (version 14):
 
 | Table                 | Primary Key | Indexes                                                                                    |
-| --------------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| --------------------- | ----------- | ------------------------------------------------------------------------------------------ |
 | `threads`             | `++id`      | `title`, `characterId`, `personaId`, `updatedAt`, `isFavorite`, `isLocked`, `threadNumber` |
 | `characters`          | `++id`      | `name`, `createdAt`, `updatedAt`, `characterNumber`, `*tags`                               |
 | `personas`            | `++id`      | `name`, `title`, `createdAt`, `isDefault`                                                  |
-| `settings`            | `++id`      | `key`                                                                                       |
-| `uiState`             | `++id`      | `key`                                                                                       |
-| `messages`            | `++id`      | `threadId`, `role`, `personaId`, `createdAt`, `summarizedAt`                                |
-| `writingInstructions` | `++id`      | `name`, `createdAt`                                                                         |
-| `connectionProfiles`  | `++id`      | `name`, `createdAt`                                                                         |
-| `inChatShortcuts`     | `++id`      | `name`, `createdAt`                                                                         |
-| `promptHistory`       | `++id`      | `threadId`, `createdAt`                                                                     |
-| `tags`                | `++id`      | `&name`, `createdAt`                                                                        |
-| `threadMemories`      | `++id`      | `threadId`, `createdAt`                                                                     |
+| `settings`            | `++id`      | `key`                                                                                      |
+| `uiState`             | `++id`      | `key`                                                                                      |
+| `messages`            | `++id`      | `threadId`, `role`, `personaId`, `createdAt`, `summarizedAt`                               |
+| `writingInstructions` | `++id`      | `name`, `createdAt`                                                                        |
+| `connectionProfiles`  | `++id`      | `name`, `createdAt`                                                                        |
+| `inChatShortcuts`     | `++id`      | `name`, `createdAt`                                                                        |
+| `promptHistory`       | `++id`      | `threadId`, `createdAt`                                                                    |
+| `tags`                | `++id`      | `&name`, `createdAt`                                                                       |
+| `threadMemories`      | `++id`      | `threadId`, `createdAt`                                                                    |
 
 - **`settings`** — user preferences (theme, language, API config). Persistent, import/exportable.
 - **`uiState`** — transient UI state (collapse/expand, scroll positions). Never exported. Queried via `src/services/uiState.js`.
@@ -81,7 +81,7 @@ All data lives in the browser via IndexedDB. Dexie.js is the only persistence la
 
 No business logic in `db.js` — just table definitions. Query/mutate from `services/`.
 
-**Migrating the schema:** add a new `db.version(N).stores({...})` block with the *entire* table set (Dexie requires the full schema per version, not a diff), rather than editing an existing version in place.
+**Migrating the schema:** add a new `db.version(N).stores({...})` block with the _entire_ table set (Dexie requires the full schema per version, not a diff), rather than editing an existing version in place.
 
 ## AI Request Pipeline
 
@@ -95,6 +95,7 @@ This is the core of the app and the most active area of development — read thi
 
 ### Sending a request
 
+- `src/services/chatGeneration.js` — orchestration layer that both `doChatRequest` and `handleRegenerate` call. Resolves the connection profile, builds the payload via `chatApi.js`, calls `sendChatCompletion`, optionally runs the Director review pass, trims the result, and returns a typed outcome (`'no-profile' | 'empty' | 'success' | 'error'`). AbortErrors re-throw so callers can distinguish cancellation from failure. Exported pure utilities `parseBundleEntries` and `computeMessageFlags` also live here.
 - `src/services/chatApi.js` — builds the outgoing payload (`buildMessagesPayload`, `buildChatRequestPayload`), does `{{char}}`/`{{user}}`/`{{name}}` template substitution (`replaceVars`), and sends it (`sendChatCompletion`). Provider quirks (e.g. `max_completion_tokens` vs `max_tokens`, stripping zero-value params) are handled here — always use `null`/`undefined`, never `0`, as the "omit this param" signal.
 - `src/services/apiQueue.js` — single request queue per app (not per thread): enforces cooldown/timeout, tracks streaming state, and supports cancellation (`cancelRequest`, `cancelThreadRequests`). Any new code path that hits an LLM provider must go through this queue, not `fetch` directly.
 - `src/services/director.js` — an optional secondary pass that reviews/rewrites a response using the character's own instructions. Its `applyDirectorTemplate` implements the shared `{{message}}` / `{{char}}` / `{{user}}` / `{{writing_instructions}}` template-variable syntax reused by auto-titling and summarization prompts — extend this function, not a new templating scheme, when a new template variable is needed.

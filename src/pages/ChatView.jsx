@@ -24,20 +24,9 @@ import {
   deleteMessagesFrom,
   trimLeadingTrailingNewlines,
 } from '../services/messages'
-import { getWritingInstruction } from '../services/writingInstructions'
 import { getEffectiveProfileFor } from '../services/connectionProfiles'
-import { buildChatRequestPayload, getActiveParams, sendChatCompletion } from '../services/chatApi'
 import { getSetting } from '../services/settings'
-import {
-  getDirectorReviewConfig,
-  buildDirectorMessages,
-  applyDirectorTemplate,
-} from '../services/director'
-import {
-  generateChatResponse,
-  computeMessageFlags,
-  parseBundleEntries,
-} from '../services/chatGeneration'
+import { generateChatResponse, parseBundleEntries } from '../services/chatGeneration'
 import * as apiQueue from '../services/apiQueue'
 import {
   getGeneratingThreads,
@@ -665,68 +654,6 @@ function ChatView() {
     return ids.size > 0 ? msgs.filter((m) => !ids.has(m.id)) : msgs
   }
 
-  // Kept as a local function for handleRegenerate — will be removed when handleRegenerate is
-  // migrated onto generateChatResponse in a future prompt.
-  async function runDirectorReview({
-    payload,
-    originalContent,
-    writingInstructionContent,
-    character,
-    chatPersona,
-    currentPersona,
-    directorConfig,
-    signal,
-    streamInto,
-    onTiming,
-  }) {
-    const dProfile = await getEffectiveProfileFor('director')
-    if (!dProfile?.model) {
-      throw new Error(t('noProfileModel', { ns: 'chat' }))
-    }
-    await apiQueue.waitForCooldown()
-    showToast(t('directorReviewing', { ns: 'chat' }), { type: 'info' })
-    const charName = character?.name || ''
-    const userPersonaName = chatPersona?.name || ''
-    const currentPersonaName = currentPersona?.name || userPersonaName
-    const templateVars = {
-      message: originalContent,
-      message_response: originalContent,
-      message_system: payload.find((m) => m.role === 'system')?.content || '',
-      message_user: payload.find((m) => m.role === 'user')?.content || '',
-      writingInstructions: writingInstructionContent,
-      char: charName,
-      user: userPersonaName,
-      name: currentPersonaName,
-    }
-    const systemInstructions = applyDirectorTemplate(
-      directorConfig.systemInstructions,
-      templateVars,
-    )
-    const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
-    const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
-    apiQueue.setCurrentRequestDirectorPhase(true)
-    try {
-      const reviewed = await sendChatCompletion({
-        profile: dProfile,
-        messages: dPayload,
-        signal,
-        onToken: streamInto,
-        onFinish: (reason) => {
-          if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
-            showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
-          }
-        },
-        onStreamingStarted: apiQueue.markCurrentRequestStreaming,
-        onActivity: apiQueue.markCurrentRequestActivity,
-        onTiming,
-      })
-      if (!reviewed) return originalContent
-      return reviewed
-    } finally {
-      apiQueue.setCurrentRequestDirectorPhase(false)
-    }
-  }
-
   // Trailing-edge throttle: buffers rapid onToken calls and fires at most once per interval.
   // The caller writes the final content explicitly after generateChatResponse returns, so no
   // flush-on-completion is needed.
@@ -1172,6 +1099,7 @@ function ChatView() {
     let slotIndex = 0
     let outcome = 'failed'
     let regenEntries
+    let throttledToken
     try {
       const idx = messages.findIndex((m) => m.id === messageId)
       if (idx === -1) return
@@ -1179,6 +1107,8 @@ function ChatView() {
       const msg = messages[idx]
       const isOOCRegen = !!msg.isOOC
 
+      // Pre-flight profile check — must happen before any bundle slot mutations to avoid
+      // leaving orphaned empty slots if the profile is missing.
       const profile = isOOCRegen
         ? await getEffectiveProfileFor('ooc')
         : await getEffectiveProfileFor('chat')
@@ -1186,8 +1116,6 @@ function ChatView() {
         showToast(t('noProfileModel'), { type: 'error' })
         return
       }
-
-      const directorConfig = !isOOCRegen ? await getDirectorReviewConfig(character) : null
 
       let currentMsgs = messages.slice(0, idx)
       currentMsgs = withoutFailedMessages(currentMsgs)
@@ -1254,76 +1182,58 @@ function ChatView() {
           )
         }
       }
-
-      let payload
-      let entryTypes = null
-      let promptDataStr
-      let msgNumbers = null
-
-      const chatRequest = await buildChatRequestPayload({
-        character,
-        chatPersona,
-        currentPersona,
-        messages: currentMsgs,
-        isFirstMessage,
-        isOOC: isOOCRegen,
-        threadId,
-        personaMap,
-      })
-      payload = chatRequest.payload
-      entryTypes = chatRequest.entryTypes
-      msgNumbers = chatRequest.msgNumbers
-
-      const activeParams = getActiveParams(profile)
-      const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
-      let directorReviewed = false
-      let chatDurationMs = null
-      let directorDurationMs = null
-      promptDataStr = JSON.stringify({
-        payload,
-        model: profile.model,
-        params: activeParams,
-        msgNumbers,
-        messageFlags,
-        directorReviewed,
-      })
-
-      regenEntries[slotIndex].promptData = promptDataStr
-      await updateMessage(messageId, {
-        bundleMessages: JSON.stringify(regenEntries),
-        promptData: promptDataStr,
-      })
+      throttledToken = createTrailingThrottle(streamSlotIntoBubble, 100)
 
       const regenAbortController = new AbortController()
 
-      const content = await apiQueue.enqueue({
+      const result = await apiQueue.enqueue({
         threadId,
         type: 'regenerate',
         signal: regenAbortController.signal,
         controller: regenAbortController,
         execute: async () => {
-          return await sendChatCompletion({
-            profile,
-            messages: payload,
+          return await generateChatResponse({
+            character,
+            chatPersona,
+            currentPersona,
+            currentMsgs,
+            isFirstMessage,
+            isOOC: isOOCRegen,
+            threadId,
+            personaMap,
             signal: regenAbortController.signal,
-            onToken: directorConfig
-              ? undefined
-              : (fullContent) => streamSlotIntoBubble(fullContent),
+            onToken: throttledToken,
             onFinish: (reason) => {
               if (reason === 'length' && Number(currentThreadIdRef.current) === Number(threadId)) {
                 showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
               }
             },
-            onStreamingStarted: apiQueue.markCurrentRequestStreaming,
-            onActivity: apiQueue.markCurrentRequestActivity,
-            onTiming: (ms) => {
-              chatDurationMs = ms
-            },
           })
         },
       }).promise
 
-      if (!content) {
+      throttledToken.cancel()
+
+      if (result.status === 'no-profile') {
+        // Pre-flight already caught this, but handle defensively: pop the slot
+        regenEntries.pop()
+        const cleanedBundle = JSON.stringify(regenEntries)
+        await updateMessage(messageId, {
+          bundleMessages: cleanedBundle,
+          activeSlotIndex: regenEntries.length - 1,
+        })
+        if (Number(currentThreadIdRef.current) === Number(threadId)) {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === messageId
+                ? { ...m, bundleMessages: cleanedBundle, activeSlotIndex: regenEntries.length - 1 }
+                : m,
+            ),
+          )
+        }
+      }
+
+      if (result.status === 'empty') {
         const dbMsg = await db.messages.get(Number(messageId))
         const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
         if (finalEntries[slotIndex]) {
@@ -1333,63 +1243,41 @@ function ChatView() {
         await updateMessage(messageId, { bundleMessages: JSON.stringify(finalEntries) })
       }
 
-      if (content) {
-        const trimMsgs = await getSetting('prompting.trimMessages')
-        let finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
-
-        if (directorConfig) {
-          try {
-            let writingInstructionContent = ''
-            if (character?.writingInstruction) {
-              const wi = await getWritingInstruction(Number(character.writingInstruction))
-              writingInstructionContent = wi?.content || ''
-            }
-            const reviewed = await runDirectorReview({
-              payload,
-              originalContent: content,
-              writingInstructionContent,
-              character,
-              chatPersona,
-              currentPersona,
-              directorConfig,
-              signal: regenAbortController.signal,
-              streamInto: streamSlotIntoBubble,
-              onTiming: (ms) => {
-                directorDurationMs = ms
-              },
-            })
-            finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
-            directorReviewed = true
-            promptDataStr = JSON.stringify({
-              payload,
-              model: profile.model,
-              params: activeParams,
-              msgNumbers,
-              messageFlags,
-              directorReviewed,
-            })
-          } catch {
-            showToast(t('directorFailed', { ns: 'chat' }), { type: 'warning' })
-          }
-        }
-        const apiDurationMs =
-          directorReviewed && chatDurationMs != null && directorDurationMs != null
-            ? chatDurationMs + directorDurationMs
-            : chatDurationMs
+      if (result.status === 'error') {
         const dbMsg = await db.messages.get(Number(messageId))
         const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
         if (finalEntries[slotIndex]) {
-          finalEntries[slotIndex].content = finalContent
-          finalEntries[slotIndex].promptData = promptDataStr
-          finalEntries[slotIndex].apiDurationMs = apiDurationMs
+          finalEntries[slotIndex].isError = true
+          finalEntries[slotIndex].error = result.error || null
+          finalEntries[slotIndex].content = result.error || finalEntries[slotIndex].content || ''
+        }
+        await updateMessage(messageId, {
+          bundleMessages: JSON.stringify(finalEntries),
+          content: finalEntries[slotIndex]?.content ?? '',
+          activeSlotIndex: slotIndex,
+        })
+        const msgs = await getMessagesByThread(threadId)
+        if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(msgs)
+        if (Number(currentThreadIdRef.current) === Number(threadId)) {
+          showToast(result.error, { type: 'error' })
+        }
+      }
+
+      if (result.status === 'success') {
+        const dbMsg = await db.messages.get(Number(messageId))
+        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
+        if (finalEntries[slotIndex]) {
+          finalEntries[slotIndex].content = result.content
+          finalEntries[slotIndex].promptData = result.promptData
+          finalEntries[slotIndex].apiDurationMs = result.apiDurationMs
           finalEntries[slotIndex].isError = false
           finalEntries[slotIndex].error = null
         }
         await updateMessage(messageId, {
           bundleMessages: JSON.stringify(finalEntries),
-          content: finalContent,
-          promptData: promptDataStr,
-          apiDurationMs,
+          content: result.content,
+          promptData: result.promptData,
+          apiDurationMs: result.apiDurationMs,
           activeSlotIndex: slotIndex,
         })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
@@ -1398,10 +1286,10 @@ function ChatView() {
               m.id === messageId
                 ? {
                     ...m,
-                    content: finalContent,
+                    content: result.content,
                     bundleMessages: JSON.stringify(finalEntries),
-                    promptData: promptDataStr,
-                    apiDurationMs,
+                    promptData: result.promptData,
+                    apiDurationMs: result.apiDurationMs,
                     activeSlotIndex: slotIndex,
                   }
                 : m,
@@ -1412,6 +1300,7 @@ function ChatView() {
         outcome = 'succeeded'
       }
     } catch (err) {
+      if (throttledToken) throttledToken.cancel()
       if (err.name === 'AbortError') {
         outcome = 'aborted'
         if (regenEntries) {
@@ -1438,14 +1327,14 @@ function ChatView() {
       } else {
         const dbMsg = await db.messages.get(Number(messageId))
         const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
-        if (finalEntries[slotIndex]) {
+        if (finalEntries?.[slotIndex]) {
           finalEntries[slotIndex].isError = true
           finalEntries[slotIndex].error = err.message || null
           finalEntries[slotIndex].content = err.message || finalEntries[slotIndex].content || ''
         }
         await updateMessage(messageId, {
           bundleMessages: JSON.stringify(finalEntries),
-          content: finalEntries[slotIndex]?.content ?? '',
+          content: finalEntries?.[slotIndex]?.content ?? '',
           activeSlotIndex: slotIndex,
         })
         const msgs = await getMessagesByThread(threadId)
@@ -1453,7 +1342,6 @@ function ChatView() {
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           showToast(err.message, { type: 'error' })
         }
-        outcome = 'failed'
       }
     } finally {
       clearStreamingMessageId(threadId)
