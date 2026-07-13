@@ -80,6 +80,16 @@ function ShowPromptModal({ payload, model, params, msgNumbers, messageFlags, dir
               ))}
             </div>
           )}
+          {directorReviewed && (
+            <div className="flex items-center gap-2 text-text">
+              <span className="font-medium">{t('director')}:</span>
+              <span
+                className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${PILL_STYLES.DIR}`}
+              >
+                DIR
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -87,7 +97,7 @@ function ShowPromptModal({ payload, model, params, msgNumbers, messageFlags, dir
             const tokenCount = estimateTokens(msg.content || '')
             const isOpen = expandedIdx === idx
             const baseFlags = messageFlags?.[idx] || []
-            const flags = directorReviewed ? ['DIR', ...baseFlags] : baseFlags
+            const flags = baseFlags
             return (
               <div key={idx} className="border border-border rounded-lg overflow-hidden">
                 <button

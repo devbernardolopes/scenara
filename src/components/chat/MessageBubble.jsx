@@ -320,6 +320,7 @@ function MessageBubble({
   } catch {
     promptData = null
   }
+  const directorReviewed = promptData?.directorReviewed || false
 
   let userBgClass = 'bg-primary text-on-primary'
   let userBgStyle = null
@@ -835,6 +836,11 @@ function MessageBubble({
             )}
             {currentOrigin === 'edit' && (
               <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>{t('edited')}</span>
+            )}
+            {directorReviewed && (
+              <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300">
+                DIR
+              </span>
             )}
             {!streaming && typeof apiDurationMs === 'number' && (
               <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
