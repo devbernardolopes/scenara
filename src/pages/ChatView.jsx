@@ -1006,7 +1006,7 @@ function ChatView() {
         return
       }
 
-      const currentPersona = personaId ? await getPersona(personaId) : null
+      const currentPersona = personaId ? await getPersona(personaId) : chatPersona
       const abortController = new AbortController()
 
       const { outcome, messageId } = await apiQueue.enqueue({
@@ -1116,7 +1116,7 @@ function ChatView() {
         chatPersona = await getPersona(thread.personaId)
       }
 
-      const currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : null
+      const currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : chatPersona
 
       const isFirstMessage = currentMsgs.length === 0 && character?.firstMessage
 
