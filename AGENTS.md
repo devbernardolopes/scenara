@@ -236,6 +236,12 @@ Settings are code-split: `SettingsModal` uses `React.lazy()` and is bundled sepa
 
 - **No external browser automation tools.** Agents must not install, download, or use Playwright, Puppeteer, Selenium, or any other headless browser tooling. All development, testing, and automation tasks must remain within the existing client-side stack (Vite + React + Dexie.js) and available tools in the sandbox environment. Use existing skills or the sandbox shell for any necessary file or build operations.
 
+## Agent Task Execution Rules
+
+- **No automated testing.** Agents must not run any tests (unit, integration, E2E, or manual verification) after completing a task. The human maintainer will perform all testing.
+- **Linting only.** After implementing changes, agents should run linting/formatting checks (`eslint`, `oxlint`, and `prettier`) but must not execute builds, type checks, or any other validation steps unless explicitly requested.
+- **No default build step.** Agents should not automatically run `npx vite build` (or similar) at the end of tasks. While a build can occasionally surface issues, it is not required for routine changes and will be performed by the maintainer when needed.
+
 ## UI State Persistence
 
 Transient UI state (collapse/expand, scroll positions) lives in the `uiState` Dexie table — separate from user preferences.
