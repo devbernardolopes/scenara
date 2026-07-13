@@ -7,8 +7,11 @@ Architecture decisions, conventions, and constraints for human and AI-agent main
 - **Vite + React** (JavaScript, not TypeScript)
 - **Tailwind CSS v4** (mobile-first, Vite plugin, no PostCSS config)
 - **React Router v7+** (nested routes with `<Outlet />`)
-- **Dexie.js** (IndexedDB wrapper, client-side persistence)
+- **Dexie.js** (IndexedDB wrapper, client-side persistence — the only backend)
 - **i18next + react-i18next** (localization, EFIGS + pt-BR, namespace-based JSON files)
+- **@huggingface/transformers** (in-browser local inference, runs in a Web Worker — see AI Request Pipeline)
+- **gpt-tokenizer** (client-side token estimation for context budgeting)
+- **react-markdown + remark-gfm + rehype-sanitize** (message rendering)
 - **ESLint** (flat config) + **Prettier** + **oxlint**
 - Deployment: **Vercel** (SPA rewrites in `vercel.json`)
 
@@ -54,25 +57,53 @@ registerModal('personaEditor', PersonaEditorModal)
 All data lives in the browser via IndexedDB. Dexie.js is the only persistence layer — no backend.
 
 - `src/db.js` — single `new Dexie('scenara')` instance
-- Schema (version 10):
+- Schema (version 14):
 
-| Table                 | Primary Key | Indexes                                                                        |
-| --------------------- | ----------- | ------------------------------------------------------------------------------ |
-| `threads`             | `++id`      | `title`, `characterId`, `personaId`, `updatedAt`, `isFavorite`, `threadNumber` |
-| `characters`          | `++id`      | `name`, `createdAt`, `updatedAt`, `characterNumber`                            |
-| `personas`            | `++id`      | `name`, `title`, `createdAt`, `isDefault`                                      |
-| `settings`            | `++id`      | `key`                                                                          |
-| `uiState`             | `++id`      | `key`                                                                          |
-| `messages`            | `++id`      | `threadId`, `role`, `personaId`, `createdAt`                                   |
-| `writingInstructions` | `++id`      | `name`, `createdAt`                                                            |
-| `connectionProfiles`  | `++id`      | `name`, `createdAt`                                                            |
-| `inChatShortcuts`     | `++id`      | `name`, `createdAt`                                                            |
-| `promptHistory`       | `++id`      | `threadId`, `createdAt`                                                        |
+| Table                 | Primary Key | Indexes                                                                                    |
+| --------------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| `threads`             | `++id`      | `title`, `characterId`, `personaId`, `updatedAt`, `isFavorite`, `isLocked`, `threadNumber` |
+| `characters`          | `++id`      | `name`, `createdAt`, `updatedAt`, `characterNumber`, `*tags`                               |
+| `personas`            | `++id`      | `name`, `title`, `createdAt`, `isDefault`                                                  |
+| `settings`            | `++id`      | `key`                                                                                       |
+| `uiState`             | `++id`      | `key`                                                                                       |
+| `messages`            | `++id`      | `threadId`, `role`, `personaId`, `createdAt`, `summarizedAt`                                |
+| `writingInstructions` | `++id`      | `name`, `createdAt`                                                                         |
+| `connectionProfiles`  | `++id`      | `name`, `createdAt`                                                                         |
+| `inChatShortcuts`     | `++id`      | `name`, `createdAt`                                                                         |
+| `promptHistory`       | `++id`      | `threadId`, `createdAt`                                                                     |
+| `tags`                | `++id`      | `&name`, `createdAt`                                                                        |
+| `threadMemories`      | `++id`      | `threadId`, `createdAt`                                                                     |
 
 - **`settings`** — user preferences (theme, language, API config). Persistent, import/exportable.
 - **`uiState`** — transient UI state (collapse/expand, scroll positions). Never exported. Queried via `src/services/uiState.js`.
+- **`threadMemories`** — durable per-thread memory entries produced by summarization, re-injected into future prompts (see AI Request Pipeline below).
+- Summary/auto-title checkpoints are stored as empty marker messages (`isSummaryMarker` / `isAutoTitleMarker` flags on a `role: 'system'` row, `messages.summarizedAt`) rather than a separate table — filter them out when counting real messages (see `getThreadMessageCounts` in `services/messages.js`).
 
 No business logic in `db.js` — just table definitions. Query/mutate from `services/`.
+
+**Migrating the schema:** add a new `db.version(N).stores({...})` block with the *entire* table set (Dexie requires the full schema per version, not a diff), rather than editing an existing version in place.
+
+## AI Request Pipeline
+
+This is the core of the app and the most active area of development — read this before touching anything related to sending a message, providers, or prompts.
+
+### Three-layer API configuration
+
+1. **Providers & keys** (`src/services/apiProviders.js`) — `PROVIDERS` is a declarative array (like `SETTINGS`): each entry declares `id`, auth needs (`needsKey`/`needsUrl`), whether it exposes a `/models` endpoint, and a `params` schema (key, label, type, min/max/step, default) describing that provider's sampling parameters. Multiple named API keys per provider are supported and stored here. **To add a provider:** add one object to `PROVIDERS`, plus a matching entry in `modelFetcher.js`'s `STRATEGIES` if it needs model listing.
+2. **Connection profiles** (`src/services/connectionProfiles.js`) — a saved, named bundle of `{ providerId, keyId, model, params }`. Users create as many profiles as they want (e.g. "Groq — creative", "LM Studio — fast draft").
+3. **Request kinds** (`REQUEST_KINDS` in `connectionProfiles.js`: `chat`, `autoTitle`, `summarization`, `ooc`, `director`, `interface`) — each kind can be pointed at a different connection profile, so e.g. auto-titling can run on a cheap/local model while chat uses a stronger one. **To add a request kind:** add its id to `REQUEST_KINDS` and give it a profile picker in the relevant settings panel.
+
+### Sending a request
+
+- `src/services/chatApi.js` — builds the outgoing payload (`buildMessagesPayload`, `buildChatRequestPayload`), does `{{char}}`/`{{user}}`/`{{name}}` template substitution (`replaceVars`), and sends it (`sendChatCompletion`). Provider quirks (e.g. `max_completion_tokens` vs `max_tokens`, stripping zero-value params) are handled here — always use `null`/`undefined`, never `0`, as the "omit this param" signal.
+- `src/services/apiQueue.js` — single request queue per app (not per thread): enforces cooldown/timeout, tracks streaming state, and supports cancellation (`cancelRequest`, `cancelThreadRequests`). Any new code path that hits an LLM provider must go through this queue, not `fetch` directly.
+- `src/services/director.js` — an optional secondary pass that reviews/rewrites a response using the character's own instructions. Its `applyDirectorTemplate` implements the shared `{{message}}` / `{{char}}` / `{{user}}` / `{{writing_instructions}}` template-variable syntax reused by auto-titling and summarization prompts — extend this function, not a new templating scheme, when a new template variable is needed.
+- `src/services/summarization.js` + `threadMemories.js` — condense older messages into a `threadMemories` entry that's re-injected into future prompts once a thread grows long, so context stays bounded.
+- `src/services/autoTitle.js` / `titleManager.js` — generate a thread title after the first exchange, either via the active provider or the local in-browser model.
+
+### Local (on-device) inference
+
+`src/lib/inferenceClient.js` talks to `src/workers/inference.worker.js`, which runs `@huggingface/transformers` inside a Web Worker so a small model can run fully offline (currently used for auto-titling). Model load/unload and idle-unload timing live in the worker — don't block the main thread with transformer calls.
 
 ## Folder Structure
 
@@ -126,12 +157,6 @@ All visual properties are defined as CSS custom properties in `src/styles/tokens
 | Theme-aware shadows       | `shadow-surface-sm/md/lg`         |
 
 Spacing, typography, and radius use Tailwind's built-in classes (`p-4`, `text-sm`, `rounded-lg`). Do not create custom tokens for these.
-
-### Adding a new theme
-
-1. Add a `.theme-{name}` block in `tokens.css` overriding every `--color-*` and `--shadow-*` variable
-2. Add the name to the `SETTINGS` config array in `src/services/settings.js` (the `theme` setting's `options` array)
-3. Add a label to the theme options locale key in the settings namespace
 
 ### Adding a new token
 
@@ -240,43 +265,6 @@ Transient UI state (collapse/expand, scroll positions) lives in the `uiState` De
 1. Create the control component wrapping `CollapsibleSection`
 2. Add it to the `CONTROL_MAP` in `SettingRow.jsx`
 3. The `storageKey` is automatically set to `setting.key` by `SettingRow`
-
-## Modal Registration Pattern
-
-Modals are registered at the entry point (`main.jsx`), not auto-discovered. This ensures:
-
-1. All modals are visible in one place (easy to audit)
-2. Lazy-loading is straightforward to add later (dynamic `registerModal` call)
-3. Tree-shaking works — unused modals don't need importing
-
-To add a new modal:
-
-```js
-// 1. Create component
-function MyModal() {
-  const { closeModal } = useModal()
-  return <div>...</div>
-}
-
-// 2. Register in main.jsx
-import MyModal from './components/modals/MyModal'
-registerModal('myModal', MyModal)
-
-// 3. Trigger from any component
-const { openModal } = useModal()
-openModal('myModal', { someProp: value })
-```
-
-For heavy modals, use `lazy()` for automatic code-splitting:
-
-```js
-import { lazy } from 'react'
-
-const SettingsModal = lazy(() => import('./components/modals/settings/SettingsModal'))
-registerModal('settings', SettingsModal)
-```
-
-The `ModalProvider` wraps every modal in `<Suspense>`, so no additional setup is needed.
 
 ## Commit Convention
 
