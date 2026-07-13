@@ -151,6 +151,48 @@ function DirectorSection({ form, onChange, characterId }) {
         onChange={(val) => onChange('directorEnabled', val)}
       />
 
+      <CollapsibleSection
+        label={t('directorLiterals')}
+        defaultExpanded={false}
+        storageKey={characterId ? `charSection.directorLiterals.${characterId}` : undefined}
+      >
+        <div className="space-y-1 text-xs text-secondary">
+          <div>
+            <code className="text-accent">{'{{message}}'}</code> /{' '}
+            <code className="text-accent">{'{{message_response}}'}</code> —{' '}
+            {t('directorLiteralResponse')}
+          </div>
+          <div>
+            <code className="text-accent">{'{{message_system}}'}</code> —{' '}
+            {t('directorLiteralSystem')}
+          </div>
+          <div>
+            <code className="text-accent">{'{{message_user}}'}</code> — {t('directorLiteralUser')}
+          </div>
+          <div>
+            <code className="text-accent">{'{{writing_instructions}}'}</code> —{' '}
+            {t('directorLiteralWriting')}
+          </div>
+          <div>
+            <code className="text-accent">{'{{char}}'}</code> — {t('directorLiteralChar')}
+          </div>
+          <div>
+            <code className="text-accent">{'{{user}}'}</code> — {t('directorLiteralUserPersona')}
+          </div>
+          <div>
+            <code className="text-accent">{'{{name}}'}</code> — {t('directorLiteralName')}
+          </div>
+          <div>
+            <code className="text-accent">{'{{system_autotitle}}'}</code> —{' '}
+            {t('directorLiteralSystemAutotitle')}
+          </div>
+          <div>
+            <code className="text-accent">{'{{user_autotitle}}'}</code> —{' '}
+            {t('directorLiteralUserAutotitle')}
+          </div>
+        </div>
+      </CollapsibleSection>
+
       <div className={disabledCls(!directorEnabled)}>
         {GROUPS.map((group) => (
           <Group
