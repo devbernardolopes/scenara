@@ -90,8 +90,7 @@ export async function buildMessagesPayload({
 
   const replaceVarsWithDesc = (text) => {
     if (!text) return text
-    const desc = currentPersona?.description || chatPersona?.description || ''
-    // const desc = currentPersona?.description || ''
+    const desc = currentPersona?.description || ''
     return replaceVarsIn(text).replace(/{{description}}/gi, desc)
   }
 
@@ -133,7 +132,7 @@ export async function buildMessagesPayload({
   const result = [{ role: 'system', content: systemParts.join('\n\n') }]
   const entryTypes = ['system']
 
-  const postHistoryInstructions = replaceVarsIn(character?.postHistoryInstructions)
+  const postHistoryInstructions = replaceVarsWithDesc(character?.postHistoryInstructions)
 
   if (isFirstMessage) {
     const firstMessageContent = replaceVarsIn(settings.firstMessagePrompt)
