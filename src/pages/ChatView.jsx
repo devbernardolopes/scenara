@@ -762,6 +762,7 @@ function ChatView() {
           }
         },
         onStreamingStarted: apiQueue.markCurrentRequestStreaming,
+        onActivity: apiQueue.markCurrentRequestActivity,
         onTiming,
       })
       if (!reviewed) return originalContent
@@ -857,6 +858,7 @@ function ChatView() {
           }
         },
         onStreamingStarted: apiQueue.markCurrentRequestStreaming,
+        onActivity: apiQueue.markCurrentRequestActivity,
         onTiming: (ms) => {
           chatDurationMs = ms
         },
@@ -1353,6 +1355,7 @@ function ChatView() {
               }
             },
             onStreamingStarted: apiQueue.markCurrentRequestStreaming,
+            onActivity: apiQueue.markCurrentRequestActivity,
             onTiming: (ms) => {
               chatDurationMs = ms
             },

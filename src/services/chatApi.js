@@ -526,6 +526,7 @@ export async function sendChatCompletion({
   onToken,
   onFinish,
   onStreamingStarted,
+  onActivity,
   onTiming,
 }) {
   const baseUrl = getChatBaseUrl(profile.providerId)
@@ -593,6 +594,7 @@ export async function sendChatCompletion({
                 onStreamingStarted?.()
               }
               fullContent += choice.delta.content
+              onActivity?.()
               onToken?.(fullContent)
             }
             if (choice?.finish_reason) {
@@ -615,6 +617,7 @@ export async function sendChatCompletion({
               const parsed = JSON.parse(data)
               if (parsed.choices?.[0]?.delta?.content) {
                 fullContent += parsed.choices[0].delta.content
+                onActivity?.()
                 onToken?.(fullContent)
               }
             } catch {

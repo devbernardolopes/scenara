@@ -73,11 +73,13 @@ async function processNext() {
     notify()
 
     const timeoutMs = await getTimeoutMs()
-    const timeoutId = setTimeout(() => {
-      if (!item.streamingStarted && !item.signal?.aborted) {
+    const idleIntervalId = setInterval(() => {
+      if (item.signal?.aborted) return
+      const lastActivity = item.lastActivityAt ?? item.enqueuedAt
+      if (Date.now() - lastActivity > timeoutMs) {
         item.controller?.abort()
       }
-    }, timeoutMs)
+    }, 1000)
 
     try {
       const result = await item.execute()
@@ -85,7 +87,7 @@ async function processNext() {
     } catch (err) {
       item.reject?.(err)
     } finally {
-      clearTimeout(timeoutId)
+      clearInterval(idleIntervalId)
       lastRequestEndTime = Date.now()
       const tid = item.threadId
       currentRequest = null
@@ -139,6 +141,8 @@ export function enqueue({ threadId, type, execute, signal, controller }) {
     resolve,
     reject,
     streamingStarted: false,
+    enqueuedAt: Date.now(),
+    lastActivityAt: null,
   }
 
   queue.push(item)
@@ -202,6 +206,12 @@ export function subscribe(fn) {
 export function markCurrentRequestStreaming() {
   if (currentRequest) {
     currentRequest.streamingStarted = true
+  }
+}
+
+export function markCurrentRequestActivity() {
+  if (currentRequest) {
+    currentRequest.lastActivityAt = Date.now()
   }
 }
 

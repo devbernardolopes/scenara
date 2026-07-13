@@ -322,7 +322,7 @@
     },
     "requestTimeout": {
       "label": "API Timeout",
-      "desc": "Maximum time (in seconds) to wait for an API response before cancelling the request. Streaming responses that have already started are exempt."
+      "desc": "Maximum idle time (in seconds) between tokens before a stalled request is cancelled. Applies continuously — checked before the first token and after every token mid-stream — so a provider that streams a token and then hangs is also cancelled, not just one that never responds."
     },
     "profile": {
       "createProfile": "Create Profile",
