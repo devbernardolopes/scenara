@@ -68,6 +68,16 @@
       "large": "Grand",
       "xlarge": "Très grand"
     },
+    "messageBubbleSize": {
+      "label": "Taille des bulles de message",
+      "desc": "Largeur maximale des bulles de message du chat."
+    },
+    "messageBubbleSizeOptions": {
+      "compact": "Compact",
+      "normal": "Normal",
+      "wide": "Large",
+      "full": "Plein"
+    },
     "toastPosition": {
       "label": "Toast Position",
       "desc": "Where toast notifications appear on screen."

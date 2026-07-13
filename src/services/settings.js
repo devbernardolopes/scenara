@@ -132,6 +132,21 @@ export const SETTINGS = [
     },
   },
   {
+    key: 'messageBubbleSize',
+    category: 'appearance',
+    type: 'select',
+    default: 'normal',
+    options: ['compact', 'normal', 'wide', 'full'],
+    labelKey: 'settings:appearance.messageBubbleSize.label',
+    descKey: 'settings:appearance.messageBubbleSize.desc',
+    optionLabels: {
+      compact: 'settings:appearance.messageBubbleSizeOptions.compact',
+      normal: 'settings:appearance.messageBubbleSizeOptions.normal',
+      wide: 'settings:appearance.messageBubbleSizeOptions.wide',
+      full: 'settings:appearance.messageBubbleSizeOptions.full',
+    },
+  },
+  {
     key: 'language',
     category: 'appearance',
     type: 'select',

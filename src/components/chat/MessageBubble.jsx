@@ -132,6 +132,13 @@ const CHAT_FONT_SIZES = {
   xl: '1.25rem',
 }
 
+const BUBBLE_SIZES = {
+  compact: 'max-w-[70%] md:max-w-[50%]',
+  normal: 'max-w-[80%] md:max-w-[65%]',
+  wide: 'max-w-[90%] md:max-w-[80%]',
+  full: 'max-w-full',
+}
+
 function estimateTokens(text) {
   return Math.ceil((text || '').length / 4)
 }
@@ -211,6 +218,7 @@ function MessageBubble({
   )
   const [chatFontFamily, setChatFontFamily] = useState('system')
   const [chatFontSize, setChatFontSize] = useState('sm')
+  const [messageBubbleSize, setMessageBubbleSize] = useState('normal')
   const [renderMarkdown, setRenderMarkdown] = useState(true)
   const [order, setOrder] = useState({ assistantButtonOrder: null, userButtonOrder: null })
   const [postProcessingEnabled, setPostProcessingEnabled] = useState(true)
@@ -248,19 +256,22 @@ function MessageBubble({
 
   useEffect(() => {
     async function load() {
-      const [family, size, md] = await Promise.all([
+      const [family, size, bubbleSize, md] = await Promise.all([
         getSetting('chatFontFamily'),
         getSetting('chatFontSize'),
+        getSetting('messageBubbleSize'),
         getSetting('renderMarkdown'),
       ])
       setChatFontFamily(family || 'system')
       setChatFontSize(size || 'sm')
+      setMessageBubbleSize(bubbleSize || 'normal')
       setRenderMarkdown(md !== false)
     }
     load()
     function handler(e) {
       if (e.detail?.key === 'chatFontFamily') setChatFontFamily(e.detail.value || 'system')
       if (e.detail?.key === 'chatFontSize') setChatFontSize(e.detail.value || 'sm')
+      if (e.detail?.key === 'messageBubbleSize') setMessageBubbleSize(e.detail.value || 'normal')
       if (e.detail?.key === 'renderMarkdown') setRenderMarkdown(e.detail.value !== false)
       if (ORDER_KEYS.includes(e.detail?.key)) {
         getSetting(e.detail.key).then((v) => setOrder((prev) => ({ ...prev, [e.detail.key]: v })))
@@ -562,7 +573,7 @@ function MessageBubble({
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
         ref={bubbleRef}
-        className={`max-w-[80%] md:max-w-[65%] rounded-lg ${unreadClass} ${
+        className={`${BUBBLE_SIZES[messageBubbleSize] || BUBBLE_SIZES.normal} rounded-lg ${unreadClass} ${
           isUser
             ? userBgClass
             : isOOC
