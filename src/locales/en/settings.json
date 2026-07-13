@@ -10,7 +10,25 @@
     "defaults": "Defaults",
     "tts": "TTS",
     "advanced": "Advanced",
-    "database": "Database"
+    "database": "Database",
+    "postProcessing": "Post-Processing"
+  },
+  "postProcessing": {
+    "panelDesc": "Apply custom color and font-size styling to delimiter-enclosed spans of text, e.g. *narration* or \"dialogue\". Rules apply globally and can be overridden per character.",
+    "enable": "Enable Post-Processing",
+    "override": "Override global rules",
+    "label": "Label (optional)",
+    "opening": "Opening character(s)",
+    "closing": "Closing character(s)",
+    "color": "Color",
+    "fontSize": "Font size",
+    "addRule": "Add rule",
+    "reset": "Reset to defaults",
+    "delete": "Delete",
+    "preview": "Live preview",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "noRules": "No rules configured."
   },
   "groups": {
     "assistantButtons": "Assistant/System Message Bubbles Buttons",

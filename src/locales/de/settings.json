@@ -9,7 +9,25 @@
     "persona": "Persona",
     "tts": "TTS",
     "advanced": "Erweitert",
-    "database": "Database"
+    "database": "Database",
+    "postProcessing": "Post-Processing"
+  },
+  "postProcessing": {
+    "panelDesc": "Wendet benutzerdefinierte Farb- und Schriftgrößen-Stile auf durch Trennzeichen eingeschlossene Textteile an, z. B. *Erzählung* oder \"Dialog\". Regeln gelten global und können pro Charakter überschrieben werden.",
+    "enable": "Nachbearbeitung aktivieren",
+    "override": "Globale Regeln überschreiben",
+    "label": "Bezeichnung (optional)",
+    "opening": "Öffnende(s) Zeichen",
+    "closing": "Schließende(s) Zeichen",
+    "color": "Farbe",
+    "fontSize": "Schriftgröße",
+    "addRule": "Regel hinzufügen",
+    "reset": "Auf Standard zurücksetzen",
+    "delete": "Löschen",
+    "preview": "Vorschau",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten",
+    "noRules": "Keine Regeln konfiguriert."
   },
   "groups": {
     "assistantButtons": "Assistant/System Message Bubbles Buttons",

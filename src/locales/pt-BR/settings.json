@@ -9,7 +9,25 @@
     "persona": "Persona",
     "tts": "TTS",
     "advanced": "Avançado",
-    "database": "Database"
+    "database": "Database",
+    "postProcessing": "Post-Processing"
+  },
+  "postProcessing": {
+    "panelDesc": "Aplica estilização personalizada de cor e tamanho de fonte a trechos de texto entre delimitadores, ex. *narração* ou \"diálogo\". As regras valem globalmente e podem ser substituídas por personagem.",
+    "enable": "Ativar pós-processamento",
+    "override": "Substituir regras globais",
+    "label": "Rótulo (opcional)",
+    "opening": "Caractere(s) de abertura",
+    "closing": "Caractere(s) de fechamento",
+    "color": "Cor",
+    "fontSize": "Tamanho da fonte",
+    "addRule": "Adicionar regra",
+    "reset": "Restaurar padrões",
+    "delete": "Excluir",
+    "preview": "Pré-visualização",
+    "moveUp": "Mover para cima",
+    "moveDown": "Mover para baixo",
+    "noRules": "Nenhuma regra configurada."
   },
   "groups": {
     "assistantButtons": "Assistant/System Message Bubbles Buttons",

@@ -1,6 +1,7 @@
 import i18n from '../lib/i18n'
 import db from '../db'
 import { COLOR_SLOTS, getPalette } from '../config/colorPalettes'
+import { DEFAULT_PP_RULES } from '../lib/postProcessing'
 
 async function migrateColorsOnThemeChange(newTheme) {
   const palette = getPalette(newTheme)
@@ -43,6 +44,7 @@ export const CATEGORIES = [
   { id: 'prompting', labelKey: 'settings:categories.prompting' },
   { id: 'defaults', labelKey: 'settings:categories.defaults' },
   { id: 'tts', labelKey: 'settings:categories.tts' },
+  { id: 'postProcessing', labelKey: 'settings:categories.postProcessing' },
   { id: 'database', labelKey: 'settings:categories.database' },
 ]
 
@@ -1307,6 +1309,15 @@ const SETTING_EFFECTS = {
   highlightDeleteButtons: (value) => {
     document.documentElement.classList.toggle('show-delete-highlight', !!value)
   },
+}
+
+export async function getPostProcessingRules() {
+  const rules = await getSetting('postProcessingRules')
+  return rules && Array.isArray(rules) && rules.length ? rules : DEFAULT_PP_RULES
+}
+
+export async function setPostProcessingRules(rules) {
+  await setSetting('postProcessingRules', rules)
 }
 
 export async function getSetting(key) {

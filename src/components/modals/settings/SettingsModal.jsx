@@ -8,6 +8,7 @@ import SettingRow from './SettingRow'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import ApiSettingsPanel from './ApiSettingsPanel'
 import DatabaseSettingsPanel from './DatabaseSettingsPanel'
+import PostProcessingRulesPanel from './PostProcessingRulesPanel'
 import CloseButton from '../../shared/CloseButton'
 import pkg from '../../../../package.json'
 
@@ -93,6 +94,8 @@ function SettingsModal() {
             <ApiSettingsPanel />
           ) : !search && activeCategory === 'database' ? (
             <DatabaseSettingsPanel />
+          ) : !search && activeCategory === 'postProcessing' ? (
+            <PostProcessingRulesPanel />
           ) : (
             <div className="space-y-8">
               {groupedSettings(filtered).map((g) => {

@@ -1686,6 +1686,7 @@ function ChatView() {
                       requestFailed={isFailedSlot}
                       errorText={errorText}
                       isUnread={msg.isUnread || false}
+                      character={character}
                       charName={character?.name || ''}
                       personaName={personaMap[thread?.personaId]?.name || ''}
                     />

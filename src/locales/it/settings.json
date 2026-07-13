@@ -9,7 +9,25 @@
     "persona": "Persona",
     "tts": "TTS",
     "advanced": "Avanzate",
-    "database": "Database"
+    "database": "Database",
+    "postProcessing": "Post-Processing"
+  },
+  "postProcessing": {
+    "panelDesc": "Applica stile personalizzato (colore e dimensione carattere) a porzioni di testo delimitate, es. *narrazione* o \"dialogo\". Le regole valgono globalmente e possono essere sostituite per personaggio.",
+    "enable": "Abilita post-elaborazione",
+    "override": "Sostituisci regole globali",
+    "label": "Etichetta (opzionale)",
+    "opening": "Carattere/i di apertura",
+    "closing": "Carattere/i di chiusura",
+    "color": "Colore",
+    "fontSize": "Dimensione carattere",
+    "addRule": "Aggiungi regola",
+    "reset": "Ripristina predefiniti",
+    "delete": "Elimina",
+    "preview": "Anteprima",
+    "moveUp": "Sposta su",
+    "moveDown": "Sposta giù",
+    "noRules": "Nessuna regola configurata."
   },
   "groups": {
     "assistantButtons": "Assistant/System Message Bubbles Buttons",

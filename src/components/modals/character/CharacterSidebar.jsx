@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 const SECTIONS = [
   { id: 'character', labelKey: 'sectionCharacter' },
   { id: 'overrides', labelKey: 'sectionOverrides' },
+  { id: 'postProcessing', labelKey: 'sectionPostProcessing' },
   { id: 'initialMessages', labelKey: 'sectionInitialMessages' },
   { id: 'exampleMessages', labelKey: 'sectionExampleMessages' },
   { id: 'director', labelKey: 'sectionDirector' },

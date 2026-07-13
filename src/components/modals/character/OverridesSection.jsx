@@ -321,12 +321,6 @@ function OverridesSection({ form, onChange, characterId }) {
         onChange={(v) => onChange('includeOOC', v)}
       />
 
-      <ToggleRow
-        label={t('postProcessing')}
-        checked={form.postProcessing}
-        onChange={(v) => onChange('postProcessing', v)}
-      />
-
       <hr className="border-border" />
 
       <div className="flex items-center gap-3">

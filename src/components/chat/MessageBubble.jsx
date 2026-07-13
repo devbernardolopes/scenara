@@ -8,7 +8,9 @@ import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import rehypeSanitize from 'rehype-sanitize'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
+import rehypeRaw from 'rehype-raw'
+import { injectRuleTags, applyRulesToPlainText, DEFAULT_PP_RULES } from '../../lib/postProcessing'
 import {
   Trash2,
   Edit3,
@@ -134,6 +136,15 @@ function estimateTokens(text) {
   return Math.ceil((text || '').length / 4)
 }
 
+const PP_SANITIZE_SCHEMA = {
+  ...defaultSchema,
+  tagNames: [...(defaultSchema.tagNames || []), 'pp'],
+  attributes: {
+    ...defaultSchema.attributes,
+    pp: ['r'],
+  },
+}
+
 function formatTokenCount(count) {
   if (count >= 1000) return `${(count / 1000).toFixed(1)}K`
   return String(count)
@@ -178,6 +189,7 @@ function MessageBubble({
   isUnread,
   slotCreatedAt,
   apiDurationMs,
+  character,
 }) {
   function renderContent(text) {
     if (!text) return text
@@ -201,6 +213,8 @@ function MessageBubble({
   const [chatFontSize, setChatFontSize] = useState('sm')
   const [renderMarkdown, setRenderMarkdown] = useState(true)
   const [order, setOrder] = useState({ assistantButtonOrder: null, userButtonOrder: null })
+  const [postProcessingEnabled, setPostProcessingEnabled] = useState(true)
+  const [globalPPRules, setGlobalPPRules] = useState(DEFAULT_PP_RULES)
 
   useEffect(() => {
     async function load() {
@@ -255,6 +269,49 @@ function MessageBubble({
     window.addEventListener('settings-changed', handler)
     return () => window.removeEventListener('settings-changed', handler)
   }, [])
+
+  useEffect(() => {
+    async function load() {
+      const [enabled, rules] = await Promise.all([
+        getSetting('defaultPostProcessing'),
+        getSetting('postProcessingRules'),
+      ])
+      setPostProcessingEnabled(enabled !== false)
+      if (rules && Array.isArray(rules) && rules.length) setGlobalPPRules(rules)
+    }
+    load()
+    function handler(e) {
+      if (e.detail?.key === 'defaultPostProcessing')
+        setPostProcessingEnabled(e.detail.value !== false)
+      if (e.detail?.key === 'postProcessingRules') {
+        const v = e.detail.value
+        if (v && Array.isArray(v) && v.length) setGlobalPPRules(v)
+      }
+    }
+    window.addEventListener('settings-changed', handler)
+    return () => window.removeEventListener('settings-changed', handler)
+  }, [])
+
+  const activeRules = useMemo(() => {
+    if (postProcessingEnabled === false) return []
+    const charEnabled = character ? character.postProcessing !== false : true
+    if (!charEnabled) return []
+    if (character && character.postProcessingOverride) {
+      return character.postProcessingRules || []
+    }
+    return globalPPRules
+  }, [postProcessingEnabled, character, globalPPRules])
+
+  const displayContentForRender = useMemo(() => {
+    if (renderMarkdown && activeRules.length) return injectRuleTags(displayContent, activeRules)
+    return displayContent
+  }, [displayContent, renderMarkdown, activeRules])
+
+  const plainSegments = useMemo(() => {
+    if (!renderMarkdown && activeRules.length)
+      return applyRulesToPlainText(displayContent, activeRules)
+    return null
+  }, [displayContent, renderMarkdown, activeRules])
 
   const isMobile = useIsMobile()
   const hasMultipleSlots = bundleMessages?.length > 1
@@ -750,8 +807,17 @@ function MessageBubble({
               {renderMarkdown ? (
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeSanitize]}
+                  rehypePlugins={[rehypeRaw, [rehypeSanitize, PP_SANITIZE_SCHEMA]]}
                   components={{
+                    pp: ({ r, children }) => {
+                      const rule = activeRules[Number(r)]
+                      if (!rule) return <>{children}</>
+                      return (
+                        <span style={{ color: rule.color, fontSize: `${rule.fontSizePercent}%` }}>
+                          {children}
+                        </span>
+                      )
+                    },
                     p: ({ children }) => (
                       <p className="mb-2 last:mb-0 whitespace-pre-wrap">{children}</p>
                     ),
@@ -804,8 +870,26 @@ function MessageBubble({
                     },
                   }}
                 >
-                  {displayContent}
+                  {displayContentForRender}
                 </ReactMarkdown>
+              ) : plainSegments ? (
+                <p className="mb-2 last:mb-0 whitespace-pre-wrap">
+                  {plainSegments.map((seg, idx) =>
+                    seg.type === 'styled' ? (
+                      <span
+                        key={idx}
+                        style={{
+                          color: activeRules[seg.ruleIndex].color,
+                          fontSize: `${activeRules[seg.ruleIndex].fontSizePercent}%`,
+                        }}
+                      >
+                        {seg.content}
+                      </span>
+                    ) : (
+                      <span key={idx}>{seg.content}</span>
+                    ),
+                  )}
+                </p>
               ) : (
                 <p className="mb-2 last:mb-0 whitespace-pre-wrap">{displayContent}</p>
               )}

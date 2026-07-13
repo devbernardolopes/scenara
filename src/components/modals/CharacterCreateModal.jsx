@@ -13,6 +13,7 @@ import SaveButton from '../shared/SaveButton'
 import CharacterSidebar from './character/CharacterSidebar'
 import CharacterSection from './character/CharacterSection'
 import OverridesSection from './character/OverridesSection'
+import PostProcessingSection from './character/PostProcessingSection'
 import PlaceholderSection from './character/PlaceholderSection'
 import InitialMessagesSection from './character/InitialMessagesSection'
 import ExampleMessagesSection from './character/ExampleMessagesSection'
@@ -53,6 +54,8 @@ const INITIAL_FORM = {
   userPersonaPrefix: true,
   includeOOC: true,
   postProcessing: true,
+  postProcessingOverride: false,
+  postProcessingRules: [],
   systemAvatarScale: '1x',
   characterAvatarScale: '1x',
   userPersonaAvatarScale: '1x',
@@ -145,6 +148,7 @@ function buildInitialForm(existing) {
 const SECTION_COMPONENTS = {
   character: CharacterSection,
   overrides: OverridesSection,
+  postProcessing: PostProcessingSection,
   initialMessages: InitialMessagesSection,
   exampleMessages: ExampleMessagesSection,
   director: DirectorSection,
@@ -298,6 +302,10 @@ function CharacterCreateModal({ character: existing, initialData }) {
       initialMessages: (form.initialMessages || []).some((m) => m.content?.trim()),
       exampleMessages: (form.exampleMessages || []).some((m) => m.content?.trim()),
       tags: (form.tags || []).length > 0,
+      postProcessing: !!(
+        form.postProcessingOverride ||
+        (form.postProcessingRules && form.postProcessingRules.length)
+      ),
       overrides: false,
       director:
         form.directorEnabled &&
@@ -404,6 +412,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
           {[
             { id: 'character', labelKey: 'sectionCharacter' },
             { id: 'overrides', labelKey: 'sectionOverrides' },
+            { id: 'postProcessing', labelKey: 'sectionPostProcessing' },
             { id: 'initialMessages', labelKey: 'sectionInitialMessages' },
             { id: 'exampleMessages', labelKey: 'sectionExampleMessages' },
             { id: 'director', labelKey: 'sectionDirector' },
