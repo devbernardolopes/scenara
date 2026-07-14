@@ -31,12 +31,6 @@ export async function exportDatabase(selection) {
     data.personas = [...filtered]
   }
 
-  if (selection.threadIds?.size > 0) {
-    const threads = await db.threads.toArray()
-    const filtered = threads.filter((t) => selection.threadIds.has(t.id))
-    data.threads = [...filtered]
-  }
-
   if (selection.writingInstructionIds?.size > 0) {
     const items = await db.writingInstructions.toArray()
     const filtered = items.filter((w) => selection.writingInstructionIds.has(w.id))
@@ -59,17 +53,20 @@ export async function exportDatabase(selection) {
     data.settings = await db.settings.toArray()
   }
 
-  if (selection.threadIds?.size > 0 || selection.characterIds?.size > 0) {
-    const threadIds = new Set(selection.threadIds || [])
+  const threadIds = new Set(selection.threadIds || [])
 
-    if (selection.characterIds?.size > 0) {
-      const allThreads = await db.threads.toArray()
-      for (const thr of allThreads) {
-        if (selection.characterIds.has(thr.characterId)) {
-          threadIds.add(thr.id)
-        }
+  if (selection.characterIds?.size > 0) {
+    const allThreads = await db.threads.toArray()
+    for (const thr of allThreads) {
+      if (selection.characterIds.has(thr.characterId)) {
+        threadIds.add(thr.id)
       }
     }
+  }
+
+  if (threadIds.size > 0) {
+    const allThreads = await db.threads.toArray()
+    data.threads = allThreads.filter((t) => threadIds.has(t.id))
 
     const allMessages = await db.messages.toArray()
     data.messages = allMessages.filter((m) => threadIds.has(m.threadId))
