@@ -94,7 +94,7 @@ export async function getAutoTitleTemplateValues(character) {
 
   let userAutoTitle = character?.autoTitleUserInstructions?.trim()
   if (!userAutoTitle) userAutoTitle = (await getSetting('prompting.autoTitleUser'))?.trim()
-  if (!userAutoTitle) userAutoTitle = 'Create a title for the provided message exchange.'
+  if (!userAutoTitle) userAutoTitle = 'Create a title in the language of the provided message exchange.'
 
   return { system_autotitle: systemAutoTitle, user_autotitle: userAutoTitle }
 }

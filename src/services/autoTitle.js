@@ -111,7 +111,7 @@ export async function triggerAutoTitle({
   let userContent = character.autoTitleUserInstructions
   if (!userContent) {
     userContent = (await getSetting('prompting.autoTitleUser'))?.trim()
-    if (!userContent) userContent = 'Create a title for the provided message exchange.'
+    if (!userContent) userContent = 'Create a title in the language of the provided message exchange.'
   }
 
   const includeOOC = character.includeOOC !== false
