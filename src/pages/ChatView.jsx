@@ -289,10 +289,16 @@ function ChatView() {
     if (messages.length === 0 || loading) return
 
     const grew = messages.length > prevMessagesLengthRef.current
-    messagesGrewRef.current = grew
+    const newlyAdded = grew ? messages.slice(prevMessagesLengthRef.current) : []
+    const onlyMarkers =
+      grew &&
+      newlyAdded.length > 0 &&
+      newlyAdded.every((m) => m.isSummaryMarker || m.isAutoTitleMarker)
+    const messagesGrew = grew && !onlyMarkers
+    messagesGrewRef.current = messagesGrew
     prevMessagesLengthRef.current = messages.length
 
-    if (!grew && scrollCommits.current > 0) return
+    if (!messagesGrew && scrollCommits.current > 0) return
 
     const el = scrollRef.current
     if (!el) return
