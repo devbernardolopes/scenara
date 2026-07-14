@@ -580,11 +580,15 @@ function Sidebar({ open, onClose }) {
                             onMouseDown={(e) => {
                               e.stopPropagation()
                             }}
-                            className="w-[26px] h-[26px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
+                            className={`w-[26px] h-[26px] flex items-center justify-center rounded hover:bg-surface-hover ${threadColor ? '' : 'text-tertiary hover:text-text'}`}
+                            style={threadColor ? { color: threadColor } : undefined}
                             aria-label={t('sidebar.color')}
                             title={t('sidebar.color')}
                           >
-                            <Palette className="w-3.5 h-3.5" />
+                            <Palette
+                              className="w-3.5 h-3.5"
+                              style={threadColor ? { fill: threadColor } : undefined}
+                            />
                           </button>
                         </div>
                       </div>
