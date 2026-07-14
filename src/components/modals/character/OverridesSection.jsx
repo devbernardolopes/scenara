@@ -2,6 +2,9 @@ import { useTranslation } from 'react-i18next'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
+import { getSetting } from '../../../services/settings'
+import { useConfirm } from '../../../lib/confirm'
+import { RefreshCw } from '../../../lib/icons'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
@@ -42,6 +45,31 @@ const PERSONA_PLACEMENT_OPTIONS = [
 const PERSONA_MESSAGE_ROLE_OPTIONS = [
   { value: 'system', labelKey: 'personaInjectionMessageRoleOptions.system' },
   { value: 'assistant', labelKey: 'personaInjectionMessageRoleOptions.assistant' },
+]
+
+// Maps each Overrides form field to its counterpart in Settings > Defaults.
+// Settings > Defaults contains more settings than the Overrides section, so only
+// the fields with a matching key are reset (copied from the global defaults).
+const OVERRIDE_DEFAULTS_MAP = [
+  ['autoTitle', 'defaultAutoTitle'],
+  ['autoTitleThreshold', 'defaultAutoTitleThreshold'],
+  ['memory', 'defaultMemory'],
+  ['messagesThreshold', 'defaultMessagesThreshold'],
+  ['contextWindowThreshold', 'defaultContextWindowThreshold'],
+  ['messagesToKeep', 'defaultMessagesToKeep'],
+  ['memorySlots', 'defaultMemorySlots'],
+  ['firstMessage', 'defaultFirstMessage'],
+  ['userPersonaPrefix', 'defaultUserPersonaPrefix'],
+  ['includeOOC', 'defaultIncludeOOC'],
+  ['systemAvatarScale', 'defaultSystemAvatarScale'],
+  ['characterAvatarScale', 'defaultCharacterAvatarScale'],
+  ['userPersonaAvatarScale', 'defaultUserPersonaAvatarScale'],
+  ['writingInjectionTiming', 'prompting.writingInjectionTiming'],
+  ['writingPlacement', 'prompting.writingPlacement'],
+  ['writingMessageRole', 'prompting.writingMessageRole'],
+  ['personaInjectionTiming', 'prompting.personaInjectionTiming'],
+  ['personaInjectionPlacement', 'prompting.personaInjectionPlacement'],
+  ['personaInjectionMessageRole', 'prompting.personaInjectionMessageRole'],
 ]
 
 function ToggleRow({ label, checked, onChange }) {
@@ -99,11 +127,38 @@ function ButtonGroup({ options, value, onChange, disabled }) {
 
 function OverridesSection({ form, onChange, characterId }) {
   const { t } = useTranslation('characterCreation')
+  const confirm = useConfirm()
 
   const disabledCls = (disabled) => (disabled ? 'opacity-40 pointer-events-none' : '')
 
+  async function handleReset() {
+    const ok = await confirm({
+      title: t('resetConfirmTitle'),
+      message: t('resetConfirmMessage'),
+      confirmLabel: t('reset'),
+      cancelLabel: t('common:cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
+    const values = await Promise.all(
+      OVERRIDE_DEFAULTS_MAP.map(([, defaultsKey]) => getSetting(defaultsKey)),
+    )
+    OVERRIDE_DEFAULTS_MAP.forEach(([field], i) => onChange(field, values[i]))
+  }
+
   return (
     <div className="space-y-5">
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleReset}
+          className="min-h-[44px] px-4 py-2 rounded-md text-sm font-medium border border-border bg-surface text-secondary hover:bg-surface-hover inline-flex items-center gap-2"
+        >
+          <RefreshCw className="w-4 h-4" />
+          {t('reset')}
+        </button>
+      </div>
+
       <label className="flex items-center gap-3 min-h-[44px] cursor-pointer">
         <input
           type="checkbox"

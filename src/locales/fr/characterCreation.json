@@ -1,5 +1,8 @@
 {
   "title": "Créer un Personnage",
+  "reset": "Réinitialiser aux valeurs par défaut",
+  "resetConfirmTitle": "Réinitialiser aux valeurs par défaut ?",
+  "resetConfirmMessage": "Cela remplacera les remplacements de ce personnage par les valeurs définies dans Paramètres > Valeurs par défaut. Cela ne peut pas être annulé.",
   "titleFormat": "Créer un {{name}}",
   "placeholder": "Le formulaire de création de personnage sera ici.",
   "personaTitle": "Modifier la Persona",

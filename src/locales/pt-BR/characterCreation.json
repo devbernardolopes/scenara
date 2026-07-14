@@ -1,5 +1,8 @@
 {
   "title": "Criar Personagem",
+  "reset": "Restaurar padrões",
+  "resetConfirmTitle": "Restaurar padrões?",
+  "resetConfirmMessage": "Isso substituirá as substituições deste personagem pelos valores definidos em Configurações > Padrões. Isso não pode ser desfeito.",
   "titleFormat": "Criar {{name}}",
   "editTitle": "Editar Personagem",
   "editTitleFormat": "Editar {{name}}",

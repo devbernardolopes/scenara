@@ -1,5 +1,8 @@
 {
   "title": "Charakter erstellen",
+  "reset": "Auf Standardwerte zurücksetzen",
+  "resetConfirmTitle": "Auf Standardwerte zurücksetzen?",
+  "resetConfirmMessage": "Dies ersetzt die Überschreibungen dieses Charakters durch die Werte aus Einstellungen > Standardwerte. Dies kann nicht rückgängig gemacht werden.",
   "titleFormat": "{{name}} erstellen",
   "placeholder": "Das Charaktererstellungsformular wird hier sein.",
   "personaTitle": "Persona bearbeiten",

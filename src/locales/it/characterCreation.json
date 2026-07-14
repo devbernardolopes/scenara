@@ -1,5 +1,8 @@
 {
   "title": "Crea Personaggio",
+  "reset": "Ripristina predefiniti",
+  "resetConfirmTitle": "Ripristinare i predefiniti?",
+  "resetConfirmMessage": "Questo sostituirà le sostituzioni di questo personaggio con i valori impostati in Impostazioni > Predefiniti. Non può essere annullato.",
   "titleFormat": "Crea {{name}}",
   "placeholder": "Il modulo di creazione personaggio sarà qui.",
   "personaTitle": "Modifica Persona",

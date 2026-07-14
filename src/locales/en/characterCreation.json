@@ -1,5 +1,8 @@
 {
   "title": "Create Character",
+  "reset": "Reset to defaults",
+  "resetConfirmTitle": "Reset to defaults?",
+  "resetConfirmMessage": "This will replace this character's overrides with the values set in Settings > Defaults. This cannot be undone.",
   "titleFormat": "Create {{name}}",
   "editTitle": "Edit Character",
   "editTitleFormat": "Edit {{name}}",

@@ -1,5 +1,8 @@
 {
   "title": "Crear Personaje",
+  "reset": "Restablecer valores predeterminados",
+  "resetConfirmTitle": "¿Restablecer valores predeterminados?",
+  "resetConfirmMessage": "Esto reemplazará las anulaciones de este personaje con los valores establecidos en Ajustes > Predeterminados. Esto no se puede deshacer.",
   "titleFormat": "Crear {{name}}",
   "placeholder": "El formulario de creación de personaje estará aquí.",
   "personaTitle": "Editar Persona",
