@@ -104,6 +104,9 @@ function MemoryRegenerationResultModal({ threadId, entry, systemContent, userCon
     await updateThreadMemory(entry.id, { content: trimmed })
 
     const updatedPayload = entry.payload ? [...entry.payload] : []
+    if (updatedPayload.length >= 1) {
+      updatedPayload[0] = { ...updatedPayload[0], content: systemContent }
+    }
     if (updatedPayload.length >= 2) {
       updatedPayload[1] = { ...updatedPayload[1], content: userContent }
     }

@@ -11,8 +11,10 @@ function MemoryRegenerationModal({ threadId, entry }) {
   const { closeModal, openModal, setCloseGuard } = useModal()
   const { confirm } = useConfirm()
 
-  const originalContent = entry?.payload?.[1]?.content || ''
-  const [userContent, setUserContent] = useState(originalContent)
+  const originalUserContent = entry?.payload?.[1]?.content || ''
+  const originalSystemContent = entry?.payload?.[0]?.content || ''
+  const [userContent, setUserContent] = useState(originalUserContent)
+  const [systemContent, setSystemContent] = useState(originalSystemContent)
   const [dirty, setDirty] = useState(false)
 
   const handleClose = useCallback(async () => {
@@ -42,13 +44,17 @@ function MemoryRegenerationModal({ threadId, entry }) {
     return () => setCloseGuard(null)
   }, [dirty, handleClose, setCloseGuard])
 
-  function handleContentChange(e) {
+  function handleUserChange(e) {
     setUserContent(e.target.value)
-    setDirty(e.target.value !== originalContent)
+    setDirty(e.target.value !== originalUserContent || systemContent !== originalSystemContent)
+  }
+
+  function handleSystemChange(e) {
+    setSystemContent(e.target.value)
+    setDirty(e.target.value !== originalSystemContent || userContent !== originalUserContent)
   }
 
   function handleRegenerate() {
-    const systemContent = entry?.payload?.[0]?.content || ''
     openModal('memoryRegenerationResult', {
       threadId,
       entry,
@@ -82,13 +88,25 @@ function MemoryRegenerationModal({ threadId, entry }) {
     >
       <div className="space-y-3">
         <CollapsibleSection
+          label={t('memoryRegeneration.systemPromptLabel')}
+          storageKey="memoryRegenerationSystemPrompt"
+          defaultExpanded={true}
+        >
+          <AutoResizeTextarea
+            value={systemContent}
+            onChange={handleSystemChange}
+            className="w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none"
+            extraHeight={8}
+          />
+        </CollapsibleSection>
+        <CollapsibleSection
           label={t('memoryRegeneration.userPromptLabel')}
           storageKey="memoryRegenerationUserPrompt"
           defaultExpanded={true}
         >
           <AutoResizeTextarea
             value={userContent}
-            onChange={handleContentChange}
+            onChange={handleUserChange}
             className="w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none"
             extraHeight={8}
           />
