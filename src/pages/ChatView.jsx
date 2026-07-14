@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, RefreshCw } from '../lib/icons'
 import { useModal } from '../hooks/useModal'
+import { useHordeEta } from '../hooks/useHordeEta'
 import { showToast } from '../lib/toast'
 import { useConfirm } from '../lib/confirm'
 import Avatar from '../components/shared/Avatar'
@@ -162,6 +163,7 @@ function ChatView() {
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const [chatModelName, setChatModelName] = useState('')
   const scrollHeightBeforeRef = useRef(null)
+  const hordeEta = useHordeEta()
 
   async function loadPersonas() {
     const list = await getAllPersonas()
@@ -1763,7 +1765,10 @@ function ChatView() {
         {/* Wrap input for better control */}
         {chatModelName && (
           <div className="px-3 text-center">
-            <span className="text-xs text-tertiary">{chatModelName.split('/').pop()}</span>
+            <span className="text-xs text-tertiary">
+              {chatModelName.split('/').pop()}
+              {hordeEta && <> · {hordeEta}</>}
+            </span>
           </div>
         )}
         <ChatInputArea
