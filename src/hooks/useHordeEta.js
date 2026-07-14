@@ -94,11 +94,16 @@ export function useHordeEta(enabled) {
     function onSettingsChanged(e) {
       if (e.detail?.key === 'requestKind.chat.profileId') load()
     }
+    function onProfileChanged() {
+      load()
+    }
     window.addEventListener('settings-changed', onSettingsChanged)
+    window.addEventListener('connectionProfiles-changed', onProfileChanged)
 
     return () => {
       activeRef.current = false
       window.removeEventListener('settings-changed', onSettingsChanged)
+      window.removeEventListener('connectionProfiles-changed', onProfileChanged)
       if (timerRef.current) clearTimeout(timerRef.current)
       if (abortRef.current) abortRef.current.abort()
     }

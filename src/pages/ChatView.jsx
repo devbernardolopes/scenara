@@ -418,8 +418,15 @@ function ChatView() {
     function onSettingsChanged(e) {
       if (e.detail?.key === 'requestKind.chat.profileId') loadChatModel()
     }
+    function onProfileChanged() {
+      loadChatModel()
+    }
     window.addEventListener('settings-changed', onSettingsChanged)
-    return () => window.removeEventListener('settings-changed', onSettingsChanged)
+    window.addEventListener('connectionProfiles-changed', onProfileChanged)
+    return () => {
+      window.removeEventListener('settings-changed', onSettingsChanged)
+      window.removeEventListener('connectionProfiles-changed', onProfileChanged)
+    }
   }, [])
 
   useEffect(() => {
