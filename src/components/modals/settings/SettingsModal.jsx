@@ -17,7 +17,7 @@ import pkg from '../../../../package.json'
 function SettingsModal() {
   const { closeModal } = useModal()
   const { t } = useTranslation('settings')
-  const confirm = useConfirm()
+  const { confirm } = useConfirm()
   const [activeCategory, setActiveCategory] = usePersistedState(
     'modal.settings.category',
     CATEGORIES[0]?.id,
