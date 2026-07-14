@@ -34,25 +34,26 @@ function SettingsModal() {
   const noResults = search && filtered.length === 0
 
   function groupedSettings(settings) {
-    const result = []
-    let current = null
-    let currentGroup = null
+    const groupItems = new Map()
+    const order = []
 
     for (const s of settings) {
-      if (s.group && s.group === currentGroup) {
-        current.push(s)
-      } else {
-        if (current) {
-          result.push({ group: currentGroup, items: current })
+      if (s.group) {
+        if (!groupItems.has(s.group)) {
+          groupItems.set(s.group, [])
+          order.push(s.group)
         }
-        currentGroup = s.group || null
-        current = [s]
+        groupItems.get(s.group).push(s)
+      } else {
+        order.push({ item: s })
       }
     }
-    if (current) {
-      result.push({ group: currentGroup, items: current })
-    }
-    return result
+
+    return order.map((entry) =>
+      entry.item
+        ? { group: null, items: [entry.item] }
+        : { group: entry, items: groupItems.get(entry) },
+    )
   }
 
   return (

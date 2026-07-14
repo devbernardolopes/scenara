@@ -39,7 +39,8 @@
     "chatButtons": "User Chat Buttons",
     "rolePrefixes": "Prefixos de função",
     "localInference": "Inferência local",
-    "localInferenceAdvanced": "Avançado"
+    "localInferenceAdvanced": "Avançado",
+    "interface": "Interface"
   },
   "appearance": {
     "theme": {

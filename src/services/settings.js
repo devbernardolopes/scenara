@@ -60,12 +60,14 @@ export const GROUPS = [
     labelKey: 'settings:groups.localInferenceAdvanced',
     defaultExpanded: false,
   },
+  { key: 'interface', labelKey: 'settings:groups.interface' },
 ]
 
 export const SETTINGS = [
   {
     key: 'theme',
     category: 'appearance',
+    group: 'interface',
     type: 'select',
     default: 'light',
     options: [
@@ -106,6 +108,7 @@ export const SETTINGS = [
   {
     key: 'cardsPerPage',
     category: 'appearance',
+    group: 'interface',
     type: 'select',
     default: 10,
     options: [5, 10, 25, 50, Infinity],
@@ -118,6 +121,7 @@ export const SETTINGS = [
   {
     key: 'discoveryCardSize',
     category: 'appearance',
+    group: 'interface',
     type: 'select',
     default: 'regular',
     options: ['smaller', 'small', 'regular', 'large', 'xlarge'],
@@ -134,6 +138,7 @@ export const SETTINGS = [
   {
     key: 'messageBubbleSize',
     category: 'appearance',
+    group: 'interface',
     type: 'select',
     default: 'normal',
     options: ['compact', 'normal', 'wide', 'full'],
@@ -149,6 +154,7 @@ export const SETTINGS = [
   {
     key: 'language',
     category: 'appearance',
+    group: 'interface',
     type: 'select',
     default: 'en',
     options: ['en', 'pt-BR', 'fr', 'it', 'de', 'es'],
@@ -166,6 +172,7 @@ export const SETTINGS = [
   {
     key: 'toastPosition',
     category: 'appearance',
+    group: 'interface',
     type: 'select',
     default: 'top-right',
     options: [
@@ -190,6 +197,7 @@ export const SETTINGS = [
   {
     key: 'toastDuration',
     category: 'appearance',
+    group: 'interface',
     type: 'slider',
     default: 4,
     props: { min: 2, max: 15, step: 1 },
@@ -199,6 +207,7 @@ export const SETTINGS = [
   {
     key: 'sidebarTogglePosition',
     category: 'appearance',
+    group: 'interface',
     type: 'select',
     default: 'bottom-left',
     options: [
@@ -223,6 +232,7 @@ export const SETTINGS = [
   {
     key: 'sidebarNavLayout',
     category: 'appearance',
+    group: 'interface',
     type: 'select',
     default: 'vertical',
     options: ['vertical', 'compact'],
@@ -538,6 +548,7 @@ export const SETTINGS = [
   {
     key: 'characterCardMarquee',
     category: 'appearance',
+    group: 'interface',
     type: 'toggle',
     default: true,
     labelKey: 'settings:appearance.characterCardMarquee.label',
@@ -546,6 +557,7 @@ export const SETTINGS = [
   {
     key: 'threadCardMarquee',
     category: 'appearance',
+    group: 'interface',
     type: 'toggle',
     default: true,
     labelKey: 'settings:appearance.threadCardMarquee.label',
@@ -554,6 +566,7 @@ export const SETTINGS = [
   {
     key: 'chatTitleMarquee',
     category: 'appearance',
+    group: 'interface',
     type: 'toggle',
     default: true,
     labelKey: 'settings:appearance.chatTitleMarquee.label',
@@ -562,6 +575,7 @@ export const SETTINGS = [
   {
     key: 'unreadBadges',
     category: 'appearance',
+    group: 'interface',
     type: 'toggle',
     default: true,
     labelKey: 'settings:appearance.unreadBadges.label',
@@ -570,6 +584,7 @@ export const SETTINGS = [
   {
     key: 'highlightDeleteButtons',
     category: 'appearance',
+    group: 'interface',
     type: 'toggle',
     default: false,
     labelKey: 'settings:appearance.highlightDeleteButtons.label',
