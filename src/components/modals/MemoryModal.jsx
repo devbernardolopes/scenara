@@ -243,22 +243,26 @@ function MemoryModal({ threadId }) {
                     >
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRegenerate(entry)}
-                      className="p-2 rounded-md hover:bg-surface-hover text-tertiary"
-                      title={t('regenerate')}
-                    >
-                      <RefreshCw className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(entry)}
-                      className="p-2 rounded-md hover:bg-surface-hover text-error"
-                      title={t('delete', { ns: 'common' })}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {index === 0 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRegenerate(entry)}
+                        className="p-2 rounded-md hover:bg-surface-hover text-tertiary"
+                        title={t('regenerate')}
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                      </button>
+                    )}
+                    {index === 0 && (
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(entry)}
+                        className="p-2 rounded-md hover:bg-surface-hover text-error"
+                        title={t('delete', { ns: 'common' })}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
                 {isOpen && (
