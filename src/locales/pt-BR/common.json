@@ -4,10 +4,19 @@
     "close": "Fechar barra lateral",
     "discovery": "Descoberta",
     "threads": "Conversas",
+    "newChat": "Novo Chat",
     "personas": "Personas",
+    "writingInstructions": "Instruções de Escrita",
+    "connectionProfiles": "Perfis de Conexão",
+    "inChatShortcuts": "Atalhos no Chat",
+    "lorebooks": "Lorebooks",
+    "tags": "Tags",
+    "database": "Banco de Dados",
     "deleteThread": "Excluir conversa",
     "editCharacter": "Editar personagem",
     "duplicateThread": "Duplicar conversa",
+    "confirmDuplicateTitle": "Duplicar Conversa",
+    "confirmDuplicateMessage": "Tem certeza que deseja duplicar esta conversa?",
     "favorite": "Favoritar",
     "unfavorite": "Desfavoritar",
     "lock": "Bloquear conversa",
@@ -15,12 +24,21 @@
     "confirmDeleteTitle": "Excluir Conversa",
     "confirmDeleteMessage": "Tem certeza que deseja excluir esta conversa? Esta ação não pode ser desfeita.",
     "unknownCharacter": "Desconhecido",
+    "selectThreads": "Selecionar conversas",
+    "selectAll": "Selecionar todas",
+    "deselectAll": "Desmarcar todas",
+    "selectedCount": "{{count}} selecionada(s)",
+    "deleteSelected": "Excluir selecionadas",
+    "confirmBatchDeleteTitle": "Excluir Conversas",
+    "confirmBatchDeleteMessage": "Tem certeza que deseja excluir {{count}} conversas? Esta ação não pode ser desfeita.",
     "createCharacter": "Criar personagem",
     "importCharacter": "Importar personagem",
     "importFromUrl": "Da URL",
     "importFromFile": "Do arquivo",
     "importUrlPrompt": "Digite a URL do personagem para importar:",
     "importUrlComingSoon": "Importação por URL ainda não implementada",
+    "color": "Cor",
+    "colorNone": "Nenhuma",
     "characterNameWithId": "{{name}}"
   },
   "topbar": {
@@ -36,7 +54,6 @@
   "discovery": {
     "title": "Descoberta",
     "subtitle": "Navegue e selecione personagens para iniciar um novo chat.",
-    "characterCard": "Personagem {{index}}",
     "characterDesc": "Uma breve descrição deste personagem.",
     "createCharacter": "Criar Personagem",
     "startChat": "Iniciar Chat",
@@ -57,6 +74,7 @@
       "label": "Ordenar por",
       "createdAt": "Criação",
       "updatedAt": "Atualização",
+      "lastUsed": "Último Uso",
       "chatCount": "Chats",
       "name": "Nome"
     },
@@ -64,11 +82,12 @@
       "asc": "Crescente",
       "desc": "Decrescente"
     },
+    "filter": {
+      "title": "Filtros & Ordenação",
+      "active": "Ativo"
+    },
     "chatCount": "{{count}} chat",
     "chatCount_other": "{{count}} chats",
-    "filter": {
-      "title": "Filtros & Ordenação"
-    },
     "confirmDelete": {
       "title": "Excluir Personagem",
       "message": "Tem certeza que deseja excluir {{name}}? Todos os chats associados serão permanentemente deletados.",
@@ -76,9 +95,25 @@
     }
   },
   "loading": "Carregando…",
+  "saving": "Salvando…",
   "save": "Salvar",
   "cancel": "Cancelar",
   "confirm": "Confirmar",
+  "confirmDefaultMessage": "Tem certeza?",
+  "ok": "OK",
+  "close": "Fechar",
+  "moveUp": "Mover para cima",
+  "moveDown": "Mover para baixo",
+  "uploadImage": "Enviar imagem",
+  "downloadImage": "Baixar imagem",
+  "tokenCount": "{{count}} tokens",
+  "pagination": {
+    "firstPage": "Primeira página",
+    "previousPage": "Página anterior",
+    "nextPage": "Próxima página",
+    "lastPage": "Última página",
+    "page": "Página {{page}}"
+  },
   "toast": {
     "dismiss": "Dispensar",
     "paused": "Pausado",
@@ -127,14 +162,20 @@
     "import": {
       "invalidFormat": "Formato de arquivo inválido",
       "fileError": "Falha ao ler o arquivo"
-    }
+    },
+    "chatProfileRequired": "Atribua um perfil de Chat em Configurações > API para começar a conversar."
   },
   "personaPicker": {
     "title": "Iniciar com persona",
+    "changeTitle": "Alterar Persona",
     "empty": "Nenhuma persona ainda",
     "default": "Padrão"
   },
-  "ok": "OK",
+  "profilePicker": {
+    "title": "Selecionar perfil",
+    "none": "Nenhum (desativado)",
+    "empty": "Nenhum perfil ainda. Crie um em Perfis de Conexão."
+  },
   "saveDialog": {
     "title": "Alterações não salvas",
     "message": "Você tem alterações não salvas. O que deseja fazer?",
