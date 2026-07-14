@@ -15,6 +15,7 @@ import {
   Trash2,
   Edit3,
   Copy,
+  FileText,
   GitBranch,
   RefreshCw,
   Play,
@@ -38,6 +39,7 @@ const VISIBILITY_KEYS = [
   'showAssistantRegenerate',
   'showAssistantSpeak',
   'showAssistantPrompt',
+  'showAssistantRequestDetails',
   'showUserDelete',
   'showUserDeleteAll',
   'showUserDeleteFromHere',
@@ -57,6 +59,7 @@ const DEFAULT_ASSISTANT_ORDER = [
   'regenerate',
   'speak',
   'prompt',
+  'requestDetails',
 ]
 const DEFAULT_USER_ORDER = ['delete', 'deleteAll', 'deleteFromHere', 'edit', 'copy', 'fork']
 
@@ -70,6 +73,7 @@ const BUTTON_DEFS = {
   regenerate: { icon: RefreshCw, placement: 'overflow', labelKey: 'regenerate' },
   speak: { icon: Play, placement: 'overflow', labelKey: 'speak' },
   prompt: { icon: Terminal, placement: 'overflow', labelKey: 'showPrompt' },
+  requestDetails: { icon: FileText, placement: 'header', labelKey: 'requestDetails' },
 }
 
 function DeleteAllIcon({ className = '' }) {
@@ -109,6 +113,7 @@ const VIS_KEY = {
     regenerate: 'showAssistantRegenerate',
     speak: 'showAssistantSpeak',
     prompt: 'showAssistantPrompt',
+    requestDetails: 'showAssistantRequestDetails',
   },
 }
 
@@ -354,6 +359,7 @@ function MessageBubble({
     if (requestFailed) return !['delete', 'regenerate', 'deleteAll', 'deleteFromHere'].includes(key)
     if (key === 'deleteAll' && contentSlotCount <= 1) return true
     if (key === 'regenerate' && generating) return true
+    if (key === 'requestDetails' && (!promptData || streaming || generating)) return true
     if (!message.content?.trim() && ['edit', 'copy', 'fork', 'speak'].includes(key)) return true
     return false
   }
@@ -478,6 +484,14 @@ function MessageBubble({
     })
   }
 
+  function handleShowRequestDetails() {
+    if (!promptData) return
+    openModal('requestDetails', {
+      payload: promptData.payload,
+      responseContent: message.content,
+    })
+  }
+
   useEffect(() => {
     if (!overflowOpen) return
     function handleClick(e) {
@@ -536,6 +550,8 @@ function MessageBubble({
         return () => onSpeak?.(message.id)
       case 'prompt':
         return handleShowPrompt
+      case 'requestDetails':
+        return handleShowRequestDetails
       default:
         return () => {}
     }

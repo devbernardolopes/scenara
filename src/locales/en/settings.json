@@ -136,6 +136,10 @@
       "label": "Assistant/System – Prompt",
       "desc": "Show the prompt button on assistant and system message bubbles."
     },
+    "showAssistantRequestDetails": {
+      "label": "Assistant/System – Request Details",
+      "desc": "Show the button that opens the request payload and response details on assistant and system message bubbles."
+    },
     "showAssistantDeleteAll": {
       "label": "Assistant/System – Delete All Slots",
       "desc": "Show the button that deletes every slot of a multi-slot message bubble."

@@ -41,6 +41,12 @@
   "speak": "Speak",
   "stop": "Stop",
   "showPrompt": "Show prompt",
+  "requestDetails": "Request details",
+  "requestDetailsModal": {
+    "title": "Request Details",
+    "request": "Request Payload",
+    "response": "Response"
+  },
   "cancel": "Cancel",
   "messageDeleteTitle": "Delete message",
   "messageDeleteConfirm": "Delete message #{{number}}?",
