@@ -366,8 +366,18 @@ function ChatView() {
   }, [])
 
   useEffect(() => {
-    if (messages.length > 0 && scrollCommits.current > 1 && messagesGrewRef.current) {
-      scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+    const el = scrollRef.current
+    if (!el || messages.length === 0 || scrollCommits.current <= 1) return
+
+    if (messagesGrewRef.current) {
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+    } else if (isAtBottomRef.current) {
+      el.scrollTo({ top: el.scrollHeight })
+      setShowScrollButton(false)
+    } else {
+      const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
+      isAtBottomRef.current = atBottom
+      setShowScrollButton(!atBottom)
     }
   }, [messages])
 
