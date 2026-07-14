@@ -174,7 +174,7 @@ function ChatView() {
   const [oocActive, setOocActive] = useState(false)
   const [pendingRecovery, setPendingRecovery] = useState(null)
   const scrollHeightBeforeRef = useRef(null)
-  const hordeEta = useHordeEta(showStatus)
+  const hordeEta = useHordeEta(showStatus, oocActive ? 'ooc' : 'chat')
 
   async function loadPersonas() {
     const list = await getAllPersonas()

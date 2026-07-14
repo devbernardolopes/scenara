@@ -12,7 +12,7 @@ function formatEta(seconds) {
   return `${Math.round(seconds)}s`
 }
 
-export function useHordeEta(enabled) {
+export function useHordeEta(enabled, requestKind = 'chat') {
   const [eta, setEta] = useState(null)
   const abortRef = useRef(null)
   const timerRef = useRef(null)
@@ -67,7 +67,7 @@ export function useHordeEta(enabled) {
     fetchEtaRef.current = fetchEta
 
     async function load() {
-      const profile = await getEffectiveProfileFor('chat')
+      const profile = await getEffectiveProfileFor(requestKind)
       if (!activeRef.current) return
 
       providerRef.current = profile?.providerId || null
@@ -92,7 +92,10 @@ export function useHordeEta(enabled) {
     load()
 
     function onSettingsChanged(e) {
-      if (e.detail?.key === 'requestKind.chat.profileId') load()
+      const key = e.detail?.key
+      if (key === `requestKind.${requestKind}.profileId` || key === 'requestKind.chat.profileId') {
+        load()
+      }
     }
     function onProfileChanged() {
       load()
@@ -107,7 +110,7 @@ export function useHordeEta(enabled) {
       if (timerRef.current) clearTimeout(timerRef.current)
       if (abortRef.current) abortRef.current.abort()
     }
-  }, [enabled])
+  }, [enabled, requestKind])
 
   return eta
 }
