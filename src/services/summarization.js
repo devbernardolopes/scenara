@@ -173,7 +173,7 @@ export async function triggerSummarization({
   }
 
   let apiDurationMs = null
-  const summary = await sendChatCompletion({
+  const sendResult = await sendChatCompletion({
     profile,
     messages: payload,
     signal,
@@ -181,6 +181,7 @@ export async function triggerSummarization({
       apiDurationMs = ms
     },
   })
+  const summary = sendResult.content
   if (!summary?.trim()) throw new Error('Empty summary generated')
 
   const cleanedSummary = summary.trim()
