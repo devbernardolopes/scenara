@@ -47,7 +47,8 @@
     "rolePrefixes": "Role Prefixes",
     "localInference": "Local Inference",
     "localInferenceAdvanced": "Advanced",
-    "interface": "Interface"
+    "interface": "Interface",
+    "chat": "Chat"
   },
   "appearance": {
     "theme": {

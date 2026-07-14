@@ -50,10 +50,10 @@ export const CATEGORIES = [
 
 export const GROUPS = [
   { key: 'autoTitle', labelKey: 'settings:groups.autoTitle' },
-  { key: 'assistantButtons', labelKey: 'settings:groups.assistantButtons' },
-  { key: 'userButtons', labelKey: 'settings:groups.userButtons' },
+  { key: 'assistantButtons', labelKey: 'settings:groups.assistantButtons', parent: 'chat' },
+  { key: 'userButtons', labelKey: 'settings:groups.userButtons', parent: 'chat' },
   { key: 'apiRequestSectionHeaders', labelKey: 'settings:groups.apiRequestSectionHeaders' },
-  { key: 'chatButtons', labelKey: 'settings:groups.chatButtons' },
+  { key: 'chatButtons', labelKey: 'settings:groups.chatButtons', parent: 'chat' },
   { key: 'rolePrefixes', labelKey: 'settings:groups.rolePrefixes' },
   { key: 'localInference', labelKey: 'settings:groups.localInference', parent: 'autoTitle' },
   {
@@ -63,6 +63,7 @@ export const GROUPS = [
     defaultExpanded: false,
   },
   { key: 'interface', labelKey: 'settings:groups.interface' },
+  { key: 'chat', labelKey: 'settings:groups.chat' },
 ]
 
 export const SETTINGS = [
@@ -140,7 +141,7 @@ export const SETTINGS = [
   {
     key: 'messageBubbleSize',
     category: 'appearance',
-    group: 'interface',
+    group: 'chat',
     type: 'select',
     default: 'normal',
     options: ['compact', 'normal', 'wide', 'full'],
@@ -151,6 +152,42 @@ export const SETTINGS = [
       normal: 'settings:appearance.messageBubbleSizeOptions.normal',
       wide: 'settings:appearance.messageBubbleSizeOptions.wide',
       full: 'settings:appearance.messageBubbleSizeOptions.full',
+    },
+  },
+  {
+    key: 'chatFontFamily',
+    category: 'appearance',
+    group: 'chat',
+    type: 'select',
+    default: 'system',
+    options: ['system', 'inter', 'atkinson', 'roboto', 'georgia', 'courier', 'trebuchet'],
+    labelKey: 'settings:appearance.chatFontFamily.label',
+    descKey: 'settings:appearance.chatFontFamily.desc',
+    optionLabels: {
+      system: 'settings:appearance.chatFontFamilyOptions.system',
+      inter: 'settings:appearance.chatFontFamilyOptions.inter',
+      atkinson: 'settings:appearance.chatFontFamilyOptions.atkinson',
+      roboto: 'settings:appearance.chatFontFamilyOptions.roboto',
+      georgia: 'settings:appearance.chatFontFamilyOptions.georgia',
+      courier: 'settings:appearance.chatFontFamilyOptions.courier',
+      trebuchet: 'settings:appearance.chatFontFamilyOptions.trebuchet',
+    },
+  },
+  {
+    key: 'chatFontSize',
+    category: 'appearance',
+    group: 'chat',
+    type: 'select',
+    default: 'sm',
+    options: ['xs', 'sm', 'base', 'lg', 'xl'],
+    labelKey: 'settings:appearance.chatFontSize.label',
+    descKey: 'settings:appearance.chatFontSize.desc',
+    optionLabels: {
+      xs: 'settings:appearance.chatFontSizeOptions.xs',
+      sm: 'settings:appearance.chatFontSizeOptions.sm',
+      base: 'settings:appearance.chatFontSizeOptions.base',
+      lg: 'settings:appearance.chatFontSizeOptions.lg',
+      xl: 'settings:appearance.chatFontSizeOptions.xl',
     },
   },
   {
@@ -595,6 +632,7 @@ export const SETTINGS = [
   {
     key: 'regenerationConfirmation',
     category: 'appearance',
+    group: 'chat',
     type: 'toggle',
     default: false,
     labelKey: 'settings:appearance.regenerationConfirmation.label',
@@ -603,6 +641,7 @@ export const SETTINGS = [
   {
     key: 'cancellationConfirmation',
     category: 'appearance',
+    group: 'chat',
     type: 'toggle',
     default: true,
     labelKey: 'settings:appearance.cancellationConfirmation.label',
@@ -611,48 +650,16 @@ export const SETTINGS = [
   {
     key: 'unreadSound',
     category: 'appearance',
+    group: 'chat',
     type: 'toggle',
     default: false,
     labelKey: 'settings:appearance.unreadSound.label',
     descKey: 'settings:appearance.unreadSound.desc',
   },
   {
-    key: 'chatFontFamily',
-    category: 'appearance',
-    type: 'select',
-    default: 'system',
-    options: ['system', 'inter', 'atkinson', 'roboto', 'georgia', 'courier', 'trebuchet'],
-    labelKey: 'settings:appearance.chatFontFamily.label',
-    descKey: 'settings:appearance.chatFontFamily.desc',
-    optionLabels: {
-      system: 'settings:appearance.chatFontFamilyOptions.system',
-      inter: 'settings:appearance.chatFontFamilyOptions.inter',
-      atkinson: 'settings:appearance.chatFontFamilyOptions.atkinson',
-      roboto: 'settings:appearance.chatFontFamilyOptions.roboto',
-      georgia: 'settings:appearance.chatFontFamilyOptions.georgia',
-      courier: 'settings:appearance.chatFontFamilyOptions.courier',
-      trebuchet: 'settings:appearance.chatFontFamilyOptions.trebuchet',
-    },
-  },
-  {
-    key: 'chatFontSize',
-    category: 'appearance',
-    type: 'select',
-    default: 'sm',
-    options: ['xs', 'sm', 'base', 'lg', 'xl'],
-    labelKey: 'settings:appearance.chatFontSize.label',
-    descKey: 'settings:appearance.chatFontSize.desc',
-    optionLabels: {
-      xs: 'settings:appearance.chatFontSizeOptions.xs',
-      sm: 'settings:appearance.chatFontSizeOptions.sm',
-      base: 'settings:appearance.chatFontSizeOptions.base',
-      lg: 'settings:appearance.chatFontSizeOptions.lg',
-      xl: 'settings:appearance.chatFontSizeOptions.xl',
-    },
-  },
-  {
     key: 'autoTitleMarker',
     category: 'appearance',
+    group: 'chat',
     type: 'toggle',
     default: true,
     labelKey: 'settings:appearance.autoTitleMarker.label',
@@ -661,6 +668,7 @@ export const SETTINGS = [
   {
     key: 'summarizationMarker',
     category: 'appearance',
+    group: 'chat',
     type: 'toggle',
     default: true,
     labelKey: 'settings:appearance.summarizationMarker.label',
@@ -669,6 +677,7 @@ export const SETTINGS = [
   {
     key: 'trimAutoTitle',
     category: 'appearance',
+    group: 'chat',
     type: 'toggle',
     default: true,
     labelKey: 'settings:appearance.trimAutoTitle.label',
@@ -677,6 +686,7 @@ export const SETTINGS = [
   {
     key: 'renderMarkdown',
     category: 'appearance',
+    group: 'chat',
     type: 'toggle',
     default: true,
     labelKey: 'settings:appearance.renderMarkdown.label',
