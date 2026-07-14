@@ -1744,7 +1744,7 @@ function ChatView() {
         {/* Wrap input for better control */}
         {chatModelName && (
           <div className="px-3 text-center">
-            <span className="text-xs text-tertiary">{chatModelName}</span>
+            <span className="text-xs text-tertiary">{chatModelName.split('/').pop()}</span>
           </div>
         )}
         <ChatInputArea
