@@ -131,6 +131,7 @@ function ChatView() {
   const scrollCommits = useRef(0)
   const scrollStickyCleanupRef = useRef(null)
   const prevMessagesLengthRef = useRef(0)
+  const prevScrollHeightRef = useRef(0)
   const messagesGrewRef = useRef(false)
   const scrollClearedRef = useRef(false)
   const messagesRef = useRef(null)
@@ -372,7 +373,11 @@ function ChatView() {
 
     if (messagesGrewRef.current) {
       el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
-    } else if (isAtBottomRef.current && !scrollClearedRef.current) {
+    } else if (
+      isAtBottomRef.current &&
+      !scrollClearedRef.current &&
+      el.scrollHeight !== prevScrollHeightRef.current
+    ) {
       el.scrollTo({ top: el.scrollHeight })
       setShowScrollButton(false)
     } else {
@@ -380,6 +385,7 @@ function ChatView() {
       isAtBottomRef.current = atBottom
       setShowScrollButton(!atBottom)
     }
+    prevScrollHeightRef.current = el.scrollHeight
     scrollClearedRef.current = false
   }, [messages])
 
