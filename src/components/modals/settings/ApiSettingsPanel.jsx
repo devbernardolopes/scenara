@@ -8,6 +8,7 @@ import CollapsibleSection from '../../shared/CollapsibleSection'
 import ApiKeyManager from './controls/ApiKeyManager'
 import SettingSlider from './controls/SettingSlider'
 import ProfilePicker from '../../shared/ProfilePicker'
+import ProviderIcon from '../../shared/ProviderIcon'
 import { Edit3 } from '../../../lib/icons'
 
 const REQUEST_KINDS = [
@@ -53,9 +54,18 @@ function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle, onClo
           <button
             type="button"
             onClick={onToggle}
-            className="min-h-[44px] px-3 text-sm border border-border rounded-md bg-surface text-text hover:bg-surface-hover"
+            className="min-h-[44px] px-3 text-sm border border-border rounded-md bg-surface text-text hover:bg-surface-hover flex items-center gap-2"
           >
-            {currentProfile?.name || (
+            {currentProfile ? (
+              <>
+                <ProviderIcon
+                  providerId={currentProfile.providerId}
+                  size={18}
+                  className="shrink-0"
+                />
+                {currentProfile.name}
+              </>
+            ) : (
               <span className="text-tertiary">{t('api.profileAssignment.none')}</span>
             )}
           </button>
