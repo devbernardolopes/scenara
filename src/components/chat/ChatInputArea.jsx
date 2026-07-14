@@ -641,6 +641,9 @@ function ChatInputArea({
         <div className="relative">
           <textarea
             ref={textareaRef}
+            id="chat-message-input"
+            name="chatMessage"
+            autoComplete="off"
             data-no-autoresize
             rows={2}
             value={inputValue}
