@@ -101,7 +101,7 @@ function PostProcessingSection({ form, onChange, onDiffChange }) {
       />
 
       {form.postProcessing && form.postProcessingOverride && (
-        <div className="ml-7 border-l border-border pl-4 space-y-4">
+        <div className="space-y-4">
           <PostProcessingRuleEditor
             rules={form.postProcessingRules || []}
             onChange={(rules) => onChange('postProcessingRules', rules)}

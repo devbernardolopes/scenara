@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Plus, Trash2, ArrowUp, ArrowDown, ArrowUpDown, RefreshCw } from '../../lib/icons'
+import { Plus, Trash2, ArrowUp, ArrowDown, RefreshCw } from '../../lib/icons'
+import { useConfirm } from '../../lib/confirm'
 import SettingSlider from '../modals/settings/controls/SettingSlider'
 import { applyRulesToPlainText, DEFAULT_PP_RULES } from '../../lib/postProcessing'
 
@@ -69,15 +70,27 @@ function ChipInput({ label, values, placeholder, onAdd, onRemove }) {
 
 function RuleRow({ rule, index, total, onChange, onMove, onDelete }) {
   const { t } = useTranslation('settings')
+  const { confirm } = useConfirm()
 
   function update(patch) {
     onChange({ ...rule, ...patch })
   }
 
+  async function handleDelete() {
+    const ok = await confirm({
+      title: t('postProcessing.deleteConfirmTitle'),
+      message: t('postProcessing.deleteConfirmMessage'),
+      confirmLabel: t('postProcessing.delete'),
+      cancelLabel: t('common:cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
+    onDelete(index)
+  }
+
   return (
     <div className="border border-border rounded-lg p-3 space-y-3 bg-surface">
       <div className="flex items-center gap-2">
-        <ArrowUpDown className="w-4 h-4 text-tertiary shrink-0" aria-hidden />
         <input
           type="text"
           value={rule.label || ''}
@@ -85,34 +98,14 @@ function RuleRow({ rule, index, total, onChange, onMove, onDelete }) {
           placeholder={t('postProcessing.label')}
           className="flex-1 px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
         />
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => onMove(index, -1)}
-            disabled={index === 0}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md border border-border text-secondary hover:bg-surface-hover disabled:opacity-30 disabled:pointer-events-none"
-            aria-label={t('postProcessing.moveUp')}
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => onMove(index, 1)}
-            disabled={index === total - 1}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md border border-border text-secondary hover:bg-surface-hover disabled:opacity-30 disabled:pointer-events-none"
-            aria-label={t('postProcessing.moveDown')}
-          >
-            <ArrowDown className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => onDelete(index)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md border border-border text-error hover:bg-error-subtle"
-            aria-label={t('postProcessing.delete')}
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={handleDelete}
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md border border-border text-error hover:bg-error-subtle"
+          aria-label={t('postProcessing.delete')}
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -152,10 +145,28 @@ function RuleRow({ rule, index, total, onChange, onMove, onDelete }) {
             min={50}
             max={150}
             step={5}
+            formatValue={(v) => `${v}%`}
           />
-          <span className="text-sm text-text font-medium w-16 text-right">
-            {rule.fontSizePercent}%
-          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => onMove(index, -1)}
+            disabled={index === 0}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md border border-border text-secondary hover:bg-surface-hover disabled:opacity-30 disabled:pointer-events-none"
+            aria-label={t('postProcessing.moveUp')}
+          >
+            <ArrowUp className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onMove(index, 1)}
+            disabled={index === total - 1}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md border border-border text-secondary hover:bg-surface-hover disabled:opacity-30 disabled:pointer-events-none"
+            aria-label={t('postProcessing.moveDown')}
+          >
+            <ArrowDown className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>
@@ -164,6 +175,7 @@ function RuleRow({ rule, index, total, onChange, onMove, onDelete }) {
 
 export default function PostProcessingRuleEditor({ rules, onChange, resetToRules }) {
   const { t } = useTranslation('settings')
+  const { confirm } = useConfirm()
 
   function updateRule(index, next) {
     const copy = rules.slice()
@@ -198,7 +210,20 @@ export default function PostProcessingRuleEditor({ rules, onChange, resetToRules
     ])
   }
 
-  function resetDefaults() {
+  async function resetDefaults() {
+    const isOverride = Boolean(resetToRules)
+    const ok = await confirm({
+      title: t('postProcessing.resetConfirmTitle'),
+      message: t(
+        isOverride
+          ? 'postProcessing.resetOverrideConfirmMessage'
+          : 'postProcessing.resetConfirmMessage',
+      ),
+      confirmLabel: t('postProcessing.reset'),
+      cancelLabel: t('common:cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
     const source = resetToRules || DEFAULT_PP_RULES
     onChange(source.map((r) => ({ ...r })))
   }

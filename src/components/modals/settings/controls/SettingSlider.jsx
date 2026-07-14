@@ -1,4 +1,4 @@
-function SettingSlider({ value, onChange, min = 0, max = 100, step = 1 }) {
+function SettingSlider({ value, onChange, min = 0, max = 100, step = 1, formatValue }) {
   return (
     <div className="flex items-center gap-3 min-h-[44px]">
       <input
@@ -22,7 +22,7 @@ function SettingSlider({ value, onChange, min = 0, max = 100, step = 1 }) {
         className="w-48 accent-primary"
       />
       <span className="text-sm text-text font-medium w-14 text-right">
-        {step < 1 ? Number(value).toFixed(2) : value}
+        {formatValue ? formatValue(value) : step < 1 ? Number(value).toFixed(2) : value}
       </span>
     </div>
   )

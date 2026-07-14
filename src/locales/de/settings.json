@@ -30,7 +30,12 @@
     "preview": "Vorschau",
     "moveUp": "Nach oben",
     "moveDown": "Nach unten",
-    "noRules": "Keine Regeln konfiguriert."
+    "noRules": "Keine Regeln konfiguriert.",
+    "deleteConfirmTitle": "Delete rule?",
+    "deleteConfirmMessage": "This will permanently delete this post-processing rule.",
+    "resetConfirmTitle": "Reset to defaults?",
+    "resetConfirmMessage": "This will replace all rules with the built-in defaults. This cannot be undone.",
+    "resetOverrideConfirmMessage": "This will reset the character's rules to match the ones currently set in Settings. This cannot be undone."
   },
   "groups": {
     "assistantButtons": "Assistant/System Message Bubbles Buttons",
