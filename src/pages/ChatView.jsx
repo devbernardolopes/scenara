@@ -1743,7 +1743,7 @@ function ChatView() {
         {' '}
         {/* Wrap input for better control */}
         {chatModelName && (
-          <div className="px-3 pt-1.5 text-center">
+          <div className="px-3 text-center">
             <span className="text-xs text-tertiary">{chatModelName}</span>
           </div>
         )}
