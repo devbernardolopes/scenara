@@ -386,6 +386,8 @@ function CharacterDiscovery() {
           {t('discovery.sort.label')}
         </span>
         <select
+          id="character-sort-select"
+          name="characterSort"
           value={sortBy}
           onChange={(e) => persistSortBy(e.target.value)}
           className="min-h-[44px] px-3 py-2 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
@@ -431,6 +433,9 @@ function CharacterDiscovery() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
               <input
+                id="character-search-input"
+                name="characterSearch"
+                autoComplete="off"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => persistSearchQuery(e.target.value)}
