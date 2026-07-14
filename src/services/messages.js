@@ -30,6 +30,7 @@ export async function createMessage(threadId, role, content, personaId, isOOC = 
       threadId: Number(threadId),
       content,
       personaId: personaId || null,
+      isOOC: !!isOOC,
       createdAt: new Date(),
     })
   }

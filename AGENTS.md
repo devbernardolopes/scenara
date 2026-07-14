@@ -57,7 +57,7 @@ registerModal('personaEditor', PersonaEditorModal)
 All data lives in the browser via IndexedDB. Dexie.js is the only persistence layer — no backend.
 
 - `src/db.js` — single `new Dexie('scenara')` instance
-- Schema (version 14):
+- Schema (version 15):
 
 | Table                 | Primary Key | Indexes                                                                                    |
 | --------------------- | ----------- | ------------------------------------------------------------------------------------------ |
@@ -70,7 +70,7 @@ All data lives in the browser via IndexedDB. Dexie.js is the only persistence la
 | `writingInstructions` | `++id`      | `name`, `createdAt`                                                                        |
 | `connectionProfiles`  | `++id`      | `name`, `createdAt`                                                                        |
 | `inChatShortcuts`     | `++id`      | `name`, `createdAt`                                                                        |
-| `promptHistory`       | `++id`      | `threadId`, `createdAt`                                                                    |
+| `promptHistory`       | `++id`      | `threadId`, `createdAt`, `isOOC`                                                           |
 | `tags`                | `++id`      | `&name`, `createdAt`                                                                       |
 | `threadMemories`      | `++id`      | `threadId`, `createdAt`                                                                    |
 

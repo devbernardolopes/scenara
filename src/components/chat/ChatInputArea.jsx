@@ -479,6 +479,7 @@ function ChatInputArea({
         threadId: Number(threadId),
         content: text,
         personaId: selectedPersona?.id || null,
+        isOOC: oocActive,
         isCommand: true,
         createdAt: new Date(),
       })
@@ -576,14 +577,19 @@ function ChatInputArea({
             ) : (
               promptHistory.map((entry) => {
                 const pc =
-                  !entry.isCommand && entry.personaId ? personaColorMap[entry.personaId] : null
+                  !entry.isCommand && !entry.isOOC && entry.personaId
+                    ? personaColorMap[entry.personaId]
+                    : null
+                const entryClass = entry.isCommand
+                  ? 'text-text bg-red-50 hover:bg-red-100'
+                  : entry.isOOC
+                    ? 'text-ooc bg-ooc hover:bg-ooc-hover'
+                    : 'text-text hover:bg-surface-hover'
                 return (
                   <button
                     key={entry.id}
                     type="button"
-                    className={`w-full text-left px-3 py-2 text-sm text-text border-b border-border-light last:border-0 min-h-[44px] ${
-                      entry.isCommand ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-surface-hover'
-                    }`}
+                    className={`w-full text-left px-3 py-2 text-sm border-b border-border-light last:border-0 min-h-[44px] ${entryClass}`}
                     style={pc ? { backgroundColor: pc + '18' } : undefined}
                     onClick={() => {
                       setInputValue(entry.content)
