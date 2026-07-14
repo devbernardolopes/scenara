@@ -169,7 +169,7 @@ export async function triggerAutoTitle({
       throw new Error('No auto-title profile configured')
     }
 
-    title = await sendChatCompletion({
+    const sendResult = await sendChatCompletion({
       profile,
       messages: payloadWithMemory,
       signal,
@@ -177,6 +177,7 @@ export async function triggerAutoTitle({
         autoTitleDurationMs = ms
       },
     })
+    title = sendResult.content
   }
 
   if (!title?.trim()) throw new Error('Empty title generated')
@@ -213,7 +214,7 @@ export async function triggerAutoTitle({
       setCurrentRequestDirectorPhase(true)
       let reviewed
       try {
-        reviewed = await sendChatCompletion({
+        const reviewedResult = await sendChatCompletion({
           profile: dProfile,
           messages: dPayload,
           signal,
@@ -221,6 +222,7 @@ export async function triggerAutoTitle({
             directorDurationMs = ms
           },
         })
+        reviewed = reviewedResult.content
       } finally {
         setCurrentRequestDirectorPhase(false)
       }
