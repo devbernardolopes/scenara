@@ -319,25 +319,14 @@ export async function buildOOCMessagesPayload({
   const systemParts = []
 
   const oocSystemInstr = oocSettings.oocSystemInstructions
-  if (oocSystemInstr) {
-    systemParts.push(replaceVarsIn(oocSystemInstr))
-  }
-
-  const prompt = replaceVarsIn(character?.prompt)
-  if (prompt) {
-    const charPromptHeader = oocSettings.characterPromptHeader
-    if (charPromptHeader) {
-      systemParts.push(replaceVarsIn(charPromptHeader) + '\n\n' + prompt)
-    } else {
-      systemParts.push(prompt)
-    }
-  }
+  const oocUserInstr = oocSettings.oocUserInstructions
+  const systemHasTranscript = (oocSystemInstr || '').includes('{{transcript}}')
 
   const includeOOCOverride = character?.includeOOC === false ? false : true
   const userPersonaPrefixOverride = character?.userPersonaPrefix === false ? false : true
 
+  let transcriptWithVars = ''
   if (messages.length > 0) {
-    const messagesHeader = oocSettings.messagesHeader
     const transcript = buildTranscript({
       messages,
       personaName,
@@ -355,11 +344,32 @@ export async function buildOOCMessagesPayload({
         userRolePrefixOoc: oocSettings.userRolePrefixOoc,
       },
     })
+    transcriptWithVars = replaceVarsIn(transcript)
+  }
 
-    if (messagesHeader) {
-      systemParts.push(replaceVarsIn(messagesHeader) + '\n\n' + transcript)
+  if (oocSystemInstr) {
+    const sys = replaceVarsIn(oocSystemInstr)
+    systemParts.push(
+      systemHasTranscript ? sys.replace(/{{transcript}}/gi, transcriptWithVars) : sys,
+    )
+  }
+
+  const prompt = replaceVarsIn(character?.prompt)
+  if (prompt) {
+    const charPromptHeader = oocSettings.characterPromptHeader
+    if (charPromptHeader) {
+      systemParts.push(replaceVarsIn(charPromptHeader) + '\n\n' + prompt)
     } else {
-      systemParts.push(transcript)
+      systemParts.push(prompt)
+    }
+  }
+
+  if (transcriptWithVars && !systemHasTranscript) {
+    const messagesHeader = oocSettings.messagesHeader
+    if (messagesHeader) {
+      systemParts.push(replaceVarsIn(messagesHeader) + '\n\n' + transcriptWithVars)
+    } else {
+      systemParts.push(transcriptWithVars)
     }
   }
 
@@ -367,16 +377,16 @@ export async function buildOOCMessagesPayload({
   const entryTypes = ['oocSystem']
 
   if (userMessage) {
-    const oocUserInstr = oocSettings.oocUserInstructions
     if (oocUserInstr) {
-      if (oocUserInstr.includes('{{content}}')) {
-        result.push({
-          role: 'user',
-          content: replaceVarsIn(oocUserInstr).replace(/\{\{content\}\}/gi, userMessage),
-        })
-      } else {
-        result.push({ role: 'user', content: replaceVarsIn(oocUserInstr) + '\n\n' + userMessage })
+      const base = replaceVarsIn(oocUserInstr)
+      const userHasTranscript = oocUserInstr.includes('{{transcript}}')
+      let content = userHasTranscript ? base.replace(/{{transcript}}/gi, transcriptWithVars) : base
+      if (content.includes('{{content}}')) {
+        content = content.replace(/\{\{content\}\}/gi, userMessage)
+      } else if (!userHasTranscript) {
+        content += '\n\n' + userMessage
       }
+      result.push({ role: 'user', content })
     } else {
       result.push({ role: 'user', content: userMessage })
     }
