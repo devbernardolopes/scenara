@@ -1096,6 +1096,7 @@ function ChatView() {
     let outcome = 'failed'
     let regenEntries
     let throttledToken
+    let currentPersona = null
     try {
       const idx = messages.findIndex((m) => m.id === messageId)
       if (idx === -1) return
@@ -1120,7 +1121,7 @@ function ChatView() {
         chatPersona = await getPersona(thread.personaId)
       }
 
-      const currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : chatPersona
+      currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : chatPersona
 
       const isFirstMessage = currentMsgs.length === 0 && character?.firstMessage
 
