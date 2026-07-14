@@ -4,6 +4,7 @@ import { sendChatCompletion, replaceVars, buildTranscript, appendMemoryToPayload
 import { getSetting } from './settings'
 import { updateThread } from './threads'
 import { trimLeadingTrailingNewlines } from './messages'
+import { buildInjectedMemory } from './threadMemories'
 import {
   getDirectorConfig,
   applyDirectorTemplate,
@@ -132,8 +133,8 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
   systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, transcript)
 
   const payload = [{ role: 'system', content: systemContent }]
-  const memoryHeader = await getSetting('prompting.apiRequestSectionHeaders.memories')
-  const payloadWithMemory = appendMemoryToPayload(payload, thread?.memory, memoryHeader)
+  const memoryText = await buildInjectedMemory(character, thread)
+  const payloadWithMemory = appendMemoryToPayload(payload, memoryText, '')
 
   if (userContent) {
     userContent = replaceVarsIn(userContent).replace(/{{transcript}}/gi, transcript)

@@ -2,7 +2,7 @@ import db from '../db'
 import { updateMessage } from './messages'
 import { updateThread } from './threads'
 import { buildTranscript, replaceVars, sendChatCompletion } from './chatApi'
-import { createThreadMemory } from './threadMemories'
+import { createThreadMemory, buildInjectedMemory, pruneThreadMemories } from './threadMemories'
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { getSetting } from './settings'
 import { estimateTokens } from './tokenEstimator'
@@ -71,7 +71,6 @@ export async function buildSummarizationPayload({
   rolePrefixes,
   currentPersona,
   memoryText,
-  memoryHeader,
 }) {
   const charName = character?.name || ''
   let personaName = ''
@@ -112,11 +111,7 @@ export async function buildSummarizationPayload({
   }
 
   const messagesHeader = (await getSetting('prompting.apiRequestSectionHeaders.messages')) || ''
-  const memorySection = memoryText
-    ? memoryHeader
-      ? `${memoryHeader}\n\n${memoryText}`
-      : memoryText
-    : ''
+  const memorySection = memoryText ? memoryText : ''
   const transcriptSection = messagesHeader
     ? `${replaceVarsIn(messagesHeader)}\n\n${transcript}`
     : transcript
@@ -159,8 +154,8 @@ export async function triggerSummarization({
     userRolePrefixOoc: await getSetting('prompting.userRolePrefixOoc'),
   }
 
-  const memoryHeader = await getSetting('prompting.apiRequestSectionHeaders.memories')
-  const memoryText = thread?.memory || ''
+  const memorySlots = character?.memorySlots ?? (await getSetting('defaultMemorySlots')) ?? 3
+  const memoryText = await buildInjectedMemory(character, thread)
 
   const payload = await buildSummarizationPayload({
     character,
@@ -170,7 +165,6 @@ export async function triggerSummarization({
     rolePrefixes,
     currentPersona,
     memoryText,
-    memoryHeader,
   })
 
   const profile = await getEffectiveProfileFor('summarization')
@@ -202,7 +196,8 @@ export async function triggerSummarization({
     params: profile.params,
     apiDurationMs,
   })
-  await updateThread(thread.id, { memory: cleanedSummary, lastSummarizationAt: timestamp })
+  await pruneThreadMemories(thread.id, memorySlots)
+  await updateThread(thread.id, { lastSummarizationAt: timestamp })
 
   return cleanedSummary
 }

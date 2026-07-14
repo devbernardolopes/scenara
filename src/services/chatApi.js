@@ -2,6 +2,7 @@ import { PROVIDERS } from './apiProviders'
 import { getSetting } from './settings'
 import { getThread } from './threads'
 import { getWritingInstruction } from './writingInstructions'
+import { buildInjectedMemory } from './threadMemories'
 
 const BASE_URLS = {
   groq: 'https://api.groq.com/openai/v1',
@@ -425,8 +426,7 @@ export async function buildChatRequestPayload({
   const apiMessages = getMessagesForApiRequest(messages, { includeOOC, keepMessages })
 
   const latestThread = await getThread(threadId)
-  const memoryHeader = await getSetting('prompting.apiRequestSectionHeaders.memories')
-  const memoryText = latestThread?.memory || ''
+  const memoryText = await buildInjectedMemory(character, latestThread)
 
   let payload
   let entryTypes = null
@@ -459,7 +459,7 @@ export async function buildChatRequestPayload({
       userMessage: lastUserMsg,
       personaMap,
       memoryText,
-      memoryHeader,
+      memoryHeader: '',
       oocSettings: {
         oocSystemInstructions,
         oocUserInstructions,
@@ -508,7 +508,7 @@ export async function buildChatRequestPayload({
       settings,
       writingInstruction,
       memoryText,
-      memoryHeader,
+      memoryHeader: '',
     })
     payload = chatResult.payload
     entryTypes = chatResult.entryTypes
