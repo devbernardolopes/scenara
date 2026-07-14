@@ -221,7 +221,12 @@ function ChatInputArea({
       if (!cancelled) {
         setReady(true)
         initializedRef.current = true
-        requestAnimationFrame(() => textareaRef.current && autoResize(textareaRef.current))
+        requestAnimationFrame(() => {
+          const el = textareaRef.current
+          if (!el) return
+          if (el.value) autoResize(el)
+          else resetTextareaHeight()
+        })
       }
     }
     load()
@@ -438,6 +443,7 @@ function ChatInputArea({
     const el = textareaRef.current
     if (!el) return
     el.style.height = ''
+    if (!el.style.cssText.trim()) el.removeAttribute('style')
   }
 
   function handleTextareaFocus() {
