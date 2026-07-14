@@ -23,5 +23,6 @@
   "tagsSectionPlaceholder": "Escribe un nombre de tag o pega tags separados por comas…",
   "tagsSectionNoTags": "No hay tags asignados aún.",
   "tagsSectionBrowseTags": "Explorar Todos los Tags",
-  "tagsSectionBrowseActive": "Activo"
+  "tagsSectionBrowseActive": "Activo",
+  "sectionScenarios": "Scenarios"
 }

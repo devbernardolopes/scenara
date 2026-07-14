@@ -19,5 +19,6 @@
   "tagsSectionPlaceholder": "Digita il nome di un tag o incolla tag separati da virgola…",
   "tagsSectionNoTags": "Nessun tag assegnato ancora.",
   "tagsSectionBrowseTags": "Sfoglia Tutti i Tag",
-  "tagsSectionBrowseActive": "Attivo"
+  "tagsSectionBrowseActive": "Attivo",
+  "sectionScenarios": "Scenarios"
 }

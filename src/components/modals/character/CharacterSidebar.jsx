@@ -6,6 +6,7 @@ const SECTIONS = [
   { id: 'postProcessing', labelKey: 'sectionPostProcessing' },
   { id: 'initialMessages', labelKey: 'sectionInitialMessages' },
   { id: 'exampleMessages', labelKey: 'sectionExampleMessages' },
+  { id: 'scenarios', labelKey: 'sectionScenarios' },
   { id: 'director', labelKey: 'sectionDirector' },
   { id: 'lorebooks', labelKey: 'sectionLorebooks' },
   { id: 'tags', labelKey: 'sectionTags' },

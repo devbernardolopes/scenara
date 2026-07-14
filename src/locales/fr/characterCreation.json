@@ -19,5 +19,6 @@
   "tagsSectionPlaceholder": "Tapez un nom de tag ou collez des tags séparés par des virgules…",
   "tagsSectionNoTags": "Aucun tag attribué pour le moment.",
   "tagsSectionBrowseTags": "Parcourir Tous les Tags",
-  "tagsSectionBrowseActive": "Actif"
+  "tagsSectionBrowseActive": "Actif",
+  "sectionScenarios": "Scenarios"
 }
