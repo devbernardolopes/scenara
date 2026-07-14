@@ -488,6 +488,7 @@ function MessageBubble({
     if (!promptData) return
     openModal('requestDetails', {
       payload: promptData.payload,
+      responseData: message.responseData,
       responseContent: message.content,
     })
   }

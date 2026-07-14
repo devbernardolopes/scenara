@@ -81,6 +81,7 @@ export async function generateChatResponse({
       status: 'no-profile',
       content: '',
       promptData: null,
+      responseData: null,
       apiDurationMs: null,
       directorReviewed: false,
       error: null,
@@ -114,7 +115,7 @@ export async function generateChatResponse({
     directorReviewed,
   })
 
-  const content = await sendChatCompletion({
+  const sendResult = await sendChatCompletion({
     profile,
     messages: payload,
     signal,
@@ -126,12 +127,15 @@ export async function generateChatResponse({
       chatDurationMs = ms
     },
   })
+  const content = sendResult.content
+  let responseData = sendResult.response
 
   if (!content) {
     return {
       status: 'empty',
       content: '',
       promptData: null,
+      responseData: null,
       apiDurationMs: null,
       directorReviewed: false,
       error: null,
@@ -177,7 +181,7 @@ export async function generateChatResponse({
       showToast(i18n.t('chat:directorReviewing'), { type: 'info' })
       apiQueue.setCurrentRequestDirectorPhase(true)
       try {
-        const reviewed = await sendChatCompletion({
+        const reviewedResult = await sendChatCompletion({
           profile: dProfile,
           messages: dPayload,
           signal,
@@ -189,9 +193,11 @@ export async function generateChatResponse({
             directorDurationMs = ms
           },
         })
+        const reviewed = reviewedResult.content
         if (reviewed) {
           finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
           directorReviewed = true
+          responseData = reviewedResult.response
           promptData = JSON.stringify({
             payload,
             model: profile.model,
@@ -219,6 +225,7 @@ export async function generateChatResponse({
     status: 'success',
     content: finalContent,
     promptData,
+    responseData,
     apiDurationMs,
     directorReviewed,
     error: null,

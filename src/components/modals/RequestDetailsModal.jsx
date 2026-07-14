@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import ModalShell from '../shared/ModalShell'
 import CollapsibleSection from '../shared/CollapsibleSection'
+import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 
 function formatForDisplay(value) {
   if (typeof value === 'string') {
@@ -26,16 +26,16 @@ function formatForDisplay(value) {
   return String(value ?? '')
 }
 
-function RequestDetailsModal({ payload, responseContent }) {
+function RequestDetailsModal({ payload, responseData, responseContent }) {
   const { t } = useTranslation('chat')
   const { closeModal } = useModal()
-  const [openKey, setOpenKey] = useState('request')
 
   const requestText = formatForDisplay(payload)
-  const responseText = formatForDisplay(responseContent)
+  const responseText =
+    responseData != null ? formatForDisplay(responseData) : formatForDisplay(responseContent)
 
-  const codeClass =
-    'w-full p-3 border border-border rounded-md bg-surface text-text text-xs font-mono resize-none focus:outline-none cursor-default whitespace-pre-wrap break-words'
+  const textareaClass =
+    'w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none'
 
   return (
     <ModalShell title={t('requestDetailsModal.title')} onClose={closeModal}>
@@ -43,25 +43,25 @@ function RequestDetailsModal({ payload, responseContent }) {
         <CollapsibleSection
           label={t('requestDetailsModal.request')}
           storageKey="requestDetailsRequest"
-          open={openKey === 'request'}
-          onOpenChange={(next) => setOpenKey(next ? 'request' : null)}
+          defaultExpanded={true}
         >
-          <textarea
+          <AutoResizeTextarea
             readOnly
             value={requestText}
-            className={`${codeClass} max-h-[60vh] overflow-auto`}
+            className={textareaClass}
+            extraHeight={8}
           />
         </CollapsibleSection>
         <CollapsibleSection
           label={t('requestDetailsModal.response')}
           storageKey="requestDetailsResponse"
-          open={openKey === 'response'}
-          onOpenChange={(next) => setOpenKey(next ? 'response' : null)}
+          defaultExpanded={true}
         >
-          <textarea
+          <AutoResizeTextarea
             readOnly
             value={responseText}
-            className={`${codeClass} max-h-[60vh] overflow-auto`}
+            className={textareaClass}
+            extraHeight={8}
           />
         </CollapsibleSection>
       </div>

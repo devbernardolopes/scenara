@@ -47,8 +47,8 @@ function MemoryRegenerationResultModal({ threadId, entry, systemContent, userCon
           },
         })
 
-        if (response?.trim()) {
-          setResult(response)
+        if (response.content?.trim()) {
+          setResult(response.content)
         }
         setFinished(true)
       } catch (err) {

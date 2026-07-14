@@ -799,6 +799,7 @@ function ChatView() {
         await updateMessage(assistantMsgId, {
           content: result.content,
           promptData: result.promptData,
+          responseData: result.responseData,
           apiDurationMs: result.apiDurationMs,
         })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
@@ -1286,6 +1287,7 @@ function ChatView() {
         if (finalEntries[slotIndex]) {
           finalEntries[slotIndex].content = result.content
           finalEntries[slotIndex].promptData = result.promptData
+          finalEntries[slotIndex].responseData = result.responseData
           finalEntries[slotIndex].apiDurationMs = result.apiDurationMs
           finalEntries[slotIndex].isError = false
           finalEntries[slotIndex].error = null
@@ -1294,6 +1296,7 @@ function ChatView() {
           bundleMessages: JSON.stringify(finalEntries),
           content: result.content,
           promptData: result.promptData,
+          responseData: result.responseData,
           apiDurationMs: result.apiDurationMs,
           activeSlotIndex: slotIndex,
         })

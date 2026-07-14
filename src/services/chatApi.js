@@ -570,6 +570,12 @@ export async function sendChatCompletion({
       let buffer = ''
       let fullContent = ''
       let streamingStarted = false
+      let respId = null
+      let respObject = null
+      let respCreated = null
+      let respModel = null
+      let lastUsage = null
+      let finishReason = null
 
       while (true) {
         const { done, value } = await reader.read()
@@ -588,6 +594,13 @@ export async function sendChatCompletion({
           try {
             const parsed = JSON.parse(data)
             const choice = parsed.choices?.[0]
+            if (parsed.id && respId == null) {
+              respId = parsed.id
+              respObject = parsed.object
+              respCreated = parsed.created
+              respModel = parsed.model
+            }
+            if (parsed.usage) lastUsage = parsed.usage
             if (choice?.delta?.content) {
               if (!streamingStarted) {
                 streamingStarted = true
@@ -598,6 +611,7 @@ export async function sendChatCompletion({
               onToken?.(fullContent)
             }
             if (choice?.finish_reason) {
+              finishReason = choice.finish_reason
               onFinish?.(choice.finish_reason)
             }
           } catch {
@@ -615,6 +629,13 @@ export async function sendChatCompletion({
           if (data !== '[DONE]') {
             try {
               const parsed = JSON.parse(data)
+              if (parsed.id && respId == null) {
+                respId = parsed.id
+                respObject = parsed.object
+                respCreated = parsed.created
+                respModel = parsed.model
+              }
+              if (parsed.usage) lastUsage = parsed.usage
               if (parsed.choices?.[0]?.delta?.content) {
                 fullContent += parsed.choices[0].delta.content
                 onActivity?.()
@@ -627,7 +648,22 @@ export async function sendChatCompletion({
         }
       }
 
-      return fullContent
+      const response = {
+        id: respId,
+        object: respObject || 'chat.completion',
+        created: respCreated,
+        model: respModel || profile.model || null,
+        choices: [
+          {
+            index: 0,
+            finish_reason: finishReason,
+            message: { role: 'assistant', content: fullContent },
+          },
+        ],
+        usage: lastUsage || null,
+      }
+
+      return { content: fullContent, response }
     }
 
     const res = await fetch(`${baseUrl}/chat/completions`, {
@@ -646,7 +682,7 @@ export async function sendChatCompletion({
     const content = json.choices?.[0]?.message?.content || ''
     const finishReason = json.choices?.[0]?.finish_reason || null
     if (finishReason) onFinish?.(finishReason)
-    return content
+    return { content, response: json }
   } finally {
     reportTiming()
   }
