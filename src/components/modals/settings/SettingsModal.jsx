@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../../hooks/useModal'
 import { usePersistedState } from '../../../hooks/usePersistedState'
 import { CATEGORIES, GROUPS, SETTINGS, setSetting } from '../../../services/settings'
+import { useConfirm } from '../../../lib/confirm'
+import { RefreshCw } from '../../../lib/icons'
 import SettingsSidebar from './SettingsSidebar'
 import SettingsSearch from './SettingsSearch'
 import SettingRow from './SettingRow'
@@ -15,6 +17,7 @@ import pkg from '../../../../package.json'
 function SettingsModal() {
   const { closeModal } = useModal()
   const { t } = useTranslation('settings')
+  const confirm = useConfirm()
   const [activeCategory, setActiveCategory] = usePersistedState(
     'modal.settings.category',
     CATEGORIES[0]?.id,
@@ -114,10 +117,32 @@ function SettingsModal() {
     )
   }
 
+  async function handleRefresh() {
+    const ok = await confirm({
+      title: t('refreshApp.confirmTitle'),
+      message: t('refreshApp.confirmMessage'),
+      confirmLabel: t('common:confirm'),
+      cancelLabel: t('common:cancel'),
+      variant: 'danger',
+    })
+    if (ok) window.location.reload()
+  }
+
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
-        <h2 className="text-xl font-semibold text-text">{t('title')}</h2>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleRefresh}
+            aria-label={t('refreshApp.label')}
+            title={t('refreshApp.label')}
+            className="p-2 rounded-md text-secondary hover:bg-surface-hover hover:text-text min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
+          <h2 className="text-xl font-semibold text-text">{t('title')}</h2>
+        </div>
         <CloseButton onClick={closeModal} />
       </div>
 

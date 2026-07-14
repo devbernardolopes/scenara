@@ -1,5 +1,10 @@
 {
   "title": "Ajustes",
+  "refreshApp": {
+    "label": "Recargar la aplicación",
+    "confirmTitle": "¿Recargar la aplicación?",
+    "confirmMessage": "Esto recargará la aplicación y volverá a leer todos los datos locales de este dispositivo. Cualquier mensaje que estés redactando se descartará. ¿Continuar?"
+  },
   "searchPlaceholder": "Buscar ajustes…",
   "noResults": "Ningún ajuste coincide con su búsqueda.",
   "categories": {

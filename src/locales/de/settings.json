@@ -1,5 +1,10 @@
 {
   "title": "Einstellungen",
+  "refreshApp": {
+    "label": "App neu laden",
+    "confirmTitle": "App neu laden?",
+    "confirmMessage": "Dies lädt die App neu und liest alle lokalen Daten auf diesem Gerät erneut ein. Alle derzeit verfassten Nachrichten gehen verloren. Fortfahren?"
+  },
   "searchPlaceholder": "Einstellungen durchsuchen…",
   "noResults": "Keine Einstellungen entsprechen Ihrer Suche.",
   "categories": {

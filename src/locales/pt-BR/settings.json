@@ -1,5 +1,10 @@
 {
   "title": "Configurações",
+  "refreshApp": {
+    "label": "Recarregar app",
+    "confirmTitle": "Recarregar o app?",
+    "confirmMessage": "Isso recarregará o app e relerá todos os dados locais deste dispositivo. Qualquer mensagem em composição será descartada. Continuar?"
+  },
   "searchPlaceholder": "Pesquisar configurações…",
   "noResults": "Nenhuma configuração corresponde à sua pesquisa.",
   "categories": {

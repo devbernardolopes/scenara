@@ -1,5 +1,10 @@
 {
   "title": "Paramètres",
+  "refreshApp": {
+    "label": "Recharger l'application",
+    "confirmTitle": "Recharger l'application ?",
+    "confirmMessage": "Cela rechargera l'application et relira toutes les données locales de cet appareil. Tout message en cours de rédaction sera perdu. Continuer ?"
+  },
   "searchPlaceholder": "Rechercher des paramètres…",
   "noResults": "Aucun paramètre ne correspond à votre recherche.",
   "categories": {

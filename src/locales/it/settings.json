@@ -1,5 +1,10 @@
 {
   "title": "Impostazioni",
+  "refreshApp": {
+    "label": "Ricarica app",
+    "confirmTitle": "Ricaricare l'app?",
+    "confirmMessage": "Questo ricaricherà l'app e rileggerà tutti i dati locali su questo dispositivo. Eventuali messaggi in composizione andranno persi. Continuare?"
+  },
   "searchPlaceholder": "Cerca impostazioni…",
   "noResults": "Nessuna impostazione corrisponde alla ricerca.",
   "categories": {

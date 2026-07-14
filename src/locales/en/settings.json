@@ -1,5 +1,10 @@
 {
   "title": "Settings",
+  "refreshApp": {
+    "label": "Reload app",
+    "confirmTitle": "Reload app?",
+    "confirmMessage": "This will reload the app and re-read all local data on this device. Any message you are currently composing will be discarded. Continue?"
+  },
   "searchPlaceholder": "Search settings…",
   "noResults": "No settings match your search.",
   "categories": {
