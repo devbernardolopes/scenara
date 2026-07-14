@@ -35,6 +35,9 @@ function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle, onClo
   }, [])
 
   const currentProfile = currentId ? profiles.find((pr) => pr.id === currentId) : undefined
+  const currentProvider = currentProfile
+    ? PROVIDERS.find((pr) => pr.id === currentProfile.providerId)
+    : undefined
 
   function handleSelect(profileId) {
     onAssign(kind.id, profileId)
@@ -63,7 +66,17 @@ function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle, onClo
                   size={18}
                   className="shrink-0"
                 />
-                {currentProfile.name}
+                <div className="flex flex-col items-start leading-tight">
+                  <span className="truncate">{currentProfile.name}</span>
+                  {currentProfile.model && (
+                    <span className="text-xs text-tertiary truncate">
+                      {currentProvider
+                        ? t(currentProvider.nameKey.replace('settings:', ''))
+                        : currentProfile.providerId}
+                      {currentProfile.model ? ` · ${currentProfile.model}` : ''}
+                    </span>
+                  )}
+                </div>
               </>
             ) : (
               <span className="text-tertiary">{t('api.profileAssignment.none')}</span>
