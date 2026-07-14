@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { getEffectiveProfileFor } from '../services/connectionProfiles'
-import { fetchModels } from '../services/modelFetcher'
 
 const POLL_INTERVAL_MS = 15000
+const HORDE_MODELS_BASE = 'https://stablehorde.net/api/v2/status/models'
 
 function formatEta(seconds) {
   if (seconds >= 60) {
@@ -30,9 +30,13 @@ export function useHordeEta(enabled) {
     abortRef.current = new AbortController()
 
     try {
-      const result = await fetchModels('ai-horde', { signal: abortRef.current.signal })
-      const modelEta = result.meta?.[modelRef.current]?.eta
-      setEta(typeof modelEta === 'number' ? formatEta(modelEta) : '--')
+      const encoded = encodeURIComponent(modelRef.current)
+      const res = await fetch(`${HORDE_MODELS_BASE}/${encoded}`, {
+        signal: abortRef.current.signal,
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = await res.json()
+      setEta(typeof data.eta === 'number' ? formatEta(data.eta) : '--')
     } catch {
       setEta('--')
     } finally {
