@@ -271,8 +271,12 @@
       "desc": "Show delete buttons with a distinct red background for emphasis."
     },
     "showStatus": {
-      "label": "Show Status",
+      "label": "Show Status Bar",
       "desc": "Show the status bar above the chat input with the active model name."
+    },
+    "statusBarRefresh": {
+      "label": "Status Bar Refresh",
+      "desc": "How often to refresh the Horde ETA, in seconds."
     },
     "regenerationConfirmation": {
       "label": "Regeneration Confirmation",

@@ -1,4 +1,4 @@
-function SettingSlider({ value, onChange, min = 0, max = 100, step = 1, formatValue }) {
+function SettingSlider({ value, onChange, min = 0, max = 100, step = 1, formatValue, disabled }) {
   return (
     <div className="flex items-center gap-3 min-h-[44px]">
       <input
@@ -8,6 +8,7 @@ function SettingSlider({ value, onChange, min = 0, max = 100, step = 1, formatVa
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
+        disabled={disabled}
         onTouchStart={(e) => {
           e.stopPropagation()
           if (
@@ -19,7 +20,7 @@ function SettingSlider({ value, onChange, min = 0, max = 100, step = 1, formatVa
           }
         }}
         onTouchEnd={(e) => e.stopPropagation()}
-        className="w-48 accent-primary"
+        className="w-48 accent-primary disabled:opacity-40"
       />
       <span className="text-sm text-text font-medium w-14 text-right">
         {formatValue ? formatValue(value) : step < 1 ? Number(value).toFixed(2) : value}

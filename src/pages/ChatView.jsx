@@ -171,10 +171,11 @@ function ChatView() {
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const [chatModelName, setChatModelName] = useState('')
   const [showStatus, setShowStatus] = useState(true)
+  const [statusBarRefresh, setStatusBarRefresh] = useState(30)
   const [oocActive, setOocActive] = useState(false)
   const [pendingRecovery, setPendingRecovery] = useState(null)
   const scrollHeightBeforeRef = useRef(null)
-  const hordeEta = useHordeEta(showStatus, oocActive ? 'ooc' : 'chat')
+  const hordeEta = useHordeEta(showStatus, oocActive ? 'ooc' : 'chat', statusBarRefresh)
 
   async function loadPersonas() {
     const list = await getAllPersonas()
@@ -477,6 +478,22 @@ function ChatView() {
     function onSettingsChanged(e) {
       if (e.detail?.key === 'showStatus') {
         setShowStatus(e.detail.value !== false)
+      }
+    }
+    window.addEventListener('settings-changed', onSettingsChanged)
+    return () => window.removeEventListener('settings-changed', onSettingsChanged)
+  }, [])
+
+  useEffect(() => {
+    async function loadStatusBarRefresh() {
+      const val = await getSetting('statusBarRefresh')
+      if (typeof val === 'number') setStatusBarRefresh(val)
+    }
+    loadStatusBarRefresh()
+    function onSettingsChanged(e) {
+      if (e.detail?.key === 'statusBarRefresh') {
+        const val = Number(e.detail.value)
+        if (typeof val === 'number' && !isNaN(val)) setStatusBarRefresh(val)
       }
     }
     window.addEventListener('settings-changed', onSettingsChanged)

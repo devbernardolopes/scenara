@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { getEffectiveProfileFor } from '../services/connectionProfiles'
 
-const POLL_INTERVAL_MS = 15000
 const HORDE_MODELS_BASE = 'https://stablehorde.net/api/v2/status/models'
 
 function formatEta(seconds) {
@@ -12,7 +11,7 @@ function formatEta(seconds) {
   return `${Math.round(seconds)}s`
 }
 
-export function useHordeEta(enabled, requestKind = 'chat') {
+export function useHordeEta(enabled, requestKind = 'chat', pollIntervalSec = 15) {
   const [eta, setEta] = useState(null)
   const abortRef = useRef(null)
   const timerRef = useRef(null)
@@ -59,7 +58,7 @@ export function useHordeEta(enabled, requestKind = 'chat') {
         setEta('--')
       } finally {
         if (activeRef.current) {
-          timerRef.current = setTimeout(fetchEtaRef.current, POLL_INTERVAL_MS)
+          timerRef.current = setTimeout(fetchEtaRef.current, pollIntervalSec * 1000)
         }
       }
     }
@@ -110,7 +109,7 @@ export function useHordeEta(enabled, requestKind = 'chat') {
       if (timerRef.current) clearTimeout(timerRef.current)
       if (abortRef.current) abortRef.current.abort()
     }
-  }, [enabled, requestKind])
+  }, [enabled, requestKind, pollIntervalSec])
 
   return eta
 }
