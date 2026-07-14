@@ -386,7 +386,8 @@
       },
       "confirmDelete": {
         "title": "Delete Profile",
-        "message": "Are you sure you want to delete \"{{name}}\"?"
+        "message": "Are you sure you want to delete \"{{name}}\"?",
+        "assignedTo": "This profile is currently assigned to:"
       },
       "form": {
         "title": "Create Profile",

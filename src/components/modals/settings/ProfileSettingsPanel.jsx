@@ -7,8 +7,10 @@ import {
   deleteProfile,
   duplicateProfile,
   updateConnectionProfileOrder,
+  REQUEST_KINDS,
 } from '../../../services/connectionProfiles'
 import { PROVIDERS } from '../../../services/apiProviders'
+import { getSetting } from '../../../services/settings'
 import IconButton from '../../shared/IconButton'
 import ProviderIcon from '../../shared/ProviderIcon'
 import { Plus, Copy, Trash2, Edit3, ChevronUp, ChevronDown } from '../../../lib/icons'
@@ -49,12 +51,33 @@ function ProfileSettingsPanel() {
   }
 
   async function handleDelete(profile) {
+    const assignedKinds = []
+    for (const kind of REQUEST_KINDS) {
+      const assignedId = await getSetting(`requestKind.${kind}.profileId`)
+      if (assignedId === profile.id) {
+        assignedKinds.push(kind)
+      }
+    }
+
+    const children =
+      assignedKinds.length > 0 ? (
+        <div className="text-sm text-secondary mb-4">
+          <p>{t('api.profile.confirmDelete.assignedTo')}</p>
+          <ul className="list-disc pl-5 mt-1 space-y-0.5">
+            {assignedKinds.map((kind) => (
+              <li key={kind}>{t(`api.${kind}Profile.label`)}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null
+
     const ok = await confirm({
       title: t('api.profile.confirmDelete.title'),
       message: t('api.profile.confirmDelete.message', { name: profile.name }),
       confirmLabel: t('api.profile.actions.delete'),
       cancelLabel: t('cancel', { ns: 'common' }),
       variant: 'danger',
+      children,
     })
     if (!ok) return
     await deleteProfile(profile.id)
