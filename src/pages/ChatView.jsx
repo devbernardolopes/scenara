@@ -44,6 +44,11 @@ import {
 } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import {
+  detectOrphanedMessages,
+  cleanupSendOrphan,
+  cleanupRegenerateOrphan,
+} from '../services/recovery'
+import {
   shouldTriggerSummarization,
   triggerSummarization,
   getUnsummarizedMessages,
@@ -164,6 +169,7 @@ function ChatView() {
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const [chatModelName, setChatModelName] = useState('')
   const [showStatus, setShowStatus] = useState(true)
+  const [pendingRecovery, setPendingRecovery] = useState(null)
   const scrollHeightBeforeRef = useRef(null)
   const hordeEta = useHordeEta(showStatus)
 
@@ -237,6 +243,18 @@ function ChatView() {
       setOocMessageRole(oocRole || 'system')
 
       await loadPersonas()
+
+      const orphan = detectOrphanedMessages(msgs)
+      if (orphan && !generatingRef.current && !getGeneratingThreads().has(Number(threadId))) {
+        if (orphan.type === 'send') {
+          await cleanupSendOrphan(orphan.messageId)
+        } else if (orphan.type === 'regenerate') {
+          await cleanupRegenerateOrphan(orphan.messageId, msgs)
+        }
+        const updatedMsgs = await getMessagesByThread(threadId)
+        setMessages(dedupeMessages(updatedMsgs))
+        setPendingRecovery(orphan)
+      }
     } finally {
       setLoading(false)
     }
@@ -276,9 +294,23 @@ function ChatView() {
       setGenerating(false)
       setStreamingMsgId(null)
       setActiveSlotIndices({})
+      setPendingRecovery(null)
       loadData()
     })
   }, [threadId])
+
+  useEffect(() => {
+    if (!pendingRecovery || generatingRef.current) return
+    const orphan = pendingRecovery
+    setPendingRecovery(null)
+    showToast(t('retryingInterrupted', { ns: 'chat' }), { type: 'info' })
+    if (orphan.type === 'send') {
+      handleSend(null, null, orphan.isOOC, true)
+    } else if (orphan.type === 'regenerate') {
+      handleRegenerate(orphan.messageId, true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingRecovery])
 
   useEffect(() => {
     setBaseTitle(thread?.title ? `Scenara - ${thread.title}` : 'Scenara')
@@ -1171,16 +1203,18 @@ function ChatView() {
     setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
   }
 
-  async function handleRegenerate(messageId) {
-    const regenConfirm = await getSetting('regenerationConfirmation')
-    if (regenConfirm) {
-      const ok = await confirm({
-        title: t('regenerationConfirmTitle'),
-        message: t('regenerationConfirmMessage'),
-        confirmLabel: t('regenerate'),
-        cancelLabel: t('cancel'),
-      })
-      if (!ok) return
+  async function handleRegenerate(messageId, skipConfirmation = false) {
+    if (!skipConfirmation) {
+      const regenConfirm = await getSetting('regenerationConfirmation')
+      if (regenConfirm) {
+        const ok = await confirm({
+          title: t('regenerationConfirmTitle'),
+          message: t('regenerationConfirmMessage'),
+          confirmLabel: t('regenerate'),
+          cancelLabel: t('cancel'),
+        })
+        if (!ok) return
+      }
     }
 
     if (generatingRef.current) return

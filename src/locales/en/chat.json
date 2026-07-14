@@ -114,5 +114,6 @@
     "accept": "Accept"
   },
   "memoryDeleteTitle": "Delete memory entry",
-  "memoryDeleteConfirm": "Delete this memory entry? This cannot be undone."
+  "memoryDeleteConfirm": "Delete this memory entry? This cannot be undone.",
+  "retryingInterrupted": "Retrying interrupted message…"
 }
