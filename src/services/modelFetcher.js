@@ -46,7 +46,7 @@ async function fetchOpenAIModels(baseUrl, apiKey, signal, modelsPath) {
 }
 
 async function fetchOpenRouterModels(baseUrl, apiKey, signal) {
-  const url = `${baseUrl}/v1/models`
+  const url = `${baseUrl}/v1/models?max_price=0&input_modalities=text`
   const headers = { 'Content-Type': 'application/json' }
   if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`
 
