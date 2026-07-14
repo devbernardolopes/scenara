@@ -53,7 +53,8 @@ export function useHordeEta(enabled) {
         })
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const data = await res.json()
-        setEta(typeof data.eta === 'number' ? formatEta(data.eta) : '--')
+        const eta = data[0]?.eta
+        setEta(typeof eta === 'number' ? formatEta(eta) : '--')
       } catch {
         setEta('--')
       } finally {
