@@ -127,7 +127,7 @@ function ButtonGroup({ options, value, onChange, disabled }) {
 
 function OverridesSection({ form, onChange, characterId }) {
   const { t } = useTranslation('characterCreation')
-  const confirm = useConfirm()
+  const { confirm } = useConfirm()
 
   const disabledCls = (disabled) => (disabled ? 'opacity-40 pointer-events-none' : '')
 
