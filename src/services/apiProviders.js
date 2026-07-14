@@ -63,12 +63,6 @@ export const PROVIDERS = [
     trialKey: 'sk-or-placeholder-trial-openrouter-key',
     params: [
       {
-        key: 'reasoning',
-        label: 'Reasoning',
-        type: 'string',
-        default: 'none',
-      },
-      {
         key: 'max_completion_tokens',
         label: 'Max Tokens',
         type: 'range',
