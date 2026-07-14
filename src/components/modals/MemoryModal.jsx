@@ -204,7 +204,7 @@ function MemoryModal({ threadId }) {
       <div className="space-y-3">
         {sortedMemories.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border p-6 text-sm text-secondary">
-            {t('promptHistory.empty')}
+            {t('memoryEmpty')}
           </div>
         ) : (
           sortedMemories.map((entry, index) => {

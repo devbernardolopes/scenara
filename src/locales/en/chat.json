@@ -95,6 +95,7 @@
   "cancelConfirmDoneHint": "You can close this dialog — the requests completed on their own.",
   "cancelling": "Cancelling…",
   "memoryEntry": "Entry #{{number}}",
+  "memoryEmpty": "No memories",
   "memoryRegeneration": {
     "title": "Memory Entry Regeneration",
     "systemPromptLabel": "SYSTEM Summarization Prompt",
