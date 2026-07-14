@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import { createCharacter, updateCharacter } from '../../services/characters'
-import { getSetting } from '../../services/settings'
+import { getSetting, getPostProcessingRules } from '../../services/settings'
 import { getAllTags, createTag } from '../../services/tags'
 import { estimateTokens } from '../../services/tokenEstimator'
 import { getWritingInstruction } from '../../services/writingInstructions'
@@ -128,6 +128,23 @@ const DIRECTOR_GROUP_FIELDS = [
   { enabledKey: 'directorOOCEnabled', instructionsKey: 'directorOOCInstructions' },
 ]
 
+function rulesDiffer(a, b) {
+  if (a.length !== b.length) return true
+  for (let i = 0; i < a.length; i++) {
+    const ra = a[i]
+    const rb = b[i]
+    if (
+      ra.label !== rb.label ||
+      ra.color !== rb.color ||
+      ra.fontSizePercent !== rb.fontSizePercent ||
+      JSON.stringify(ra.openChars) !== JSON.stringify(rb.openChars) ||
+      JSON.stringify(ra.closeChars) !== JSON.stringify(rb.closeChars)
+    )
+      return true
+  }
+  return false
+}
+
 function buildInitialForm(existing) {
   if (!existing) return { ...INITIAL_FORM }
   const result = {}
@@ -176,7 +193,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
   const [defaultPersonaName, setDefaultPersonaName] = useState('')
   const [overrideDefaults, setOverrideDefaults] = useState(null)
   const [wiRevision, setWiRevision] = useState(0)
-  const [ppDiff, setPpDiff] = useState(false)
+  const [ppGlobals, setPpGlobals] = useState({ rules: [], enabled: true })
 
   useEffect(() => {
     getSetting('defaultPersonaId').then((id) => {
@@ -202,6 +219,14 @@ function CharacterCreateModal({ character: existing, initialData }) {
     const handler = () => setWiRevision((c) => c + 1)
     window.addEventListener('writingInstructions-changed', handler)
     return () => window.removeEventListener('writingInstructions-changed', handler)
+  }, [])
+
+  useEffect(() => {
+    Promise.all([getPostProcessingRules(), getSetting('defaultPostProcessing')]).then(
+      ([rules, enabled]) => {
+        setPpGlobals({ rules, enabled: enabled !== false })
+      },
+    )
   }, [])
 
   useEffect(() => {
@@ -293,6 +318,10 @@ function CharacterCreateModal({ character: existing, initialData }) {
     })
 
   const sectionHighlights = useMemo(() => {
+    const ppEnabledDiff = form.postProcessing !== ppGlobals.enabled
+    const ppOverrideDiff = form.postProcessingOverride === true
+    const ppRulesDiff =
+      form.postProcessingOverride && rulesDiffer(form.postProcessingRules || [], ppGlobals.rules)
     const highlights = {
       character:
         form.name?.trim() ||
@@ -304,7 +333,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       initialMessages: (form.initialMessages || []).some((m) => m.content?.trim()),
       exampleMessages: (form.exampleMessages || []).some((m) => m.content?.trim()),
       tags: (form.tags || []).length > 0,
-      postProcessing: ppDiff,
+      postProcessing: ppEnabledDiff || ppOverrideDiff || ppRulesDiff,
       overrides: false,
       director:
         form.directorEnabled &&
@@ -321,7 +350,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       })
     }
     return highlights
-  }, [form, overrideDefaults, ppDiff])
+  }, [form, overrideDefaults, ppGlobals])
 
   const handleCloseRef = useRef()
   handleCloseRef.current = handleCloseAttempt
@@ -435,12 +464,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
           highlights={sectionHighlights}
         />
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          <ActivePanel
-            form={form}
-            onChange={handleChange}
-            characterId={characterId}
-            onDiffChange={setPpDiff}
-          />
+          <ActivePanel form={form} onChange={handleChange} characterId={characterId} />
         </div>
       </div>
 
