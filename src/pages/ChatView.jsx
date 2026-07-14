@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, RefreshCw } from '../lib/icons'
+import { ChevronDown, RefreshCw, Clock } from '../lib/icons'
 import { useModal } from '../hooks/useModal'
 import { useHordeEta } from '../hooks/useHordeEta'
 import { showToast } from '../lib/toast'
@@ -154,6 +154,7 @@ function ChatView() {
   const [queuedCount, setQueuedCount] = useState(0)
   const [summarizing, setSummarizing] = useState(false)
   const [autoTitling, setAutoTitling] = useState(false)
+  const [pendingMarkers, setPendingMarkers] = useState([])
   const [streamingMsgId, setStreamingMsgId] = useState(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [noChatProfile, setNoChatProfile] = useState(false)
@@ -592,6 +593,79 @@ function ChatView() {
 
   useEffect(() => {
     let cancelled = false
+    async function reconstruct() {
+      const [autoTitleMarker, summMarker] = await Promise.all([
+        getSetting('autoTitleMarker'),
+        getSetting('summarizationMarker'),
+      ])
+      if (cancelled) return
+      const state = apiQueue.getState()
+      const pending = []
+      if (autoTitleMarker) {
+        if (
+          state.currentThreadId === Number(threadId) &&
+          state.currentRequestType === 'autoTitle'
+        ) {
+          pending.push({ type: 'autoTitle', status: 'active' })
+        } else if (
+          state.queue.some((q) => q.threadId === Number(threadId) && q.type === 'autoTitle')
+        ) {
+          pending.push({ type: 'autoTitle', status: 'queued' })
+        }
+      }
+      if (summMarker) {
+        if (
+          state.currentThreadId === Number(threadId) &&
+          state.currentRequestType === 'summarization'
+        ) {
+          pending.push({ type: 'summarization', status: 'active' })
+        } else if (
+          state.queue.some((q) => q.threadId === Number(threadId) && q.type === 'summarization')
+        ) {
+          pending.push({ type: 'summarization', status: 'queued' })
+        }
+      }
+      if (pending.length > 0) setPendingMarkers(pending)
+    }
+    reconstruct()
+    return () => {
+      cancelled = true
+    }
+  }, [threadId])
+
+  useEffect(() => {
+    function handleQueueChange() {
+      const state = apiQueue.getState()
+      setPendingMarkers((prev) => {
+        let changed = false
+        const next = prev
+          .map((m) => {
+            const isCurrent =
+              state.currentRequestType === m.type && state.currentThreadId === Number(threadId)
+            const isQueued = state.queue.some(
+              (q) => q.type === m.type && q.threadId === Number(threadId),
+            )
+            if (isCurrent) {
+              if (m.status !== 'active') {
+                changed = true
+                return { ...m, status: 'active' }
+              }
+              return m
+            }
+            if (isQueued) return m
+            changed = true
+            return null
+          })
+          .filter(Boolean)
+        return changed ? next : prev
+      })
+    }
+    window.addEventListener('api-queue-changed', handleQueueChange)
+    return () => window.removeEventListener('api-queue-changed', handleQueueChange)
+  }, [threadId])
+
+  useEffect(() => {
+    let cancelled = false
     const msgId = getStreamingMessageId(threadId)
     if (msgId != null) {
       Promise.resolve().then(() => {
@@ -991,6 +1065,10 @@ function ChatView() {
       if (await shouldAutoTitle(thr, chr, nonFailedMsgs)) {
         showToast(t('autoTitleGenerating'), { type: 'info' })
         const atAbort = new AbortController()
+        const showMarker = await getSetting('autoTitleMarker')
+        if (showMarker) {
+          setPendingMarkers((prev) => [...prev, { type: 'autoTitle', status: 'queued' }])
+        }
         setAutoTitling(true)
         try {
           await apiQueue.enqueue({
@@ -1013,8 +1091,7 @@ function ChatView() {
           setThread((prev) => ({ ...prev, title: updatedThr.title, autoTitleGenerated: true }))
           showToast(t('autoTitleGenerated'), { type: 'success' })
 
-          const markerEnabled = await getSetting('autoTitleMarker')
-          if (markerEnabled) {
+          if (showMarker) {
             const postMsgs = await getMessagesByThread(threadId)
             if (postMsgs.length > 0) {
               const lastMsg = postMsgs[postMsgs.length - 1]
@@ -1033,6 +1110,9 @@ function ChatView() {
           }
         } finally {
           setAutoTitling(false)
+          if (showMarker) {
+            setPendingMarkers((prev) => prev.filter((m) => m.type !== 'autoTitle'))
+          }
         }
       }
 
@@ -1051,6 +1131,10 @@ function ChatView() {
         })
         if (unsummarizedMessages.length > 0) {
           const summAbort = new AbortController()
+          const showMarker = await getSetting('summarizationMarker')
+          if (showMarker) {
+            setPendingMarkers((prev) => [...prev, { type: 'summarization', status: 'queued' }])
+          }
           setSummarizing(true)
           showToast('Generating summary', { type: 'info' })
           try {
@@ -1074,8 +1158,7 @@ function ChatView() {
               setThread((prev) => (prev ? { ...prev, memory: summary } : prev))
               showToast('Summary generated', { type: 'success' })
 
-              const markerEnabled = await getSetting('summarizationMarker')
-              if (markerEnabled) {
+              if (showMarker) {
                 const postMsgs = await getMessagesByThread(threadId)
                 let lastSummarizedIdx = -1
                 for (let i = postMsgs.length - 1; i >= 0; i--) {
@@ -1099,6 +1182,9 @@ function ChatView() {
             }
           } finally {
             setSummarizing(false)
+            if (showMarker) {
+              setPendingMarkers((prev) => prev.filter((m) => m.type !== 'summarization'))
+            }
           }
         }
       }
@@ -1839,6 +1925,18 @@ function ChatView() {
             </>
           )}
           <div ref={messagesEndRef} />
+
+          {pendingMarkers.map((pm) => (
+            <div key={`pending-${pm.type}`} className="flex items-center gap-3 my-2 px-1">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
+                {t(pm.type === 'autoTitle' ? 'autoTitleMarker' : 'summarizationMarker')}
+                {pm.status === 'queued' && <Clock className="w-3 h-3" />}
+                {pm.status === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
+              </span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+          ))}
 
           {showScrollButton && (
             <button

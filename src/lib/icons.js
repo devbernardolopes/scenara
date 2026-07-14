@@ -60,4 +60,5 @@ export {
   Forward,
   Lock,
   Unlock,
+  Clock,
 } from 'lucide-react'
