@@ -58,6 +58,7 @@ async function fetchOpenRouterModels(baseUrl, apiKey, signal) {
 
   const json = await res.json()
   const names = {}
+  const supportedParams = {}
   const models = (json.data || [])
     .filter((m) => {
       if (!(m.id || m.name)) return false
@@ -68,11 +69,14 @@ async function fetchOpenRouterModels(baseUrl, apiKey, signal) {
     })
     .map((m) => {
       if (m.name) names[m.id] = m.name
+      if (Array.isArray(m.supported_parameters)) {
+        supportedParams[m.id] = m.supported_parameters
+      }
       return m.id
     })
     .sort((a, b) => a.localeCompare(b))
 
-  return { models, meta: {}, names }
+  return { models, meta: {}, names, supportedParams }
 }
 
 async function fetchHordeModels(signal) {

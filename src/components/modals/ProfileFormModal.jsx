@@ -15,6 +15,8 @@ import {
   setCachedModelMeta as persistCachedModelMeta,
   getCachedModelNames,
   setCachedModelNames as persistCachedModelNames,
+  getCachedModelSupportedParams,
+  setCachedModelSupportedParams as persistCachedModelSupportedParams,
 } from '../../services/apiProviders'
 import { fetchModels, getCooldownRemaining } from '../../services/modelFetcher'
 import { createProfile, updateProfile } from '../../services/connectionProfiles'
@@ -119,12 +121,21 @@ function ProfileFormModal({ profile }) {
   const [cachedModels, setCachedModels] = useState([])
   const [modelMeta, setModelMeta] = useState({})
   const [modelNames, setModelNames] = useState({})
+  const [modelSupportedParams, setModelSupportedParams] = useState({})
   const [fetching, setFetching] = useState(false)
   const abortRef = useRef(null)
   const savePendingRef = useRef(false)
 
   const selectedProvider = PROVIDERS.find((p) => p.id === form.providerId)
   const paramDefs = selectedProvider?.params || []
+
+  const isOpenRouter = form.providerId === 'openrouter'
+  const modelParams = form.model ? modelSupportedParams[form.model] || [] : []
+  const supportsReasoning = isOpenRouter && modelParams.includes('reasoning')
+  const supportsIncludeReasoning = isOpenRouter && modelParams.includes('include_reasoning')
+  const showReasoningControls = isOpenRouter && (supportsReasoning || supportsIncludeReasoning)
+
+  const REASONING_EFFORT_OPTIONS = ['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max']
 
   useEffect(() => {
     if (selectedProvider) {
@@ -166,10 +177,16 @@ function ProfileFormModal({ profile }) {
         setModelMeta({})
       }
       getCachedModelNames(form.providerId).then(setModelNames)
+      if (form.providerId === 'openrouter') {
+        getCachedModelSupportedParams(form.providerId).then(setModelSupportedParams)
+      } else {
+        setModelSupportedParams({})
+      }
     } else {
       setCachedModels([])
       setModelMeta({})
       setModelNames({})
+      setModelSupportedParams({})
     }
   }, [form.providerId, hordeMethod])
 
@@ -246,7 +263,7 @@ function ProfileFormModal({ profile }) {
         signal: abortRef.current.signal,
         hordeMethod,
       })
-      const { models, meta, names } = result
+      const { models, meta, names, supportedParams } = result
       await persistCachedModels(form.providerId, models, hordeMethod)
       setCachedModels(models)
       if (meta && Object.keys(meta).length > 0) {
@@ -260,6 +277,12 @@ function ProfileFormModal({ profile }) {
         setModelNames(names)
       } else {
         setModelNames({})
+      }
+      if (supportedParams && Object.keys(supportedParams).length > 0) {
+        await persistCachedModelSupportedParams(form.providerId, supportedParams)
+        setModelSupportedParams(supportedParams)
+      } else if (form.providerId === 'openrouter') {
+        setModelSupportedParams({})
       }
     } catch (err) {
       if (err.name !== 'AbortError') throw err
@@ -412,6 +435,49 @@ function ProfileFormModal({ profile }) {
                 placeholder={t('api.model.placeholder')}
                 className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
               />
+            )}
+          </div>
+        )}
+
+        {showReasoningControls && (
+          <div className="space-y-4 pt-2 border-t border-border">
+            <p className="text-sm font-medium text-text">{t('api.profile.form.reasoning')}</p>
+            {supportsReasoning && (
+              <div>
+                <label className="block text-xs font-medium text-secondary mb-1.5">
+                  {t('api.profile.form.reasoningEffort')}
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {REASONING_EFFORT_OPTIONS.map((opt) => {
+                    const active = (form.params.reasoning_effort || 'none') === opt
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => updateParam('reasoning_effort', opt)}
+                        className={`min-h-[44px] px-3 py-2 text-sm rounded-md border transition-colors ${
+                          active
+                            ? 'bg-primary text-on-primary border-primary'
+                            : 'bg-surface text-secondary border-border hover:bg-surface-hover'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+            {supportsIncludeReasoning && (
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium text-secondary">
+                  {t('api.profile.form.includeReasoning')}
+                </label>
+                <SettingToggle
+                  value={form.params.include_reasoning ?? false}
+                  onChange={(v) => updateParam('include_reasoning', v)}
+                />
+              </div>
             )}
           </div>
         )}

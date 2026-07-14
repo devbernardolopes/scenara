@@ -381,3 +381,20 @@ export async function getCachedModelNames(providerId) {
 export async function setCachedModelNames(providerId, names) {
   await setSetting(cachedModelNamesKey(providerId), JSON.stringify(names))
 }
+
+function cachedModelSupportedParamsKey(providerId) {
+  return `api.${providerId}.cachedModelSupportedParams`
+}
+
+export async function getCachedModelSupportedParams(providerId) {
+  const raw = await getSetting(cachedModelSupportedParamsKey(providerId))
+  try {
+    return JSON.parse(raw) || {}
+  } catch {
+    return {}
+  }
+}
+
+export async function setCachedModelSupportedParams(providerId, supportedParams) {
+  await setSetting(cachedModelSupportedParamsKey(providerId), JSON.stringify(supportedParams))
+}

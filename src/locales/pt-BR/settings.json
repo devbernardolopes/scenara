@@ -400,6 +400,9 @@
         "selectKey": "Selecione uma chave…",
         "model": "Modelo",
         "parameters": "Parâmetros",
+        "reasoning": "Raciocínio",
+        "reasoningEffort": "Esforço de Raciocínio",
+        "includeReasoning": "Incluir Raciocínio",
         "hordeMethod": "Método AI Horde",
         "hordeMethodNative": "Nativo",
         "hordeMethodOpenAI": "Compatível com OpenAI"
