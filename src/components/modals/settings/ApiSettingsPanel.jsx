@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useModal } from '../../../hooks/useModal'
 import { PROVIDERS, getBaseUrl, setBaseUrl } from '../../../services/apiProviders'
 import { getAllProfiles, migrateFromOldSettings } from '../../../services/connectionProfiles'
 import { getSetting, setSetting } from '../../../services/settings'
@@ -7,6 +8,7 @@ import CollapsibleSection from '../../shared/CollapsibleSection'
 import ApiKeyManager from './controls/ApiKeyManager'
 import SettingSlider from './controls/SettingSlider'
 import ProfilePicker from '../../shared/ProfilePicker'
+import { Edit3 } from '../../../lib/icons'
 
 const REQUEST_KINDS = [
   { id: 'chat', labelKey: 'settings:api.profileAssignment.chat' },
@@ -19,46 +21,62 @@ const REQUEST_KINDS = [
 
 function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle, onClose }) {
   const { t } = useTranslation('settings')
+  const { openModal } = useModal()
   const [profiles, setProfiles] = useState([])
-  const [currentProfileName, setCurrentProfileName] = useState('')
 
   useEffect(() => {
-    getAllProfiles().then(setProfiles)
+    function load() {
+      getAllProfiles().then(setProfiles)
+    }
+    load()
+    window.addEventListener('connectionProfiles-changed', load)
+    return () => window.removeEventListener('connectionProfiles-changed', load)
   }, [])
 
-  useEffect(() => {
-    if (currentId) {
-      const p = profiles.find((pr) => pr.id === currentId)
-      setCurrentProfileName(p ? p.name : '')
-    } else {
-      setCurrentProfileName('')
-    }
-  }, [currentId, profiles])
+  const currentProfile = currentId ? profiles.find((pr) => pr.id === currentId) : undefined
 
   function handleSelect(profileId) {
     onAssign(kind.id, profileId)
     onToggle()
   }
 
+  function handleEdit(e) {
+    e.stopPropagation()
+    if (currentProfile) openModal('profileForm', { profile: currentProfile })
+  }
+
   return (
     <div className="relative flex items-center justify-between min-h-[44px]">
       <span className="text-sm text-text">{t(kind.labelKey.replace('settings:', ''))}</span>
-      <div className="relative">
-        <button
-          type="button"
-          onClick={onToggle}
-          className="min-h-[44px] px-3 text-sm border border-border rounded-md bg-surface text-text hover:bg-surface-hover"
-        >
-          {currentProfileName || (
-            <span className="text-tertiary">{t('api.profileAssignment.none')}</span>
-          )}
-        </button>
-        <ProfilePicker
-          open={open}
-          onClose={onClose}
-          onSelect={handleSelect}
-          currentId={currentId}
-        />
+      <div className="flex items-center gap-1">
+        <div className="relative">
+          <button
+            type="button"
+            onClick={onToggle}
+            className="min-h-[44px] px-3 text-sm border border-border rounded-md bg-surface text-text hover:bg-surface-hover"
+          >
+            {currentProfile?.name || (
+              <span className="text-tertiary">{t('api.profileAssignment.none')}</span>
+            )}
+          </button>
+          <ProfilePicker
+            open={open}
+            onClose={onClose}
+            onSelect={handleSelect}
+            currentId={currentId}
+          />
+        </div>
+        {currentProfile && (
+          <button
+            type="button"
+            onClick={handleEdit}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-secondary hover:text-text hover:bg-surface-hover"
+            aria-label={t('api.profile.actions.edit')}
+            title={t('api.profile.actions.edit')}
+          >
+            <Edit3 className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </div>
   )
