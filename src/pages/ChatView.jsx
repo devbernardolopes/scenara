@@ -158,6 +158,7 @@ function ChatView() {
   const [systemAvatar, setSystemAvatar] = useState('')
   const [oocMessageRole, setOocMessageRole] = useState('system')
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
+  const [chatModelName, setChatModelName] = useState('')
   const scrollHeightBeforeRef = useRef(null)
 
   async function loadPersonas() {
@@ -383,6 +384,19 @@ function ChatView() {
   useEffect(() => {
     messagesRef.current = messages
   }, [messages])
+
+  useEffect(() => {
+    async function loadChatModel() {
+      const profile = await getEffectiveProfileFor('chat')
+      setChatModelName(profile?.model || '')
+    }
+    loadChatModel()
+    function onSettingsChanged(e) {
+      if (e.detail?.key === 'requestKind.chat.profileId') loadChatModel()
+    }
+    window.addEventListener('settings-changed', onSettingsChanged)
+    return () => window.removeEventListener('settings-changed', onSettingsChanged)
+  }, [])
 
   useEffect(() => {
     function onSettingsChanged(e) {
@@ -1725,6 +1739,11 @@ function ChatView() {
       <div className="flex-shrink-0 border-t border-border bg-surface">
         {' '}
         {/* Wrap input for better control */}
+        {chatModelName && (
+          <div className="px-3 pt-1.5 text-center">
+            <span className="text-xs text-tertiary">{chatModelName}</span>
+          </div>
+        )}
         <ChatInputArea
           threadId={threadId}
           onSend={handleSend}
