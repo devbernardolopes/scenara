@@ -688,7 +688,9 @@
       "displayName": "Title / Label",
       "displayNamePlaceholder": "For your reference (not shown in chat)",
       "avatarLabel": "Avatar",
-      "avatarPlaceholder": "URL, emoji, or upload an image",
+      "avatarPlaceholder": "URL or emoji",
+      "avatarImageData": "Image data ({{size}})",
+      "avatarClear": "Clear avatar",
       "uploadFile": "Upload image",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "A short bio for this persona…",
@@ -806,7 +808,9 @@
     "systemAvatar": {
       "label": "SYSTEM Avatar",
       "desc": "Default avatar for system messages.",
-      "placeholder": "URL, emoji, or upload an image"
+      "placeholder": "URL, emoji, or upload an image",
+      "imageData": "Image data ({{size}})",
+      "clear": "Clear avatar"
     },
     "systemAvatarScale": {
       "label": "SYSTEM Avatar Scale",

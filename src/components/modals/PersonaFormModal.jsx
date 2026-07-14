@@ -13,9 +13,16 @@ import { estimateTokens } from '../../services/tokenEstimator'
 import { findColorSlot } from '../../config/colorPalettes'
 import { useTheme } from '../../hooks/useTheme'
 import ColorPicker from '../shared/ColorPicker'
+import { X } from '../../lib/icons'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
+
+function formatDataSize(byteLen) {
+  if (byteLen < 1024) return `${byteLen} B`
+  if (byteLen < 1024 * 1024) return `${(byteLen / 1024).toFixed(1)} KB`
+  return `${(byteLen / (1024 * 1024)).toFixed(1)} MB`
+}
 
 function ToggleRow({ label, checked, onChange, disabled = false }) {
   return (
@@ -231,12 +238,35 @@ function PersonaFormModal({ persona }) {
                 openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })
               }
             />
-            <input
-              className={inputClass}
-              value={form.avatar}
-              onChange={update('avatar')}
-              placeholder={t('persona.form.avatarPlaceholder')}
-            />
+            <div className="relative flex-1">
+              {form.avatar.startsWith('data:') ? (
+                <input
+                  className={`${inputClass} pr-10`}
+                  value={t('persona.form.avatarImageData', {
+                    size: formatDataSize(form.avatar.length),
+                  })}
+                  readOnly
+                />
+              ) : (
+                <input
+                  className={`${inputClass} pr-10`}
+                  value={form.avatar}
+                  onChange={update('avatar')}
+                  placeholder={t('persona.form.avatarPlaceholder')}
+                />
+              )}
+              {form.avatar && (
+                <button
+                  type="button"
+                  onClick={() => setForm((prev) => ({ ...prev, avatar: '' }))}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
+                  aria-label={t('persona.form.avatarClear')}
+                  title={t('persona.form.avatarClear')}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
             <button
               type="button"
               onClick={() => fileRef.current?.click()}

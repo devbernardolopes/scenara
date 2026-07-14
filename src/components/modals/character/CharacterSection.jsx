@@ -7,10 +7,16 @@ import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { getAllWritingInstructions } from '../../../services/writingInstructions'
 import Avatar from '../../shared/Avatar'
-import { FileText } from '../../../lib/icons'
+import { FileText, X } from '../../../lib/icons'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
+
+function formatDataSize(byteLen) {
+  if (byteLen < 1024) return `${byteLen} B`
+  if (byteLen < 1024 * 1024) return `${(byteLen / 1024).toFixed(1)} KB`
+  return `${(byteLen / (1024 * 1024)).toFixed(1)} MB`
+}
 
 function CharacterSection({ form, onChange, characterId }) {
   const { t } = useTranslation('characterCreation')
@@ -71,12 +77,33 @@ function CharacterSection({ form, onChange, characterId }) {
             className="shrink-0"
             onClick={() => openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })}
           />
-          <input
-            className={`${inputClass} flex-1`}
-            value={form.avatar}
-            onChange={(e) => onChange('avatar', e.target.value)}
-            placeholder={t('avatarPlaceholder')}
-          />
+          <div className="relative flex-1">
+            {form.avatar.startsWith('data:') ? (
+              <input
+                className={`${inputClass} pr-10`}
+                value={t('avatarImageData', { size: formatDataSize(form.avatar.length) })}
+                readOnly
+              />
+            ) : (
+              <input
+                className={`${inputClass} pr-10`}
+                value={form.avatar}
+                onChange={(e) => onChange('avatar', e.target.value)}
+                placeholder={t('avatarPlaceholder')}
+              />
+            )}
+            {form.avatar && (
+              <button
+                type="button"
+                onClick={() => onChange('avatar', '')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
+                aria-label={t('avatarClear')}
+                title={t('avatarClear')}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => fileRef.current?.click()}

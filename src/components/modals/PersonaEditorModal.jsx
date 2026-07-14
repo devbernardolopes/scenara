@@ -8,11 +8,17 @@ import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../services/tokenEstimator'
 import Avatar from '../shared/Avatar'
-import { Plus } from '../../lib/icons'
+import { Plus, X } from '../../lib/icons'
+
+function formatDataSize(byteLen) {
+  if (byteLen < 1024) return `${byteLen} B`
+  if (byteLen < 1024 * 1024) return `${(byteLen / 1024).toFixed(1)} KB`
+  return `${(byteLen / (1024 * 1024)).toFixed(1)} MB`
+}
 
 function PersonaEditorModal() {
   const { t } = useTranslation('characterCreation')
-  const { closeModal } = useModal()
+  const { closeModal, openModal } = useModal()
   const { confirm } = useConfirm()
   const [personas, setPersonas] = useState([])
   const [editing, setEditing] = useState(null)
@@ -116,12 +122,35 @@ function PersonaEditorModal() {
               <label className="block text-sm font-medium text-text mb-1">
                 {t('personaAvatarLabel')}
               </label>
-              <input
-                className={inputClass}
-                value={form.avatar}
-                onChange={update('avatar')}
-                placeholder={t('personaAvatarPlaceholder')}
-              />
+              <div className="relative">
+                {form.avatar.startsWith('data:') ? (
+                  <input
+                    className={`${inputClass} pr-10`}
+                    value={t('personaAvatarImageData', {
+                      size: formatDataSize(form.avatar.length),
+                    })}
+                    readOnly
+                  />
+                ) : (
+                  <input
+                    className={`${inputClass} pr-10`}
+                    value={form.avatar}
+                    onChange={update('avatar')}
+                    placeholder={t('personaAvatarPlaceholder')}
+                  />
+                )}
+                {form.avatar && (
+                  <button
+                    type="button"
+                    onClick={() => setForm((prev) => ({ ...prev, avatar: '' }))}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
+                    aria-label={t('personaAvatarClear')}
+                    title={t('personaAvatarClear')}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
 
             <CollapsibleSection

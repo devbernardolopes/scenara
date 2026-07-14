@@ -1,6 +1,13 @@
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { X } from 'lucide-react'
 import Avatar from '../../../shared/Avatar'
+
+function formatDataSize(byteLen) {
+  if (byteLen < 1024) return `${byteLen} B`
+  if (byteLen < 1024 * 1024) return `${(byteLen / 1024).toFixed(1)} KB`
+  return `${(byteLen / (1024 * 1024)).toFixed(1)} MB`
+}
 
 function SettingAvatarPicker({ value, onChange, disabled }) {
   const { t } = useTranslation('settings')
@@ -25,13 +32,35 @@ function SettingAvatarPicker({ value, onChange, disabled }) {
   return (
     <div className="flex items-center gap-2">
       <Avatar src={value} size="2xl" className="shrink-0" />
-      <input
-        className={`${inputClass} flex-1`}
-        value={value ?? ''}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={t('defaults.systemAvatar.placeholder')}
-        disabled={disabled}
-      />
+      <div className="relative flex-1">
+        {value?.startsWith('data:') ? (
+          <input
+            className={`${inputClass} pr-10`}
+            value={t('defaults.systemAvatar.imageData', { size: formatDataSize(value.length) })}
+            readOnly
+            disabled={disabled}
+          />
+        ) : (
+          <input
+            className={`${inputClass} pr-10`}
+            value={value ?? ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={t('defaults.systemAvatar.placeholder')}
+            disabled={disabled}
+          />
+        )}
+        {value && !disabled && (
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
+            aria-label={t('defaults.systemAvatar.clear')}
+            title={t('defaults.systemAvatar.clear')}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
       <button
         type="button"
         onClick={() => fileRef.current?.click()}
