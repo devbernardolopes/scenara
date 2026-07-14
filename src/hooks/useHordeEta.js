@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getEffectiveProfileFor } from '../services/connectionProfiles'
 
 const POLL_INTERVAL_MS = 15000
@@ -20,35 +20,10 @@ export function useHordeEta(enabled) {
   const modelRef = useRef(null)
   const activeRef = useRef(false)
 
-  const fetchEta = useCallback(async () => {
-    if (providerRef.current !== 'ai-horde' || !modelRef.current) {
-      setEta(null)
-      return
-    }
-
-    if (abortRef.current) abortRef.current.abort()
-    abortRef.current = new AbortController()
-
-    try {
-      const encoded = encodeURIComponent(modelRef.current)
-      const res = await fetch(`${HORDE_MODELS_BASE}/${encoded}`, {
-        signal: abortRef.current.signal,
-      })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
-      setEta(typeof data.eta === 'number' ? formatEta(data.eta) : '--')
-    } catch {
-      setEta('--')
-    } finally {
-      if (activeRef.current) {
-        timerRef.current = setTimeout(fetchEta, POLL_INTERVAL_MS)
-      }
-    }
-  }, [])
+  const fetchEtaRef = useRef(null)
 
   useEffect(() => {
     if (!enabled) {
-      setEta(null)
       if (timerRef.current) {
         clearTimeout(timerRef.current)
         timerRef.current = null
@@ -61,6 +36,34 @@ export function useHordeEta(enabled) {
     }
 
     activeRef.current = true
+
+    async function fetchEta() {
+      if (providerRef.current !== 'ai-horde' || !modelRef.current) {
+        setEta(null)
+        return
+      }
+
+      if (abortRef.current) abortRef.current.abort()
+      abortRef.current = new AbortController()
+
+      try {
+        const encoded = encodeURIComponent(modelRef.current)
+        const res = await fetch(`${HORDE_MODELS_BASE}/${encoded}`, {
+          signal: abortRef.current.signal,
+        })
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const data = await res.json()
+        setEta(typeof data.eta === 'number' ? formatEta(data.eta) : '--')
+      } catch {
+        setEta('--')
+      } finally {
+        if (activeRef.current) {
+          timerRef.current = setTimeout(fetchEtaRef.current, POLL_INTERVAL_MS)
+        }
+      }
+    }
+
+    fetchEtaRef.current = fetchEta
 
     async function load() {
       const profile = await getEffectiveProfileFor('chat')
@@ -79,7 +82,7 @@ export function useHordeEta(enabled) {
       }
 
       if (profile?.providerId === 'ai-horde') {
-        fetchEta()
+        fetchEtaRef.current?.()
       } else {
         setEta(null)
       }
@@ -98,7 +101,7 @@ export function useHordeEta(enabled) {
       if (timerRef.current) clearTimeout(timerRef.current)
       if (abortRef.current) abortRef.current.abort()
     }
-  }, [enabled, fetchEta])
+  }, [enabled])
 
   return eta
 }

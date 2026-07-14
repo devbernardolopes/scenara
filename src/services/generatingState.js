@@ -64,6 +64,20 @@ export function clearStreamingSlotIndex(threadId) {
   )
 }
 
+const streamingStartTimes = new Map()
+
+export function setStreamingStartTime(messageId, startTime) {
+  streamingStartTimes.set(Number(messageId), startTime)
+}
+
+export function getStreamingStartTime(messageId) {
+  return streamingStartTimes.get(Number(messageId)) || null
+}
+
+export function clearStreamingStartTime(messageId) {
+  streamingStartTimes.delete(Number(messageId))
+}
+
 export function startGenerating(threadId) {
   const id = Number(threadId)
   generatingThreads.add(id)

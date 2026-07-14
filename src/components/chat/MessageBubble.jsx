@@ -6,6 +6,7 @@ import { useIsMobile } from '../../hooks/useIsMobile'
 import { useOverflowButtons } from '../../hooks/useOverflowButtons'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
+import { getStreamingStartTime } from '../../services/generatingState'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
@@ -228,6 +229,24 @@ function MessageBubble({
   const [order, setOrder] = useState({ assistantButtonOrder: null, userButtonOrder: null })
   const [postProcessingEnabled, setPostProcessingEnabled] = useState(true)
   const [globalPPRules, setGlobalPPRules] = useState(DEFAULT_PP_RULES)
+  const [elapsedMs, setElapsedMs] = useState(null)
+
+  useEffect(() => {
+    if (!streaming) return
+    const startTime = getStreamingStartTime(message.id)
+    if (!startTime) return
+    let cancelled = false
+    const tick = () => {
+      if (!cancelled) setElapsedMs(Date.now() - startTime)
+    }
+    const id = setTimeout(tick, 0)
+    const interval = setInterval(tick, 1000)
+    return () => {
+      cancelled = true
+      clearTimeout(id)
+      clearInterval(interval)
+    }
+  }, [streaming, message.id])
 
   useEffect(() => {
     async function load() {
@@ -956,14 +975,21 @@ function MessageBubble({
                 DIR
               </span>
             )}
+            {streaming && elapsedMs != null && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
+                {t('apiDuration', { duration: formatDuration(elapsedMs) })}
+              </span>
+            )}
             {!streaming && typeof apiDurationMs === 'number' && (
               <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
                 {t('apiDuration', { duration: formatDuration(apiDurationMs) })}
               </span>
             )}
-            <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
-              {t('tokens', { count: formatTokenCount(tokenCount) })}
-            </span>
+            {!streaming && typeof apiDurationMs === 'number' && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
+                {t('tokens', { count: formatTokenCount(tokenCount) })}
+              </span>
+            )}
             {!streaming && typeof apiDurationMs === 'number' && (
               <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
                 {t('words', { count: wordCount })}

@@ -39,6 +39,8 @@ import {
   setStreamingSlotIndex,
   getStreamingSlotIndex,
   clearStreamingSlotIndex,
+  setStreamingStartTime,
+  clearStreamingStartTime,
 } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import {
@@ -136,7 +138,6 @@ function ChatView() {
   const messagesGrewRef = useRef(false)
   const scrollClearedRef = useRef(false)
   const messagesRef = useRef(null)
-  const bundleSlotRef = useRef({})
   const failedIdsRef = useRef(new Set())
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
@@ -270,11 +271,13 @@ function ChatView() {
     scrollStickyCleanupRef.current = null
     prevMessagesLengthRef.current = 0
     scrollCommits.current = 0
-    setShowScrollButton(false)
-    setGenerating(false)
-    setStreamingMsgId(null)
-    setActiveSlotIndices({})
-    loadData()
+    Promise.resolve().then(() => {
+      setShowScrollButton(false)
+      setGenerating(false)
+      setStreamingMsgId(null)
+      setActiveSlotIndices({})
+      loadData()
+    })
   }, [threadId])
 
   useEffect(() => {
@@ -526,7 +529,7 @@ function ChatView() {
 
   useEffect(() => {
     if (getGeneratingThreads().has(Number(threadId))) {
-      setGenerating(true)
+      Promise.resolve().then(() => setGenerating(true))
     }
     function handleGeneratingChange(e) {
       const { threadId: eventThreadId, generating: isGenerating } = e.detail
@@ -545,6 +548,27 @@ function ChatView() {
     }
     window.addEventListener('generating-state-changed', handleGeneratingChange)
     return () => window.removeEventListener('generating-state-changed', handleGeneratingChange)
+  }, [threadId])
+
+  useEffect(() => {
+    let cancelled = false
+    const msgId = getStreamingMessageId(threadId)
+    if (msgId != null) {
+      Promise.resolve().then(() => {
+        if (!cancelled) setStreamingMsgId(msgId)
+      })
+    }
+    function handleStreamingChange(e) {
+      const { threadId: eventThreadId, messageId } = e.detail
+      if (Number(eventThreadId) === Number(threadId)) {
+        setStreamingMsgId(messageId)
+      }
+    }
+    window.addEventListener('streaming-message-changed', handleStreamingChange)
+    return () => {
+      cancelled = true
+      window.removeEventListener('streaming-message-changed', handleStreamingChange)
+    }
   }, [threadId])
 
   useEffect(() => {
@@ -736,6 +760,7 @@ function ChatView() {
 
     const assistantMsgId = await createAssistantMessage(threadId, '', null, isOOC)
     setStreamingMessageId(threadId, assistantMsgId)
+    setStreamingStartTime(assistantMsgId, Date.now())
     if (Number(currentThreadIdRef.current) === Number(threadId)) {
       setStreamingMsgId(assistantMsgId)
       setMessages((prev) => [
@@ -874,12 +899,13 @@ function ChatView() {
       const msgs = await getMessagesByThread(threadId)
       if (Number(currentThreadIdRef.current) === Number(threadId)) setMessages(dedupeMessages(msgs))
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
-        showToast(result.error, { type: 'error' })
+        showToast(err.message, { type: 'error' })
       }
       const newFailed = new Set(failedIdsRef.current)
       newFailed.add(assistantMsgId)
       failedIdsRef.current = newFailed
     } finally {
+      clearStreamingStartTime(assistantMsgId)
       clearStreamingMessageId(threadId)
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setStreamingMsgId(null)
@@ -910,7 +936,9 @@ function ChatView() {
         const soundEnabled = await getSetting('unreadSound')
         if (soundEnabled) playNotificationSound()
       }
-    } catch {}
+    } catch {
+      // Non-critical: unread tracking failure shouldn't block the response
+    }
 
     if (outcome !== 'succeeded') return
 
@@ -1031,7 +1059,9 @@ function ChatView() {
           }
         }
       }
-    } catch {}
+    } catch {
+      // Non-critical: post-generation tasks (auto-title, summarize) shouldn't block the flow
+    }
   }
 
   async function handleSend(text, personaId, isOOC, autoReply = true) {
@@ -1209,6 +1239,7 @@ function ChatView() {
         activeSlotIndex: slotIndex,
       })
       setStreamingMessageId(threadId, messageId)
+      setStreamingStartTime(messageId, Date.now())
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setStreamingMsgId(messageId)
         setMessages((prev) =>
@@ -1402,6 +1433,7 @@ function ChatView() {
         }
       }
     } finally {
+      clearStreamingStartTime(messageId)
       clearStreamingMessageId(threadId)
       clearStreamingSlotIndex(threadId)
       isLocalStreamerRef.current = false
