@@ -132,6 +132,7 @@ function ChatView() {
   const scrollStickyCleanupRef = useRef(null)
   const prevMessagesLengthRef = useRef(0)
   const messagesGrewRef = useRef(false)
+  const scrollClearedRef = useRef(false)
   const messagesRef = useRef(null)
   const bundleSlotRef = useRef({})
   const failedIdsRef = useRef(new Set())
@@ -371,7 +372,7 @@ function ChatView() {
 
     if (messagesGrewRef.current) {
       el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
-    } else if (isAtBottomRef.current) {
+    } else if (isAtBottomRef.current && !scrollClearedRef.current) {
       el.scrollTo({ top: el.scrollHeight })
       setShowScrollButton(false)
     } else {
@@ -379,6 +380,7 @@ function ChatView() {
       isAtBottomRef.current = atBottom
       setShowScrollButton(!atBottom)
     }
+    scrollClearedRef.current = false
   }, [messages])
 
   useEffect(() => {
@@ -549,6 +551,7 @@ function ChatView() {
     isAtBottomRef.current = atBottom
     if (atBottom) {
       clearUnread(threadId)
+      scrollClearedRef.current = true
       setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
       if (messageThreshold > 0) {
         setVisibleStartIndex((prev) =>
