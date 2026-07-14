@@ -171,6 +171,7 @@ function ChatView() {
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const [chatModelName, setChatModelName] = useState('')
   const [showStatus, setShowStatus] = useState(true)
+  const [oocActive, setOocActive] = useState(false)
   const [pendingRecovery, setPendingRecovery] = useState(null)
   const scrollHeightBeforeRef = useRef(null)
   const hordeEta = useHordeEta(showStatus)
@@ -445,12 +446,16 @@ function ChatView() {
 
   useEffect(() => {
     async function loadChatModel() {
-      const profile = await getEffectiveProfileFor('chat')
+      const kind = oocActive ? 'ooc' : 'chat'
+      const profile = await getEffectiveProfileFor(kind)
       setChatModelName(profile?.model || '')
     }
     loadChatModel()
     function onSettingsChanged(e) {
-      if (e.detail?.key === 'requestKind.chat.profileId') loadChatModel()
+      const key = e.detail?.key
+      if (key === 'requestKind.chat.profileId' || key === 'requestKind.ooc.profileId') {
+        loadChatModel()
+      }
     }
     function onProfileChanged() {
       loadChatModel()
@@ -461,7 +466,7 @@ function ChatView() {
       window.removeEventListener('settings-changed', onSettingsChanged)
       window.removeEventListener('connectionProfiles-changed', onProfileChanged)
     }
-  }, [])
+  }, [oocActive])
 
   useEffect(() => {
     async function loadShowStatus() {
@@ -1970,6 +1975,7 @@ function ChatView() {
           autoTitling={autoTitling}
           hasQueued={queuedCount > 0}
           onPersonaChange={setSelectedPersonaId}
+          onOocChange={setOocActive}
         />
       </div>
 

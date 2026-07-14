@@ -116,6 +116,7 @@ function ChatInputArea({
   autoTitling,
   hasQueued,
   onPersonaChange,
+  onOocChange,
 }) {
   const { t } = useTranslation('chat')
   const { openModal } = useModal()
@@ -242,6 +243,10 @@ function ChatInputArea({
       }
     }
   }, [threadId])
+
+  useEffect(() => {
+    onOocChange?.(oocActive)
+  }, [oocActive, onOocChange])
 
   // Sync latestRef after every render so cleanup always has freshest values
   useEffect(() => {
