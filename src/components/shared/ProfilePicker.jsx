@@ -28,8 +28,8 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
         onClose()
       }
     }
-    document.addEventListener('click', handleClick)
-    return () => document.removeEventListener('click', handleClick)
+    document.addEventListener('click', handleClick, true)
+    return () => document.removeEventListener('click', handleClick, true)
   }, [open, onClose])
 
   useEffect(() => {
@@ -39,6 +39,17 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
     }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
+  }, [open, onClose])
+
+  useEffect(() => {
+    if (!open) return
+    function handleScroll(e) {
+      if (ref.current && !ref.current.contains(e.target)) {
+        onClose()
+      }
+    }
+    window.addEventListener('scroll', handleScroll, { capture: true })
+    return () => window.removeEventListener('scroll', handleScroll, { capture: true })
   }, [open, onClose])
 
   useEffect(() => {
