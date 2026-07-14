@@ -1740,7 +1740,7 @@ function ChatView() {
                   const isVisible = idx >= visibleStartIndex
                   let nextIdx = idx + 1
                   while (nextIdx < messages.length && messages[nextIdx].isSummaryMarker) nextIdx++
-                  const nextVisible = nextIdx < messages.length && nextIdx >= visibleStartIndex
+                  const nextVisible = nextIdx >= messages.length || nextIdx >= visibleStartIndex
                   if (!isVisible || !nextVisible) return null
                   return (
                     <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
@@ -1761,7 +1761,7 @@ function ChatView() {
                     (messages[nextIdx].isAutoTitleMarker || messages[nextIdx].isSummaryMarker)
                   )
                     nextIdx++
-                  const nextVisible = nextIdx < messages.length && nextIdx >= visibleStartIndex
+                  const nextVisible = nextIdx >= messages.length || nextIdx >= visibleStartIndex
                   if (!isVisible || !nextVisible) return null
                   return (
                     <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
