@@ -153,6 +153,7 @@ function ChatView() {
   const [generating, setGenerating] = useState(false)
   const [queuedCount, setQueuedCount] = useState(0)
   const [summarizing, setSummarizing] = useState(false)
+  const [autoTitling, setAutoTitling] = useState(false)
   const [streamingMsgId, setStreamingMsgId] = useState(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [noChatProfile, setNoChatProfile] = useState(false)
@@ -990,6 +991,7 @@ function ChatView() {
       if (await shouldAutoTitle(thr, chr, nonFailedMsgs)) {
         showToast(t('autoTitleGenerating'), { type: 'info' })
         const atAbort = new AbortController()
+        setAutoTitling(true)
         try {
           await apiQueue.enqueue({
             threadId,
@@ -1029,6 +1031,8 @@ function ChatView() {
           if (err.name !== 'AbortError') {
             showToast(err.message, { type: 'error' })
           }
+        } finally {
+          setAutoTitling(false)
         }
       }
 
@@ -1866,6 +1870,7 @@ function ChatView() {
           onCancel={handleCancel}
           generating={generating}
           summarizing={summarizing}
+          autoTitling={autoTitling}
           hasQueued={queuedCount > 0}
           onPersonaChange={setSelectedPersonaId}
         />

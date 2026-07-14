@@ -113,6 +113,7 @@ function ChatInputArea({
   onCancel,
   generating,
   summarizing,
+  autoTitling,
   hasQueued,
   onPersonaChange,
 }) {
@@ -458,7 +459,8 @@ function ChatInputArea({
   }
 
   function handleSend() {
-    if (generating || summarizing || hasQueued) {
+    if (autoTitling || summarizing) return
+    if (generating || hasQueued) {
       onCancel?.()
       return
     }
@@ -654,7 +656,7 @@ function ChatInputArea({
             rows={2}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            disabled={summarizing}
+            disabled={autoTitling || summarizing}
             onInput={(e) => autoResize(e.target)}
             onFocus={handleTextareaFocus}
             onBlur={handleTextareaBlur}
