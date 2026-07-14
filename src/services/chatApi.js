@@ -229,14 +229,12 @@ export function getActiveParams(profile) {
       }
     }
   }
-  // OpenRouter reasoning params: convert types and filter defaults
-  if (active.reasoning_effort === 'none' || active.reasoning_effort == null) {
-    delete active.reasoning_effort
+  // OpenRouter reasoning params: always pass through as strings
+  if (active.reasoning_effort != null) {
+    active.reasoning_effort = String(active.reasoning_effort)
   }
-  if (active.include_reasoning === false || active.include_reasoning == null) {
-    delete active.include_reasoning
-  } else {
-    active.include_reasoning = 'true'
+  if (active.include_reasoning != null) {
+    active.include_reasoning = active.include_reasoning ? 'true' : 'false'
   }
   return active
 }
