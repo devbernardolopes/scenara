@@ -495,6 +495,7 @@ function ChatInputArea({
     if (e.key === 'Enter' && quickSettings.enterToSend && !e.shiftKey) {
       e.preventDefault()
       handleSend()
+      textareaRef.current?.blur()
     }
   }
 
