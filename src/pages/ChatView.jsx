@@ -836,6 +836,7 @@ function ChatView() {
     outcome,
     notifyMessageId,
     includeSummarization,
+    currentPersona,
   }) {
     if (outcome === 'aborted') return
 
@@ -876,6 +877,7 @@ function ChatView() {
                 character: chr,
                 messages: nonFailedMsgs,
                 personaMap,
+                currentPersona,
                 signal: atAbort.signal,
               })
             },
@@ -1034,6 +1036,7 @@ function ChatView() {
         outcome,
         notifyMessageId: messageId,
         includeSummarization: true,
+        currentPersona,
       })
     } catch {
       // doChatRequest re-throws AbortError on cancel — handled silently
@@ -1359,6 +1362,7 @@ function ChatView() {
         outcome,
         notifyMessageId: messageId,
         includeSummarization: true,
+        currentPersona,
       })
     }
   }

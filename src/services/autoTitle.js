@@ -83,14 +83,21 @@ export async function shouldAutoTitle(thread, character, messages) {
   return count >= threshold
 }
 
-export async function triggerAutoTitle({ thread, character, messages, personaMap, signal }) {
+export async function triggerAutoTitle({
+  thread,
+  character,
+  messages,
+  personaMap,
+  currentPersona,
+  signal,
+}) {
   const charName = character.name || ''
   let personaName = ''
   if (thread.personaId) {
     const persona = await db.personas.get(thread.personaId)
     personaName = persona?.name || ''
   }
-  const currentPersonaName = personaName
+  const currentPersonaName = currentPersona?.name || personaName
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
 
   let systemContent = character.autoTitleSystemInstructions
@@ -129,18 +136,19 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
     personaMap,
     rolePrefixes,
   })
+  const transcriptWithVars = replaceVarsIn(transcript)
 
-  systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, transcript)
+  systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, transcriptWithVars)
 
   const payload = [{ role: 'system', content: systemContent }]
   const memoryText = await buildInjectedMemory(character, thread)
   const payloadWithMemory = appendMemoryToPayload(payload, memoryText, '')
 
   if (userContent) {
-    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/gi, transcript)
+    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/gi, transcriptWithVars)
     payloadWithMemory.push({ role: 'user', content: userContent })
   } else {
-    payloadWithMemory.push({ role: 'user', content: transcript })
+    payloadWithMemory.push({ role: 'user', content: transcriptWithVars })
   }
 
   let title = ''
@@ -149,7 +157,7 @@ export async function triggerAutoTitle({ thread, character, messages, personaMap
   const useLocalInference = await getSetting('localInference.autoTitle')
   if (useLocalInference) {
     try {
-      title = await tryLocalTitle(transcript)
+      title = await tryLocalTitle(transcriptWithVars)
     } catch {
       title = ''
     }
