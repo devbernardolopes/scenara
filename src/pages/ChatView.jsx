@@ -1198,6 +1198,10 @@ function ChatView() {
     generatingRef.current = true
     isLocalStreamerRef.current = true
 
+    let sendOutcome = 'aborted'
+    let sendMessageId = null
+    let currentPersona = null
+
     try {
       let currentMsgs = messages
       let chatPersona = null
@@ -1218,15 +1222,9 @@ function ChatView() {
 
       const isFirstMessage = currentMsgs.length === 0
 
-      if (text && !autoReply) {
-        generatingRef.current = false
-        if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          setGenerating(false)
-        }
-        return
-      }
+      if (text && !autoReply) return
 
-      const currentPersona = personaId ? await getPersona(personaId) : chatPersona
+      currentPersona = personaId ? await getPersona(personaId) : chatPersona
       const abortController = new AbortController()
 
       const { outcome, messageId } = await apiQueue.enqueue({
@@ -1246,15 +1244,8 @@ function ChatView() {
         },
       }).promise
 
-      if (Number(currentThreadIdRef.current) !== Number(threadId)) return
-      await runPostGenerationTasks({
-        threadId,
-        character,
-        outcome,
-        notifyMessageId: messageId,
-        includeSummarization: true,
-        currentPersona,
-      })
+      sendOutcome = outcome
+      sendMessageId = messageId
     } catch {
       // doChatRequest re-throws AbortError on cancel — handled silently
     } finally {
@@ -1263,6 +1254,14 @@ function ChatView() {
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setGenerating(false)
       }
+      await runPostGenerationTasks({
+        threadId,
+        character,
+        outcome: sendOutcome,
+        notifyMessageId: sendMessageId,
+        includeSummarization: true,
+        currentPersona,
+      })
     }
   }
 
