@@ -47,7 +47,7 @@ export function useHordeEta(enabled) {
       abortRef.current = new AbortController()
 
       try {
-        const encoded = encodeURIComponent(modelRef.current)
+        const encoded = encodeURIComponent(encodeURIComponent(modelRef.current))
         const res = await fetch(`${HORDE_MODELS_BASE}/${encoded}`, {
           signal: abortRef.current.signal,
         })
