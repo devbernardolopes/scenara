@@ -49,15 +49,17 @@ export const CATEGORIES = [
 ]
 
 export const GROUPS = [
+  { key: 'autoTitle', labelKey: 'settings:groups.autoTitle' },
   { key: 'assistantButtons', labelKey: 'settings:groups.assistantButtons' },
   { key: 'userButtons', labelKey: 'settings:groups.userButtons' },
   { key: 'apiRequestSectionHeaders', labelKey: 'settings:groups.apiRequestSectionHeaders' },
   { key: 'chatButtons', labelKey: 'settings:groups.chatButtons' },
   { key: 'rolePrefixes', labelKey: 'settings:groups.rolePrefixes' },
-  { key: 'localInference', labelKey: 'settings:groups.localInference' },
+  { key: 'localInference', labelKey: 'settings:groups.localInference', parent: 'autoTitle' },
   {
     key: 'localInferenceAdvanced',
     labelKey: 'settings:groups.localInferenceAdvanced',
+    parent: 'localInference',
     defaultExpanded: false,
   },
   { key: 'interface', labelKey: 'settings:groups.interface' },
@@ -888,6 +890,7 @@ export const SETTINGS = [
   {
     key: 'prompting.autoTitleSystem',
     category: 'prompting',
+    group: 'autoTitle',
     type: 'textarea',
     default: 'You are a title generator for conversational AI.\n\n{{transcript}}',
     props: { rows: 6, collapsible: true, summary: 'tokens' },
@@ -897,6 +900,7 @@ export const SETTINGS = [
   {
     key: 'prompting.autoTitleUser',
     category: 'prompting',
+    group: 'autoTitle',
     type: 'textarea',
     default: 'Create a title for the provided message exchange.',
     props: { rows: 6, collapsible: true, summary: 'tokens' },

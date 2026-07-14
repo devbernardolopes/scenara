@@ -45,7 +45,8 @@
     "rolePrefixes": "Prefijos de rol",
     "localInference": "Inferencia local",
     "localInferenceAdvanced": "Avanzado",
-    "interface": "Interface"
+    "interface": "Interface",
+    "autoTitle": "Auto-Title"
   },
   "appearance": {
     "theme": {

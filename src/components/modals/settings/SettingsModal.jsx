@@ -34,25 +34,83 @@ function SettingsModal() {
   const noResults = search && filtered.length === 0
 
   function groupedSettings(settings) {
-    const groupItems = new Map()
-    const order = []
-
+    const settingsByGroup = new Map()
     for (const s of settings) {
       if (s.group) {
-        if (!groupItems.has(s.group)) {
-          groupItems.set(s.group, [])
-          order.push(s.group)
-        }
-        groupItems.get(s.group).push(s)
-      } else {
-        order.push({ item: s })
+        if (!settingsByGroup.has(s.group)) settingsByGroup.set(s.group, [])
+        settingsByGroup.get(s.group).push(s)
       }
     }
 
-    return order.map((entry) =>
-      entry.item
-        ? { group: null, items: [entry.item] }
-        : { group: entry, items: groupItems.get(entry) },
+    const groupNodes = new Map()
+    for (const [key, items] of settingsByGroup) {
+      groupNodes.set(key, {
+        key,
+        def: GROUPS.find((g) => g.key === key),
+        items,
+        children: [],
+      })
+    }
+
+    for (const [, node] of groupNodes) {
+      const parentKey = node.def?.parent
+      if (parentKey && groupNodes.has(parentKey)) {
+        groupNodes.get(parentKey).children.push(node)
+      }
+    }
+
+    const emittedRoots = new Set()
+    const roots = []
+    for (const s of settings) {
+      if (!s.group) {
+        roots.push({ setting: s })
+        continue
+      }
+      const node = groupNodes.get(s.group)
+      if (!node) {
+        roots.push({ setting: s })
+        continue
+      }
+      let cur = node
+      while (cur.def?.parent && groupNodes.has(cur.def.parent)) {
+        cur = groupNodes.get(cur.def.parent)
+      }
+      if (emittedRoots.has(cur.key)) continue
+      emittedRoots.add(cur.key)
+      roots.push(groupNodes.get(cur.key))
+    }
+    return roots
+  }
+
+  function renderGroupNode(node) {
+    if (node.setting) {
+      return (
+        <SettingRow
+          key={node.setting.key}
+          setting={node.setting}
+          onSave={(v) => setSetting(node.setting.key, v)}
+        />
+      )
+    }
+    const groupDef = node.def
+    return (
+      <CollapsibleSection
+        key={node.key}
+        label={groupDef ? t(groupDef.labelKey.replace('settings:', '')) : node.key}
+        storageKey={`settings.group.${node.key}`}
+        defaultExpanded={groupDef?.defaultExpanded ?? true}
+      >
+        <div className="space-y-4">
+          {node.items.map((setting) => (
+            <SettingRow
+              key={setting.key}
+              setting={setting}
+              onSave={(v) => setSetting(setting.key, v)}
+            />
+          ))}
+          {node.children.map((child) => renderGroupNode(child))}
+        </div>
+      </CollapsibleSection>
     )
   }
 
@@ -99,36 +157,7 @@ function SettingsModal() {
             <PostProcessingRulesPanel />
           ) : (
             <div className="space-y-8">
-              {groupedSettings(filtered).map((g) => {
-                if (g.group) {
-                  const groupDef = GROUPS.find((grp) => grp.key === g.group)
-                  return (
-                    <CollapsibleSection
-                      key={g.group}
-                      label={groupDef ? t(groupDef.labelKey.replace('settings:', '')) : g.group}
-                      storageKey={`settings.group.${g.group}`}
-                      defaultExpanded={groupDef?.defaultExpanded ?? true}
-                    >
-                      <div className="space-y-4">
-                        {g.items.map((setting) => (
-                          <SettingRow
-                            key={setting.key}
-                            setting={setting}
-                            onSave={(v) => setSetting(setting.key, v)}
-                          />
-                        ))}
-                      </div>
-                    </CollapsibleSection>
-                  )
-                }
-                return g.items.map((setting) => (
-                  <SettingRow
-                    key={setting.key}
-                    setting={setting}
-                    onSave={(v) => setSetting(setting.key, v)}
-                  />
-                ))
-              })}
+              {groupedSettings(filtered).map((node) => renderGroupNode(node))}
             </div>
           )}
         </div>
