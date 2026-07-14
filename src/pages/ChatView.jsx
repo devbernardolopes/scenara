@@ -162,8 +162,9 @@ function ChatView() {
   const [oocMessageRole, setOocMessageRole] = useState('system')
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const [chatModelName, setChatModelName] = useState('')
+  const [showStatus, setShowStatus] = useState(true)
   const scrollHeightBeforeRef = useRef(null)
-  const hordeEta = useHordeEta()
+  const hordeEta = useHordeEta(showStatus)
 
   async function loadPersonas() {
     const list = await getAllPersonas()
@@ -413,6 +414,21 @@ function ChatView() {
     loadChatModel()
     function onSettingsChanged(e) {
       if (e.detail?.key === 'requestKind.chat.profileId') loadChatModel()
+    }
+    window.addEventListener('settings-changed', onSettingsChanged)
+    return () => window.removeEventListener('settings-changed', onSettingsChanged)
+  }, [])
+
+  useEffect(() => {
+    async function loadShowStatus() {
+      const val = await getSetting('showStatus')
+      setShowStatus(val !== false)
+    }
+    loadShowStatus()
+    function onSettingsChanged(e) {
+      if (e.detail?.key === 'showStatus') {
+        setShowStatus(e.detail.value !== false)
+      }
     }
     window.addEventListener('settings-changed', onSettingsChanged)
     return () => window.removeEventListener('settings-changed', onSettingsChanged)
@@ -1763,7 +1779,7 @@ function ChatView() {
       <div className="flex-shrink-0 border-t border-border bg-surface">
         {' '}
         {/* Wrap input for better control */}
-        {chatModelName && (
+        {showStatus && chatModelName && (
           <div className="px-3 text-center">
             <span className="text-xs text-tertiary">
               {chatModelName.split('/').pop()}

@@ -12,7 +12,7 @@ function formatEta(seconds) {
   return `${Math.round(seconds)}s`
 }
 
-export function useHordeEta() {
+export function useHordeEta(enabled) {
   const [eta, setEta] = useState(null)
   const abortRef = useRef(null)
   const timerRef = useRef(null)
@@ -43,6 +43,19 @@ export function useHordeEta() {
   }, [])
 
   useEffect(() => {
+    if (!enabled) {
+      setEta(null)
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
+      if (abortRef.current) {
+        abortRef.current.abort()
+        abortRef.current = null
+      }
+      return
+    }
+
     activeRef.current = true
 
     async function load() {
@@ -81,7 +94,7 @@ export function useHordeEta() {
       if (timerRef.current) clearTimeout(timerRef.current)
       if (abortRef.current) abortRef.current.abort()
     }
-  }, [fetchEta])
+  }, [enabled, fetchEta])
 
   return eta
 }

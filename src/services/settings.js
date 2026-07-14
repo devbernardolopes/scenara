@@ -644,6 +644,15 @@ export const SETTINGS = [
     descKey: 'settings:appearance.highlightDeleteButtons.desc',
   },
   {
+    key: 'showStatus',
+    category: 'appearance',
+    group: 'chat',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.showStatus.label',
+    descKey: 'settings:appearance.showStatus.desc',
+  },
+  {
     key: 'regenerationConfirmation',
     category: 'appearance',
     group: 'chat',

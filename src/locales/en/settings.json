@@ -270,6 +270,10 @@
       "label": "Highlight Delete Buttons",
       "desc": "Show delete buttons with a distinct red background for emphasis."
     },
+    "showStatus": {
+      "label": "Show Status",
+      "desc": "Show the status bar above the chat input with the active model name."
+    },
     "regenerationConfirmation": {
       "label": "Regeneration Confirmation",
       "desc": "Show a confirmation dialog before regenerating a message."
