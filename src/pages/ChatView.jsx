@@ -860,6 +860,10 @@ function ChatView() {
     return ids.size > 0 ? msgs.filter((m) => !ids.has(m.id)) : msgs
   }
 
+  function isRealMessage(m) {
+    return !m?.isSummaryMarker && !m?.isAutoTitleMarker
+  }
+
   // Defensive: collapse any duplicate ids in a DB-fetched message list so a stale
   // race between a full-replace setMessages and an optimistic append can never
   // render two bubbles for the same message.
@@ -1253,7 +1257,7 @@ function ChatView() {
         }
       }
 
-      const isFirstMessage = currentMsgs.length === 0
+      const isFirstMessage = currentMsgs.filter(isRealMessage).length === 0
 
       if (text && !autoReply) return
 
@@ -1377,7 +1381,8 @@ function ChatView() {
 
       currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : chatPersona
 
-      const isFirstMessage = currentMsgs.length === 0 && character?.firstMessage
+      const isFirstMessage =
+        currentMsgs.filter(isRealMessage).length === 0 && character?.firstMessage
 
       regenEntries = parseBundleEntries(msg.bundleMessages)
       if (!regenEntries) {
