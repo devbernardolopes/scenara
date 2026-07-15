@@ -659,7 +659,7 @@ function ChatInputArea({
         {/* In-Chat Shortcuts Pills */}
         {shortcutsActive && parsedShortcuts && (
           <div className="absolute bottom-full left-0 right-0 mb-2 bg-surface border border-border rounded-lg shadow-surface-lg z-20 max-h-60 overflow-y-auto">
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-border sticky top-0 bg-surface z-10">
               <select
                 value={shortcutsSet?.id ?? ''}
                 onChange={(e) => handleSetChange(Number(e.target.value))}
@@ -681,23 +681,43 @@ function ChatInputArea({
               </button>
             </div>
             <div className="flex flex-wrap-reverse gap-2 p-3">
-              {parsedShortcuts.map((s, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => {
-                    setInputValue(s.message)
-                    requestAnimationFrame(() => {
-                      textareaRef.current?.focus()
-                      if (textareaRef.current) autoResize(textareaRef.current)
-                    })
-                  }}
-                  className="min-h-[44px] min-w-[44px] px-3 py-2 flex items-center justify-center rounded-md bg-primary-subtle text-primary hover:bg-primary/20 text-sm break-words transition-colors"
-                  title={s.message}
-                >
-                  {s.name}
-                </button>
-              ))}
+              {parsedShortcuts.map((s, i) => {
+                const sendDisabled = generating || summarizing || hasQueued
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      setInputValue(s.message)
+                      setShortcutsActive(false)
+                      requestAnimationFrame(() => {
+                        textareaRef.current?.focus()
+                        if (textareaRef.current) autoResize(textareaRef.current)
+                      })
+                    }}
+                    onDoubleClick={() => {
+                      setInputValue(s.message)
+                      setShortcutsActive(false)
+                      if (!sendDisabled) {
+                        requestAnimationFrame(() => {
+                          onSend?.(
+                            s.message,
+                            selectedPersona?.id,
+                            oocActive,
+                            quickSettings.autoReply,
+                          )
+                          setInputValue('')
+                          persistNow({ inputValue: '' })
+                        })
+                      }
+                    }}
+                    className="min-h-[44px] min-w-[44px] px-3 py-2 flex items-center justify-center rounded-md bg-primary-subtle text-primary hover:bg-primary/20 text-sm break-words transition-colors"
+                    title={s.message}
+                  >
+                    {s.name}
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}
