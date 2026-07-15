@@ -198,7 +198,7 @@ function Sidebar({ open, onClose }) {
     function updateQueueCounts() {
       const counts = {}
       threads.forEach((t) => {
-        const c = apiQueue.getThreadQueueCount(t.id)
+        const c = apiQueue.getThreadQueuedCount(t.id)
         if (c > 0) counts[t.id] = c
       })
       setQueueCounts(counts)

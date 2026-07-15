@@ -488,7 +488,7 @@ function ChatInputArea({
   }
 
   function handleSend() {
-    if (autoTitling || summarizing) return
+    if (summarizing) return
     if (generating || hasQueued) {
       onCancel?.()
       return
@@ -733,7 +733,7 @@ function ChatInputArea({
             rows={2}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            disabled={autoTitling || summarizing}
+            disabled={summarizing}
             onInput={(e) => autoResize(e.target)}
             onFocus={handleTextareaFocus}
             onBlur={handleTextareaBlur}

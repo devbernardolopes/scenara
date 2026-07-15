@@ -153,6 +153,8 @@ function ChatView() {
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [queuedCount, setQueuedCount] = useState(0)
+  const [blockingGenerating, setBlockingGenerating] = useState(false)
+  const [blockingQueued, setBlockingQueued] = useState(false)
   const [summarizing, setSummarizing] = useState(false)
   const [autoTitling, setAutoTitling] = useState(false)
   const [pendingMarkers, setPendingMarkers] = useState([])
@@ -593,7 +595,15 @@ function ChatView() {
 
   useEffect(() => {
     const handler = () => {
-      setQueuedCount(apiQueue.getThreadQueueCount(threadId))
+      const state = apiQueue.getState()
+      const tid = Number(threadId)
+      setQueuedCount(state.queue.filter((q) => q.threadId === tid).length)
+      setBlockingQueued(
+        state.queue.some((q) => q.threadId === tid && apiQueue.BLOCKING_KINDS.includes(q.type)),
+      )
+      setBlockingGenerating(
+        state.inflight.some((i) => i.threadId === tid && apiQueue.BLOCKING_KINDS.includes(i.type)),
+      )
     }
     handler()
     const unsub = apiQueue.subscribe(handler)
@@ -1842,8 +1852,10 @@ function ChatView() {
                 onDoubleClick={() => openModal('editThreadTitle', { thread })}
               />
             </div>
-            {generating && <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />}
-            {queuedCount > 0 && (
+            {blockingGenerating && (
+              <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />
+            )}
+            {blockingQueued && (
               <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-primary rounded-full shrink-0">
                 {queuedCount}
               </span>
@@ -1960,7 +1972,7 @@ function ChatView() {
                       onFork={handleForkMessage}
                       onRegenerate={handleRegenerate}
                       onSpeak={() => {}}
-                      generating={generating}
+                      generating={blockingGenerating}
                       requestFailed={isFailedSlot}
                       errorText={errorText}
                       isUnread={msg.isUnread || false}
@@ -2026,10 +2038,10 @@ function ChatView() {
           threadId={threadId}
           onSend={handleSend}
           onCancel={handleCancel}
-          generating={generating}
+          generating={blockingGenerating}
           summarizing={summarizing}
           autoTitling={autoTitling}
-          hasQueued={queuedCount > 0}
+          hasQueued={blockingQueued}
           onPersonaChange={setSelectedPersonaId}
           onOocChange={setOocActive}
         />

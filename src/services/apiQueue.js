@@ -1,6 +1,11 @@
 import { getSetting } from './settings'
 import { startGenerating, stopGenerating } from './generatingState'
 
+// Queue types that represent user-facing, input-blocking chat activity.
+// OOC and director run as subtypes of 'chat' (same queue type), so they are
+// inherently covered. 'autoTitle' and 'summarization' are intentionally excluded.
+export const BLOCKING_KINDS = ['chat', 'regenerate']
+
 let queue = []
 let inflight = new Set()
 let schedulerRunning = false
@@ -207,7 +212,7 @@ export function cancelThreadRequests(threadId) {
   let cancelled = false
 
   queue = queue.filter((item) => {
-    if (item.threadId === tid) {
+    if (item.threadId === tid && BLOCKING_KINDS.includes(item.type)) {
       item.reject?.(new DOMException('Cancelled', 'AbortError'))
       cancelled = true
       return false
@@ -216,7 +221,7 @@ export function cancelThreadRequests(threadId) {
   })
 
   for (const item of inflight) {
-    if (item.threadId === tid) {
+    if (item.threadId === tid && BLOCKING_KINDS.includes(item.type)) {
       item.controller?.abort()
       cancelled = true
     }
@@ -226,9 +231,29 @@ export function cancelThreadRequests(threadId) {
   return cancelled
 }
 
-export function getThreadQueueCount(threadId) {
+function matchesKind(item, kinds) {
+  return !kinds || kinds.length === 0 || kinds.includes(item.type)
+}
+
+// Count of queued (waiting, not yet dispatched) items for a thread, optionally
+// filtered by request kinds.
+export function getThreadQueuedCount(threadId, { kinds } = {}) {
   const tid = Number(threadId)
-  return queue.filter((item) => item.threadId === tid).length
+  return queue.filter((item) => item.threadId === tid && matchesKind(item, kinds)).length
+}
+
+// Count of inflight (running) items for a thread, optionally filtered by kinds.
+export function getThreadInflightCount(threadId, { kinds } = {}) {
+  const tid = Number(threadId)
+  return [...inflight].filter((item) => item.threadId === tid && matchesKind(item, kinds)).length
+}
+
+// True if any item of the given kinds is queued OR inflight for the thread.
+export function isThreadBlockingActive(threadId, { kinds = BLOCKING_KINDS } = {}) {
+  const tid = Number(threadId)
+  const inQueue = queue.some((item) => item.threadId === tid && kinds.includes(item.type))
+  const inFlight = [...inflight].some((item) => item.threadId === tid && kinds.includes(item.type))
+  return inQueue || inFlight
 }
 
 export function subscribe(fn) {
