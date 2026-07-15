@@ -171,6 +171,7 @@ function ChatView() {
   const [oocMessageRole, setOocMessageRole] = useState('system')
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const [chatModelName, setChatModelName] = useState('')
+  const [chatModelTemp, setChatModelTemp] = useState(null)
   const [showStatus, setShowStatus] = useState(true)
   const [statusBarRefresh, setStatusBarRefresh] = useState(30)
   const [oocActive, setOocActive] = useState(false)
@@ -451,6 +452,8 @@ function ChatView() {
       const kind = oocActive ? 'ooc' : 'chat'
       const profile = await getEffectiveProfileFor(kind)
       setChatModelName(profile?.model || '')
+      const temp = profile?.params?.temperature
+      setChatModelTemp(typeof temp === 'number' ? temp : null)
     }
     loadChatModel()
     function onSettingsChanged(e) {
@@ -2008,6 +2011,7 @@ function ChatView() {
         {showStatus && chatModelName && (
           <div className="px-3 text-center">
             <span className="text-xs text-tertiary">
+              {chatModelTemp != null && <>T {chatModelTemp} · </>}
               {chatModelName.split('/').pop()}
               {hordeEta && <> · {hordeEta}</>}
             </span>
