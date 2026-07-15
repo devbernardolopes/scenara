@@ -2,14 +2,18 @@ import { getSetting } from './settings'
 import { startGenerating, stopGenerating } from './generatingState'
 
 let queue = []
-let currentRequest = null
-let isProcessing = false
-let lastRequestEndTime = 0
+let inflight = new Set()
+let schedulerRunning = false
+let lastDispatchTime = 0
 let requestCounter = 0
 const listeners = new Set()
 
 function generateId() {
   return `apiq_${++requestCounter}_${Date.now()}`
+}
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms))
 }
 
 async function getCooldownMs() {
@@ -36,68 +40,93 @@ function notify() {
 
 export function getState() {
   return {
-    queueLength: queue.length,
-    currentRequestId: currentRequest?.id ?? null,
-    currentThreadId: currentRequest?.threadId ?? null,
-    currentRequestType: currentRequest?.type ?? null,
-    currentRequestDirector: currentRequest?.directorPhase ?? false,
+    queueLength: queue.length + inflight.size,
     queue: queue.map((item) => ({ id: item.id, threadId: item.threadId, type: item.type })),
+    inflight: [...inflight].map((item) => ({
+      id: item.id,
+      threadId: item.threadId,
+      type: item.type,
+      director: !!item.directorPhase,
+    })),
   }
 }
 
-async function processNext() {
-  if (isProcessing) return
-  isProcessing = true
+async function scheduleDispatch() {
+  if (schedulerRunning) return
+  schedulerRunning = true
 
-  while (queue.length > 0) {
-    const now = Date.now()
-    const cooldownMs = await getCooldownMs()
-    const elapsed = now - lastRequestEndTime
+  try {
+    while (queue.length > 0) {
+      const cooldownMs = await getCooldownMs()
+      const elapsed = Date.now() - lastDispatchTime
 
-    if (elapsed < cooldownMs) {
-      await new Promise((r) => setTimeout(r, cooldownMs - elapsed))
+      if (elapsed < cooldownMs) {
+        await sleep(cooldownMs - elapsed)
+      }
+
+      if (queue.length === 0) break
+
+      const item = queue.shift()
+
+      if (item.signal?.aborted) {
+        item.reject?.(new DOMException('Aborted before execution', 'AbortError'))
+        notify()
+        continue
+      }
+
+      lastDispatchTime = Date.now()
+      dispatch(item)
     }
+  } finally {
+    schedulerRunning = false
+  }
+}
 
-    if (queue.length === 0) break
+function dispatch(item) {
+  inflight.add(item)
+  startGenerating(item.threadId)
+  notify()
 
-    const item = queue.shift()
-
-    if (item.signal?.aborted) {
-      item.reject?.(new DOMException('Aborted before execution', 'AbortError'))
+  const ctx = {
+    markStreaming: () => {
+      item.streamingStarted = true
+    },
+    markActivity: () => {
+      item.lastActivityAt = Date.now()
+    },
+    setDirectorPhase: (active) => {
+      item.directorPhase = !!active
       notify()
-      continue
-    }
+    },
+  }
 
-    currentRequest = item
-    startGenerating(item.threadId)
-    notify()
+  let idleIntervalId = null
+  let settled = false
 
-    const timeoutMs = await getTimeoutMs()
-    const idleIntervalId = setInterval(() => {
+  getTimeoutMs().then((timeoutMs) => {
+    if (settled) return
+    idleIntervalId = setInterval(() => {
       if (item.signal?.aborted) return
       const lastActivity = item.lastActivityAt ?? item.enqueuedAt
       if (Date.now() - lastActivity > timeoutMs) {
         item.controller?.abort()
       }
     }, 1000)
+  })
 
-    try {
-      const result = await item.execute()
-      item.resolve?.(result)
-    } catch (err) {
-      item.reject?.(err)
-    } finally {
-      clearInterval(idleIntervalId)
-      lastRequestEndTime = Date.now()
+  Promise.resolve()
+    .then(() => item.execute(ctx))
+    .then((result) => item.resolve?.(result))
+    .catch((err) => item.reject?.(err))
+    .finally(() => {
+      settled = true
+      if (idleIntervalId) clearInterval(idleIntervalId)
+      inflight.delete(item)
       const tid = item.threadId
-      currentRequest = null
-      stopGenerating(tid)
+      const stillGenerating = [...inflight].some((i) => i.threadId === tid)
+      if (!stillGenerating) stopGenerating(tid)
       notify()
-    }
-  }
-
-  isProcessing = false
-  notify()
+    })
 }
 
 function autoRemoveIfAborted(item) {
@@ -149,7 +178,7 @@ export function enqueue({ threadId, type, execute, signal, controller }) {
   autoRemoveIfAborted(item)
   notify()
 
-  processNext()
+  scheduleDispatch()
 
   return { id, promise }
 }
@@ -163,9 +192,11 @@ export function cancelRequest(id) {
     return true
   }
 
-  if (currentRequest?.id === id) {
-    currentRequest.controller?.abort()
-    return true
+  for (const item of inflight) {
+    if (item.id === id) {
+      item.controller?.abort()
+      return true
+    }
   }
 
   return false
@@ -184,9 +215,11 @@ export function cancelThreadRequests(threadId) {
     return true
   })
 
-  if (currentRequest?.threadId === tid) {
-    currentRequest.controller?.abort()
-    cancelled = true
+  for (const item of inflight) {
+    if (item.threadId === tid) {
+      item.controller?.abort()
+      cancelled = true
+    }
   }
 
   if (cancelled) notify()
@@ -195,7 +228,12 @@ export function cancelThreadRequests(threadId) {
 
 export function getThreadQueueCount(threadId) {
   const tid = Number(threadId)
-  return queue.filter((item) => item.threadId === tid).length
+  const queued = queue.filter((item) => item.threadId === tid).length
+  let running = 0
+  for (const item of inflight) {
+    if (item.threadId === tid) running += 1
+  }
+  return queued + running
 }
 
 export function subscribe(fn) {
@@ -203,29 +241,10 @@ export function subscribe(fn) {
   return () => listeners.delete(fn)
 }
 
-export function markCurrentRequestStreaming() {
-  if (currentRequest) {
-    currentRequest.streamingStarted = true
-  }
-}
-
-export function markCurrentRequestActivity() {
-  if (currentRequest) {
-    currentRequest.lastActivityAt = Date.now()
-  }
-}
-
-export function setCurrentRequestDirectorPhase(active) {
-  if (currentRequest) {
-    currentRequest.directorPhase = !!active
-    notify()
-  }
-}
-
 export async function waitForCooldown() {
   const cooldownMs = await getCooldownMs()
-  const elapsed = Date.now() - lastRequestEndTime
+  const elapsed = Date.now() - lastDispatchTime
   if (elapsed < cooldownMs) {
-    await new Promise((r) => setTimeout(r, cooldownMs - elapsed))
+    await sleep(cooldownMs - elapsed)
   }
 }

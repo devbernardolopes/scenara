@@ -72,6 +72,7 @@ export async function generateChatResponse({
   signal,
   onToken,
   onFinish,
+  ctx,
 }) {
   const profile = isOOC ? await getEffectiveProfileFor('ooc') : await getEffectiveProfileFor('chat')
 
@@ -135,8 +136,8 @@ export async function generateChatResponse({
     signal,
     onToken: directorConfig ? undefined : onToken,
     onFinish,
-    onStreamingStarted: apiQueue.markCurrentRequestStreaming,
-    onActivity: apiQueue.markCurrentRequestActivity,
+    onStreamingStarted: ctx?.markStreaming,
+    onActivity: ctx?.markActivity,
     onTiming: (ms) => {
       chatDurationMs = ms
     },
@@ -198,7 +199,7 @@ export async function generateChatResponse({
 
       await apiQueue.waitForCooldown()
       showToast(i18n.t('chat:directorReviewing'), { type: 'info' })
-      apiQueue.setCurrentRequestDirectorPhase(true)
+      ctx?.setDirectorPhase?.(true)
       try {
         const reviewedResult = await sendChatCompletion({
           profile: dProfile,
@@ -206,8 +207,8 @@ export async function generateChatResponse({
           signal,
           onToken,
           onFinish,
-          onStreamingStarted: apiQueue.markCurrentRequestStreaming,
-          onActivity: apiQueue.markCurrentRequestActivity,
+          onStreamingStarted: ctx?.markStreaming,
+          onActivity: ctx?.markActivity,
           onTiming: (ms) => {
             directorDurationMs = ms
           },
@@ -238,7 +239,7 @@ export async function generateChatResponse({
           })
         }
       } finally {
-        apiQueue.setCurrentRequestDirectorPhase(false)
+        ctx?.setDirectorPhase?.(false)
       }
     } catch (err) {
       if (err.name === 'AbortError') throw err

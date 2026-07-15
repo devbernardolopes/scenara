@@ -15,19 +15,15 @@ function CancelConfirmModal({ threadId }) {
     const tid = Number(threadId)
     const items = []
 
-    if (state.currentThreadId === tid && state.currentRequestType) {
-      items.push({
-        type: state.currentRequestType,
-        status: 'executing',
-        director: state.currentRequestDirector,
-      })
+    for (const item of state.inflight) {
+      if (item.threadId === tid) {
+        items.push({ type: item.type, status: 'executing', director: item.director })
+      }
     }
 
     for (const item of state.queue) {
       if (item.threadId === tid) {
-        if (item.id !== state.currentRequestId) {
-          items.push({ type: item.type, status: 'queued' })
-        }
+        items.push({ type: item.type, status: 'queued' })
       }
     }
 
@@ -46,7 +42,8 @@ function CancelConfirmModal({ threadId }) {
     const state = getState()
     const tid = Number(threadId)
     const stillActive =
-      state.currentThreadId === tid || state.queue.some((item) => item.threadId === tid)
+      state.inflight.some((item) => item.threadId === tid) ||
+      state.queue.some((item) => item.threadId === tid)
     if (!stillActive) return
 
     setCancelling(true)

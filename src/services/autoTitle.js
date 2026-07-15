@@ -11,7 +11,7 @@ import {
   buildDirectorMessages,
   getAutoTitleTemplateValues,
 } from './director'
-import { waitForCooldown, setCurrentRequestDirectorPhase } from './apiQueue'
+import { waitForCooldown } from './apiQueue'
 import { showToast } from '../lib/toast'
 import { run, disposeModel } from '../lib/inferenceClient'
 import i18n from '../lib/i18n'
@@ -90,6 +90,7 @@ export async function triggerAutoTitle({
   personaMap,
   currentPersona,
   signal,
+  ctx,
 }) {
   const charName = character.name || ''
   let personaName = ''
@@ -111,7 +112,8 @@ export async function triggerAutoTitle({
   let userContent = character.autoTitleUserInstructions
   if (!userContent) {
     userContent = (await getSetting('prompting.autoTitleUser'))?.trim()
-    if (!userContent) userContent = 'Create a title in the language of the provided message exchange.'
+    if (!userContent)
+      userContent = 'Create a title in the language of the provided message exchange.'
   }
 
   const includeOOC = character.includeOOC !== false
@@ -211,7 +213,7 @@ export async function triggerAutoTitle({
       )
       const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
       const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
-      setCurrentRequestDirectorPhase(true)
+      ctx?.setDirectorPhase?.(true)
       let reviewed
       try {
         const reviewedResult = await sendChatCompletion({
@@ -224,7 +226,7 @@ export async function triggerAutoTitle({
         })
         reviewed = reviewedResult.content
       } finally {
-        setCurrentRequestDirectorPhase(false)
+        ctx?.setDirectorPhase?.(false)
       }
       const trimMsgs = await getSetting('prompting.trimMessages')
       const reviewedTrimmed = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed

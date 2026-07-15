@@ -640,28 +640,19 @@ function ChatView() {
       ])
       if (cancelled) return
       const state = apiQueue.getState()
+      const tid = Number(threadId)
       const pending = []
       if (autoTitleMarker) {
-        if (
-          state.currentThreadId === Number(threadId) &&
-          state.currentRequestType === 'autoTitle'
-        ) {
+        if (state.inflight.some((i) => i.threadId === tid && i.type === 'autoTitle')) {
           pending.push({ type: 'autoTitle', status: 'active' })
-        } else if (
-          state.queue.some((q) => q.threadId === Number(threadId) && q.type === 'autoTitle')
-        ) {
+        } else if (state.queue.some((q) => q.threadId === tid && q.type === 'autoTitle')) {
           pending.push({ type: 'autoTitle', status: 'queued' })
         }
       }
       if (summMarker) {
-        if (
-          state.currentThreadId === Number(threadId) &&
-          state.currentRequestType === 'summarization'
-        ) {
+        if (state.inflight.some((i) => i.threadId === tid && i.type === 'summarization')) {
           pending.push({ type: 'summarization', status: 'active' })
-        } else if (
-          state.queue.some((q) => q.threadId === Number(threadId) && q.type === 'summarization')
-        ) {
+        } else if (state.queue.some((q) => q.threadId === tid && q.type === 'summarization')) {
           pending.push({ type: 'summarization', status: 'queued' })
         }
       }
@@ -676,16 +667,14 @@ function ChatView() {
   useEffect(() => {
     function handleQueueChange() {
       const state = apiQueue.getState()
+      const tid = Number(threadId)
       setPendingMarkers((prev) => {
         let changed = false
         const next = prev
           .map((m) => {
-            const isCurrent =
-              state.currentRequestType === m.type && state.currentThreadId === Number(threadId)
-            const isQueued = state.queue.some(
-              (q) => q.type === m.type && q.threadId === Number(threadId),
-            )
-            if (isCurrent) {
+            const isActive = state.inflight.some((i) => i.threadId === tid && i.type === m.type)
+            const isQueued = state.queue.some((q) => q.type === m.type && q.threadId === tid)
+            if (isActive) {
               if (m.status !== 'active') {
                 changed = true
                 return { ...m, status: 'active' }
@@ -909,6 +898,7 @@ function ChatView() {
     currentPersona,
     isOOC = false,
     signal,
+    ctx,
   ) {
     currentMsgs = withoutFailedMessages(currentMsgs)
 
@@ -959,6 +949,7 @@ function ChatView() {
             showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
           }
         },
+        ctx,
       })
 
       throttledToken.cancel()
@@ -1116,7 +1107,7 @@ function ChatView() {
             type: 'autoTitle',
             signal: atAbort.signal,
             controller: atAbort,
-            execute: async () => {
+            execute: async (ctx) => {
               return await triggerAutoTitle({
                 thread: thr,
                 character: chr,
@@ -1124,6 +1115,7 @@ function ChatView() {
                 personaMap,
                 currentPersona,
                 signal: atAbort.signal,
+                ctx,
               })
             },
           }).promise
@@ -1183,7 +1175,7 @@ function ChatView() {
               type: 'summarization',
               signal: summAbort.signal,
               controller: summAbort,
-              execute: async () => {
+              execute: async (ctx) => {
                 return await triggerSummarization({
                   thread: currentThread,
                   character,
@@ -1191,6 +1183,7 @@ function ChatView() {
                   personaMap,
                   signal: summAbort.signal,
                   currentPersona: null,
+                  ctx,
                 })
               },
             }).promise
@@ -1272,7 +1265,7 @@ function ChatView() {
         type: 'chat',
         signal: abortController.signal,
         controller: abortController,
-        execute: async () => {
+        execute: async (ctx) => {
           return await doChatRequest(
             isFirstMessage,
             currentMsgs,
@@ -1280,6 +1273,7 @@ function ChatView() {
             currentPersona,
             isOOC,
             abortController.signal,
+            ctx,
           )
         },
       }).promise
@@ -1456,7 +1450,7 @@ function ChatView() {
         type: 'regenerate',
         signal: regenAbortController.signal,
         controller: regenAbortController,
-        execute: async () => {
+        execute: async (ctx) => {
           return await generateChatResponse({
             character,
             chatPersona,
@@ -1473,6 +1467,7 @@ function ChatView() {
                 showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
               }
             },
+            ctx,
           })
         },
       }).promise
