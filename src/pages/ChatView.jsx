@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, RefreshCw, Clock } from '../lib/icons'
+import { ChevronDown, RefreshCw, Clock, Square } from '../lib/icons'
 import { useModal } from '../hooks/useModal'
 import { useHordeEta } from '../hooks/useHordeEta'
 import { showToast } from '../lib/toast'
@@ -1984,6 +1984,16 @@ function ChatView() {
             <div key={`pending-${pm.type}`} className="flex items-center gap-3 my-2 px-1">
               <div className="flex-1 h-px bg-border" />
               <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
+                {pm.type === 'autoTitle' && (pm.status === 'queued' || pm.status === 'active') && (
+                  <button
+                    type="button"
+                    onClick={() => openModal('cancelConfirm', { threadId })}
+                    className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-error hover:bg-error/10 transition-colors"
+                    title={t('cancelConfirmTitle')}
+                  >
+                    <Square className="w-3 h-3" />
+                  </button>
+                )}
                 {t(pm.type === 'autoTitle' ? 'autoTitleMarker' : 'summarizationMarker')}
                 {pm.status === 'queued' && <Clock className="w-3 h-3" />}
                 {pm.status === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
