@@ -11,7 +11,10 @@
   "characterTag": "Personagem",
   "ooc": "Modo OOC",
   "attachFile": "Anexar arquivo",
-  "shortcuts": "Atalhos no chat",
+  "shortcuts": {
+    "label": "Atalhos no chat",
+    "manage": "Gerenciar conjuntos de atalhos"
+  },
   "memories": "Memórias salvas",
   "stt": "Fala para texto",
   "moreOptions": "Mais opções",

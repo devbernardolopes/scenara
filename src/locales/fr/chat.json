@@ -6,7 +6,10 @@
   "send": "Envoyer",
   "ooc": "Mode OOC",
   "attachFile": "Joindre un fichier",
-  "shortcuts": "Raccourcis",
+  "shortcuts": {
+    "label": "Raccourcis",
+    "manage": "Gérer les ensembles de raccourcis"
+  },
   "memories": "Mémoires",
   "stt": "Parole en texte",
   "moreOptions": "Plus d'options",

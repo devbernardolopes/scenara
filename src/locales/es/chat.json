@@ -6,7 +6,10 @@
   "send": "Enviar",
   "ooc": "Modo OOC",
   "attachFile": "Adjuntar archivo",
-  "shortcuts": "Atajos",
+  "shortcuts": {
+    "label": "Atajos",
+    "manage": "Gestionar conjuntos de atajos"
+  },
   "memories": "Recuerdos guardados",
   "stt": "Voz a texto",
   "moreOptions": "Más opciones",

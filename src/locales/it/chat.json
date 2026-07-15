@@ -6,7 +6,10 @@
   "send": "Invia",
   "ooc": "Modalità OOC",
   "attachFile": "Allega file",
-  "shortcuts": "Scorciatoie",
+  "shortcuts": {
+    "label": "Scorciatoie",
+    "manage": "Gestisci insiemi di scorciatoie"
+  },
   "memories": "Memorie salvate",
   "stt": "Voce in testo",
   "moreOptions": "Altre opzioni",

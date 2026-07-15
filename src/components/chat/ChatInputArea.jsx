@@ -17,11 +17,12 @@ import {
   Reply,
   Forward,
   X,
+  Settings,
 } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 import PersonaPicker from '../shared/PersonaPicker'
 import { getPersona, getAllPersonas } from '../../services/personas'
-import { getThread } from '../../services/threads'
+import { getThread, updateThread } from '../../services/threads'
 import { getUIState, setUIState } from '../../services/uiState'
 import { useModal } from '../../hooks/useModal'
 import { getSetting } from '../../services/settings'
@@ -74,7 +75,7 @@ const TOGGLEABLE_CHAT_BUTTONS = new Set([
 const CHAT_BUTTON_DEFS = {
   ooc: { icon: MessageSquare, labelKey: 'ooc' },
   attachFile: { icon: Paperclip, labelKey: 'attachFile' },
-  shortcuts: { icon: Zap, labelKey: 'shortcuts' },
+  shortcuts: { icon: Zap, labelKey: 'shortcuts.label' },
   memories: { icon: Brain, labelKey: 'memories' },
   stt: { icon: Mic, labelKey: 'stt' },
   autoTTS: { icon: Volume2, labelKey: 'quickSettings.autoTTS' },
@@ -151,6 +152,7 @@ function ChatInputArea({
   )
   const [chatOrder, setChatOrder] = useState(null)
   const [shortcutsActive, setShortcutsActive] = useState(false)
+  const [allShortcutsSets, setAllShortcutsSets] = useState([])
   const [shortcutsSet, setShortcutsSet] = useState(null)
   const [overflowOpen, setOverflowOpen] = useState(false)
   const [overflowMenuStyle, setOverflowMenuStyle] = useState(null)
@@ -348,13 +350,25 @@ function ChatInputArea({
     return () => document.removeEventListener('mousedown', handleClick)
   }, [promptHistoryOpen])
 
-  // Load the active In-Chat Shortcuts set (first in DB)
+  // Load In-Chat Shortcuts sets + resolve active set for this thread
   useEffect(() => {
     let cancelled = false
     async function load() {
       const all = await getAllInChatShortcuts()
       if (cancelled) return
-      setShortcutsSet(all && all.length > 0 ? all[0] : null)
+      setAllShortcutsSets(all || [])
+      if (!all || all.length === 0) {
+        setShortcutsSet(null)
+        return
+      }
+      const thread = await getThread(threadId)
+      const savedId = thread?.activeShortcutSetId
+      const match = savedId ? all.find((s) => s.id === savedId) : null
+      const active = match || all[0]
+      setShortcutsSet(active)
+      if (!match && thread) {
+        await updateThread(threadId, { activeShortcutSetId: active.id })
+      }
     }
     load()
     window.addEventListener('inChatShortcuts-changed', load)
@@ -362,13 +376,23 @@ function ChatInputArea({
       cancelled = true
       window.removeEventListener('inChatShortcuts-changed', load)
     }
-  }, [])
+  }, [threadId])
 
-  const hasShortcutsSet = Boolean(shortcutsSet)
+  const hasShortcutsSet = allShortcutsSets.length > 0
   const parsedShortcuts = useMemo(() => {
     if (!shortcutsSet?.content) return null
     return parseShortcuts(shortcutsSet.content)
   }, [shortcutsSet])
+
+  const handleSetChange = useCallback(
+    async (setId) => {
+      const selected = allShortcutsSets.find((s) => s.id === setId)
+      if (!selected) return
+      setShortcutsSet(selected)
+      await updateThread(threadId, { activeShortcutSetId: selected.id })
+    },
+    [allShortcutsSets, threadId],
+  )
 
   useEffect(() => {
     let cancelled = false
@@ -634,8 +658,29 @@ function ChatInputArea({
 
         {/* In-Chat Shortcuts Pills */}
         {shortcutsActive && parsedShortcuts && (
-          <div className="absolute bottom-full left-0 right-0 mb-2 bg-surface border border-border rounded-lg shadow-surface-lg z-20 p-3 max-h-60 overflow-y-auto">
-            <div className="flex flex-wrap-reverse gap-2">
+          <div className="absolute bottom-full left-0 right-0 mb-2 bg-surface border border-border rounded-lg shadow-surface-lg z-20 max-h-60 overflow-y-auto">
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
+              <select
+                value={shortcutsSet?.id ?? ''}
+                onChange={(e) => handleSetChange(Number(e.target.value))}
+                className="flex-1 min-h-[36px] text-sm bg-surface-secondary border border-border rounded px-2 text-text"
+              >
+                {allShortcutsSets.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => openModal('inChatShortcutManagement')}
+                className="min-h-[36px] min-w-[36px] p-1.5 rounded text-tertiary hover:text-primary hover:bg-primary-subtle transition-colors"
+                title={t('shortcuts.manage')}
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex flex-wrap-reverse gap-2 p-3">
               {parsedShortcuts.map((s, i) => (
                 <button
                   key={i}

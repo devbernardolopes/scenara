@@ -11,7 +11,10 @@
   "characterTag": "Character",
   "ooc": "OOC mode",
   "attachFile": "Attach file",
-  "shortcuts": "In-chat shortcuts",
+  "shortcuts": {
+    "label": "In-chat shortcuts",
+    "manage": "Manage shortcut sets"
+  },
   "memories": "Saved memories",
   "stt": "Speech to text",
   "moreOptions": "More options",

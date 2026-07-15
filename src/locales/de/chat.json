@@ -6,7 +6,10 @@
   "send": "Senden",
   "ooc": "OOC-Modus",
   "attachFile": "Datei anhängen",
-  "shortcuts": "Chat-Verknüpfungen",
+  "shortcuts": {
+    "label": "Chat-Verknüpfungen",
+    "manage": "Verknüpfungssätze verwalten"
+  },
   "memories": "Gespeicherte Erinnerungen",
   "stt": "Sprache zu Text",
   "moreOptions": "Weitere Optionen",
