@@ -2,7 +2,7 @@ import db from '../db'
 import { updateMessage } from './messages'
 import { updateThread } from './threads'
 import { buildTranscript, replaceVars, sendChatCompletion } from './chatApi'
-import { createThreadMemory, buildInjectedMemory, pruneThreadMemories } from './threadMemories'
+import { createThreadMemory, buildInjectedMemory } from './threadMemories'
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { getSetting } from './settings'
 import { estimateTokens } from './tokenEstimator'
@@ -154,7 +154,6 @@ export async function triggerSummarization({
     userRolePrefixOoc: await getSetting('prompting.userRolePrefixOoc'),
   }
 
-  const memorySlots = character?.memorySlots ?? (await getSetting('defaultMemorySlots')) ?? 3
   const memoryText = await buildInjectedMemory(character, thread)
 
   const payload = await buildSummarizationPayload({
@@ -197,7 +196,6 @@ export async function triggerSummarization({
     params: profile.params,
     apiDurationMs,
   })
-  await pruneThreadMemories(thread.id, memorySlots)
   await updateThread(thread.id, { lastSummarizationAt: timestamp })
 
   return cleanedSummary

@@ -132,23 +132,6 @@ export async function createThreadMemory({
   return id
 }
 
-export async function pruneThreadMemories(threadId, memorySlots) {
-  const id = Number(threadId)
-  const slots = Number(memorySlots) || 1
-  const memories = await db.threadMemories.where('threadId').equals(id).sortBy('createdAt')
-  if (memories.length <= slots) return
-  const toDelete = memories.slice(0, memories.length - slots)
-  await Promise.all(
-    toDelete.map((m) =>
-      db.threadMemories
-        .delete(m.id)
-        .then(() =>
-          window.dispatchEvent(new CustomEvent('memories-changed', { detail: { threadId: id } })),
-        ),
-    ),
-  )
-}
-
 export async function updateThreadMemory(id, data) {
   return db.threadMemories.update(Number(id), { ...data, updatedAt: new Date() })
 }
