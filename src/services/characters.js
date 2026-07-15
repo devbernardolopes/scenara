@@ -73,7 +73,7 @@ export async function getCharacterChatCounts() {
 
 export async function touchCharacterLastUsed(characterId) {
   const now = new Date()
-  await db.characters.update(characterId, { lastUsedAt: now, updatedAt: now })
+  await db.characters.update(characterId, { lastUsedAt: now })
 }
 
 export async function createCharacter(data) {
