@@ -54,7 +54,24 @@
     "systemPrompt": "Prompt SYSTEM do Diretor",
     "userPrompt": "Prompt USER do Diretor",
     "response": "Resposta do Diretor",
-    "responseError": "Erro do Diretor"
+    "responseError": "Erro do Diretor",
+    "apply": "Aplicar",
+    "regenerate": "Regenerar",
+    "discardTitle": "Descartar alterações?",
+    "discardMessage": "Você tem alterações não salvas nos prompts do Diretor. Tem certeza que deseja fechar sem aplicar?",
+    "discardConfirm": "Descartar alterações",
+    "saved": "Detalhes do Diretor salvos",
+    "saveError": "Falha ao salvar detalhes do Diretor"
+  },
+  "directorRegenerationResult": {
+    "title": "Regeneração do Diretor",
+    "cancelTitle": "Cancelar regeneração?",
+    "cancelMessage": "Tem certeza que deseja cancelar? A resposta regenerada será descartada.",
+    "cancelConfirm": "Sim, cancelar",
+    "generating": "Gerando…",
+    "noProfile": "Nenhum perfil de Diretor configurado",
+    "error": "Ocorreu um erro durante a regeneração",
+    "accept": "Aceitar"
   },
   "cancel": "Cancelar",
   "messageDeleteTitle": "Excluir mensagem",

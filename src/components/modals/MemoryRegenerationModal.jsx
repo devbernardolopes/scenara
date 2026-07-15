@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
@@ -32,17 +32,22 @@ function MemoryRegenerationModal({ threadId, entry }) {
     if (ok) closeModal()
   }, [dirty, closeModal, confirm, t])
 
+  const handleCloseRef = useRef(handleClose)
+  useEffect(() => {
+    handleCloseRef.current = handleClose
+  })
+
   useEffect(() => {
     if (!dirty) {
       setCloseGuard(null)
       return
     }
     setCloseGuard(() => {
-      void handleClose()
+      void handleCloseRef.current()
       return false
     })
     return () => setCloseGuard(null)
-  }, [dirty, handleClose, setCloseGuard])
+  }, [dirty, setCloseGuard])
 
   function handleUserChange(e) {
     setUserContent(e.target.value)

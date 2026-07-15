@@ -551,6 +551,16 @@ function ChatView() {
   }, [thread])
 
   useEffect(() => {
+    function handleDirectorDetailsUpdated(e) {
+      if (Number(e.detail?.threadId) !== Number(threadId)) return
+      getMessagesByThread(threadId).then((msgs) => setMessages(dedupeMessages(msgs)))
+    }
+    window.addEventListener('director-details-updated', handleDirectorDetailsUpdated)
+    return () =>
+      window.removeEventListener('director-details-updated', handleDirectorDetailsUpdated)
+  }, [threadId])
+
+  useEffect(() => {
     if (loading || !character || noChatProfile) return
     if (
       !autoTriggeredRef.current &&

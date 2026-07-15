@@ -54,7 +54,24 @@
     "systemPrompt": "SYSTEM Director Prompt",
     "userPrompt": "USER Director Prompt",
     "response": "Director Response",
-    "responseError": "Director Error"
+    "responseError": "Director Error",
+    "apply": "Apply",
+    "regenerate": "Regenerate",
+    "discardTitle": "Discard changes?",
+    "discardMessage": "You have unsaved changes to the Director prompts. Are you sure you want to close without applying?",
+    "discardConfirm": "Discard changes",
+    "saved": "Director details saved",
+    "saveError": "Failed to save Director details"
+  },
+  "directorRegenerationResult": {
+    "title": "Director Regeneration",
+    "cancelTitle": "Cancel regeneration?",
+    "cancelMessage": "Are you sure you want to cancel? The regenerated response will be discarded.",
+    "cancelConfirm": "Yes, cancel",
+    "generating": "Generating…",
+    "noProfile": "No Director profile configured",
+    "error": "An error occurred during regeneration",
+    "accept": "Accept"
   },
   "cancel": "Cancel",
   "messageDeleteTitle": "Delete message",

@@ -526,6 +526,9 @@ function MessageBubble({
       userPrompt: promptData.directorUserPrompt || '',
       response: promptData.directorResponse || '',
       failed: promptData.directorFailed || false,
+      messageId: message.id,
+      threadId: message.threadId,
+      outputDirectorResponse: character?.directorRegularChatOutputDirectorResponse !== false,
     })
   }
 
