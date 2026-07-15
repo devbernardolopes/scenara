@@ -15,6 +15,21 @@ export function getChatBaseUrl(providerId) {
   return BASE_URLS[providerId] || null
 }
 
+function extractErrorDetail(errBody) {
+  if (!errBody) return ''
+  try {
+    const parsed = JSON.parse(errBody)
+    if (typeof parsed === 'string') return parsed
+    if (parsed.error) {
+      if (typeof parsed.error === 'string') return parsed.error
+      if (parsed.error.message) return parsed.error.message
+    }
+  } catch {
+    return errBody
+  }
+  return errBody
+}
+
 export function replaceVars(text, { charName, personaName, currentPersonaName }) {
   if (!text) return text
   return text
@@ -587,7 +602,7 @@ export async function sendChatCompletion({
 
       if (!res.ok) {
         const errBody = await res.text().catch(() => '')
-        throw new Error(`HTTP ${res.status}${errBody ? `: ${errBody}` : ''}`)
+        throw new Error(extractErrorDetail(errBody) || `HTTP ${res.status}`)
       }
 
       const reader = res.body.getReader()
@@ -700,10 +715,14 @@ export async function sendChatCompletion({
 
     if (!res.ok) {
       const errBody = await res.text().catch(() => '')
-      throw new Error(`HTTP ${res.status}${errBody ? `: ${errBody}` : ''}`)
+      throw new Error(extractErrorDetail(errBody) || `HTTP ${res.status}`)
     }
 
     const json = await res.json()
+    if (json.error) {
+      const detail = typeof json.error === 'string' ? json.error : json.error.message || ''
+      throw new Error(detail || 'Unknown API error')
+    }
     const content = json.choices?.[0]?.message?.content || ''
     const finishReason = json.choices?.[0]?.finish_reason || null
     if (finishReason) onFinish?.(finishReason)
