@@ -32,6 +32,7 @@ import MemoryRegenerationResultModal from './components/modals/MemoryRegeneratio
 import TagManagementModal from './components/modals/TagManagementModal'
 import LocalInferenceModal from './components/modals/LocalInferenceModal'
 import CancelConfirmModal from './components/modals/CancelConfirmModal'
+import AutoTitleCancelModal from './components/modals/AutoTitleCancelModal'
 import ProgressModal from './components/modals/ProgressModal'
 import ImportSourceModal from './components/modals/ImportSourceModal'
 
@@ -62,6 +63,7 @@ registerModal('memoryRegenerationResult', MemoryRegenerationResultModal)
 registerModal('tagManagement', TagManagementModal)
 registerModal('localInference', LocalInferenceModal)
 registerModal('cancelConfirm', CancelConfirmModal)
+registerModal('autoTitleCancel', AutoTitleCancelModal)
 registerModal('progress', ProgressModal)
 registerModal('exportDatabase', ExportDatabaseModal)
 registerModal('importSource', ImportSourceModal)

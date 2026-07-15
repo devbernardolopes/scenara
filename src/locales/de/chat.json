@@ -47,5 +47,11 @@
   "clearInitialMessages": "Erste Nachrichten entfernen",
   "previousInitialMessage": "Vorherige",
   "nextInitialMessage": "Nächste",
-  "loadEarlierMessages": "Frühere Nachrichten laden ({{count}} mehr)"
+  "loadEarlierMessages": "Frühere Nachrichten laden ({{count}} mehr)",
+  "autoTitleCancelTitle": "Auto-Titel abbrechen",
+  "autoTitleCancelMessage": "Die Auto-Titel-Anfrage wird abgebrochen und der Titel wird nicht aktualisiert.",
+  "autoTitleCancelButton": "Ja, Auto-Titel abbrechen",
+  "autoTitleCancelHint": "Wenn die Anfrage abgeschlossen wird, während dieser Dialog geöffnet ist, wird der Bestätigungsbutton automatisch deaktiviert.",
+  "autoTitleCancelDone": "Die Auto-Titel-Anfrage ist bereits abgeschlossen.",
+  "autoTitleCancelDoneHint": "Du kannst diesen Dialog schließen — die Anfrage wurde von selbst beendet."
 }

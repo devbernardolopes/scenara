@@ -852,7 +852,7 @@ function ChatView() {
   }
 
   function handleCancelAutoTitle() {
-    apiQueue.cancelAutoTitleRequests(threadId)
+    openModal('autoTitleCancel', { threadId })
   }
 
   function withoutFailedMessages(msgs) {

@@ -47,5 +47,11 @@
   "clearInitialMessages": "Eliminar mensajes iniciales",
   "previousInitialMessage": "Anterior",
   "nextInitialMessage": "Siguiente",
-  "loadEarlierMessages": "Cargar mensajes anteriores ({{count}} más)"
+  "loadEarlierMessages": "Cargar mensajes anteriores ({{count}} más)",
+  "autoTitleCancelTitle": "Cancelar título automático",
+  "autoTitleCancelMessage": "Se cancelará la solicitud de título automático y el título no se actualizará.",
+  "autoTitleCancelButton": "Sí, cancelar título",
+  "autoTitleCancelHint": "Si la solicitud termina mientras este diálogo está abierto, el botón de confirmación se desactivará automáticamente.",
+  "autoTitleCancelDone": "La solicitud de título automático ya ha finalizado.",
+  "autoTitleCancelDoneHint": "Puedes cerrar este diálogo — la solicitud terminó por sí sola."
 }
