@@ -18,6 +18,10 @@ export function useHordeEta(enabled, requestKind = 'chat', pollIntervalSec = 15)
   const providerRef = useRef(null)
   const modelRef = useRef(null)
   const activeRef = useRef(false)
+  const pollIntervalRef = useRef(pollIntervalSec)
+  useEffect(() => {
+    pollIntervalRef.current = pollIntervalSec
+  })
 
   const fetchEtaRef = useRef(null)
 
@@ -58,7 +62,7 @@ export function useHordeEta(enabled, requestKind = 'chat', pollIntervalSec = 15)
         setEta('--')
       } finally {
         if (activeRef.current) {
-          timerRef.current = setTimeout(fetchEtaRef.current, pollIntervalSec * 1000)
+          timerRef.current = setTimeout(fetchEtaRef.current, pollIntervalRef.current * 1000)
         }
       }
     }
@@ -109,7 +113,7 @@ export function useHordeEta(enabled, requestKind = 'chat', pollIntervalSec = 15)
       if (timerRef.current) clearTimeout(timerRef.current)
       if (abortRef.current) abortRef.current.abort()
     }
-  }, [enabled, requestKind, pollIntervalSec])
+  }, [enabled, requestKind])
 
   return eta
 }
