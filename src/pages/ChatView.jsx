@@ -1107,6 +1107,8 @@ function ChatView() {
         showToast(t('autoTitleGenerating'), { type: 'info' })
         const atAbort = new AbortController()
         const showMarker = await getSetting('autoTitleMarker')
+        const triggerLastCreatedAt =
+          nonFailedMsgs.length > 0 ? nonFailedMsgs[nonFailedMsgs.length - 1].createdAt : null
         if (showMarker) {
           setPendingMarkers((prev) => [...prev, { type: 'autoTitle', status: 'queued' }])
         }
@@ -1133,16 +1135,14 @@ function ChatView() {
           setThread((prev) => ({ ...prev, title: updatedThr.title, autoTitleGenerated: true }))
           showToast(t('autoTitleGenerated'), { type: 'success' })
 
-          if (showMarker) {
+          if (showMarker && triggerLastCreatedAt != null) {
             const postMsgs = await getMessagesByThread(threadId)
-            if (postMsgs.length > 0) {
-              const lastMsg = postMsgs[postMsgs.length - 1]
-              if (!lastMsg.isAutoTitleMarker) {
-                await createAutoTitleMarker(threadId, lastMsg.createdAt)
-                const updated = await getMessagesByThread(threadId)
-                if (Number(currentThreadIdRef.current) === Number(threadId)) {
-                  setMessages(dedupeMessages(updated))
-                }
+            const alreadyHasMarker = postMsgs.some((m) => m.isAutoTitleMarker)
+            if (!alreadyHasMarker) {
+              await createAutoTitleMarker(threadId, triggerLastCreatedAt)
+              const updated = await getMessagesByThread(threadId)
+              if (Number(currentThreadIdRef.current) === Number(threadId)) {
+                setMessages(dedupeMessages(updated))
               }
             }
           }
