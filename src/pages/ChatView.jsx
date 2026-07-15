@@ -1388,6 +1388,7 @@ function ChatView() {
       await updateMessage(messageId, {
         bundleMessages: bundleJson,
         content: '',
+        promptData: null,
         activeSlotIndex: slotIndex,
       })
       setStreamingMessageId(threadId, messageId)
@@ -1397,7 +1398,13 @@ function ChatView() {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === messageId
-              ? { ...m, bundleMessages: bundleJson, content: '', activeSlotIndex: slotIndex }
+              ? {
+                  ...m,
+                  bundleMessages: bundleJson,
+                  content: '',
+                  promptData: null,
+                  activeSlotIndex: slotIndex,
+                }
               : m,
           ),
         )
@@ -1477,7 +1484,10 @@ function ChatView() {
           finalEntries[slotIndex].isError = true
           finalEntries[slotIndex].error = null
         }
-        await updateMessage(messageId, { bundleMessages: JSON.stringify(finalEntries) })
+        await updateMessage(messageId, {
+          bundleMessages: JSON.stringify(finalEntries),
+          promptData: null,
+        })
       }
 
       if (result.status === 'error') {
@@ -1491,6 +1501,7 @@ function ChatView() {
         await updateMessage(messageId, {
           bundleMessages: JSON.stringify(finalEntries),
           content: finalEntries[slotIndex]?.content ?? '',
+          promptData: null,
           activeSlotIndex: slotIndex,
         })
         const msgs = await getMessagesByThread(threadId)
