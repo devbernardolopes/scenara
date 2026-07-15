@@ -1113,7 +1113,15 @@ function ChatView() {
           setPendingMarkers((prev) => [...prev, { type: 'autoTitle', status: 'queued' }])
         }
         setAutoTitling(true)
+        let markerId = null
         try {
+          if (showMarker && triggerLastCreatedAt != null) {
+            markerId = await createAutoTitleMarker(threadId, triggerLastCreatedAt)
+            const updated = await getMessagesByThread(threadId)
+            if (Number(currentThreadIdRef.current) === Number(threadId)) {
+              setMessages(dedupeMessages(updated))
+            }
+          }
           await apiQueue.enqueue({
             threadId,
             type: 'autoTitle',
@@ -1134,21 +1142,16 @@ function ChatView() {
           const updatedThr = await getThread(threadId)
           setThread((prev) => ({ ...prev, title: updatedThr.title, autoTitleGenerated: true }))
           showToast(t('autoTitleGenerated'), { type: 'success' })
-
-          if (showMarker && triggerLastCreatedAt != null) {
-            const postMsgs = await getMessagesByThread(threadId)
-            const alreadyHasMarker = postMsgs.some((m) => m.isAutoTitleMarker)
-            if (!alreadyHasMarker) {
-              await createAutoTitleMarker(threadId, triggerLastCreatedAt)
-              const updated = await getMessagesByThread(threadId)
-              if (Number(currentThreadIdRef.current) === Number(threadId)) {
-                setMessages(dedupeMessages(updated))
-              }
-            }
-          }
         } catch (err) {
           if (err.name !== 'AbortError') {
             showToast(err.message, { type: 'error' })
+          }
+          if (markerId != null) {
+            await deleteMessage(markerId)
+            const updated = await getMessagesByThread(threadId)
+            if (Number(currentThreadIdRef.current) === Number(threadId)) {
+              setMessages(dedupeMessages(updated))
+            }
           }
         } finally {
           setAutoTitling(false)
