@@ -228,12 +228,7 @@ export function cancelThreadRequests(threadId) {
 
 export function getThreadQueueCount(threadId) {
   const tid = Number(threadId)
-  const queued = queue.filter((item) => item.threadId === tid).length
-  let running = 0
-  for (const item of inflight) {
-    if (item.threadId === tid) running += 1
-  }
-  return queued + running
+  return queue.filter((item) => item.threadId === tid).length
 }
 
 export function subscribe(fn) {
