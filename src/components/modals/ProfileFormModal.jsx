@@ -156,6 +156,9 @@ function ProfileFormModal({ profile }) {
             merged[def.key] = def.default
           }
         }
+        if (selectedProvider.supportsLmStudioMethods && !merged.lmStudioMethod) {
+          merged.lmStudioMethod = 'openai-compatible'
+        }
         return { ...prev, params: merged }
       })
     }
@@ -425,6 +428,42 @@ function ProfileFormModal({ profile }) {
               <option value="native">{t('api.profile.form.hordeMethodNative')}</option>
               <option value="openai-compatible">{t('api.profile.form.hordeMethodOpenAI')}</option>
             </select>
+          </div>
+        )}
+
+        {selectedProvider?.supportsLmStudioMethods && (
+          <div>
+            <label className="block text-sm font-medium text-text mb-1.5">
+              {t('api.profile.form.lmStudioMethod')}
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { key: 'openai-compatible', labelKey: 'api.profile.form.lmStudioMethodOpenAI' },
+                { key: 'native', labelKey: 'api.profile.form.lmStudioMethodNative' },
+                { key: 'anthropic', labelKey: 'api.profile.form.lmStudioMethodAnthropic' },
+              ].map((opt) => {
+                const isActive = (form.params.lmStudioMethod || 'openai-compatible') === opt.key
+                const isDisabled = opt.key !== 'openai-compatible'
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    disabled={isDisabled}
+                    title={isDisabled ? t('api.profile.form.comingSoon') : undefined}
+                    onClick={() => updateParam('lmStudioMethod', opt.key)}
+                    className={`min-h-[44px] px-3 py-2 text-sm rounded-md border transition-colors ${
+                      isActive
+                        ? 'bg-primary text-on-primary border-primary'
+                        : isDisabled
+                          ? 'bg-surface text-tertiary border-border-light cursor-not-allowed opacity-50'
+                          : 'bg-surface text-secondary border-border hover:bg-surface-hover'
+                    }`}
+                  >
+                    {t(opt.labelKey)}
+                  </button>
+                )
+              })}
+            </div>
           </div>
         )}
 

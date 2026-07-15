@@ -1,4 +1,4 @@
-import { PROVIDERS } from './apiProviders'
+import { PROVIDERS, getBaseUrl } from './apiProviders'
 import { getSetting } from './settings'
 import { getThread } from './threads'
 import { getWritingInstruction } from './writingInstructions'
@@ -547,7 +547,8 @@ export async function sendChatCompletion({
   onActivity,
   onTiming,
 }) {
-  const baseUrl = getChatBaseUrl(profile.providerId)
+  let baseUrl = getChatBaseUrl(profile.providerId)
+  if (!baseUrl) baseUrl = await getBaseUrl(profile.providerId)
   if (!baseUrl) throw new Error(`No base URL for provider "${profile.providerId}"`)
 
   const headers = { 'Content-Type': 'application/json' }

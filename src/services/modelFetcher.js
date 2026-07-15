@@ -1,4 +1,4 @@
-import { getActiveKey } from './apiProviders'
+import { getActiveKey, getBaseUrl } from './apiProviders'
 
 const COOLDOWN_MS = 5000
 let _lastFetchTime = 0
@@ -141,7 +141,8 @@ export async function fetchModels(providerId, { signal, hordeMethod: _hordeMetho
 
   let models
   if (strategy.type === 'openai') {
-    const baseUrl = strategy.baseUrl
+    let baseUrl = strategy.baseUrl
+    if (!baseUrl) baseUrl = await getBaseUrl(providerId)
     if (!baseUrl) throw new Error(`No base URL configured for ${providerId}`)
     models = await fetchOpenAIModels(baseUrl, apiKey, signal)
   } else {

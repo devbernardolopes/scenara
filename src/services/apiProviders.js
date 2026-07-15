@@ -213,7 +213,8 @@ export const PROVIDERS = [
     descKey: 'settings:api.providers.lmStudio.desc',
     needsKey: false,
     needsUrl: true,
-    hasModelEndpoint: false,
+    hasModelEndpoint: true,
+    supportsLmStudioMethods: true,
     supportsAnonymous: false,
     trialKey: null,
     params: [
@@ -236,6 +237,7 @@ export const PROVIDERS = [
         default: 0.75,
       },
       { key: 'top_p', label: 'Top P', type: 'range', min: 0, max: 1, step: 0.05, default: 1 },
+      { key: 'top_k', label: 'Top K', type: 'range', min: 0, max: 100, step: 1, default: 40 },
       {
         key: 'frequency_penalty',
         label: 'Frequency Penalty',

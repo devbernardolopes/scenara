@@ -414,7 +414,12 @@
         "includeReasoning": "Include Reasoning",
         "hordeMethod": "AI Horde Method",
         "hordeMethodNative": "Native",
-        "hordeMethodOpenAI": "OpenAI-compatible"
+        "hordeMethodOpenAI": "OpenAI-compatible",
+        "lmStudioMethod": "Connection Method",
+        "lmStudioMethodNative": "Native",
+        "lmStudioMethodOpenAI": "OpenAI-Compatible",
+        "lmStudioMethodAnthropic": "Anthropic-Compatible",
+        "comingSoon": "Coming soon"
       },
       "add": "Add",
       "maxStopItems": "Limit reached",
