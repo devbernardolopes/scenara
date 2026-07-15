@@ -12,8 +12,8 @@ export const DEFAULT_PP_RULES = [
   {
     id: 'preset-narration',
     label: 'Narration',
-    openChars: ['*', '_'],
-    closeChars: ['*', '_'],
+    openChars: ['*', '_', '**'],
+    closeChars: ['*', '_', '**'],
     color: '#6b7280',
     fontSizePercent: 95,
   },
