@@ -4,6 +4,7 @@ const DIRECTOR_GROUPS = {
   regularChat: {
     enabledKey: 'directorRegularChatEnabled',
     instructionsKey: 'directorRegularChatInstructions',
+    systemInstructionsKey: 'directorRegularChatSystemInstructions',
   },
   autoTitle: {
     enabledKey: 'directorAutoTitleEnabled',
@@ -18,7 +19,11 @@ export async function getDirectorConfig(character, group) {
   if (!character[g.enabledKey]) return null
   const userInstructions = character[g.instructionsKey]?.trim()
   if (!userInstructions) return null
-  const systemInstructions = (await getSetting('prompting.directorSystem'))?.trim()
+  let systemInstructions = g.systemInstructionsKey
+    ? character[g.systemInstructionsKey]?.trim()
+    : undefined
+  if (!systemInstructions)
+    systemInstructions = (await getSetting('prompting.directorSystem'))?.trim()
   if (!systemInstructions) return null
   return { systemInstructions, userInstructions }
 }
@@ -85,7 +90,8 @@ export function applyDirectorTemplate(
   return next
 }
 
-const DEFAULT_AUTO_TITLE_SYSTEM = 'You are a title generator for conversational AI.\n\n{{transcript}}'
+const DEFAULT_AUTO_TITLE_SYSTEM =
+  'You are a title generator for conversational AI.\n\n{{transcript}}'
 
 export async function getAutoTitleTemplateValues(character) {
   let systemAutoTitle = character?.autoTitleSystemInstructions?.trim()
@@ -94,7 +100,8 @@ export async function getAutoTitleTemplateValues(character) {
 
   let userAutoTitle = character?.autoTitleUserInstructions?.trim()
   if (!userAutoTitle) userAutoTitle = (await getSetting('prompting.autoTitleUser'))?.trim()
-  if (!userAutoTitle) userAutoTitle = 'Create a title in the language of the provided message exchange.'
+  if (!userAutoTitle)
+    userAutoTitle = 'Create a title in the language of the provided message exchange.'
 
   return { system_autotitle: systemAutoTitle, user_autotitle: userAutoTitle }
 }

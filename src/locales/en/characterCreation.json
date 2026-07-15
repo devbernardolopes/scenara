@@ -146,6 +146,8 @@
   "directorSummarizationInstructionsPlaceholder": "Instructions for the director reviewing summarization responses…",
   "directorRegularChatInstructions": "USER Director Instructions for Regular Chat",
   "directorRegularChatInstructionsPlaceholder": "Instructions for the director reviewing regular chat responses…",
+  "directorRegularChatSystemInstructions": "SYSTEM Director Instructions for Regular Chat",
+  "directorRegularChatSystemInstructionsPlaceholder": "System prompt for the director reviewing regular chat responses…",
   "directorOOCInstructions": "USER Director Instructions for OOC",
   "directorOOCInstructionsPlaceholder": "Instructions for the director reviewing OOC responses…",
   "directorLiterals": "Available Variables",

@@ -35,6 +35,10 @@ const GROUPS = [
     instructionsLabelKey: 'directorRegularChatInstructions',
     placeholderKey: 'directorRegularChatInstructionsPlaceholder',
     storageBase: 'charSection.directorRegularChat',
+    systemInstructionsKey: 'directorRegularChatSystemInstructions',
+    systemInstructionsLabelKey: 'directorRegularChatSystemInstructions',
+    systemInstructionsPlaceholderKey: 'directorRegularChatSystemInstructionsPlaceholder',
+    systemStorageBase: 'charSection.directorRegularChatSystem',
   },
   {
     id: 'ooc',
@@ -84,14 +88,27 @@ function Group({ group, form, onChange, characterId, directorEnabled }) {
   const storageKey = characterId ? `${group.storageBase}.instructions.${characterId}` : undefined
   const [open, setOpen] = useState(false)
 
+  const hasSystemField = Boolean(group.systemInstructionsKey)
+  const systemInstructions = hasSystemField ? form[group.systemInstructionsKey] : ''
+  const systemStorageKey =
+    hasSystemField && characterId
+      ? `${group.systemStorageBase}.instructions.${characterId}`
+      : undefined
+  const [systemOpen, setSystemOpen] = useState(false)
+
   useEffect(() => {
     setOpen(groupEnabled)
-  }, [groupEnabled])
+    if (hasSystemField) setSystemOpen(groupEnabled)
+  }, [groupEnabled, hasSystemField])
 
   useEffect(() => {
     if (!directorEnabled) {
       setOpen(false)
       if (storageKey) setUIState(`collapsed.${storageKey}`, true)
+      if (hasSystemField) {
+        setSystemOpen(false)
+        if (systemStorageKey) setUIState(`collapsed.${systemStorageKey}`, true)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [directorEnabled])
@@ -99,6 +116,11 @@ function Group({ group, form, onChange, characterId, directorEnabled }) {
   const handleOpenChange = (val) => {
     setOpen(val)
     if (storageKey) setUIState(`collapsed.${storageKey}`, !val)
+  }
+
+  const handleSystemOpenChange = (val) => {
+    setSystemOpen(val)
+    if (systemStorageKey) setUIState(`collapsed.${systemStorageKey}`, !val)
   }
 
   return (
@@ -113,6 +135,30 @@ function Group({ group, form, onChange, characterId, directorEnabled }) {
       </div>
 
       <div className={`px-3 pb-3 ${!groupEnabled ? 'opacity-40 pointer-events-none' : ''}`}>
+        {hasSystemField && (
+          <CollapsibleSection
+            label={t(group.systemInstructionsLabelKey)}
+            summary={
+              systemInstructions
+                ? t('common:tokenCount', { count: estimateTokens(systemInstructions) })
+                : null
+            }
+            hasContent={!!systemInstructions}
+            storageKey={systemStorageKey}
+            defaultExpanded={false}
+            open={systemOpen}
+            onOpenChange={handleSystemOpenChange}
+          >
+            <AutoResizeTextarea
+              className={`${inputClass} resize-none mt-2`}
+              value={systemInstructions}
+              onChange={(e) => onChange(group.systemInstructionsKey, e.target.value)}
+              placeholder={t(group.systemInstructionsPlaceholderKey)}
+              disabled={!groupEnabled}
+              extraHeight={8}
+            />
+          </CollapsibleSection>
+        )}
         <CollapsibleSection
           label={t(group.instructionsLabelKey)}
           summary={

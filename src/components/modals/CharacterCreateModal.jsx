@@ -47,6 +47,7 @@ const INITIAL_FORM = {
   directorSummarizationEnabled: false,
   directorSummarizationInstructions: '',
   directorRegularChatEnabled: false,
+  directorRegularChatSystemInstructions: '',
   directorRegularChatInstructions: '',
   directorOOCEnabled: false,
   directorOOCInstructions: '',
@@ -123,6 +124,10 @@ const DIRECTOR_GROUP_FIELDS = [
   {
     enabledKey: 'directorSummarizationEnabled',
     instructionsKey: 'directorSummarizationInstructions',
+  },
+  {
+    enabledKey: 'directorRegularChatEnabled',
+    instructionsKey: 'directorRegularChatSystemInstructions',
   },
   { enabledKey: 'directorRegularChatEnabled', instructionsKey: 'directorRegularChatInstructions' },
   { enabledKey: 'directorOOCEnabled', instructionsKey: 'directorOOCInstructions' },
