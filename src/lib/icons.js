@@ -41,6 +41,7 @@ export {
   Zap,
   BookOpen,
   Brain,
+  BrainCog,
   Tags,
   Database,
   Globe,

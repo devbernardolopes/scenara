@@ -37,7 +37,7 @@ import {
   Zap,
   BookOpen,
   Tags,
-  Brain,
+  BrainCog,
   Plus,
   Upload,
   Globe,
@@ -724,7 +724,7 @@ function Sidebar({ open, onClose }) {
             { onClick: () => openModal('tagManagement'), icon: Tags, labelKey: 'sidebar.tags' },
             {
               onClick: () => openModal('localInference'),
-              icon: Brain,
+              icon: BrainCog,
               labelKey: 'sidebar.localInference',
             },
             { onClick: () => openModal('settings'), icon: Settings, labelKey: 'topbar.settings' },
