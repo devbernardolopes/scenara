@@ -1,4 +1,5 @@
 import Groq from '@lobehub/icons/es/Groq/components/Mono'
+import Cerebras from '@lobehub/icons/es/Cerebras/components/Mono'
 import LmStudio from '@lobehub/icons/es/LmStudio/components/Mono'
 import OpenRouter from '@lobehub/icons/es/OpenRouter/components/Mono'
 import { SlidersHorizontal } from '../../lib/icons'
@@ -6,6 +7,7 @@ import aiHordeIcon from '../../assets/providers/ai-horde.png'
 
 const BRAND_ICONS = {
   groq: { Icon: Groq, color: '#F55036' },
+  cerebras: { Icon: Cerebras, color: '#000000' },
   'lm-studio': { Icon: LmStudio, color: '#4338CA' },
   openrouter: { Icon: OpenRouter, color: '#6566F1' },
 }

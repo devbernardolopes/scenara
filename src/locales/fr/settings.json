@@ -260,6 +260,10 @@
         "name": "Groq",
         "desc": "Fast inference with LPUs"
       },
+      "cerebras": {
+        "name": "Cerebras",
+        "desc": "Fast inference with Cerebras wafer-scale chips"
+      },
       "openrouter": {
         "name": "OpenRouter",
         "desc": "Access hundreds of models through one API"

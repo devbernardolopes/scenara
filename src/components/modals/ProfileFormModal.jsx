@@ -100,6 +100,12 @@ function StringListInput({ value, onChange, maxItems }) {
   )
 }
 
+const CEREBRAS_REASONING_MAP = {
+  'gpt-oss-120b': { options: ['low', 'medium', 'high'], default: 'medium' },
+  'zai-glm-4.7': { options: ['none'], default: 'none' },
+  'gemma-4-31b': { options: ['none', 'low', 'medium', 'high'], default: 'none' },
+}
+
 function ProfileFormModal({ profile }) {
   const { t } = useTranslation('settings')
   const { closeModal, setCloseGuard } = useModal()
@@ -130,12 +136,16 @@ function ProfileFormModal({ profile }) {
   const paramDefs = selectedProvider?.params || []
 
   const isOpenRouter = form.providerId === 'openrouter'
+  const isCerebras = selectedProvider?.hasModelReasoning
   const modelParams = form.model ? modelSupportedParams[form.model] || [] : []
   const supportsReasoning = isOpenRouter && modelParams.includes('reasoning')
   const supportsIncludeReasoning = isOpenRouter && modelParams.includes('include_reasoning')
   const showReasoningControls = isOpenRouter && (supportsReasoning || supportsIncludeReasoning)
 
   const REASONING_EFFORT_OPTIONS = ['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max']
+
+  const cerebrasReasoning = isCerebras ? CEREBRAS_REASONING_MAP[form.model] || null : null
+  const showCerebrasReasoning = Boolean(cerebrasReasoning)
 
   useEffect(() => {
     if (selectedProvider) {
@@ -150,6 +160,15 @@ function ProfileFormModal({ profile }) {
       })
     }
   }, [selectedProvider])
+
+  useEffect(() => {
+    if (isCerebras && form.model && CEREBRAS_REASONING_MAP[form.model]) {
+      setForm((prev) => ({
+        ...prev,
+        params: { ...prev.params, reasoning_effort: CEREBRAS_REASONING_MAP[form.model].default },
+      }))
+    }
+  }, [isCerebras, form.model])
 
   const isDirty = Object.keys(initialRef.current).some((key) => {
     if (key === 'params')
@@ -439,7 +458,7 @@ function ProfileFormModal({ profile }) {
           </div>
         )}
 
-        {showReasoningControls && (
+        {(showReasoningControls || showCerebrasReasoning) && (
           <div className="space-y-4 pt-2 border-t border-border">
             <p className="text-sm font-medium text-text">{t('api.profile.form.reasoning')}</p>
             {supportsReasoning && (
@@ -450,6 +469,33 @@ function ProfileFormModal({ profile }) {
                 <div className="flex flex-wrap gap-1.5">
                   {REASONING_EFFORT_OPTIONS.map((opt) => {
                     const active = (form.params.reasoning_effort || 'none') === opt
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => updateParam('reasoning_effort', opt)}
+                        className={`min-h-[44px] px-3 py-2 text-sm rounded-md border transition-colors ${
+                          active
+                            ? 'bg-primary text-on-primary border-primary'
+                            : 'bg-surface text-secondary border-border hover:bg-surface-hover'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+            {showCerebrasReasoning && (
+              <div>
+                <label className="block text-xs font-medium text-secondary mb-1.5">
+                  {t('api.profile.form.reasoningEffort')}
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {cerebrasReasoning.options.map((opt) => {
+                    const active =
+                      (form.params.reasoning_effort || cerebrasReasoning.default) === opt
                     return (
                       <button
                         key={opt}

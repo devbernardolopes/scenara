@@ -456,6 +456,10 @@
         "name": "Groq",
         "desc": "Inferência rápida com LPUs"
       },
+      "cerebras": {
+        "name": "Cerebras",
+        "desc": "Inferência rápida com chips de escala wafer da Cerebras"
+      },
       "openrouter": {
         "name": "OpenRouter",
         "desc": "Acesse centenas de modelos através de uma API"

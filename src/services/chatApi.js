@@ -6,6 +6,7 @@ import { buildInjectedMemory } from './threadMemories'
 
 const BASE_URLS = {
   groq: 'https://api.groq.com/openai/v1',
+  cerebras: 'https://api.cerebras.ai/v1',
   openrouter: 'https://openrouter.ai/api/v1',
   'ai-horde': 'https://oai.aihorde.net/v1',
 }
@@ -229,7 +230,7 @@ export function getActiveParams(profile) {
       }
     }
   }
-  // OpenRouter reasoning params: always pass through as strings
+  // OpenAI-compatible reasoning params: always pass through as strings
   if (active.reasoning_effort != null) {
     active.reasoning_effort = String(active.reasoning_effort)
   }
