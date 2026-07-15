@@ -107,6 +107,7 @@ export async function generateChatResponse({
   let directorAttempted = false
   let directorSystemPrompt = ''
   let directorUserPrompt = ''
+  let directorOriginalMessage = ''
   let directorResponse = ''
   let directorResponseData = null
   let directorFailed = false
@@ -122,6 +123,7 @@ export async function generateChatResponse({
     directorAttempted,
     directorSystemPrompt,
     directorUserPrompt,
+    directorOriginalMessage,
     directorResponse,
     directorResponseData,
     directorFailed,
@@ -187,6 +189,7 @@ export async function generateChatResponse({
       directorAttempted = true
       directorSystemPrompt = systemInstructions
       directorUserPrompt = userInstructions
+      directorOriginalMessage = content
 
       const dProfile = await getEffectiveProfileFor('director')
       if (!dProfile?.model) {
@@ -226,6 +229,7 @@ export async function generateChatResponse({
             directorAttempted,
             directorSystemPrompt,
             directorUserPrompt,
+            directorOriginalMessage,
             directorResponse,
             directorResponseData,
             directorFailed,
@@ -248,6 +252,7 @@ export async function generateChatResponse({
         directorAttempted,
         directorSystemPrompt,
         directorUserPrompt,
+        directorOriginalMessage,
         directorResponse,
         directorResponseData,
         directorFailed,

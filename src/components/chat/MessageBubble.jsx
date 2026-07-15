@@ -521,10 +521,10 @@ function MessageBubble({
   function handleShowDirectorDetails() {
     if (!promptData?.directorAttempted) return
     openModal('directorDetails', {
+      originalMessage: promptData.directorOriginalMessage || '',
       systemPrompt: promptData.directorSystemPrompt || '',
       userPrompt: promptData.directorUserPrompt || '',
       response: promptData.directorResponse || '',
-      responseData: promptData.directorResponseData || null,
       failed: promptData.directorFailed || false,
     })
   }

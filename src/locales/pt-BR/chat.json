@@ -50,6 +50,7 @@
   },
   "directorDetailsModal": {
     "title": "Detalhes do Diretor",
+    "originalMessage": "Mensagem Original",
     "systemPrompt": "Prompt SYSTEM do Diretor",
     "userPrompt": "Prompt USER do Diretor",
     "response": "Resposta do Diretor",

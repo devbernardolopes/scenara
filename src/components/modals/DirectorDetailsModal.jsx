@@ -5,24 +5,34 @@ import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../services/tokenEstimator'
 
-function DirectorDetailsModal({ systemPrompt, userPrompt, response, responseData, failed }) {
+function DirectorDetailsModal({ originalMessage, systemPrompt, userPrompt, response, failed }) {
   const { t } = useTranslation('chat')
   const { closeModal } = useModal()
 
   const textareaClass =
     'w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none'
 
-  const responseDisplay = failed
-    ? response
-    : responseData != null
-      ? typeof responseData === 'string'
-        ? responseData
-        : JSON.stringify(responseData, null, 2)
-      : response
-
   return (
     <ModalShell title={t('directorDetailsModal.title')} onClose={closeModal}>
       <div className="space-y-3">
+        <CollapsibleSection
+          label={t('directorDetailsModal.originalMessage')}
+          summary={
+            originalMessage
+              ? t('common:tokenCount', { count: estimateTokens(originalMessage) })
+              : null
+          }
+          hasContent={!!originalMessage}
+          storageKey="directorDetailsOriginalMessage"
+          defaultExpanded={true}
+        >
+          <AutoResizeTextarea
+            readOnly
+            value={originalMessage}
+            className={textareaClass}
+            extraHeight={8}
+          />
+        </CollapsibleSection>
         <CollapsibleSection
           label={t('directorDetailsModal.systemPrompt')}
           summary={
@@ -49,18 +59,14 @@ function DirectorDetailsModal({ systemPrompt, userPrompt, response, responseData
           label={
             failed ? t('directorDetailsModal.responseError') : t('directorDetailsModal.response')
           }
-          summary={
-            responseDisplay
-              ? t('common:tokenCount', { count: estimateTokens(responseDisplay) })
-              : null
-          }
-          hasContent={!!responseDisplay}
+          summary={response ? t('common:tokenCount', { count: estimateTokens(response) }) : null}
+          hasContent={!!response}
           storageKey="directorDetailsResponse"
           defaultExpanded={true}
         >
           <AutoResizeTextarea
             readOnly={failed}
-            value={responseDisplay}
+            value={response}
             className={`${textareaClass} ${failed ? 'opacity-80' : ''}`}
             extraHeight={8}
           />
