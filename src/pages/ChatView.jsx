@@ -641,32 +641,37 @@ function ChatView() {
     return () => window.removeEventListener('generating-state-changed', handleGeneratingChange)
   }, [threadId])
 
+  async function derivePendingMarkers(state, tid) {
+    const pending = []
+    const [atMarker, summMarker] = await Promise.all([
+      getSetting('autoTitleMarker'),
+      getSetting('summarizationMarker'),
+    ])
+    if (atMarker) {
+      if (state.inflight.some((i) => i.threadId === tid && i.type === 'autoTitle')) {
+        pending.push({ type: 'autoTitle', status: 'active' })
+      } else if (state.queue.some((q) => q.threadId === tid && q.type === 'autoTitle')) {
+        pending.push({ type: 'autoTitle', status: 'queued' })
+      }
+    }
+    if (summMarker) {
+      if (state.inflight.some((i) => i.threadId === tid && i.type === 'summarization')) {
+        pending.push({ type: 'summarization', status: 'active' })
+      } else if (state.queue.some((q) => q.threadId === tid && q.type === 'summarization')) {
+        pending.push({ type: 'summarization', status: 'queued' })
+      }
+    }
+    return pending
+  }
+
   useEffect(() => {
     let cancelled = false
     async function reconstruct() {
-      const [autoTitleMarker, summMarker] = await Promise.all([
-        getSetting('autoTitleMarker'),
-        getSetting('summarizationMarker'),
-      ])
-      if (cancelled) return
       const state = apiQueue.getState()
       const tid = Number(threadId)
-      const pending = []
-      if (autoTitleMarker) {
-        if (state.inflight.some((i) => i.threadId === tid && i.type === 'autoTitle')) {
-          pending.push({ type: 'autoTitle', status: 'active' })
-        } else if (state.queue.some((q) => q.threadId === tid && q.type === 'autoTitle')) {
-          pending.push({ type: 'autoTitle', status: 'queued' })
-        }
-      }
-      if (summMarker) {
-        if (state.inflight.some((i) => i.threadId === tid && i.type === 'summarization')) {
-          pending.push({ type: 'summarization', status: 'active' })
-        } else if (state.queue.some((q) => q.threadId === tid && q.type === 'summarization')) {
-          pending.push({ type: 'summarization', status: 'queued' })
-        }
-      }
-      if (pending.length > 0) setPendingMarkers(pending)
+      const pending = await derivePendingMarkers(state, tid)
+      if (cancelled) return
+      setPendingMarkers(pending)
     }
     reconstruct()
     return () => {
@@ -678,26 +683,7 @@ function ChatView() {
     function handleQueueChange() {
       const state = apiQueue.getState()
       const tid = Number(threadId)
-      setPendingMarkers((prev) => {
-        let changed = false
-        const next = prev
-          .map((m) => {
-            const isActive = state.inflight.some((i) => i.threadId === tid && i.type === m.type)
-            const isQueued = state.queue.some((q) => q.type === m.type && q.threadId === tid)
-            if (isActive) {
-              if (m.status !== 'active') {
-                changed = true
-                return { ...m, status: 'active' }
-              }
-              return m
-            }
-            if (isQueued) return m
-            changed = true
-            return null
-          })
-          .filter(Boolean)
-        return changed ? next : prev
-      })
+      derivePendingMarkers(state, tid).then((pending) => setPendingMarkers(pending))
     }
     window.addEventListener('api-queue-changed', handleQueueChange)
     return () => window.removeEventListener('api-queue-changed', handleQueueChange)
