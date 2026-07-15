@@ -144,6 +144,7 @@
   "directorRegularChatInstructionsPlaceholder": "Instruções para o diretor revisar respostas de chat normal…",
   "directorRegularChatSystemInstructions": "Instruções SYSTEM do Diretor para Chat Normal",
   "directorRegularChatSystemInstructionsPlaceholder": "Prompt de sistema para o diretor revisar respostas de chat normal…",
+  "directorRegularChatOutputDirectorResponse": "Exibir Resposta do Diretor",
   "directorOOCInstructions": "Instruções do Diretor para OOC",
   "directorOOCInstructionsPlaceholder": "Instruções para o diretor revisar respostas OOC…",
   "directorLiterals": "Variáveis Disponíveis",

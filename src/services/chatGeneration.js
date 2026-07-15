@@ -214,11 +214,13 @@ export async function generateChatResponse({
         })
         const reviewed = reviewedResult.content
         if (reviewed) {
-          finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
           directorReviewed = true
           directorResponse = reviewed
           directorResponseData = reviewedResult.response
-          responseData = reviewedResult.response
+          if (directorConfig.outputDirectorResponse) {
+            finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
+            responseData = reviewedResult.response
+          }
           promptData = JSON.stringify({
             payload,
             model: profile.model,

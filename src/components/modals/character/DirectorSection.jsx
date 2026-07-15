@@ -39,6 +39,8 @@ const GROUPS = [
     systemInstructionsLabelKey: 'directorRegularChatSystemInstructions',
     systemInstructionsPlaceholderKey: 'directorRegularChatSystemInstructionsPlaceholder',
     systemStorageBase: 'charSection.directorRegularChatSystem',
+    outputDirectorResponseKey: 'directorRegularChatOutputDirectorResponse',
+    outputDirectorResponseLabelKey: 'directorRegularChatOutputDirectorResponse',
   },
   {
     id: 'ooc',
@@ -179,6 +181,15 @@ function Group({ group, form, onChange, characterId, directorEnabled }) {
             extraHeight={8}
           />
         </CollapsibleSection>
+        {group.outputDirectorResponseKey && (
+          <div className="mt-2">
+            <SwitchRow
+              label={t(group.outputDirectorResponseLabelKey)}
+              checked={form[group.outputDirectorResponseKey]}
+              onChange={(val) => onChange(group.outputDirectorResponseKey, val)}
+            />
+          </div>
+        )}
       </div>
     </div>
   )

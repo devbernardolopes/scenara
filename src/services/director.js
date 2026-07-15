@@ -5,6 +5,7 @@ const DIRECTOR_GROUPS = {
     enabledKey: 'directorRegularChatEnabled',
     instructionsKey: 'directorRegularChatInstructions',
     systemInstructionsKey: 'directorRegularChatSystemInstructions',
+    outputDirectorResponseKey: 'directorRegularChatOutputDirectorResponse',
   },
   autoTitle: {
     enabledKey: 'directorAutoTitleEnabled',
@@ -25,7 +26,10 @@ export async function getDirectorConfig(character, group) {
   if (!systemInstructions)
     systemInstructions = (await getSetting('prompting.directorSystem'))?.trim()
   if (!systemInstructions) return null
-  return { systemInstructions, userInstructions }
+  const outputDirectorResponse = g.outputDirectorResponseKey
+    ? character[g.outputDirectorResponseKey] !== false
+    : true
+  return { systemInstructions, userInstructions, outputDirectorResponse }
 }
 
 export async function getDirectorReviewConfig(character) {

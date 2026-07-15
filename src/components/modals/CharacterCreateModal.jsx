@@ -49,6 +49,7 @@ const INITIAL_FORM = {
   directorRegularChatEnabled: false,
   directorRegularChatSystemInstructions: '',
   directorRegularChatInstructions: '',
+  directorRegularChatOutputDirectorResponse: true,
   directorOOCEnabled: false,
   directorOOCInstructions: '',
   firstMessage: true,
