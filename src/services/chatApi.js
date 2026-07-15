@@ -548,7 +548,13 @@ export async function sendChatCompletion({
   onTiming,
 }) {
   let baseUrl = getChatBaseUrl(profile.providerId)
-  if (!baseUrl) baseUrl = await getBaseUrl(profile.providerId)
+  if (!baseUrl) {
+    const rawUrl = await getBaseUrl(profile.providerId)
+    if (rawUrl) {
+      const stripped = rawUrl.replace(/\/+$/, '')
+      baseUrl = stripped.endsWith('/v1') ? stripped : `${stripped}/v1`
+    }
+  }
   if (!baseUrl) throw new Error(`No base URL for provider "${profile.providerId}"`)
 
   const headers = { 'Content-Type': 'application/json' }

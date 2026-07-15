@@ -142,7 +142,10 @@ export async function fetchModels(providerId, { signal, hordeMethod: _hordeMetho
   let models
   if (strategy.type === 'openai') {
     let baseUrl = strategy.baseUrl
-    if (!baseUrl) baseUrl = await getBaseUrl(providerId)
+    if (!baseUrl) {
+      const rawUrl = await getBaseUrl(providerId)
+      if (rawUrl) baseUrl = rawUrl.replace(/\/v1\/?$/, '')
+    }
     if (!baseUrl) throw new Error(`No base URL configured for ${providerId}`)
     models = await fetchOpenAIModels(baseUrl, apiKey, signal)
   } else {
