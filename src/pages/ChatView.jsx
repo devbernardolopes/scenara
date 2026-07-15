@@ -1310,6 +1310,7 @@ function ChatView() {
     await updateMessage(messageId, {
       content: entry.content,
       promptData: entry.promptData,
+      responseData: entry.responseData ?? null,
       apiDurationMs: entry.apiDurationMs ?? null,
       activeSlotIndex: slotIndex,
     })
@@ -1320,6 +1321,7 @@ function ChatView() {
               ...m,
               content: entry.content,
               promptData: entry.promptData,
+              responseData: entry.responseData ?? null,
               apiDurationMs: entry.apiDurationMs ?? null,
               activeSlotIndex: slotIndex,
             }
@@ -1386,6 +1388,7 @@ function ChatView() {
           {
             content: msg.content,
             promptData: msg.promptData || null,
+            responseData: msg.responseData || null,
             apiDurationMs: msg.apiDurationMs ?? null,
           },
         ]
@@ -1648,6 +1651,7 @@ function ChatView() {
         {
           content: msg.content,
           promptData: msg.promptData || null,
+          responseData: msg.responseData || null,
           apiDurationMs: msg.apiDurationMs ?? null,
         },
       ]
