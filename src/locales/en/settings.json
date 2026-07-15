@@ -889,6 +889,10 @@
   "database": {
     "export": "Export Database",
     "import": "Import Database",
+    "fromUrl": "File URL",
+    "fromUrlPlaceholder": "https://example.com/scenara-export.json",
+    "importFromUrl": "Import",
+    "urlInvalid": "Please enter a valid URL",
     "reset": "Reset Database",
     "exportDesc": "Export all data to a JSON file for backup or transfer.",
     "importDesc": "Import data from a previously exported JSON file.",
@@ -934,7 +938,18 @@
       "invalidFile": "Invalid file.",
       "failedImport": "Failed to import database.",
       "restart": "Restart",
-      "close": "Close"
+      "close": "Close",
+      "importSourceTitle": "Import Database",
+      "fromFile": "From File",
+      "fromFileDesc": "Select a JSON file from your device",
+      "fromUrl": "From URL",
+      "fromUrlDesc": "Fetch a JSON file from a direct download link",
+      "urlLabel": "File URL",
+      "urlPlaceholder": "https://example.com/scenara-export.json",
+      "urlInvalid": "Please enter a valid URL",
+      "fetching": "Downloading…",
+      "fetchFailed": "Failed to download file from URL",
+      "invalidFormat": "The file does not appear to be a valid Scenara export."
     }
   },
   "inChatShortcut": {

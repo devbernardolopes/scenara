@@ -880,6 +880,10 @@
   "database": {
     "export": "Exportar Banco de Dados",
     "import": "Importar Banco de Dados",
+    "fromUrl": "URL do Arquivo",
+    "fromUrlPlaceholder": "https://example.com/scenara-export.json",
+    "importFromUrl": "Importar",
+    "urlInvalid": "Informe uma URL válida",
     "reset": "Resetar Banco de Dados",
     "exportDesc": "Exportar todos os dados para um arquivo JSON para backup ou transferência.",
     "importDesc": "Importar dados de um arquivo JSON exportado anteriormente.",
@@ -925,7 +929,18 @@
       "invalidFile": "Arquivo inválido.",
       "failedImport": "Falha ao importar banco de dados.",
       "restart": "Reiniciar",
-      "close": "Fechar"
+      "close": "Fechar",
+      "importSourceTitle": "Importar Banco de Dados",
+      "fromFile": "Do Arquivo",
+      "fromFileDesc": "Selecione um arquivo JSON do seu dispositivo",
+      "fromUrl": "Da URL",
+      "fromUrlDesc": "Buscar um arquivo JSON a partir de um link direto",
+      "urlLabel": "URL do Arquivo",
+      "urlPlaceholder": "https://example.com/scenara-export.json",
+      "urlInvalid": "Informe uma URL válida",
+      "fetching": "Baixando…",
+      "fetchFailed": "Falha ao baixar arquivo da URL",
+      "invalidFormat": "O arquivo não parece ser uma exportação válida do Scenara."
     }
   },
   "inChatShortcut": {

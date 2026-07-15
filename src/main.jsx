@@ -33,6 +33,7 @@ import TagManagementModal from './components/modals/TagManagementModal'
 import LocalInferenceModal from './components/modals/LocalInferenceModal'
 import CancelConfirmModal from './components/modals/CancelConfirmModal'
 import ProgressModal from './components/modals/ProgressModal'
+import ImportSourceModal from './components/modals/ImportSourceModal'
 
 const SettingsModal = lazy(() => import('./components/modals/settings/SettingsModal'))
 const ImageViewerModal = lazy(() => import('./components/modals/ImageViewerModal'))
@@ -63,6 +64,7 @@ registerModal('localInference', LocalInferenceModal)
 registerModal('cancelConfirm', CancelConfirmModal)
 registerModal('progress', ProgressModal)
 registerModal('exportDatabase', ExportDatabaseModal)
+registerModal('importSource', ImportSourceModal)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

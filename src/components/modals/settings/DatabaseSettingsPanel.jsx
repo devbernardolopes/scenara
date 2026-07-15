@@ -16,12 +16,57 @@ function DatabaseSettingsPanel() {
   const [isImporting, setIsImporting] = useState(false)
   const fileInputRef = useRef(null)
 
+  const [importUrl, setImportUrl] = useState('')
+  const importViaUrlRef = useRef(null)
+
   const handleExport = () => {
     openModal('exportDatabase', { modalSize: 'lg' })
   }
 
   const handleImport = () => {
-    fileInputRef.current?.click()
+    openModal('importSource', {
+      onFromFile: () => {
+        fileInputRef.current?.click()
+      },
+      onFromUrl: handleImportFromUrl,
+    })
+  }
+
+  async function handleImportFromUrl(url) {
+    setIsImporting(true)
+    openModal('progress', { status: 'importing', label: t('database.importModal.fetching') })
+
+    try {
+      const response = await fetch(url)
+      if (!response.ok) {
+        updateModal({
+          status: 'error',
+          label: t('database.importModal.fetchFailed'),
+        })
+        return
+      }
+      const text = await response.text()
+      let data
+      try {
+        data = JSON.parse(text, jsonReviver)
+      } catch {
+        updateModal({
+          status: 'error',
+          label: t('database.importModal.invalidFormat'),
+        })
+        return
+      }
+
+      await importDatabase(data)
+      updateModal({ status: 'imported', label: t('database.importModal.imported') })
+    } catch (err) {
+      updateModal({
+        status: 'error',
+        label: err.message || t('database.importModal.fetchFailed'),
+      })
+    } finally {
+      setIsImporting(false)
+    }
   }
 
   async function handleFileSelected(e) {
@@ -99,26 +144,6 @@ function DatabaseSettingsPanel() {
     }
   }
 
-  function OptionCard({ icon: Icon, label, desc, onClick, disabled, danger }) {
-    return (
-      <button
-        onClick={onClick}
-        disabled={disabled}
-        className="flex items-start gap-4 w-full min-h-[44px] p-4 rounded-lg border border-border hover:bg-surface-hover hover:border-border-light transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <div
-          className={`p-2 rounded-lg shrink-0 ${danger ? 'bg-error/10 text-error' : 'bg-primary-subtle text-primary'}`}
-        >
-          <Icon className="w-5 h-5" />
-        </div>
-        <div className="min-w-0">
-          <div className="text-sm font-medium text-text">{label}</div>
-          <div className="text-xs text-secondary mt-0.5">{desc}</div>
-        </div>
-      </button>
-    )
-  }
-
   return (
     <div className="space-y-3">
       <OptionCard
@@ -134,6 +159,35 @@ function DatabaseSettingsPanel() {
         onClick={handleImport}
         disabled={isImporting}
       />
+      <hr className="border-border" />
+      <div>
+        <label className="block text-sm font-medium text-text mb-2">{t('database.fromUrl')}</label>
+        <div className="flex gap-2">
+          <input
+            ref={importViaUrlRef}
+            type="url"
+            value={importUrl}
+            onChange={(e) => setImportUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && importUrl.trim()) {
+                handleImportFromUrl(importUrl.trim())
+              }
+            }}
+            placeholder={t('database.fromUrlPlaceholder')}
+            className="flex-1 min-h-[44px] px-3 py-2 rounded-lg border border-border bg-surface text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              if (importUrl.trim()) handleImportFromUrl(importUrl.trim())
+            }}
+            disabled={isImporting || !importUrl.trim()}
+            className="min-h-[44px] px-4 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+          >
+            {t('database.importFromUrl')}
+          </button>
+        </div>
+      </div>
       <input
         ref={fileInputRef}
         type="file"
@@ -158,6 +212,26 @@ function DatabaseSettingsPanel() {
         danger
       />
     </div>
+  )
+}
+
+function OptionCard({ icon: Icon, label, desc, onClick, disabled, danger }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="flex items-start gap-4 w-full min-h-[44px] p-4 rounded-lg border border-border hover:bg-surface-hover hover:border-border-light transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <div
+        className={`p-2 rounded-lg shrink-0 ${danger ? 'bg-error/10 text-error' : 'bg-primary-subtle text-primary'}`}
+      >
+        <Icon className="w-5 h-5" />
+      </div>
+      <div className="min-w-0">
+        <div className="text-sm font-medium text-text">{label}</div>
+        <div className="text-xs text-secondary mt-0.5">{desc}</div>
+      </div>
+    </button>
   )
 }
 
