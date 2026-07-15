@@ -43,6 +43,7 @@ function formatMemoryEntry(
   content,
   { seq, memorySlots, memoryEntry, charName, personaName, currentPersonaName },
 ) {
+  if (memorySlots <= 1) return content
   const level = Math.floor((seq - 1) / memorySlots) + 1
   const slot = ((seq - 1) % memorySlots) + 1
   const vars = { charName, personaName, currentPersonaName }
