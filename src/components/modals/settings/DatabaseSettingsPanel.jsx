@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useConfirm } from '../../../lib/confirm'
 import { useModal } from '../../../hooks/useModal'
 import { showToast } from '../../../lib/toast'
 import { resetDatabase, resetSettings, importDatabase } from '../../../services/database'
+import { getSetting, setSetting } from '../../../services/settings'
 import { jsonReviver } from '../../../lib/download'
 import { Download, Upload, AlertTriangle, RefreshCw } from '../../../lib/icons'
 
@@ -18,6 +19,17 @@ function DatabaseSettingsPanel() {
 
   const [importUrl, setImportUrl] = useState('')
   const importViaUrlRef = useRef(null)
+
+  useEffect(() => {
+    getSetting('database.importUrl').then((val) => {
+      if (val) setImportUrl(val)
+    })
+  }, [])
+
+  function handleImportUrlChange(value) {
+    setImportUrl(value)
+    setSetting('database.importUrl', value)
+  }
 
   const handleExport = () => {
     openModal('exportDatabase', { modalSize: 'lg' })
@@ -167,7 +179,7 @@ function DatabaseSettingsPanel() {
             ref={importViaUrlRef}
             type="url"
             value={importUrl}
-            onChange={(e) => setImportUrl(e.target.value)}
+            onChange={(e) => handleImportUrlChange(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && importUrl.trim()) {
                 handleImportFromUrl(importUrl.trim())

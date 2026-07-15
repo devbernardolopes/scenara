@@ -1383,6 +1383,13 @@ export const SETTINGS = [
     labelKey: 'settings:prompting.trimMessages.label',
     descKey: 'settings:prompting.trimMessages.desc',
   },
+  {
+    key: 'database.importUrl',
+    category: 'database',
+    type: 'text',
+    default: '',
+    labelKey: 'settings:database.fromUrl',
+  },
 ]
 
 const SETTING_EFFECTS = {
