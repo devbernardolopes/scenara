@@ -148,6 +148,10 @@
       "label": "Assistant/System – Delete From Here",
       "desc": "Show the button that deletes this message and every message below it."
     },
+    "showAssistantDirectorDetails": {
+      "label": "Assistant/System – Director Details",
+      "desc": "Show the button that opens the Director review details on assistant and system message bubbles."
+    },
     "showUserDelete": {
       "label": "User – Delete",
       "desc": "Show the delete button on user message bubbles."

@@ -26,6 +26,7 @@ import {
   ChevronRight,
   Layers,
   ChevronsDown,
+  Theater,
 } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
@@ -41,6 +42,7 @@ const VISIBILITY_KEYS = [
   'showAssistantSpeak',
   'showAssistantPrompt',
   'showAssistantRequestDetails',
+  'showAssistantDirectorDetails',
   'showUserDelete',
   'showUserDeleteAll',
   'showUserDeleteFromHere',
@@ -61,6 +63,7 @@ const DEFAULT_ASSISTANT_ORDER = [
   'speak',
   'prompt',
   'requestDetails',
+  'directorDetails',
 ]
 const DEFAULT_USER_ORDER = ['delete', 'deleteAll', 'deleteFromHere', 'edit', 'copy', 'fork']
 
@@ -75,6 +78,7 @@ const BUTTON_DEFS = {
   speak: { icon: Play, placement: 'overflow', labelKey: 'speak' },
   prompt: { icon: Terminal, placement: 'overflow', labelKey: 'showPrompt' },
   requestDetails: { icon: FileText, placement: 'header', labelKey: 'requestDetails' },
+  directorDetails: { icon: Theater, placement: 'header', labelKey: 'directorDetails' },
 }
 
 function DeleteAllIcon({ className = '' }) {
@@ -115,6 +119,7 @@ const VIS_KEY = {
     speak: 'showAssistantSpeak',
     prompt: 'showAssistantPrompt',
     requestDetails: 'showAssistantRequestDetails',
+    directorDetails: 'showAssistantDirectorDetails',
   },
 }
 
@@ -379,6 +384,7 @@ function MessageBubble({
     if (key === 'deleteAll' && contentSlotCount <= 1) return true
     if (key === 'regenerate' && generating) return true
     if (key === 'requestDetails' && (!promptData || streaming || generating)) return true
+    if (key === 'directorDetails' && (!promptData?.directorAttempted || streaming)) return true
     if (!message.content?.trim() && ['edit', 'copy', 'fork', 'speak'].includes(key)) return true
     return false
   }
@@ -512,6 +518,17 @@ function MessageBubble({
     })
   }
 
+  function handleShowDirectorDetails() {
+    if (!promptData?.directorAttempted) return
+    openModal('directorDetails', {
+      systemPrompt: promptData.directorSystemPrompt || '',
+      userPrompt: promptData.directorUserPrompt || '',
+      response: promptData.directorResponse || '',
+      responseData: promptData.directorResponseData || null,
+      failed: promptData.directorFailed || false,
+    })
+  }
+
   useEffect(() => {
     if (!overflowOpen) return
     function handleClick(e) {
@@ -572,6 +589,8 @@ function MessageBubble({
         return handleShowPrompt
       case 'requestDetails':
         return handleShowRequestDetails
+      case 'directorDetails':
+        return handleShowDirectorDetails
       default:
         return () => {}
     }

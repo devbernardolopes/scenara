@@ -148,6 +148,10 @@
       "label": "Assistente/System – Excluir a Partir Daqui",
       "desc": "Mostrar o botão que exclui esta mensagem e todas abaixo dela."
     },
+    "showAssistantDirectorDetails": {
+      "label": "Assistente/System – Detalhes do Diretor",
+      "desc": "Mostrar o botão que abre os detalhes da revisão do Diretor nas bolhas de mensagem do assistente e do sistema."
+    },
     "showUserDelete": {
       "label": "Usuário – Excluir",
       "desc": "Mostrar o botão de excluir nas bolhas de mensagem do usuário."

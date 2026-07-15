@@ -373,6 +373,15 @@ export const SETTINGS = [
     descKey: 'settings:appearance.showAssistantDeleteFromHere.desc',
   },
   {
+    key: 'showAssistantDirectorDetails',
+    category: 'appearance',
+    type: 'toggle',
+    default: true,
+    group: 'assistantButtons',
+    labelKey: 'settings:appearance.showAssistantDirectorDetails.label',
+    descKey: 'settings:appearance.showAssistantDirectorDetails.desc',
+  },
+  {
     key: 'assistantButtonOrder',
     category: 'appearance',
     type: 'buttonOrder',
@@ -387,6 +396,7 @@ export const SETTINGS = [
       'speak',
       'prompt',
       'requestDetails',
+      'directorDetails',
     ],
     group: 'assistantButtons',
     labelKey: 'settings:appearance.assistantButtonOrder.label',
@@ -408,6 +418,10 @@ export const SETTINGS = [
         {
           key: 'requestDetails',
           labelKey: 'settings:appearance.showAssistantRequestDetails.label',
+        },
+        {
+          key: 'directorDetails',
+          labelKey: 'settings:appearance.showAssistantDirectorDetails.label',
         },
       ],
     },

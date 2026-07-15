@@ -42,10 +42,18 @@
   "stop": "Stop",
   "showPrompt": "Show prompt",
   "requestDetails": "Request details",
+  "directorDetails": "Director Details",
   "requestDetailsModal": {
     "title": "Request Details",
     "request": "Request Payload",
     "response": "Response"
+  },
+  "directorDetailsModal": {
+    "title": "Director Details",
+    "systemPrompt": "SYSTEM Director Prompt",
+    "userPrompt": "USER Director Prompt",
+    "response": "Director Response",
+    "responseError": "Director Error"
   },
   "cancel": "Cancel",
   "messageDeleteTitle": "Delete message",

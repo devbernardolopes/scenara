@@ -61,4 +61,5 @@ export {
   Lock,
   Unlock,
   Clock,
+  Theater,
 } from 'lucide-react'

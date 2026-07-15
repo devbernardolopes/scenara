@@ -24,6 +24,7 @@ import InChatShortcutManagementModal from './components/modals/InChatShortcutMan
 import InChatShortcutFormModal from './components/modals/InChatShortcutFormModal'
 import ShowPromptModal from './components/modals/ShowPromptModal'
 import RequestDetailsModal from './components/modals/RequestDetailsModal'
+import DirectorDetailsModal from './components/modals/DirectorDetailsModal'
 import MemoryModal from './components/modals/MemoryModal'
 import MemoryRegenerationModal from './components/modals/MemoryRegenerationModal'
 import MemoryRegenerationResultModal from './components/modals/MemoryRegenerationResultModal'
@@ -51,6 +52,7 @@ registerModal('inChatShortcutManagement', InChatShortcutManagementModal)
 registerModal('inChatShortcutForm', InChatShortcutFormModal)
 registerModal('showPrompt', ShowPromptModal)
 registerModal('requestDetails', RequestDetailsModal)
+registerModal('directorDetails', DirectorDetailsModal)
 registerModal('memory', MemoryModal)
 registerModal('memoryRegeneration', MemoryRegenerationModal)
 registerModal('memoryRegenerationResult', MemoryRegenerationResultModal)

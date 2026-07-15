@@ -42,10 +42,18 @@
   "stop": "Parar",
   "showPrompt": "Mostrar prompt",
   "requestDetails": "Detalhes da requisição",
+  "directorDetails": "Detalhes do Diretor",
   "requestDetailsModal": {
     "title": "Detalhes da Requisição",
     "request": "Payload da Requisição",
     "response": "Resposta"
+  },
+  "directorDetailsModal": {
+    "title": "Detalhes do Diretor",
+    "systemPrompt": "Prompt SYSTEM do Diretor",
+    "userPrompt": "Prompt USER do Diretor",
+    "response": "Resposta do Diretor",
+    "responseError": "Erro do Diretor"
   },
   "cancel": "Cancelar",
   "messageDeleteTitle": "Excluir mensagem",

@@ -104,6 +104,12 @@ export async function generateChatResponse({
   const activeParams = getActiveParams(profile)
   const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
   let directorReviewed = false
+  let directorAttempted = false
+  let directorSystemPrompt = ''
+  let directorUserPrompt = ''
+  let directorResponse = ''
+  let directorResponseData = null
+  let directorFailed = false
   let chatDurationMs = null
   let directorDurationMs = null
   let promptData = JSON.stringify({
@@ -113,6 +119,12 @@ export async function generateChatResponse({
     msgNumbers,
     messageFlags,
     directorReviewed,
+    directorAttempted,
+    directorSystemPrompt,
+    directorUserPrompt,
+    directorResponse,
+    directorResponseData,
+    directorFailed,
   })
 
   const sendResult = await sendChatCompletion({
@@ -172,6 +184,10 @@ export async function generateChatResponse({
       const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
       const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
 
+      directorAttempted = true
+      directorSystemPrompt = systemInstructions
+      directorUserPrompt = userInstructions
+
       const dProfile = await getEffectiveProfileFor('director')
       if (!dProfile?.model) {
         throw new Error(i18n.t('chat:noProfileModel'))
@@ -197,6 +213,8 @@ export async function generateChatResponse({
         if (reviewed) {
           finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
           directorReviewed = true
+          directorResponse = reviewed
+          directorResponseData = reviewedResult.response
           responseData = reviewedResult.response
           promptData = JSON.stringify({
             payload,
@@ -205,6 +223,12 @@ export async function generateChatResponse({
             msgNumbers,
             messageFlags,
             directorReviewed,
+            directorAttempted,
+            directorSystemPrompt,
+            directorUserPrompt,
+            directorResponse,
+            directorResponseData,
+            directorFailed,
           })
         }
       } finally {
@@ -212,6 +236,22 @@ export async function generateChatResponse({
       }
     } catch (err) {
       if (err.name === 'AbortError') throw err
+      directorFailed = true
+      directorResponse = err.message || 'Unknown error'
+      promptData = JSON.stringify({
+        payload,
+        model: profile.model,
+        params: activeParams,
+        msgNumbers,
+        messageFlags,
+        directorReviewed,
+        directorAttempted,
+        directorSystemPrompt,
+        directorUserPrompt,
+        directorResponse,
+        directorResponseData,
+        directorFailed,
+      })
       showToast(i18n.t('chat:directorFailed'), { type: 'warning' })
     }
   }
