@@ -21,7 +21,8 @@
     "importFromFile": "Da file",
     "importUrlPrompt": "Inserisci l'URL del personaggio da importare:",
     "importUrlComingSoon": "L'importazione da URL non è ancora implementata",
-    "characterNameWithId": "{{name}}"
+    "characterNameWithId": "{{name}}",
+    "localInference": "Inferenza locale"
   },
   "topbar": {
     "toggleSidebar": "Attiva/disattiva barra laterale",
@@ -146,5 +147,8 @@
     },
     "duplicate": "Il tag \"{{name}}\" esiste già",
     "emptyName": "Il nome del tag non può essere vuoto"
+  },
+  "localInference": {
+    "placeholder": "Le impostazioni di inferenza locale saranno disponibili qui."
   }
 }

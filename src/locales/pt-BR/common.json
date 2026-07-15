@@ -11,6 +11,7 @@
     "inChatShortcuts": "Atalhos no Chat",
     "lorebooks": "Lorebooks",
     "tags": "Tags",
+    "localInference": "Inferência Local",
     "database": "Banco de Dados",
     "deleteThread": "Excluir conversa",
     "editCharacter": "Editar personagem",
@@ -217,5 +218,8 @@
     },
     "duplicate": "Tag \"{{name}}\" já existe",
     "emptyName": "O nome da tag não pode estar vazio"
+  },
+  "localInference": {
+    "placeholder": "As configurações de inferência local estarão disponíveis aqui."
   }
 }

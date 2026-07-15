@@ -11,6 +11,7 @@
     "inChatShortcuts": "In-Chat Shortcuts",
     "lorebooks": "Lorebooks",
     "tags": "Tags",
+    "localInference": "Local Inference",
     "database": "Database",
     "deleteThread": "Delete thread",
     "editCharacter": "Edit character",
@@ -217,5 +218,8 @@
     },
     "duplicate": "Tag \"{{name}}\" already exists",
     "emptyName": "Tag name cannot be empty"
+  },
+  "localInference": {
+    "placeholder": "Local inference settings will be available here."
   }
 }

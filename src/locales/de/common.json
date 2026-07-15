@@ -21,7 +21,8 @@
     "importFromFile": "Aus Datei",
     "importUrlPrompt": "Gib die Charakter-URL zum Importieren ein:",
     "importUrlComingSoon": "URL-Import ist noch nicht implementiert",
-    "characterNameWithId": "{{name}}"
+    "characterNameWithId": "{{name}}",
+    "localInference": "Lokale Inferenz"
   },
   "topbar": {
     "toggleSidebar": "Seitenleiste umschalten",
@@ -146,5 +147,8 @@
     },
     "duplicate": "Tag \"{{name}}\" existiert bereits",
     "emptyName": "Der Tag-Name darf nicht leer sein"
+  },
+  "localInference": {
+    "placeholder": "Lokale Inferenzeinstellungen werden hier verfügbar sein."
   }
 }

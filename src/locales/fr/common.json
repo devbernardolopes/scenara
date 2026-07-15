@@ -21,7 +21,8 @@
     "importFromFile": "Depuis un fichier",
     "importUrlPrompt": "Entrez l'URL du personnage à importer :",
     "importUrlComingSoon": "L'importation par URL n'est pas encore implémentée",
-    "characterNameWithId": "{{name}}"
+    "characterNameWithId": "{{name}}",
+    "localInference": "Inférence locale"
   },
   "topbar": {
     "toggleSidebar": "Basculer la barre latérale",
@@ -146,5 +147,8 @@
     },
     "duplicate": "L'étiquette \"{{name}}\" existe déjà",
     "emptyName": "Le nom de l'étiquette ne peut pas être vide"
+  },
+  "localInference": {
+    "placeholder": "Les paramètres d'inférence locale seront disponibles ici."
   }
 }
