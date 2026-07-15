@@ -862,7 +862,11 @@ function ChatView() {
       openModal('cancelConfirm', { threadId })
       return
     }
-    apiQueue.cancelThreadRequests(threadId)
+    apiQueue.cancelThreadRequests(threadId, { kinds: apiQueue.BLOCKING_KINDS })
+  }
+
+  function handleCancelAutoTitle() {
+    apiQueue.cancelAutoTitleRequests(threadId)
   }
 
   function withoutFailedMessages(msgs) {
@@ -1109,9 +1113,6 @@ function ChatView() {
         const showMarker = await getSetting('autoTitleMarker')
         const triggerLastCreatedAt =
           nonFailedMsgs.length > 0 ? nonFailedMsgs[nonFailedMsgs.length - 1].createdAt : null
-        if (showMarker) {
-          setPendingMarkers((prev) => [...prev, { type: 'autoTitle', status: 'queued' }])
-        }
         setAutoTitling(true)
         let markerId = null
         try {
@@ -1913,11 +1914,25 @@ function ChatView() {
                     nextIdx++
                   const nextVisible = nextIdx >= messages.length || nextIdx >= visibleStartIndex
                   if (!isVisible || !nextVisible) return null
+                  const autoTitlePending = pendingMarkers.find((m) => m.type === 'autoTitle')
+                  const atStatus = autoTitlePending?.status
                   return (
                     <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
                       <div className="flex-1 h-px bg-border" />
-                      <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap">
+                      <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
+                        {atStatus && (
+                          <button
+                            type="button"
+                            onClick={handleCancelAutoTitle}
+                            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-error hover:bg-error/10 transition-colors"
+                            title={t('cancelConfirmTitle')}
+                          >
+                            <Square className="w-3 h-3" />
+                          </button>
+                        )}
                         {t('autoTitleMarker')}
+                        {atStatus === 'queued' && <Clock className="w-3 h-3" />}
+                        {atStatus === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
                       </span>
                       <div className="flex-1 h-px bg-border" />
                     </div>
@@ -1990,27 +2005,19 @@ function ChatView() {
           )}
           <div ref={messagesEndRef} />
 
-          {pendingMarkers.map((pm) => (
-            <div key={`pending-${pm.type}`} className="flex items-center gap-3 my-2 px-1">
-              <div className="flex-1 h-px bg-border" />
-              <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
-                {pm.type === 'autoTitle' && (pm.status === 'queued' || pm.status === 'active') && (
-                  <button
-                    type="button"
-                    onClick={() => openModal('cancelConfirm', { threadId })}
-                    className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-error hover:bg-error/10 transition-colors"
-                    title={t('cancelConfirmTitle')}
-                  >
-                    <Square className="w-3 h-3" />
-                  </button>
-                )}
-                {t(pm.type === 'autoTitle' ? 'autoTitleMarker' : 'summarizationMarker')}
-                {pm.status === 'queued' && <Clock className="w-3 h-3" />}
-                {pm.status === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
-              </span>
-              <div className="flex-1 h-px bg-border" />
-            </div>
-          ))}
+          {pendingMarkers
+            .filter((pm) => pm.type === 'summarization')
+            .map((pm) => (
+              <div key={`pending-${pm.type}`} className="flex items-center gap-3 my-2 px-1">
+                <div className="flex-1 h-px bg-border" />
+                <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
+                  {t('summarizationMarker')}
+                  {pm.status === 'queued' && <Clock className="w-3 h-3" />}
+                  {pm.status === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
+                </span>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+            ))}
 
           {showScrollButton && (
             <button

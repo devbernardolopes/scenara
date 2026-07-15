@@ -207,12 +207,12 @@ export function cancelRequest(id) {
   return false
 }
 
-export function cancelThreadRequests(threadId) {
+export function cancelThreadRequests(threadId, { kinds = BLOCKING_KINDS } = {}) {
   const tid = Number(threadId)
   let cancelled = false
 
   queue = queue.filter((item) => {
-    if (item.threadId === tid && BLOCKING_KINDS.includes(item.type)) {
+    if (item.threadId === tid && kinds.includes(item.type)) {
       item.reject?.(new DOMException('Cancelled', 'AbortError'))
       cancelled = true
       return false
@@ -221,7 +221,7 @@ export function cancelThreadRequests(threadId) {
   })
 
   for (const item of inflight) {
-    if (item.threadId === tid && BLOCKING_KINDS.includes(item.type)) {
+    if (item.threadId === tid && kinds.includes(item.type)) {
       item.controller?.abort()
       cancelled = true
     }
@@ -229,6 +229,13 @@ export function cancelThreadRequests(threadId) {
 
   if (cancelled) notify()
   return cancelled
+}
+
+// Cancel only auto-title requests for a thread (used by the auto-title marker
+// cancel control). Auto-title is non-blocking, so it is intentionally excluded
+// from the blocking cancel path.
+export function cancelAutoTitleRequests(threadId) {
+  return cancelThreadRequests(threadId, { kinds: ['autoTitle'] })
 }
 
 function matchesKind(item, kinds) {

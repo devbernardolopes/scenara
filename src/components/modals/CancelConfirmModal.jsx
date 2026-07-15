@@ -1,7 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
-import { getState, cancelThreadRequests, isThreadBlockingActive } from '../../services/apiQueue'
+import {
+  getState,
+  cancelThreadRequests,
+  isThreadBlockingActive,
+  BLOCKING_KINDS,
+} from '../../services/apiQueue'
 import ModalShell from '../shared/ModalShell'
 
 function CancelConfirmModal({ threadId }) {
@@ -43,7 +48,7 @@ function CancelConfirmModal({ threadId }) {
     if (!isThreadBlockingActive(tid)) return
 
     setCancelling(true)
-    cancelThreadRequests(threadId)
+    cancelThreadRequests(threadId, { kinds: BLOCKING_KINDS })
     closeModal()
   }
 
