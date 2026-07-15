@@ -241,6 +241,8 @@ export async function resetDatabase() {
   await db.connectionProfiles.clear()
   await db.inChatShortcuts.clear()
   await db.promptHistory.clear()
+  await db.tags.clear()
+  await db.threadMemories.clear()
 
   for (const setting of SETTINGS) {
     await db.settings.add({ key: setting.key, value: setting.default })

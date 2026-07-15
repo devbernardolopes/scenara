@@ -4,6 +4,8 @@ function jsonReplacer(_key, val) {
   return val
 }
 
+const DATE_KEYS = new Set(['createdAt', 'updatedAt', 'summarizedAt', 'exportDate'])
+
 export function downloadJson(data, filename) {
   const blob = new Blob([JSON.stringify(data, jsonReplacer, 2)], {
     type: 'application/json',
@@ -22,6 +24,10 @@ export function jsonReviver(_key, val) {
   if (val && typeof val === 'object') {
     if (val.$type === 'Infinity') return Infinity
     if (val.$type === '-Infinity') return -Infinity
+  }
+  if (typeof val === 'string' && DATE_KEYS.has(_key)) {
+    const date = new Date(val)
+    if (!isNaN(date.getTime())) return date
   }
   return val
 }

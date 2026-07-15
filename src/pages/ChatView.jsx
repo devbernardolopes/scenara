@@ -142,6 +142,7 @@ function ChatView() {
   const prevScrollHeightRef = useRef(0)
   const messagesGrewRef = useRef(false)
   const scrollClearedRef = useRef(false)
+  const generatingFetchIdRef = useRef(0)
   const messagesRef = useRef(null)
   const failedIdsRef = useRef(new Set())
   const [thread, setThread] = useState(null)
@@ -609,8 +610,12 @@ function ChatView() {
       if (Number(eventThreadId) === Number(threadId)) {
         setGenerating(isGenerating)
         if (!isGenerating) {
+          const fetchId = ++generatingFetchIdRef.current
           getMessagesByThread(threadId).then((msgs) => {
-            if (Number(currentThreadIdRef.current) === Number(threadId)) {
+            if (
+              fetchId === generatingFetchIdRef.current &&
+              Number(currentThreadIdRef.current) === Number(threadId)
+            ) {
               setMessages(dedupeMessages(msgs))
               const { slots } = rebuildFailedState(msgs)
               setActiveSlotIndices(slots)
