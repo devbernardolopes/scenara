@@ -1181,8 +1181,12 @@ function ChatView() {
           showToast('Generating summary', { type: 'info' })
           let summaryMarkerId = null
           try {
-            if (showMarker && lastSummarizedCreatedAt != null) {
-              summaryMarkerId = await createSummaryMarker(threadId, lastSummarizedCreatedAt)
+            if (showMarker && unsummarizedMessages.length > 0) {
+              const anchorCreatedAt =
+                lastSummarizedCreatedAt != null
+                  ? lastSummarizedCreatedAt
+                  : unsummarizedMessages[unsummarizedMessages.length - 1].createdAt
+              summaryMarkerId = await createSummaryMarker(threadId, anchorCreatedAt)
               const updated = await getMessagesByThread(threadId)
               if (Number(currentThreadIdRef.current) === Number(threadId)) {
                 setMessages(dedupeMessages(updated))
@@ -1208,26 +1212,6 @@ function ChatView() {
             if (summary) {
               setThread((prev) => (prev ? { ...prev, memory: summary } : prev))
               showToast('Summary generated', { type: 'success' })
-
-              if (showMarker) {
-                const postMsgs = await getMessagesByThread(threadId)
-                let lastSummarizedIdx = -1
-                for (let i = postMsgs.length - 1; i >= 0; i--) {
-                  if (postMsgs[i].summarizedAt) {
-                    lastSummarizedIdx = i
-                    break
-                  }
-                }
-                if (lastSummarizedIdx !== -1 && !postMsgs[lastSummarizedIdx + 1]?.isSummaryMarker) {
-                  if (summaryMarkerId == null) {
-                    await createSummaryMarker(threadId, postMsgs[lastSummarizedIdx].createdAt)
-                    const updated = await getMessagesByThread(threadId)
-                    if (Number(currentThreadIdRef.current) === Number(threadId)) {
-                      setMessages(dedupeMessages(updated))
-                    }
-                  }
-                }
-              }
             }
           } catch (err) {
             if (err.name !== 'AbortError') {
@@ -1241,6 +1225,9 @@ function ChatView() {
               }
             }
           } finally {
+            if (showMarker) {
+              setPendingMarkers((prev) => prev.filter((m) => m.type !== 'summarization'))
+            }
           }
         }
       }
