@@ -23,7 +23,13 @@ function ImageViewerModal({ src, alt }) {
 
   const handlePointerDown = (e) => {
     pointerStart.current = { x: e.clientX, y: e.clientY }
-    pointerDownOnImage.current = e.target === imgRef.current
+    const rect = imgRef.current?.getBoundingClientRect()
+    pointerDownOnImage.current = rect
+      ? e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom
+      : false
   }
 
   const handleBackdropClick = (e) => {
