@@ -479,6 +479,7 @@ export async function buildChatRequestPayload({
 
   // During regeneration, clear summarization flags on messages summarized after
   // the message's position so getMessagesForApiRequest sees the original state.
+  //
   const effectiveMessages = beforeDate
     ? messages.map((m) =>
         m.summarizedAt && new Date(m.summarizedAt) > beforeDate ? { ...m, summarizedAt: null } : m,
