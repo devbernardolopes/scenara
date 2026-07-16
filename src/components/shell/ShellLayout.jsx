@@ -22,7 +22,7 @@ function ShellLayout() {
         <main className="flex-1 overflow-auto min-w-0">
           <Outlet />
         </main>
-        {location.pathname !== '/' && <ModelStatusBar />}
+        {!location.pathname.startsWith('/chat/') && <ModelStatusBar />}
       </div>
       <SidebarToggle open={sidebarOpen} onToggle={() => setSidebarOpen((prev) => !prev)} />
       <ToastContainer />
