@@ -4,7 +4,7 @@
    Add themes by adding a new `.theme-*` block below.
    ============================================================ */
 
-/* --- Light (default) --- */
+/* --- Light (default but we must change to the Dark one) --- */
 :root,
 .theme-light {
   --color-primary: #2563eb;
