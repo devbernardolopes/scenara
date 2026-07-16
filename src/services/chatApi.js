@@ -470,7 +470,16 @@ export async function buildChatRequestPayload({
   const keepMessages = Number(
     character?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0,
   )
-  const apiMessages = getMessagesForApiRequest(messages, { includeOOC, keepMessages })
+
+  // During regeneration, clear summarization flags on messages summarized after
+  // the message's position so getMessagesForApiRequest sees the original state.
+  const effectiveMessages = beforeDate
+    ? messages.map((m) =>
+        m.summarizedAt && new Date(m.summarizedAt) > beforeDate ? { ...m, summarizedAt: null } : m,
+      )
+    : messages
+
+  const apiMessages = getMessagesForApiRequest(effectiveMessages, { includeOOC, keepMessages })
 
   const latestThread = await getThread(threadId)
   const memoryText = await buildInjectedMemory(character, latestThread, { beforeDate })
