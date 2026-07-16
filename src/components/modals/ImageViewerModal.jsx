@@ -49,8 +49,9 @@ function ImageViewerModal({ src, alt }) {
       <TransformWrapper
         minScale={0.5}
         maxScale={5}
+        smooth={false}
+        wheel={{ step: 0.12, wheelDisabled: false }}
         doubleClick={{ mode: 'reset' }}
-        wheel={{ wheelDisabled: false }}
         panning={{ disabled: false }}
         pinch={{ disabled: false }}
       >
