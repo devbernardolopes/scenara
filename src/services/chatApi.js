@@ -464,6 +464,7 @@ export async function buildChatRequestPayload({
   isOOC,
   threadId,
   personaMap,
+  beforeDate,
 }) {
   const includeOOC = character?.includeOOC !== false
   const keepMessages = Number(
@@ -472,7 +473,7 @@ export async function buildChatRequestPayload({
   const apiMessages = getMessagesForApiRequest(messages, { includeOOC, keepMessages })
 
   const latestThread = await getThread(threadId)
-  const memoryText = await buildInjectedMemory(character, latestThread)
+  const memoryText = await buildInjectedMemory(character, latestThread, { beforeDate })
 
   let payload
   let entryTypes = null

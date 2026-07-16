@@ -1378,6 +1378,10 @@ function ChatView() {
 
       let currentMsgs = messages.slice(0, idx)
       currentMsgs = withoutFailedMessages(currentMsgs)
+
+      const lastMsgBefore = currentMsgs[currentMsgs.length - 1]
+      const beforeDate = lastMsgBefore?.createdAt ? new Date(lastMsgBefore.createdAt) : null
+
       let chatPersona = null
       if (thread?.personaId) {
         chatPersona = await getPersona(thread.personaId)
@@ -1477,6 +1481,7 @@ function ChatView() {
               }
             },
             ctx,
+            beforeDate,
           })
         },
       }).promise

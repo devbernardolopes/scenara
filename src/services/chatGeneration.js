@@ -73,6 +73,7 @@ export async function generateChatResponse({
   onToken,
   onFinish,
   ctx,
+  beforeDate,
 }) {
   const profile = isOOC ? await getEffectiveProfileFor('ooc') : await getEffectiveProfileFor('chat')
 
@@ -100,6 +101,7 @@ export async function generateChatResponse({
     isOOC,
     threadId,
     personaMap,
+    beforeDate,
   })
 
   const activeParams = getActiveParams(profile)

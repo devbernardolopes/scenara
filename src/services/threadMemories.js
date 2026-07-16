@@ -55,7 +55,7 @@ function formatMemoryEntry(
   return entryHeader ? `${entryHeader}\n\n${content}` : content
 }
 
-export async function buildInjectedMemory(character, thread) {
+export async function buildInjectedMemory(character, thread, { beforeDate } = {}) {
   const {
     memorySlots,
     memoriesHeader,
@@ -78,6 +78,12 @@ export async function buildInjectedMemory(character, thread) {
       memories = await getThreadMemoriesAscending(threadId)
       memories.sort((a, b) => (a.seq ?? 0) - (b.seq ?? 0))
     }
+  }
+
+  // During regeneration, exclude memories created after the message's position
+  // so the regenerated response sees only the context that was originally available.
+  if (beforeDate) {
+    memories = memories.filter((m) => new Date(m.createdAt) <= beforeDate)
   }
 
   const window = memories.slice(-memorySlots)
