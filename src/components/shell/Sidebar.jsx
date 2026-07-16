@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -64,39 +64,7 @@ function Sidebar({ open, onClose }) {
   const [sidebarNavLayout, setSidebarNavLayout] = useState('vertical')
   const [messageCounts, setMessageCounts] = useState(new Map())
   const fileInputRef = useRef(null)
-  const cardRefs = useRef(new Map())
-  const prevRects = useRef(new Map())
   useUnread()
-
-  useLayoutEffect(() => {
-    const newRects = new Map()
-    cardRefs.current.forEach((el, id) => {
-      if (!el) return
-      newRects.set(id, el.getBoundingClientRect())
-    })
-    prevRects.current.forEach((oldRect, id) => {
-      const el = cardRefs.current.get(id)
-      const newRect = newRects.get(id)
-      if (!el || !newRect) return
-      const dx = oldRect.left - newRect.left
-      const dy = oldRect.top - newRect.top
-      if (dx === 0 && dy === 0) return
-      el.style.transition = 'none'
-      el.style.transform = `translate(${dx}px, ${dy}px)`
-      requestAnimationFrame(() => {
-        el.style.transition = 'transform 300ms ease-in-out'
-        el.style.transform = ''
-      })
-    })
-    prevRects.current = newRects
-  }, [threads])
-
-  function setCardRef(id) {
-    return (el) => {
-      if (el) cardRefs.current.set(id, el)
-      else cardRefs.current.delete(id)
-    }
-  }
 
   function handleCreateCharacter() {
     openModal('characterCreate')
@@ -462,7 +430,6 @@ function Sidebar({ open, onClose }) {
               return (
                 <ThreadCard
                   key={thread.id}
-                  ref={setCardRef(thread.id)}
                   thread={thread}
                   character={character}
                   theme={theme}
