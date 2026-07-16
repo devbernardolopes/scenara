@@ -26,7 +26,7 @@ import {
   deleteMessagesFrom,
   trimLeadingTrailingNewlines,
 } from '../services/messages'
-import { getEffectiveProfileFor } from '../services/connectionProfiles'
+import { getEffectiveProfileFor, getProfile } from '../services/connectionProfiles'
 import { getSetting } from '../services/settings'
 import { generateChatResponse, parseBundleEntries } from '../services/chatGeneration'
 import * as apiQueue from '../services/apiQueue'
@@ -174,6 +174,7 @@ function ChatView() {
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const [chatModelName, setChatModelName] = useState('')
   const [chatModelTemp, setChatModelTemp] = useState(null)
+  const [chatProfile, setChatProfile] = useState(null)
   const [showStatus, setShowStatus] = useState(true)
   const [statusBarRefresh, setStatusBarRefresh] = useState(30)
   const [oocActive, setOocActive] = useState(false)
@@ -456,6 +457,8 @@ function ChatView() {
       setChatModelName(profile?.model || '')
       const temp = profile?.params?.temperature
       setChatModelTemp(typeof temp === 'number' ? temp : null)
+      const profileId = await getSetting(`requestKind.${kind}.profileId`)
+      setChatProfile(profileId ? await getProfile(profileId) : null)
     }
     loadChatModel()
     function onSettingsChanged(e) {
@@ -2026,13 +2029,28 @@ function ChatView() {
         {/* Wrap input for better control */}
         {showStatus && chatModelName && (
           <div className="px-3 text-center">
-            <span className="text-xs text-tertiary">
-              {chatModelTemp != null && <>T {chatModelTemp} · </>}
-              <MarqueeText className="inline-block align-bottom max-w-full">
-                {chatModelName.split('/').pop()}
-              </MarqueeText>
-              {hordeEta && <> · {hordeEta}</>}
-            </span>
+            {chatProfile ? (
+              <button
+                type="button"
+                onClick={() => openModal('profileForm', { profile: chatProfile })}
+                className="text-xs text-tertiary hover:text-text hover:underline inline-flex items-center gap-1 max-w-full"
+                title={t('statusBar.editProfile')}
+              >
+                {chatModelTemp != null && <>T {chatModelTemp} · </>}
+                <MarqueeText className="inline-block align-bottom max-w-full">
+                  {chatModelName.split('/').pop()}
+                </MarqueeText>
+                {hordeEta && <> · {hordeEta}</>}
+              </button>
+            ) : (
+              <span className="text-xs text-tertiary">
+                {chatModelTemp != null && <>T {chatModelTemp} · </>}
+                <MarqueeText className="inline-block align-bottom max-w-full">
+                  {chatModelName.split('/').pop()}
+                </MarqueeText>
+                {hordeEta && <> · {hordeEta}</>}
+              </span>
+            )}
           </div>
         )}
         <ChatInputArea
