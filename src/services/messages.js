@@ -124,3 +124,8 @@ export function trimLeadingTrailingNewlines(text) {
   if (!text) return text
   return text.replace(/^\n+|\n+$/g, '')
 }
+
+export function trimWhitespace(text) {
+  if (!text) return text
+  return text.replace(/^\s+|\s+$/g, '')
+}

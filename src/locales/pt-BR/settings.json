@@ -646,8 +646,12 @@
       "desc": "Prefixar mensagens USER com o nome da persona ativa."
     },
     "trimMessages": {
-      "label": "Limpar Mensagens",
+      "label": "Limpar Novas Linhas",
       "desc": "Remover novas linhas no início e fim de todas as mensagens."
+    },
+    "trimWhitespaces": {
+      "label": "Limpar Espaços em Branco",
+      "desc": "Remover espaços em branco no início e fim das mensagens USER após o envio."
     },
     "toggleInputPlaceholder": "Digite o valor"
   },

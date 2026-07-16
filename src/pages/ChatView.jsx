@@ -25,6 +25,7 @@ import {
   deleteMessage,
   deleteMessagesFrom,
   trimLeadingTrailingNewlines,
+  trimWhitespace,
 } from '../services/messages'
 import { getEffectiveProfileFor, getProfile } from '../services/connectionProfiles'
 import { getSetting } from '../services/settings'
@@ -1251,7 +1252,9 @@ function ChatView() {
 
       if (text) {
         const trimMsgs = await getSetting('prompting.trimMessages')
-        const userText = trimMsgs ? trimLeadingTrailingNewlines(text) : text
+        let userText = trimMsgs ? trimLeadingTrailingNewlines(text) : text
+        const trimWs = await getSetting('prompting.trimWhitespaces')
+        if (trimWs) userText = trimWhitespace(userText)
         await createMessage(threadId, 'user', userText, personaId, isOOC)
         currentMsgs = await getMessagesByThread(threadId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) {

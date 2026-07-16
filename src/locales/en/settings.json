@@ -656,8 +656,12 @@
       "desc": "Prefix USER messages with current active persona name for regular chat API calls."
     },
     "trimMessages": {
-      "label": "Trim Messages",
+      "label": "Trim Newlines",
       "desc": "Remove leading and trailing newlines from all messages."
+    },
+    "trimWhitespaces": {
+      "label": "Trim Whitespaces",
+      "desc": "Remove leading and trailing whitespace from USER messages after they are sent."
     },
     "toggleInputPlaceholder": "Enter value"
   },

@@ -1411,6 +1411,14 @@ export const SETTINGS = [
     descKey: 'settings:prompting.trimMessages.desc',
   },
   {
+    key: 'prompting.trimWhitespaces',
+    category: 'prompting',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:prompting.trimWhitespaces.label',
+    descKey: 'settings:prompting.trimWhitespaces.desc',
+  },
+  {
     key: 'database.importUrl',
     category: 'database',
     type: 'text',
