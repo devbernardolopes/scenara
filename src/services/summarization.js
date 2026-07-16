@@ -51,18 +51,6 @@ export async function shouldTriggerSummarization({ character, messages, includeO
   return false
 }
 
-export function appendMemoryToPayload(payload, memoryText, memoryHeader) {
-  if (!Array.isArray(payload) || payload.length === 0) return payload
-  const firstEntry = payload[0]
-  if (!firstEntry || firstEntry.role !== 'system') return payload
-  if (!memoryText) return payload
-
-  const section = memoryHeader ? `${memoryHeader}\n\n${memoryText}` : `\n\n${memoryText}`
-  const content = `${firstEntry.content || ''}${firstEntry.content ? '\n\n' : ''}${section}`
-
-  return [{ ...firstEntry, content }, ...payload.slice(1)]
-}
-
 export async function buildSummarizationPayload({
   character,
   thread,

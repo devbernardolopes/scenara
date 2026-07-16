@@ -36,7 +36,7 @@ const INITIAL_FORM = {
   autoTitleUserInstructions: '',
   memory: 'messages',
   messagesThreshold: 7,
-  contextWindowThreshold: 512,
+  contextWindowThreshold: 1024,
   messagesToKeep: 5,
   memorySlots: 3,
   summarizationSystemInstructions: '',

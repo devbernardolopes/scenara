@@ -130,6 +130,7 @@ export async function deleteThread(id) {
   const numId = Number(id)
   const thread = await db.threads.get(numId)
   await db.messages.where('threadId').equals(numId).delete()
+  await db.threadMemories.where('threadId').equals(numId).delete()
   await db.threads.delete(numId)
   window.dispatchEvent(
     new CustomEvent('threads-changed', {
@@ -141,6 +142,7 @@ export async function deleteThread(id) {
 export async function deleteThreads(ids) {
   const numIds = ids.map(Number)
   await Promise.all(numIds.map((id) => db.messages.where('threadId').equals(id).delete()))
+  await Promise.all(numIds.map((id) => db.threadMemories.where('threadId').equals(id).delete()))
   await db.threads.bulkDelete(numIds)
   window.dispatchEvent(
     new CustomEvent('threads-changed', {
