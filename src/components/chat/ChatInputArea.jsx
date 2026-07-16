@@ -72,6 +72,18 @@ const TOGGLEABLE_CHAT_BUTTONS = new Set([
   'autoSend',
 ])
 
+const CHAT_BUTTON_GROUP = {
+  ooc: 'mode',
+  shortcuts: 'mode',
+  attachFile: 'content',
+  memories: 'content',
+  stt: 'audio',
+  autoTTS: 'audio',
+  enterToSend: 'send',
+  autoReply: 'send',
+  autoSend: 'send',
+}
+
 const CHAT_BUTTON_DEFS = {
   ooc: { icon: MessageSquare, labelKey: 'ooc' },
   attachFile: { icon: Paperclip, labelKey: 'attachFile' },
@@ -787,23 +799,27 @@ function ChatInputArea({
                 ref={headerBtnRef}
                 className="flex items-center gap-0.5 overflow-hidden min-w-0 flex-1"
               >
-                {headerKeys.map((key) => {
+                {headerKeys.map((key, idx) => {
                   const def = CHAT_BUTTON_DEFS[key]
                   if (!def) return null
                   const Icon = def.icon
                   const isToggleable = TOGGLEABLE_CHAT_BUTTONS.has(key)
                   const isToggled = getToggleState(key)
+                  const prevGroup = idx > 0 ? CHAT_BUTTON_GROUP[headerKeys[idx - 1]] : null
+                  const group = CHAT_BUTTON_GROUP[key]
+                  const groupStart = idx > 0 && group && group !== prevGroup
+                  const dividerClass = groupStart ? 'border-l border-border pl-1 ml-1' : ''
                   const btnClass =
                     key === 'ooc'
                       ? isToggled
-                        ? '!text-ooc !bg-ooc hover:!bg-ooc-hover ring-2 ring-ooc-border shadow-[inset_0_2px_4px_rgba(0,0,0,0.35)]'
+                        ? 'text-ooc bg-ooc hover:bg-ooc-hover ring-2 ring-ooc-border shadow-[inset_0_2px_4px_rgba(0,0,0,0.35)]'
                         : ''
                       : key === 'stt'
                         ? isToggled
-                          ? '!text-primary !bg-primary-subtle shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]'
+                          ? 'text-primary bg-primary-subtle shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]'
                           : ''
                         : isToggleable && isToggled
-                          ? '!text-on-primary !bg-primary hover:!bg-primary-hover ring-1 ring-primary-hover shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)]'
+                          ? 'text-on-primary bg-primary hover:bg-primary-hover ring-1 ring-primary-hover shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)]'
                           : ''
                   const showBadge = key === 'memories' && unreadMemoryCount > 0
                   return (
@@ -814,7 +830,7 @@ function ChatInputArea({
                         if (key === 'memories') openModal('memory', { threadId })
                         else toggleButton(key)
                       }}
-                      className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md shrink-0 text-secondary hover:text-text hover:bg-surface-hover ${btnClass}`}
+                      className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md shrink-0 text-secondary hover:text-text hover:bg-surface-hover ${dividerClass} ${btnClass}`}
                       title={t(def.labelKey)}
                     >
                       <span className="relative">
@@ -872,12 +888,19 @@ function ChatInputArea({
                         <p className="px-3 py-1.5 text-xs font-medium text-tertiary uppercase tracking-wider">
                           {t('moreOptions')}
                         </p>
-                        {overflowKeys.map((key) => {
+                        {overflowKeys.map((key, idx) => {
                           const def = CHAT_BUTTON_DEFS[key]
                           if (!def) return null
                           const Icon = def.icon
                           const isToggleable = TOGGLEABLE_CHAT_BUTTONS.has(key)
                           const isToggled = getToggleState(key)
+                          const prevGroup =
+                            idx > 0 ? CHAT_BUTTON_GROUP[overflowKeys[idx - 1]] : null
+                          const group = CHAT_BUTTON_GROUP[key]
+                          const groupStart = idx > 0 && group && group !== prevGroup
+                          const separatorClass = groupStart
+                            ? 'mt-1 pt-1 border-t border-border'
+                            : ''
                           return (
                             <button
                               key={key}
@@ -893,9 +916,9 @@ function ChatInputArea({
                               }}
                               className={`w-full flex items-center justify-between px-3 py-2 text-sm min-h-[44px] ${
                                 isToggleable && isToggled
-                                  ? '!bg-primary !text-on-primary hover:!bg-primary-hover'
+                                  ? 'bg-primary text-on-primary hover:bg-primary-hover'
                                   : 'text-text hover:bg-surface-hover'
-                              }`}
+                              } ${separatorClass}`}
                             >
                               <span className="flex items-center gap-2">
                                 <Icon className="w-4 h-4" />
@@ -937,7 +960,16 @@ function ChatInputArea({
               className="flex items-center gap-1.5 min-h-[44px] px-2 rounded-md hover:bg-surface-hover text-text text-sm"
               title={t('personaSelector')}
             >
-              <Avatar src={selectedPersona?.avatar} size="sm" />
+              <div
+                className="rounded-full"
+                style={
+                  selectedPersona?.color && !oocActive
+                    ? { boxShadow: `0 0 0 2px ${selectedPersona.color}` }
+                    : undefined
+                }
+              >
+                <Avatar src={selectedPersona?.avatar} size="sm" />
+              </div>
               <ChevronDown className="w-3.5 h-3.5 text-tertiary" />
             </button>
             <PersonaPicker

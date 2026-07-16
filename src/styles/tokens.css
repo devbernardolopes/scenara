@@ -709,6 +709,9 @@
 .hover\:bg-primary-hover:hover {
   background-color: var(--color-primary-hover);
 }
+.ring-primary-hover {
+  --tw-ring-color: var(--color-primary-hover);
+}
 .text-primary {
   color: var(--color-primary);
 }
@@ -834,6 +837,9 @@
 }
 .border-ooc {
   border-color: var(--color-ooc-border);
+}
+.ring-ooc-border {
+  --tw-ring-color: var(--color-ooc-border);
 }
 .text-ooc-muted {
   color: var(--color-ooc-muted);
