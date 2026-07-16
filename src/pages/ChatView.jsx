@@ -142,6 +142,7 @@ function ChatView() {
   const prevMessagesLengthRef = useRef(0)
   const prevScrollHeightRef = useRef(0)
   const messagesGrewRef = useRef(false)
+  const loadEarlierSuppressUntilRef = useRef(0)
   const scrollClearedRef = useRef(false)
   const generatingFetchIdRef = useRef(0)
   const messagesRef = useRef(null)
@@ -743,7 +744,7 @@ function ChatView() {
       clearUnread(threadId)
       scrollClearedRef.current = true
       setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
-      if (messageThreshold > 0) {
+      if (messageThreshold > 0 && Date.now() > loadEarlierSuppressUntilRef.current) {
         setVisibleStartIndex((prev) =>
           Math.max(prev, messagesRef.current.length - messageThreshold),
         )
@@ -819,6 +820,7 @@ function ChatView() {
   function handleLoadEarlier() {
     if (!scrollRef.current || visibleStartIndex <= 0) return
     scrollHeightBeforeRef.current = scrollRef.current.scrollHeight
+    loadEarlierSuppressUntilRef.current = Date.now() + 800
     const chunkSize = messageThreshold || 50
     setVisibleStartIndex((prev) => Math.max(0, prev - chunkSize))
   }
