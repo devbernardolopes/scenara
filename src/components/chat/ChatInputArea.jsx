@@ -616,7 +616,7 @@ function ChatInputArea({
                 const entryClass = entry.isCommand
                   ? 'text-text bg-red-50 hover:bg-red-100'
                   : entry.isOOC
-                    ? 'text-ooc bg-ooc hover:bg-ooc-hover'
+                    ? 'text-accent bg-accent-subtle hover:bg-accent/10'
                     : 'text-text hover:bg-surface-hover'
                 return (
                   <button
@@ -757,17 +757,22 @@ function ChatInputArea({
             onKeyDown={handleKeyDown}
             placeholder={t('inputPlaceholder')}
             style={
-              selectedPersona?.color && !oocActive
+              oocActive
                 ? {
-                    borderLeftColor: selectedPersona.color,
+                    borderLeftColor: 'var(--color-accent)',
                     borderLeftWidth: '3px',
-                    backgroundColor: `color-mix(in srgb, ${selectedPersona.color} 12%, var(--color-surface))`,
                   }
-                : undefined
+                : selectedPersona?.color
+                  ? {
+                      borderLeftColor: selectedPersona.color,
+                      borderLeftWidth: '3px',
+                      backgroundColor: `color-mix(in srgb, ${selectedPersona.color} 12%, var(--color-surface))`,
+                    }
+                  : undefined
             }
             className={`w-full resize-none rounded-lg border px-4 py-3 pr-12 text-sm leading-relaxed transition-colors duration-150 min-h-[56px] max-h-48 focus:outline-none focus:ring-2 focus:ring-primary/30 ${
               oocActive
-                ? 'bg-ooc text-ooc border-ooc placeholder-ooc'
+                ? 'bg-accent-subtle text-text border-border placeholder-accent'
                 : 'bg-surface border-border text-text placeholder-tertiary'
             }`}
           />
@@ -809,7 +814,7 @@ function ChatInputArea({
                   const btnClass =
                     key === 'ooc'
                       ? isToggled
-                        ? 'text-ooc bg-ooc hover:bg-ooc-hover ring-2 ring-ooc-border shadow-[inset_0_2px_4px_rgba(0,0,0,0.35)]'
+                        ? 'text-accent bg-accent-subtle ring-2 ring-accent shadow-[inset_0_1px_2px_rgba(0,0,0,0.15)]'
                         : ''
                       : key === 'stt'
                         ? isToggled

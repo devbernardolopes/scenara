@@ -409,8 +409,8 @@ function MessageBubble({
       userHoverBg = 'hover:bg-white/10'
     }
   } else if (isUser && isOOC) {
-    userMutedClass = 'text-ooc-muted'
-    userHoverBg = 'hover:bg-ooc-hover'
+    userMutedClass = 'text-accent-muted'
+    userHoverBg = 'hover:bg-accent-subtle'
   }
 
   let promptData = null
@@ -424,7 +424,11 @@ function MessageBubble({
   let userBgClass = 'bg-primary text-on-primary'
   let userBgStyle = null
   if (isOOC) {
-    userBgClass = 'bg-ooc text-ooc border border-ooc'
+    userBgClass = 'bg-accent-subtle text-text border border-border'
+    userBgStyle = {
+      borderLeftColor: 'var(--color-accent)',
+      borderLeftWidth: '3px',
+    }
   } else if (personaColor) {
     userBgStyle = {
       borderLeftColor: personaColor,
@@ -635,13 +639,16 @@ function MessageBubble({
           isUser
             ? userBgClass
             : isOOC
-              ? 'bg-ooc text-ooc border border-ooc'
+              ? 'bg-accent-subtle text-text border border-border'
               : isSystem
                 ? 'bg-surface-secondary text-secondary text-sm italic'
                 : 'bg-surface-secondary text-text'
         }`}
         style={{
           ...(isUser ? userBgStyle : {}),
+          ...(!isUser && isOOC
+            ? { borderLeftColor: 'var(--color-accent)', borderLeftWidth: '3px' }
+            : {}),
           ...(editing && editWidth ? { minWidth: editWidth } : {}),
         }}
       >
@@ -671,12 +678,17 @@ function MessageBubble({
                       isUser
                         ? userMutedClass || 'text-on-primary-muted'
                         : isOOC
-                          ? 'text-ooc'
+                          ? 'text-accent'
                           : 'text-text'
                     }`}
                     style={isUser ? userMutedStyle : undefined}
                   >
                     {nameLabel}
+                  </span>
+                )}
+                {isOOC && (
+                  <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-accent-subtle text-accent border border-accent/30 leading-none shrink-0">
+                    {t('oocLabel')}
                   </span>
                 )}
               </div>
@@ -697,7 +709,7 @@ function MessageBubble({
                         isUser
                           ? `${userHoverBg} ${userMutedClass}`
                           : isOOC
-                            ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                            ? 'hover:bg-accent-subtle text-accent-muted hover:text-accent'
                             : 'hover:bg-black/10 text-tertiary hover:text-text'
                       } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''}`}
                       style={isUser ? userMutedStyle : undefined}
@@ -706,7 +718,7 @@ function MessageBubble({
                       <ChevronLeft className="w-3.5 h-3.5" />
                     </button>
                     <span
-                      className={`text-xs whitespace-nowrap ${isUser ? userMutedClass || '' : isOOC ? 'text-ooc-muted' : 'text-tertiary'}`}
+                      className={`text-xs whitespace-nowrap ${isUser ? userMutedClass || '' : isOOC ? 'text-accent-muted' : 'text-tertiary'}`}
                       style={isUser ? userMutedStyle : undefined}
                     >
                       {bundleIndex + 1}/{bundleMessages.length}
@@ -722,7 +734,7 @@ function MessageBubble({
                         isUser
                           ? `${userHoverBg} ${userMutedClass}`
                           : isOOC
-                            ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                            ? 'hover:bg-accent-subtle text-accent-muted hover:text-accent'
                             : 'hover:bg-black/10 text-tertiary hover:text-text'
                       } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''}`}
                       style={isUser ? userMutedStyle : undefined}
@@ -757,7 +769,7 @@ function MessageBubble({
                                 ? `${userHoverBg} ${userMutedClass}`
                                 : userHoverBg
                               : isOOC
-                                ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                                ? 'hover:bg-accent-subtle text-accent-muted hover:text-accent'
                                 : 'hover:bg-black/10 text-tertiary hover:text-text'
                         } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
                         style={isUser && !isDelete && userMutedStyle ? userMutedStyle : undefined}
@@ -779,7 +791,7 @@ function MessageBubble({
                               ? `${userHoverBg} ${userMutedClass}`
                               : userHoverBg
                             : isOOC
-                              ? 'hover:bg-ooc-hover text-ooc-muted hover:text-ooc'
+                              ? 'hover:bg-accent-subtle text-accent-muted hover:text-accent'
                               : 'hover:bg-black/10 text-tertiary hover:text-text'
                         }`}
                         style={isUser && userMutedStyle ? userMutedStyle : undefined}
@@ -847,13 +859,17 @@ function MessageBubble({
               extraHeight={8}
               className={`w-full resize-none rounded border whitespace-pre-wrap break-words px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
                 isOOC
-                  ? 'bg-ooc text-ooc border-ooc focus:ring-ooc'
+                  ? 'bg-accent-subtle text-text border-border focus:ring-accent'
                   : isUser
                     ? `${userBgClass || 'bg-transparent'} border-white/20 focus:ring-white/40`
                     : 'bg-surface text-text border-border focus:ring-primary/40'
               }`}
               style={{
-                ...(isUser ? userBgStyle : undefined),
+                ...(isOOC
+                  ? { borderLeftColor: 'var(--color-accent)', borderLeftWidth: '3px' }
+                  : isUser
+                    ? userBgStyle
+                    : undefined),
                 fontFamily: CHAT_FONTS[chatFontFamily],
                 fontSize: CHAT_FONT_SIZES[chatFontSize],
               }}
@@ -976,7 +992,7 @@ function MessageBubble({
         >
           <span className="flex items-center gap-2">
             <span
-              className={`text-xs font-medium ${isUser ? '' : isOOC ? 'text-ooc-muted' : 'text-tertiary'}`}
+              className={`text-xs font-medium ${isUser ? '' : isOOC ? 'text-accent-muted' : 'text-tertiary'}`}
             >{`#${messageNumber}`}</span>
             <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
               {new Date(slotCreatedAt || message.createdAt).toLocaleTimeString([], {

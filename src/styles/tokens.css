@@ -39,11 +39,7 @@
   --color-delete-hover: #b91c1c;
   --color-on-delete: #ffffff;
 
-  --color-ooc-bg: #991b1b;
-  --color-ooc-text: #fef2f2;
-  --color-ooc-border: #b91c1c;
-  --color-ooc-muted: rgba(254, 242, 242, 0.65);
-  --color-ooc-placeholder: rgba(254, 242, 242, 0.45);
+  --color-accent-subtle: color-mix(in srgb, var(--color-accent) 12%, transparent);
 
   --color-code-bg: rgba(0, 0, 0, 0.05);
 
@@ -401,12 +397,6 @@
   --color-delete-hover: #ef4444;
   --color-on-delete: #ffffff;
 
-  --color-ooc-bg: #7f1d1d;
-  --color-ooc-text: #fee2e2;
-  --color-ooc-border: #b91c1c;
-  --color-ooc-muted: rgba(254, 226, 226, 0.7);
-  --color-ooc-placeholder: rgba(254, 226, 226, 0.45);
-
   --color-code-bg: rgba(129, 140, 248, 0.08);
 
   --color-pill-count-bg: #312e81;
@@ -457,11 +447,6 @@
   --color-delete-hover: #f43f5e;
   --color-on-delete: #111827;
 
-  --color-ooc-bg: #881337;
-  --color-ooc-text: #fce7f3;
-  --color-ooc-border: #be123c;
-  --color-ooc-muted: rgba(251, 113, 133, 0.7);
-
   --color-code-bg: rgba(103, 232, 249, 0.08);
 
   --shadow-sm: 0 1px 2px rgba(34, 211, 238, 0.2);
@@ -502,10 +487,6 @@
   --color-delete: #ff0044;
   --color-delete-hover: #cc0033;
   --color-on-delete: #ffffff;
-
-  --color-ooc-bg: #7f1d1d;
-  --color-ooc-text: #ff99aa;
-  --color-ooc-border: #ff0044;
 
   --color-code-bg: rgba(255, 0, 255, 0.1);
 
@@ -795,6 +776,24 @@
 .bg-accent {
   background-color: var(--color-accent);
 }
+.bg-accent-subtle {
+  background-color: var(--color-accent-subtle);
+}
+.border-accent {
+  border-color: var(--color-accent);
+}
+.ring-accent {
+  --tw-ring-color: var(--color-accent);
+}
+.focus\:ring-accent:focus {
+  --tw-ring-color: var(--color-accent);
+}
+.text-accent-muted {
+  color: color-mix(in srgb, var(--color-accent) 65%, transparent);
+}
+.placeholder-accent::placeholder {
+  color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
 .hover\:bg-accent-hover:hover {
   background-color: var(--color-accent-hover);
 }
@@ -830,32 +829,6 @@
 /* Placeholder (theme-aware — Tailwind v4 doesn't generate placeholder-tertiary natively) */
 .placeholder-tertiary::placeholder {
   color: var(--color-text-tertiary);
-}
-
-/* OOC (out-of-character) mode — consistent deep red across all themes */
-.bg-ooc {
-  background-color: var(--color-ooc-bg);
-}
-.text-ooc {
-  color: var(--color-ooc-text);
-}
-.border-ooc {
-  border-color: var(--color-ooc-border);
-}
-.ring-ooc-border {
-  --tw-ring-color: var(--color-ooc-border);
-}
-.text-ooc-muted {
-  color: var(--color-ooc-muted);
-}
-.placeholder-ooc::placeholder {
-  color: var(--color-ooc-placeholder);
-}
-.focus\:ring-ooc:focus {
-  --tw-ring-color: var(--color-ooc-border);
-}
-.hover\:bg-ooc-hover:hover {
-  background-color: rgba(254, 242, 242, 0.1);
 }
 
 /* Code blocks (markdown) */
