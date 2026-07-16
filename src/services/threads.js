@@ -1,6 +1,7 @@
 import db from '../db'
 import { setUIState } from './uiState'
 import { touchCharacterLastUsed } from './characters'
+import { cancelThreadRequests } from './apiQueue'
 
 export async function getAllThreads() {
   const all = await db.threads.toArray()
@@ -128,6 +129,9 @@ export async function updateThreadColor(id, color, colorSlot) {
 
 export async function deleteThread(id) {
   const numId = Number(id)
+  cancelThreadRequests(numId, {
+    kinds: ['chat', 'regenerate', 'autoTitle', 'summarization'],
+  })
   const thread = await db.threads.get(numId)
   await db.messages.where('threadId').equals(numId).delete()
   await db.threadMemories.where('threadId').equals(numId).delete()
@@ -141,6 +145,11 @@ export async function deleteThread(id) {
 
 export async function deleteThreads(ids) {
   const numIds = ids.map(Number)
+  for (const id of numIds) {
+    cancelThreadRequests(id, {
+      kinds: ['chat', 'regenerate', 'autoTitle', 'summarization'],
+    })
+  }
   await Promise.all(numIds.map((id) => db.messages.where('threadId').equals(id).delete()))
   await Promise.all(numIds.map((id) => db.threadMemories.where('threadId').equals(id).delete()))
   await db.threads.bulkDelete(numIds)

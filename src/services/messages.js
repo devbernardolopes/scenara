@@ -104,7 +104,11 @@ export async function deleteMessagesFrom(id) {
   const allInThread = await db.messages.where('threadId').equals(msg.threadId).sortBy('createdAt')
   const idx = allInThread.findIndex((m) => m.id === msg.id)
   if (idx === -1) return
-  const toDelete = allInThread.slice(idx).map((m) => m.id)
+  const toDelete = allInThread
+    .slice(idx)
+    .filter((m) => !m.isSummaryMarker && !m.isAutoTitleMarker)
+    .map((m) => m.id)
+  if (toDelete.length === 0) return
   await db.messages.bulkDelete(toDelete)
   await updateThreadTimestamp(msg.threadId)
   window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId: msg.threadId } }))
