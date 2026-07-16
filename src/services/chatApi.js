@@ -92,6 +92,7 @@ export async function buildMessagesPayload({
   writingInstruction,
   memoryText,
   memoryHeader,
+  personaMap,
 }) {
   const writingMessageRole =
     character?.writingMessageRole || settings.writingMessageRole || 'system'
@@ -119,7 +120,6 @@ export async function buildMessagesPayload({
 
   const userRolePrefixWithPersona = await getSetting('prompting.userRolePrefixWithPersona')
   const userPersonaPrefixOverride = character?.userPersonaPrefix === false ? false : true
-  const personaNameForPrefix = currentPersonaName || personaName
 
   const prompt = replaceVarsIn(character?.prompt)
   if (prompt) systemParts.push(prompt)
@@ -178,9 +178,10 @@ export async function buildMessagesPayload({
           content = assistantPrefix + content
         } else if (msg.role === 'user') {
           if (userPersonaPrefixOverride && userRolePrefixWithPersona) {
+            const pName = personaMap?.[msg.personaId]?.name || currentPersonaName || personaName
             let resolved = userRolePrefixWithPersona
-              .replace(/{{name}}/gi, personaNameForPrefix)
-              .replace(/{{persona_name}}/gi, personaNameForPrefix)
+              .replace(/{{name}}/gi, pName)
+              .replace(/{{persona_name}}/gi, pName)
             if (resolved && !/\s$/.test(resolved)) resolved += '\n'
             content = resolved + content
           } else if (userPrefix) {
@@ -554,6 +555,7 @@ export async function buildChatRequestPayload({
       writingInstruction,
       memoryText,
       memoryHeader: '',
+      personaMap,
     })
     payload = chatResult.payload
     entryTypes = chatResult.entryTypes
