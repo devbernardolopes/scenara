@@ -655,6 +655,7 @@ export async function sendChatCompletion({
               onFinish?.(choice.finish_reason)
             }
           } catch {
+            // TODO: Review this 
             // skip unparseable chunks
           }
         }
