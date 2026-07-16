@@ -39,6 +39,12 @@
   --color-delete-hover: #b91c1c;
   --color-on-delete: #ffffff;
 
+  --color-ooc: #b45309;
+  --color-ooc-subtle: rgba(180, 83, 9, 0.1);
+  --color-ooc-text: #451a03;
+  --color-ooc-muted: rgba(69, 26, 3, 0.65);
+  --color-ooc-placeholder: rgba(69, 26, 3, 0.45);
+
   --color-accent-subtle: color-mix(in srgb, var(--color-accent) 12%, transparent);
 
   --color-code-bg: rgba(0, 0, 0, 0.05);
@@ -95,6 +101,12 @@
   --color-delete-hover: #dc2626;
   --color-on-delete: #ffffff;
 
+  --color-ooc: #f59e0b;
+  --color-ooc-subtle: rgba(245, 158, 11, 0.12);
+  --color-ooc-text: #fef3c7;
+  --color-ooc-muted: rgba(254, 243, 199, 0.7);
+  --color-ooc-placeholder: rgba(254, 243, 199, 0.45);
+
   --color-code-bg: rgba(255, 255, 255, 0.07);
 
   --color-pill-count-bg: #1e3a5f;
@@ -144,6 +156,12 @@
   --color-delete: #b91c1c;
   --color-delete-hover: #991b1b;
   --color-on-delete: #ffffff;
+
+  --color-ooc: #9a3412;
+  --color-ooc-subtle: rgba(154, 52, 18, 0.1);
+  --color-ooc-text: #431407;
+  --color-ooc-muted: rgba(67, 20, 7, 0.65);
+  --color-ooc-placeholder: rgba(67, 20, 7, 0.45);
 
   --color-pill-count-bg: #dbeafe;
   --color-pill-count-text: #1d4ed8;
@@ -195,6 +213,12 @@
   --color-delete-hover: #be123c;
   --color-on-delete: #ffffff;
 
+  --color-ooc: #8b5cf6;
+  --color-ooc-subtle: rgba(139, 92, 246, 0.1);
+  --color-ooc-text: #3b0764;
+  --color-ooc-muted: rgba(59, 7, 100, 0.65);
+  --color-ooc-placeholder: rgba(59, 7, 100, 0.45);
+
   --color-pill-count-bg: #e0e7ff;
   --color-pill-count-text: #4338ca;
   --color-pill-queued-bg: #fef3c7;
@@ -244,6 +268,12 @@
   --color-delete: #b91c1c;
   --color-delete-hover: #991b1b;
   --color-on-delete: #ffffff;
+
+  --color-ooc: #7c3aed;
+  --color-ooc-subtle: rgba(124, 58, 237, 0.12);
+  --color-ooc-text: #1e1b4b;
+  --color-ooc-muted: rgba(30, 27, 75, 0.7);
+  --color-ooc-placeholder: rgba(30, 27, 75, 0.5);
 
   --color-pill-count-bg: #bfdbfe;
   --color-pill-count-text: #1e40af;
@@ -295,6 +325,12 @@
   --color-delete-hover: #cc3700;
   --color-on-delete: #000000;
 
+  --color-ooc: #eab308;
+  --color-ooc-subtle: rgba(234, 179, 8, 0.12);
+  --color-ooc-text: #fef3c7;
+  --color-ooc-muted: rgba(254, 243, 199, 0.7);
+  --color-ooc-placeholder: rgba(254, 243, 199, 0.45);
+
   --color-pill-count-bg: #1e3a5f;
   --color-pill-count-text: #93c5fd;
   --color-pill-queued-bg: #713f12;
@@ -344,6 +380,12 @@
   --color-delete: #cc0000;
   --color-delete-hover: #990000;
   --color-on-delete: #ffffff;
+
+  --color-ooc: #fbbf24;
+  --color-ooc-subtle: rgba(251, 191, 36, 0.1);
+  --color-ooc-text: #422006;
+  --color-ooc-muted: rgba(66, 32, 6, 0.65);
+  --color-ooc-placeholder: rgba(66, 32, 6, 0.45);
 
   --color-pill-count-bg: #003300;
   --color-pill-count-text: #33ff33;
@@ -397,6 +439,12 @@
   --color-delete-hover: #ef4444;
   --color-on-delete: #ffffff;
 
+  --color-ooc: #3b82f6;
+  --color-ooc-subtle: rgba(59, 130, 246, 0.12);
+  --color-ooc-text: #e0f2fe;
+  --color-ooc-muted: rgba(224, 242, 254, 0.7);
+  --color-ooc-placeholder: rgba(224, 242, 254, 0.45);
+
   --color-code-bg: rgba(129, 140, 248, 0.08);
 
   --color-pill-count-bg: #312e81;
@@ -447,6 +495,12 @@
   --color-delete-hover: #f43f5e;
   --color-on-delete: #111827;
 
+  --color-ooc: #f59e0b;
+  --color-ooc-subtle: rgba(245, 158, 11, 0.12);
+  --color-ooc-text: #fef3c7;
+  --color-ooc-muted: rgba(254, 243, 199, 0.7);
+  --color-ooc-placeholder: rgba(254, 243, 199, 0.45);
+
   --color-code-bg: rgba(103, 232, 249, 0.08);
 
   --shadow-sm: 0 1px 2px rgba(34, 211, 238, 0.2);
@@ -488,6 +542,12 @@
   --color-delete-hover: #cc0033;
   --color-on-delete: #ffffff;
 
+  --color-ooc: #f59e0b;
+  --color-ooc-subtle: rgba(245, 158, 11, 0.12);
+  --color-ooc-text: #fef3c7;
+  --color-ooc-muted: rgba(254, 243, 199, 0.7);
+  --color-ooc-placeholder: rgba(254, 243, 199, 0.45);
+
   --color-code-bg: rgba(255, 0, 255, 0.1);
 
   --shadow-sm: 0 0 8px rgba(255, 0, 255, 0.4);
@@ -527,6 +587,12 @@
 
   --color-delete: #ff4488;
   --color-delete-hover: #e11d48;
+
+  --color-ooc: #fbbf24;
+  --color-ooc-subtle: rgba(251, 191, 36, 0.12);
+  --color-ooc-text: #fef3c7;
+  --color-ooc-muted: rgba(254, 243, 199, 0.7);
+  --color-ooc-placeholder: rgba(254, 243, 199, 0.45);
 
   --color-code-bg: rgba(255, 105, 180, 0.12);
 
@@ -568,6 +634,12 @@
   --color-delete: #ef4444;
   --color-delete-hover: #b91c1c;
 
+  --color-ooc: #f59e0b;
+  --color-ooc-subtle: rgba(245, 158, 11, 0.1);
+  --color-ooc-text: #422006;
+  --color-ooc-muted: rgba(66, 32, 6, 0.65);
+  --color-ooc-placeholder: rgba(66, 32, 6, 0.45);
+
   --color-code-bg: rgba(163, 230, 53, 0.15);
 
   --shadow-sm: 0 1px 4px rgba(163, 230, 53, 0.3);
@@ -608,6 +680,12 @@
   --color-delete: #dc322f;
   --color-delete-hover: #b22c2a;
 
+  --color-ooc: #2aa198;
+  --color-ooc-subtle: rgba(42, 161, 152, 0.12);
+  --color-ooc-text: #fdf6e3;
+  --color-ooc-muted: rgba(253, 246, 227, 0.7);
+  --color-ooc-placeholder: rgba(253, 246, 227, 0.45);
+
   --color-code-bg: rgba(131, 148, 150, 0.15);
 }
 
@@ -643,6 +721,12 @@
 
   --color-delete: #ff0055;
   --color-delete-hover: #cc0044;
+
+  --color-ooc: #22d3ee;
+  --color-ooc-subtle: rgba(34, 211, 238, 0.12);
+  --color-ooc-text: #083344;
+  --color-ooc-muted: rgba(8, 51, 68, 0.75);
+  --color-ooc-placeholder: rgba(8, 51, 68, 0.55);
 
   --color-code-bg: rgba(0, 255, 234, 0.12);
 
@@ -796,6 +880,32 @@
 }
 .hover\:bg-accent-hover:hover {
   background-color: var(--color-accent-hover);
+}
+
+/* OOC (out-of-character) mode */
+.bg-ooc {
+  background-color: var(--color-ooc);
+}
+.bg-ooc-subtle {
+  background-color: var(--color-ooc-subtle);
+}
+.text-ooc {
+  color: var(--color-ooc);
+}
+.text-ooc-muted {
+  color: var(--color-ooc-muted);
+}
+.border-ooc {
+  border-color: var(--color-ooc);
+}
+.ring-ooc {
+  --tw-ring-color: var(--color-ooc);
+}
+.focus\:ring-ooc:focus {
+  --tw-ring-color: var(--color-ooc);
+}
+.placeholder-ooc::placeholder {
+  color: var(--color-ooc-placeholder);
 }
 
 /* Delete */

@@ -616,7 +616,7 @@ function ChatInputArea({
                 const entryClass = entry.isCommand
                   ? 'text-text bg-red-50 hover:bg-red-100'
                   : entry.isOOC
-                    ? 'text-accent bg-accent-subtle hover:bg-accent/10'
+                    ? 'text-ooc bg-ooc-subtle hover:bg-ooc-subtle'
                     : 'text-text hover:bg-surface-hover'
                 return (
                   <button
@@ -759,7 +759,9 @@ function ChatInputArea({
             style={
               oocActive
                 ? {
-                    borderLeftColor: 'var(--color-accent)',
+                    borderTopColor: 'var(--color-ooc)',
+                    borderTopWidth: '3px',
+                    borderLeftColor: 'var(--color-ooc)',
                     borderLeftWidth: '3px',
                   }
                 : selectedPersona?.color
@@ -772,7 +774,7 @@ function ChatInputArea({
             }
             className={`w-full resize-none rounded-lg border px-4 py-3 pr-12 text-sm leading-relaxed transition-colors duration-150 min-h-[56px] max-h-48 focus:outline-none focus:ring-2 focus:ring-primary/30 ${
               oocActive
-                ? 'bg-accent-subtle text-text border-border placeholder-accent'
+                ? 'bg-ooc-subtle text-text border-border placeholder-ooc'
                 : 'bg-surface border-border text-text placeholder-tertiary'
             }`}
           />
@@ -814,7 +816,7 @@ function ChatInputArea({
                   const btnClass =
                     key === 'ooc'
                       ? isToggled
-                        ? 'text-accent bg-accent-subtle ring-2 ring-accent shadow-[inset_0_1px_2px_rgba(0,0,0,0.15)]'
+                        ? 'text-ooc bg-ooc-subtle ring-2 ring-ooc shadow-[inset_0_1px_2px_rgba(0,0,0,0.15)]'
                         : ''
                       : key === 'stt'
                         ? isToggled
