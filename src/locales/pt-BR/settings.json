@@ -189,6 +189,10 @@
       "label": "Rolagem no Card da Conversa",
       "desc": "Rolar títulos de conversa quando eles transbordam o card."
     },
+    "showChatModel": {
+      "label": "Mostrar Modelo do Chat",
+      "desc": "Exibe uma barra de status com o modelo de Chat ativo na parte inferior da visualização principal."
+    },
     "chatTitleMarquee": {
       "label": "Rolagem no Título do Chat",
       "desc": "Rolar o título do chat quando ele transborda o cabeçalho."

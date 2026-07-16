@@ -105,6 +105,7 @@
   "confirmDefaultMessage": "Are you sure?",
   "ok": "OK",
   "close": "Close",
+  "dismissModelBar": "Dismiss chat model bar",
   "moveUp": "Move up",
   "moveDown": "Move down",
   "uploadImage": "Upload image",

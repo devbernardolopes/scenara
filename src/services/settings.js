@@ -636,6 +636,15 @@ export const SETTINGS = [
     descKey: 'settings:appearance.threadCardMarquee.desc',
   },
   {
+    key: 'showChatModel',
+    category: 'appearance',
+    group: 'interface',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.showChatModel.label',
+    descKey: 'settings:appearance.showChatModel.desc',
+  },
+  {
     key: 'chatTitleMarquee',
     category: 'appearance',
     group: 'interface',

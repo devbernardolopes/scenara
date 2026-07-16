@@ -8,6 +8,7 @@ import { showToast } from '../lib/toast'
 import { useConfirm } from '../lib/confirm'
 import Avatar from '../components/shared/Avatar'
 import MarkdownTitle from '../components/shared/MarkdownTitle'
+import MarqueeText from '../components/shared/MarqueeText'
 import ChatInputArea from '../components/chat/ChatInputArea'
 import MessageBubble from '../components/chat/MessageBubble'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
@@ -2027,7 +2028,9 @@ function ChatView() {
           <div className="px-3 text-center">
             <span className="text-xs text-tertiary">
               {chatModelTemp != null && <>T {chatModelTemp} · </>}
-              {chatModelName.split('/').pop()}
+              <MarqueeText className="inline-block align-bottom max-w-full">
+                {chatModelName.split('/').pop()}
+              </MarqueeText>
               {hordeEta && <> · {hordeEta}</>}
             </span>
           </div>

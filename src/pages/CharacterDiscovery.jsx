@@ -20,6 +20,7 @@ import { setBaseTitle } from '../services/titleManager'
 import CollapsibleSection from '../components/shared/CollapsibleSection'
 import IconButton from '../components/shared/IconButton'
 import Pagination from '../components/shared/Pagination'
+import ModelStatusBar from '../components/shell/ModelStatusBar'
 import PersonaPicker from '../components/shared/PersonaPicker'
 import { getAllTags } from '../services/tags'
 import {
@@ -569,6 +570,7 @@ function CharacterDiscovery() {
       </div>
       {!isUnlimited && sortedCharacters.length > 0 && (
         <div className="shrink-0 px-4 md:px-8 pb-4 md:pb-8 pt-4 bg-surface border-t border-border">
+          <ModelStatusBar embedded />
           <Pagination
             currentPage={safePage}
             totalPages={totalPages}
