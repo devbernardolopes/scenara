@@ -47,7 +47,7 @@ const ThreadCard = forwardRef(function ThreadCard(
   return (
     <div
       ref={ref}
-      className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px] p-2 flex flex-col w-full aspect-[3/1]`}
+      className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px] p-2 flex flex-col w-full min-h-[92px]`}
       style={{
         borderLeftColor: threadColor || undefined,
         backgroundColor: threadColor
