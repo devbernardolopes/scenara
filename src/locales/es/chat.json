@@ -53,5 +53,11 @@
   "autoTitleCancelButton": "Sí, cancelar título",
   "autoTitleCancelHint": "Si la solicitud termina mientras este diálogo está abierto, el botón de confirmación se desactivará automáticamente.",
   "autoTitleCancelDone": "La solicitud de título automático ya ha finalizado.",
-  "autoTitleCancelDoneHint": "Puedes cerrar este diálogo — la solicitud terminó por sí sola."
+  "autoTitleCancelDoneHint": "Puedes cerrar este diálogo — la solicitud terminó por sí sola.",
+  "summaryCancelTitle": "Cancelar resumen",
+  "summaryCancelMessage": "Se cancelará la solicitud de resumen y el resumen de la conversación no se actualizará.",
+  "summaryCancelButton": "Sí, cancelar resumen",
+  "summaryCancelHint": "Si la solicitud termina mientras este diálogo está abierto, el botón de confirmación se desactivará automáticamente.",
+  "summaryCancelDone": "La solicitud de resumen ya ha finalizado.",
+  "summaryCancelDoneHint": "Puedes cerrar este diálogo — la solicitud terminó por sí sola."
 }

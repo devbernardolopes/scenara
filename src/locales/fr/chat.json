@@ -53,5 +53,11 @@
   "autoTitleCancelButton": "Oui, annuler le titre",
   "autoTitleCancelHint": "Si la requête se termine pendant que cette fenêtre est ouverte, le bouton de confirmation sera désactivé automatiquement.",
   "autoTitleCancelDone": "La requête de titre automatique est déjà terminée.",
-  "autoTitleCancelDoneHint": "Vous pouvez fermer cette fenêtre — la requête s'est terminée d'elle-même."
+  "autoTitleCancelDoneHint": "Vous pouvez fermer cette fenêtre — la requête s'est terminée d'elle-même.",
+  "summaryCancelTitle": "Annuler le résumé",
+  "summaryCancelMessage": "La requête de résumé sera annulée et le résumé de la conversation ne sera pas mis à jour.",
+  "summaryCancelButton": "Oui, annuler le résumé",
+  "summaryCancelHint": "Si la requête se termine pendant que cette fenêtre est ouverte, le bouton de confirmation sera désactivé automatiquement.",
+  "summaryCancelDone": "La requête de résumé est déjà terminée.",
+  "summaryCancelDoneHint": "Vous pouvez fermer cette fenêtre — la requête s'est terminée d'elle-même."
 }

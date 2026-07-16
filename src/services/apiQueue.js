@@ -268,6 +268,13 @@ export function subscribe(fn) {
   return () => listeners.delete(fn)
 }
 
+// Cancel only summarization requests for a thread (used by the summarization
+// marker cancel control). Summarization is non-blocking, so it is intentionally
+// excluded from the blocking cancel path.
+export function cancelSummarizationRequests(threadId) {
+  return cancelThreadRequests(threadId, { kinds: ['summarization'] })
+}
+
 export async function waitForCooldown() {
   const cooldownMs = await getCooldownMs()
   const elapsed = Date.now() - lastDispatchTime

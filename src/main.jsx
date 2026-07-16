@@ -33,6 +33,7 @@ import TagManagementModal from './components/modals/TagManagementModal'
 import LocalInferenceModal from './components/modals/LocalInferenceModal'
 import CancelConfirmModal from './components/modals/CancelConfirmModal'
 import AutoTitleCancelModal from './components/modals/AutoTitleCancelModal'
+import SummaryCancelModal from './components/modals/SummaryCancelModal'
 import ProgressModal from './components/modals/ProgressModal'
 import ImportSourceModal from './components/modals/ImportSourceModal'
 
@@ -64,6 +65,7 @@ registerModal('tagManagement', TagManagementModal)
 registerModal('localInference', LocalInferenceModal)
 registerModal('cancelConfirm', CancelConfirmModal)
 registerModal('autoTitleCancel', AutoTitleCancelModal)
+registerModal('summaryCancel', SummaryCancelModal)
 registerModal('progress', ProgressModal)
 registerModal('exportDatabase', ExportDatabaseModal)
 registerModal('importSource', ImportSourceModal)

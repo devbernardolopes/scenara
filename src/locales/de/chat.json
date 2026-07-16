@@ -53,5 +53,11 @@
   "autoTitleCancelButton": "Ja, Auto-Titel abbrechen",
   "autoTitleCancelHint": "Wenn die Anfrage abgeschlossen wird, während dieser Dialog geöffnet ist, wird der Bestätigungsbutton automatisch deaktiviert.",
   "autoTitleCancelDone": "Die Auto-Titel-Anfrage ist bereits abgeschlossen.",
-  "autoTitleCancelDoneHint": "Du kannst diesen Dialog schließen — die Anfrage wurde von selbst beendet."
+  "autoTitleCancelDoneHint": "Du kannst diesen Dialog schließen — die Anfrage wurde von selbst beendet.",
+  "summaryCancelTitle": "Auto-Zusammenfassung abbrechen",
+  "summaryCancelMessage": "Die Zusammenfassungsanfrage wird abgebrochen und die Konversationszusammenfassung wird nicht aktualisiert.",
+  "summaryCancelButton": "Ja, Zusammenfassung abbrechen",
+  "summaryCancelHint": "Wenn die Anfrage abgeschlossen wird, während dieser Dialog geöffnet ist, wird der Bestätigungsbutton automatisch deaktiviert.",
+  "summaryCancelDone": "Die Zusammenfassungsanfrage ist bereits abgeschlossen.",
+  "summaryCancelDoneHint": "Du kannst diesen Dialog schließen — die Anfrage wurde von selbst beendet."
 }

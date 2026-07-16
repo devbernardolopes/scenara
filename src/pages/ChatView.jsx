@@ -155,7 +155,6 @@ function ChatView() {
   const [queuedCount, setQueuedCount] = useState(0)
   const [blockingGenerating, setBlockingGenerating] = useState(false)
   const [blockingQueued, setBlockingQueued] = useState(false)
-  const [summarizing, setSummarizing] = useState(false)
   const [autoTitling, setAutoTitling] = useState(false)
   const [pendingMarkers, setPendingMarkers] = useState([])
   const [streamingMsgId, setStreamingMsgId] = useState(null)
@@ -855,6 +854,10 @@ function ChatView() {
     openModal('autoTitleCancel', { threadId })
   }
 
+  function handleCancelSummarization() {
+    openModal('summaryCancel', { threadId })
+  }
+
   function withoutFailedMessages(msgs) {
     const ids = failedIdsRef.current
     return ids.size > 0 ? msgs.filter((m) => !ids.has(m.id)) : msgs
@@ -1168,12 +1171,23 @@ function ChatView() {
         if (unsummarizedMessages.length > 0) {
           const summAbort = new AbortController()
           const showMarker = await getSetting('summarizationMarker')
-          if (showMarker) {
-            setPendingMarkers((prev) => [...prev, { type: 'summarization', status: 'queued' }])
+          let lastSummarizedCreatedAt = null
+          for (let i = nonFailedMsgs.length - 1; i >= 0; i--) {
+            if (nonFailedMsgs[i].summarizedAt) {
+              lastSummarizedCreatedAt = nonFailedMsgs[i].createdAt
+              break
+            }
           }
-          setSummarizing(true)
           showToast('Generating summary', { type: 'info' })
+          let summaryMarkerId = null
           try {
+            if (showMarker && lastSummarizedCreatedAt != null) {
+              summaryMarkerId = await createSummaryMarker(threadId, lastSummarizedCreatedAt)
+              const updated = await getMessagesByThread(threadId)
+              if (Number(currentThreadIdRef.current) === Number(threadId)) {
+                setMessages(dedupeMessages(updated))
+              }
+            }
             const summary = await apiQueue.enqueue({
               threadId,
               type: 'summarization',
@@ -1205,10 +1219,12 @@ function ChatView() {
                   }
                 }
                 if (lastSummarizedIdx !== -1 && !postMsgs[lastSummarizedIdx + 1]?.isSummaryMarker) {
-                  await createSummaryMarker(threadId, postMsgs[lastSummarizedIdx].createdAt)
-                  const updated = await getMessagesByThread(threadId)
-                  if (Number(currentThreadIdRef.current) === Number(threadId)) {
-                    setMessages(dedupeMessages(updated))
+                  if (summaryMarkerId == null) {
+                    await createSummaryMarker(threadId, postMsgs[lastSummarizedIdx].createdAt)
+                    const updated = await getMessagesByThread(threadId)
+                    if (Number(currentThreadIdRef.current) === Number(threadId)) {
+                      setMessages(dedupeMessages(updated))
+                    }
                   }
                 }
               }
@@ -1217,11 +1233,14 @@ function ChatView() {
             if (err.name !== 'AbortError') {
               showToast(err.message || 'Summarization failed', { type: 'error' })
             }
-          } finally {
-            setSummarizing(false)
-            if (showMarker) {
-              setPendingMarkers((prev) => prev.filter((m) => m.type !== 'summarization'))
+            if (summaryMarkerId != null) {
+              await deleteMessage(summaryMarkerId)
+              const updated = await getMessagesByThread(threadId)
+              if (Number(currentThreadIdRef.current) === Number(threadId)) {
+                setMessages(dedupeMessages(updated))
+              }
             }
+          } finally {
           }
         }
       }
@@ -1884,11 +1903,25 @@ function ChatView() {
                   while (nextIdx < messages.length && messages[nextIdx].isSummaryMarker) nextIdx++
                   const nextVisible = nextIdx >= messages.length || nextIdx >= visibleStartIndex
                   if (!isVisible || !nextVisible) return null
+                  const summPending = pendingMarkers.find((m) => m.type === 'summarization')
+                  const summStatus = summPending?.status
                   return (
                     <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
                       <div className="flex-1 h-px bg-border" />
-                      <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap">
+                      <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
+                        {summStatus && (
+                          <button
+                            type="button"
+                            onClick={handleCancelSummarization}
+                            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-error hover:bg-error/10 transition-colors"
+                            title={t('cancelConfirmTitle')}
+                          >
+                            <Square className="w-3 h-3" />
+                          </button>
+                        )}
                         {t('summarizationMarker')}
+                        {summStatus === 'queued' && <Clock className="w-3 h-3" />}
+                        {summStatus === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
                       </span>
                       <div className="flex-1 h-px bg-border" />
                     </div>
@@ -1996,20 +2029,6 @@ function ChatView() {
           )}
           <div ref={messagesEndRef} />
 
-          {pendingMarkers
-            .filter((pm) => pm.type === 'summarization')
-            .map((pm) => (
-              <div key={`pending-${pm.type}`} className="flex items-center gap-3 my-2 px-1">
-                <div className="flex-1 h-px bg-border" />
-                <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
-                  {t('summarizationMarker')}
-                  {pm.status === 'queued' && <Clock className="w-3 h-3" />}
-                  {pm.status === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
-                </span>
-                <div className="flex-1 h-px bg-border" />
-              </div>
-            ))}
-
           {showScrollButton && (
             <button
               type="button"
@@ -2040,7 +2059,6 @@ function ChatView() {
           onSend={handleSend}
           onCancel={handleCancel}
           generating={blockingGenerating}
-          summarizing={summarizing}
           autoTitling={autoTitling}
           hasQueued={blockingQueued}
           onPersonaChange={setSelectedPersonaId}

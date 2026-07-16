@@ -53,5 +53,11 @@
   "autoTitleCancelButton": "Sì, annulla titolo",
   "autoTitleCancelHint": "Se la richiesta termina mentre questa finestra è aperta, il pulsante di conferma verrà disabilitato automaticamente.",
   "autoTitleCancelDone": "La richiesta di titolo automatico è già stata completata.",
-  "autoTitleCancelDoneHint": "Puoi chiudere questa finestra — la richiesta è terminata da sola."
+  "autoTitleCancelDoneHint": "Puoi chiudere questa finestra — la richiesta è terminata da sola.",
+  "summaryCancelTitle": "Annulla riepilogo",
+  "summaryCancelMessage": "La richiesta di riepilogo verrà annullata e il riepilogo della conversazione non sarà aggiornato.",
+  "summaryCancelButton": "Sì, annulla riepilogo",
+  "summaryCancelHint": "Se la richiesta termina mentre questa finestra è aperta, il pulsante di conferma verrà disabilitato automaticamente.",
+  "summaryCancelDone": "La richiesta di riepilogo è già stata completata.",
+  "summaryCancelDoneHint": "Puoi chiudere questa finestra — la richiesta è terminata da sola."
 }

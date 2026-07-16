@@ -125,8 +125,6 @@ function ChatInputArea({
   onSend,
   onCancel,
   generating,
-  summarizing,
-  autoTitling,
   hasQueued,
   onPersonaChange,
   onOocChange,
@@ -500,7 +498,6 @@ function ChatInputArea({
   }
 
   function handleSend() {
-    if (summarizing) return
     if (generating || hasQueued) {
       onCancel?.()
       return
@@ -694,7 +691,7 @@ function ChatInputArea({
             </div>
             <div className="flex flex-wrap-reverse gap-2 p-3">
               {parsedShortcuts.map((s, i) => {
-                const sendDisabled = generating || summarizing || hasQueued
+                const sendDisabled = generating || hasQueued
                 return (
                   <button
                     key={i}
@@ -745,7 +742,7 @@ function ChatInputArea({
             rows={2}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            disabled={summarizing}
+            disabled={false}
             onInput={(e) => autoResize(e.target)}
             onFocus={handleTextareaFocus}
             onBlur={handleTextareaBlur}
@@ -989,12 +986,12 @@ function ChatInputArea({
             type="button"
             onClick={handleSend}
             className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-sm flex-shrink-0 ${
-              generating || summarizing || hasQueued
+              generating || hasQueued
                 ? 'bg-error text-on-primary hover:opacity-90'
                 : 'bg-primary text-on-primary hover:bg-primary-hover'
             }`}
           >
-            {generating || summarizing || hasQueued ? (
+            {generating || hasQueued ? (
               <Square className="w-4 h-4" />
             ) : (
               <Send className="w-4 h-4" />
