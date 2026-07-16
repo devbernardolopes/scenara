@@ -47,7 +47,7 @@ const ThreadCard = forwardRef(function ThreadCard(
   return (
     <div
       ref={ref}
-      className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px] p-2 flex flex-col w-full min-h-[92px]`}
+      className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px] p-2 flex flex-col w-full h-[92px]`}
       style={{
         borderLeftColor: threadColor || undefined,
         backgroundColor: threadColor
@@ -60,7 +60,7 @@ const ThreadCard = forwardRef(function ThreadCard(
         onClick={onClose}
         className="flex items-stretch gap-0 min-w-0 flex-1 min-h-0"
       >
-        <div className="w-22 flex-shrink-0 self-stretch rounded-l-lg overflow-hidden relative bg-surface-hover">
+        <div className="w-22 flex-shrink-0 h-[92px] rounded-l-lg overflow-hidden relative bg-surface-hover">
           {character?.avatar &&
           (/^https?:\/\//.test(character.avatar) || character.avatar.startsWith('data:image/')) ? (
             <img
