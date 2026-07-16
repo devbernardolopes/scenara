@@ -2017,10 +2017,15 @@ function ChatView() {
             <button
               type="button"
               onClick={scrollToBottom}
-              className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center bg-primary text-on-primary rounded-full shadow-surface-lg hover:bg-primary-hover transition-all duration-200"
+              className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center bg-primary text-on-primary rounded-full shadow-surface-lg hover:bg-primary-hover transition-all duration-200 relative"
               aria-label={t('scrollToBottom')}
             >
               <ChevronDown className="w-5 h-5" />
+              {(thread?.unreadCount || 0) > 0 && (
+                <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-badge-unread-text bg-badge-unread rounded-full leading-none">
+                  {thread.unreadCount > 99 ? '99+' : thread.unreadCount}
+                </span>
+              )}
             </button>
           )}
         </div>
