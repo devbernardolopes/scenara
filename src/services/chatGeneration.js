@@ -22,7 +22,7 @@ export function parseBundleEntries(bundleMessages) {
   }
 }
 
-export function computeMessageFlags(entryTypes, msgNumbers, currentMsgs) {
+export function computeMessageFlags(entryTypes, msgNumbers, currentMsgs, { beforeDate } = {}) {
   if (!entryTypes) return null
   const realMsgs = currentMsgs.filter((m) => !m.isSummaryMarker && !m.isAutoTitleMarker)
   return entryTypes.map((type, i) => {
@@ -52,7 +52,7 @@ export function computeMessageFlags(entryTypes, msgNumbers, currentMsgs) {
           }
         } catch {}
       }
-      if (dbMsg?.summarizedAt) {
+      if (dbMsg?.summarizedAt && (!beforeDate || new Date(dbMsg.summarizedAt) <= beforeDate)) {
         flags.push('SUM')
         flags.push('KEP')
       }
@@ -106,7 +106,7 @@ export async function generateChatResponse({
   })
 
   const activeParams = getActiveParams(profile)
-  const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs)
+  const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs, { beforeDate })
   let directorReviewed = false
   let directorAttempted = false
   let directorSystemPrompt = ''
