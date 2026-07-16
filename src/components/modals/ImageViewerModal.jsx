@@ -27,8 +27,8 @@ function ImageViewerModal({ src, alt }) {
         pinch={{ disabled: false }}
       >
         <TransformComponent
-          wrapperClass="!w-full !h-full"
-          contentClass="!w-full !h-full flex items-center justify-center"
+          wrapperClass="flex items-center justify-center"
+          contentClass="flex items-center justify-center"
         >
           <img
             src={src}
