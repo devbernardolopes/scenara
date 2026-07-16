@@ -50,6 +50,11 @@ export const CATEGORIES = [
 
 export const GROUPS = [
   { key: 'autoTitle', labelKey: 'settings:groups.autoTitle' },
+  { key: 'summarization', labelKey: 'settings:groups.summarization' },
+  { key: 'ooc', labelKey: 'settings:groups.ooc' },
+  { key: 'director', labelKey: 'settings:groups.director' },
+  { key: 'aiContinue', labelKey: 'settings:groups.aiContinue' },
+  { key: 'prefixes', labelKey: 'settings:groups.prefixes' },
   { key: 'assistantButtons', labelKey: 'settings:groups.assistantButtons', parent: 'chat' },
   { key: 'userButtons', labelKey: 'settings:groups.userButtons', parent: 'chat' },
   { key: 'apiRequestSectionHeaders', labelKey: 'settings:groups.apiRequestSectionHeaders' },
@@ -1037,6 +1042,7 @@ export const SETTINGS = [
   {
     key: 'prompting.summarizationSystem',
     category: 'prompting',
+    group: 'summarization',
     type: 'textarea',
     default:
       'You are an expert memory compressor for a roleplay conversation.\n\nYour task is to create a concise, factual update to the ongoing memory based on the chat history provided.\n\nRules:\n- Start from the previous memory (if any) and integrate only new key information.\n- Extract and condense important facts: character actions, decisions, relationship changes, locations, important objects, emotional states, and plot progression.\n- Use a neutral, matter-of-fact, third-person style.\n- Be concise: Maximum 2 short paragraphs, under 192 tokens total.\n- Never include quoted dialogue, inner thoughts, speculation, or invented details.\n- Do not add closure or continue the scene.\n- Eliminate any duplicate information already in the previous memory.\n- Output ONLY the updated memory text. No explanations or labels.\n\n{{transcript}}',
@@ -1047,6 +1053,7 @@ export const SETTINGS = [
   {
     key: 'prompting.summarizationUser',
     category: 'prompting',
+    group: 'summarization',
     type: 'textarea',
     default: 'Create a summary in the language of the provided message exchange.',
     props: { rows: 6, collapsible: true, summary: 'tokens' },
@@ -1056,6 +1063,7 @@ export const SETTINGS = [
   {
     key: 'prompting.directorSystem',
     category: 'prompting',
+    group: 'director',
     type: 'textarea',
     default:
       "You are a rigorous director reviewing an AI roleplay response before it is shown to the user.\n\nYour task is to evaluate the response strictly against the character prompt and the defined writing style, and to rewrite it so that it fully complies.\n\nRules:\n- Enforce strict adherence to the character's personality, knowledge, motivations, and constraints from the character prompt.\n- Enforce the specified writing style: tone, POV, tense, prose density, formatting, and any style directives.\n- Remove or correct any content that breaks character, contradicts established facts, or violates the style definition.\n- Preserve the original meaning, intent, and narrative events unless they conflict with the above.\n- Output ONLY the corrected response text. No explanations, labels, or commentary.",
@@ -1066,6 +1074,7 @@ export const SETTINGS = [
   {
     key: 'prompting.oocDelimiters',
     category: 'prompting',
+    group: 'ooc',
     type: 'oocDelimiters',
     default: { enabled: true, left: '((OOC: ', right: '))' },
     labelKey: 'settings:prompting.oocDelimiters.label',
@@ -1074,6 +1083,7 @@ export const SETTINGS = [
   {
     key: 'prompting.oocSystem',
     category: 'prompting',
+    group: 'ooc',
     type: 'textarea',
     default:
       'This is an OOC (out-of-character) request. Respond only in OOC mode. Be concise, direct, pragmatic, and exact. Do not roleplay, narrate, or continue the story.',
@@ -1084,6 +1094,7 @@ export const SETTINGS = [
   {
     key: 'prompting.oocMessageRole',
     category: 'prompting',
+    group: 'ooc',
     type: 'select',
     default: 'assistant',
     options: ['system', 'assistant'],
@@ -1097,6 +1108,7 @@ export const SETTINGS = [
   {
     key: 'prompting.oocUser',
     category: 'prompting',
+    group: 'ooc',
     type: 'textarea',
     default: '{{content}}',
     props: { rows: 6, collapsible: true, summary: 'tokens' },
@@ -1266,6 +1278,7 @@ export const SETTINGS = [
   {
     key: 'prompting.firstMessageRole',
     category: 'prompting',
+    group: 'aiContinue',
     type: 'select',
     default: 'user',
     options: ['system', 'assistant', 'user'],
@@ -1280,6 +1293,7 @@ export const SETTINGS = [
   {
     key: 'prompting.firstMessagePrompt',
     category: 'prompting',
+    group: 'aiContinue',
     type: 'textarea',
     default:
       'Begin the interaction abiding to writing instructions, system instructions, and starting context, if provided.',
@@ -1290,6 +1304,7 @@ export const SETTINGS = [
   {
     key: 'prompting.continueRole',
     category: 'prompting',
+    group: 'aiContinue',
     type: 'select',
     default: 'user',
     options: ['system', 'assistant', 'user'],
@@ -1304,6 +1319,7 @@ export const SETTINGS = [
   {
     key: 'prompting.continuePrompt',
     category: 'prompting',
+    group: 'aiContinue',
     type: 'textarea',
     default:
       'Continue. Keep it short. Conclude if fitting. Follow writing instructions. Avoid repetition unless it makes sense in the current context.',
@@ -1362,6 +1378,7 @@ export const SETTINGS = [
   {
     key: 'prompting.prefixAssistantRole',
     category: 'prompting',
+    group: 'prefixes',
     type: 'toggleInput',
     default: { enabled: false, value: '{{char}}: ' },
     labelKey: 'settings:prompting.prefixAssistantRole.label',
@@ -1370,6 +1387,7 @@ export const SETTINGS = [
   {
     key: 'prompting.prefixUserRole',
     category: 'prompting',
+    group: 'prefixes',
     type: 'toggleInput',
     default: { enabled: false, value: '{{name}}: ' },
     labelKey: 'settings:prompting.prefixUserRole.label',

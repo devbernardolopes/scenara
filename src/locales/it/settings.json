@@ -52,6 +52,11 @@
     "localInferenceAdvanced": "Avanzate",
     "interface": "Interface",
     "chat": "Chat",
+    "summarization": "Summarization",
+    "ooc": "OOC",
+    "director": "Director",
+    "aiContinue": "AI Continue",
+    "prefixes": "Prefixes",
     "autoTitle": "Auto-Title"
   },
   "appearance": {

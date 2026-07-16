@@ -45,6 +45,11 @@
   },
   "groups": {
     "autoTitle": "Título Automático",
+    "summarization": "Sumarização",
+    "ooc": "OOC",
+    "director": "Diretor",
+    "aiContinue": "Continuar IA",
+    "prefixes": "Prefixos",
     "assistantButtons": "Botões das Bolhas de Mensagem do Assistente/System",
     "userButtons": "Botões das Bolhas de Mensagem do Usuário",
     "apiRequestSectionHeaders": "Cabeçalhos de Seção de Requisição API",

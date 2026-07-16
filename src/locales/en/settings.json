@@ -45,6 +45,11 @@
   },
   "groups": {
     "autoTitle": "Auto-Title",
+    "summarization": "Summarization",
+    "ooc": "OOC",
+    "director": "Director",
+    "aiContinue": "AI Continue",
+    "prefixes": "Prefixes",
     "assistantButtons": "Assistant/System Message Bubbles Buttons",
     "userButtons": "User Message Bubbles Buttons",
     "apiRequestSectionHeaders": "API Request Section Headers",
