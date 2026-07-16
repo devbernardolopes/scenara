@@ -18,8 +18,8 @@
     "duplicateThread": "Duplicate thread",
     "confirmDuplicateTitle": "Duplicate Thread",
     "confirmDuplicateMessage": "Are you sure you want to duplicate this thread?",
-    "favorite": "Favorite",
-    "unfavorite": "Unfavorite",
+    "favorite": "Pin",
+    "unfavorite": "Unpin",
     "lock": "Lock thread",
     "unlock": "Unlock thread",
     "confirmDeleteTitle": "Delete Thread",
@@ -40,7 +40,9 @@
     "importUrlComingSoon": "URL import is not yet implemented",
     "color": "Color",
     "colorNone": "None",
-    "characterNameWithId": "{{name}}"
+    "characterNameWithId": "{{name}}",
+    "pin": "Pin",
+    "unpin": "Unpin"
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",

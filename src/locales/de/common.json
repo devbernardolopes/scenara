@@ -8,8 +8,8 @@
     "deleteThread": "Unterhaltung löschen",
     "editCharacter": "Charakter bearbeiten",
     "duplicateThread": "Unterhaltung duplizieren",
-    "favorite": "Favorit",
-    "unfavorite": "Kein Favorit",
+    "favorite": "Anheften",
+    "unfavorite": "Lösen",
     "lock": "Unterhaltung sperren",
     "unlock": "Unterhaltung entsperren",
     "confirmDeleteTitle": "Unterhaltung löschen",
@@ -22,7 +22,9 @@
     "importUrlPrompt": "Gib die Charakter-URL zum Importieren ein:",
     "importUrlComingSoon": "URL-Import ist noch nicht implementiert",
     "characterNameWithId": "{{name}}",
-    "localInference": "Lokale Inferenz"
+    "localInference": "Lokale Inferenz",
+    "pin": "Anheften",
+    "unpin": "Lösen"
   },
   "topbar": {
     "toggleSidebar": "Seitenleiste umschalten",

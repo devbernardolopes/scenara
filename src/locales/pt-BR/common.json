@@ -18,8 +18,8 @@
     "duplicateThread": "Duplicar conversa",
     "confirmDuplicateTitle": "Duplicar Conversa",
     "confirmDuplicateMessage": "Tem certeza que deseja duplicar esta conversa?",
-    "favorite": "Favoritar",
-    "unfavorite": "Desfavoritar",
+    "favorite": "Fixar",
+    "unfavorite": "Desafixar",
     "lock": "Bloquear conversa",
     "unlock": "Desbloquear conversa",
     "confirmDeleteTitle": "Excluir Conversa",
@@ -40,7 +40,9 @@
     "importUrlComingSoon": "Importação por URL ainda não implementada",
     "color": "Cor",
     "colorNone": "Nenhuma",
-    "characterNameWithId": "{{name}}"
+    "characterNameWithId": "{{name}}",
+    "pin": "Fixar",
+    "unpin": "Desafixar"
   },
   "topbar": {
     "toggleSidebar": "Alternar barra lateral",

@@ -8,8 +8,8 @@
     "deleteThread": "Supprimer la discussion",
     "editCharacter": "Modifier le personnage",
     "duplicateThread": "Dupliquer la discussion",
-    "favorite": "Favori",
-    "unfavorite": "Ne plus favori",
+    "favorite": "Épingler",
+    "unfavorite": "Désépingler",
     "lock": "Verrouiller la conversation",
     "unlock": "Déverrouiller la conversation",
     "confirmDeleteTitle": "Supprimer la Discussion",
@@ -22,7 +22,9 @@
     "importUrlPrompt": "Entrez l'URL du personnage à importer :",
     "importUrlComingSoon": "L'importation par URL n'est pas encore implémentée",
     "characterNameWithId": "{{name}}",
-    "localInference": "Inférence locale"
+    "localInference": "Inférence locale",
+    "pin": "Épingler",
+    "unpin": "Désépingler"
   },
   "topbar": {
     "toggleSidebar": "Basculer la barre latérale",

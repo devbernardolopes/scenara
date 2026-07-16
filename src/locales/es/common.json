@@ -8,8 +8,8 @@
     "deleteThread": "Eliminar conversación",
     "editCharacter": "Editar personaje",
     "duplicateThread": "Duplicar conversación",
-    "favorite": "Favorito",
-    "unfavorite": "No favorito",
+    "favorite": "Fijar",
+    "unfavorite": "Quitar fijado",
     "lock": "Bloquear conversación",
     "unlock": "Desbloquear conversación",
     "confirmDeleteTitle": "Eliminar Conversación",
@@ -22,7 +22,9 @@
     "importUrlPrompt": "Introduce la URL del personaje para importar:",
     "importUrlComingSoon": "La importación por URL aún no está implementada",
     "characterNameWithId": "{{name}}",
-    "localInference": "Inferencia local"
+    "localInference": "Inferencia local",
+    "pin": "Fijar",
+    "unpin": "Quitar fijado"
   },
   "topbar": {
     "toggleSidebar": "Alternar barra lateral",

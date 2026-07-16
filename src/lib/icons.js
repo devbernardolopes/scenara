@@ -61,6 +61,8 @@ export {
   Forward,
   Lock,
   Unlock,
+  Pin,
+  PinOff,
   Clock,
   Theater,
 } from 'lucide-react'

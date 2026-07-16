@@ -16,21 +16,15 @@ import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
-import { findColorSlot, getColorHex } from '../../config/colorPalettes'
+import { findColorSlot } from '../../config/colorPalettes'
 import { useTheme } from '../../hooks/useTheme'
 import ColorPicker from '../shared/ColorPicker'
 import CloseButton from '../shared/CloseButton'
-import MarkdownTitle from '../shared/MarkdownTitle'
+import ThreadCard from './ThreadCard'
 import {
   UserPlus,
   Settings,
-  Edit3,
   Trash2,
-  Copy,
-  Star,
-  Lock,
-  Unlock,
-  Palette,
   CheckSquare,
   Square,
   FileText,
@@ -43,49 +37,11 @@ import {
   Globe,
   FileUp,
   SlidersHorizontal,
-  RefreshCw,
 } from '../../lib/icons'
 import { getGeneratingThreads } from '../../services/generatingState'
 import * as apiQueue from '../../services/apiQueue'
 import { useUnread } from '../../hooks/useUnread'
 import { getThreadMessageCounts } from '../../services/messages'
-
-function ThreadCardTitle({ title, isActive, threadCardMarquee }) {
-  const wrapperRef = useRef(null)
-  const [overflows, setOverflows] = useState(false)
-
-  useLayoutEffect(() => {
-    const el = wrapperRef.current
-    if (el && threadCardMarquee) {
-      const overflows = el.scrollWidth > el.clientWidth
-      if (overflows) {
-        el.style.setProperty('--marquee-distance', `-${el.scrollWidth - el.clientWidth}px`)
-      }
-      setOverflows(overflows)
-    } else {
-      setOverflows(false)
-    }
-  }, [title, threadCardMarquee])
-
-  if (!threadCardMarquee) {
-    return (
-      <span className={`text-sm font-medium truncate ${isActive ? 'text-primary' : 'text-text'}`}>
-        <MarkdownTitle>{title}</MarkdownTitle>
-      </span>
-    )
-  }
-
-  return (
-    <span
-      ref={wrapperRef}
-      className={`text-sm font-medium marquee-wrapper ${overflows ? 'marquee-animate' : ''} ${isActive ? 'text-primary' : 'text-text'}`}
-    >
-      <span className="marquee-text">
-        <MarkdownTitle>{title}</MarkdownTitle>
-      </span>
-    </span>
-  )
-}
 
 function Sidebar({ open, onClose }) {
   const { t } = useTranslation('common')
@@ -108,7 +64,39 @@ function Sidebar({ open, onClose }) {
   const [sidebarNavLayout, setSidebarNavLayout] = useState('vertical')
   const [messageCounts, setMessageCounts] = useState(new Map())
   const fileInputRef = useRef(null)
+  const cardRefs = useRef(new Map())
+  const prevRects = useRef(new Map())
   useUnread()
+
+  useLayoutEffect(() => {
+    const newRects = new Map()
+    cardRefs.current.forEach((el, id) => {
+      if (!el) return
+      newRects.set(id, el.getBoundingClientRect())
+    })
+    prevRects.current.forEach((oldRect, id) => {
+      const el = cardRefs.current.get(id)
+      const newRect = newRects.get(id)
+      if (!el || !newRect) return
+      const dx = oldRect.left - newRect.left
+      const dy = oldRect.top - newRect.top
+      if (dx === 0 && dy === 0) return
+      el.style.transition = 'none'
+      el.style.transform = `translate(${dx}px, ${dy}px)`
+      requestAnimationFrame(() => {
+        el.style.transition = 'transform 300ms ease-in-out'
+        el.style.transform = ''
+      })
+    })
+    prevRects.current = newRects
+  }, [threads])
+
+  function setCardRef(id) {
+    return (el) => {
+      if (el) cardRefs.current.set(id, el)
+      else cardRefs.current.delete(id)
+    }
+  }
 
   function handleCreateCharacter() {
     openModal('characterCreate')
@@ -293,6 +281,20 @@ function Sidebar({ open, onClose }) {
     await toggleFavorite(thread.id)
   }
 
+  function handleColorPickerToggle(e, thread) {
+    if (colorPickerId === thread.id) {
+      setColorPickerId(null)
+      setColorPickerPos(null)
+    } else {
+      const rect = e.currentTarget.getBoundingClientRect()
+      setColorPickerPos({
+        top: rect.bottom + 4,
+        left: Math.max(8, rect.right - 224),
+      })
+      setColorPickerId(thread.id)
+    }
+  }
+
   async function handleToggleLock(thread) {
     await toggleLock(thread.id)
     if (!thread.isLocked) {
@@ -457,225 +459,30 @@ function Sidebar({ open, onClose }) {
             threads.map((thread) => {
               const character = characters[thread.characterId]
               const isActive = String(thread.id) === threadId
-              const threadColor =
-                thread.colorSlot >= 0 ? getColorHex(theme, thread.colorSlot) : thread.color
               return (
-                <div
+                <ThreadCard
                   key={thread.id}
-                  className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px] p-2 flex flex-col w-full aspect-[2.3/1]`}
-                  style={{
-                    borderLeftColor: threadColor || undefined,
-                    backgroundColor: threadColor
-                      ? `color-mix(in srgb, ${threadColor} 12%, var(--color-surface))`
-                      : undefined,
-                  }}
-                >
-                  <Link
-                    to={`/chat/${thread.id}`}
-                    onClick={onClose}
-                    className="flex items-stretch gap-0 min-w-0 flex-1 min-h-0"
-                  >
-                    <div className="w-22 flex-shrink-0 self-stretch rounded-l-lg overflow-hidden relative bg-surface-hover">
-                      {character?.avatar &&
-                      (/^https?:\/\//.test(character.avatar) ||
-                        character.avatar.startsWith('data:image/')) ? (
-                        <img
-                          src={character.avatar}
-                          alt={character?.name || ''}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <span className="flex items-center justify-center h-full w-full text-3xl">
-                          {character?.avatar || '👤'}
-                        </span>
-                      )}
-                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-1 py-0.5">
-                        <p className="text-center text-[10px] text-on-image-muted leading-none truncate">
-                          #{thread.threadNumber} · {messageCounts.get(thread.id) || 0}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0 flex flex-col gap-1 pl-2">
-                      <div className="flex items-center gap-1">
-                        <div className="flex-1 min-w-0 flex items-center gap-1.5">
-                          <ThreadCardTitle
-                            title={thread.title}
-                            isActive={isActive}
-                            threadCardMarquee={threadCardMarquee}
-                          />
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            {unreadBadges && (thread.unreadCount || 0) > 0 && (
-                              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-badge-unread-text bg-badge-unread rounded-full">
-                                {thread.unreadCount > 99 ? '99+' : thread.unreadCount}
-                              </span>
-                            )}
-                            {generatingSet.has(thread.id) && (
-                              <RefreshCw className="w-3.5 h-3.5 text-primary animate-spin" />
-                            )}
-                            {queueCounts[thread.id] > 0 && (
-                              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-badge-queue-text bg-badge-queue rounded-full">
-                                {queueCounts[thread.id]}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="w-[26px] shrink-0 flex justify-center">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              handleEditTitle(thread)
-                            }}
-                            className="w-[26px] h-[26px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
-                            aria-label={t('editThreadTitle.title')}
-                            title={t('editThreadTitle.title')}
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 mt-1">
-                        <p className="text-xs text-secondary truncate flex-1 min-w-0">
-                          {t('sidebar.characterNameWithId', {
-                            name: character?.name || t('sidebar.unknownCharacter'),
-                          })}
-                        </p>
-                        <div className="w-[26px] shrink-0 flex justify-center">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              handleToggleLock(thread)
-                            }}
-                            className={`w-[26px] h-[26px] flex items-center justify-center rounded hover:bg-surface-hover ${thread.isLocked ? 'text-primary' : 'text-tertiary hover:text-text'}`}
-                            aria-label={thread.isLocked ? t('sidebar.unlock') : t('sidebar.lock')}
-                            title={thread.isLocked ? t('sidebar.unlock') : t('sidebar.lock')}
-                          >
-                            {thread.isLocked ? (
-                              <Lock className="w-3.5 h-3.5" />
-                            ) : (
-                              <Unlock className="w-3.5 h-3.5" />
-                            )}
-                          </button>
-                        </div>
-                        <div className="w-[26px] shrink-0 flex justify-center">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              if (colorPickerId === thread.id) {
-                                setColorPickerId(null)
-                                setColorPickerPos(null)
-                              } else {
-                                const rect = e.currentTarget.getBoundingClientRect()
-                                setColorPickerPos({
-                                  top: rect.bottom + 4,
-                                  left: Math.max(8, rect.right - 224),
-                                })
-                                setColorPickerId(thread.id)
-                              }
-                            }}
-                            onMouseDown={(e) => {
-                              e.stopPropagation()
-                            }}
-                            className={`w-[26px] h-[26px] flex items-center justify-center rounded hover:bg-surface-hover ${threadColor ? '' : 'text-tertiary hover:text-text'}`}
-                            style={threadColor ? { color: threadColor } : undefined}
-                            aria-label={t('sidebar.color')}
-                            title={t('sidebar.color')}
-                          >
-                            <Palette
-                              className="w-3.5 h-3.5"
-                              style={threadColor ? { fill: threadColor } : undefined}
-                            />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 mt-auto justify-end">
-                        {!thread.isLocked && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              toggleSelect(thread.id)
-                            }}
-                            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover flex-shrink-0"
-                            aria-label={t('sidebar.selectThreads')}
-                          >
-                            {selectedIds.has(thread.id) ? (
-                              <CheckSquare className="w-4 h-4" />
-                            ) : (
-                              <Square className="w-4 h-4" />
-                            )}
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            handleEditCharacter(thread)
-                          }}
-                          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
-                          aria-label={t('sidebar.editCharacter')}
-                          title={t('sidebar.editCharacter')}
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            handleDuplicate(thread)
-                          }}
-                          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
-                          aria-label={t('sidebar.duplicateThread')}
-                          title={t('sidebar.duplicateThread')}
-                        >
-                          <Copy className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            handleToggleFavorite(thread)
-                          }}
-                          className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-surface-hover ${thread.isFavorite ? 'text-yellow-500' : 'text-tertiary hover:text-text'}`}
-                          aria-label={
-                            thread.isFavorite ? t('sidebar.unfavorite') : t('sidebar.favorite')
-                          }
-                          title={
-                            thread.isFavorite ? t('sidebar.unfavorite') : t('sidebar.favorite')
-                          }
-                        >
-                          <Star
-                            className={`w-3.5 h-3.5 ${thread.isFavorite ? 'fill-yellow-500' : ''}`}
-                          />
-                        </button>
-                        {!thread.isLocked && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              handleDelete(thread)
-                            }}
-                            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-delete text-on-delete hover:bg-delete-hover"
-                            aria-label={t('sidebar.deleteThread')}
-                            title={t('sidebar.deleteThread')}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                </div>
+                  ref={setCardRef(thread.id)}
+                  thread={thread}
+                  character={character}
+                  theme={theme}
+                  messageCount={messageCounts.get(thread.id) || 0}
+                  isActive={isActive}
+                  unreadBadges={unreadBadges}
+                  generating={generatingSet.has(thread.id)}
+                  queueCount={queueCounts[thread.id] || 0}
+                  threadCardMarquee={threadCardMarquee}
+                  selected={selectedIds.has(thread.id)}
+                  onClose={onClose}
+                  onEditTitle={handleEditTitle}
+                  onEditCharacter={handleEditCharacter}
+                  onDuplicate={handleDuplicate}
+                  onTogglePin={handleToggleFavorite}
+                  onToggleLock={handleToggleLock}
+                  onToggleSelect={toggleSelect}
+                  onToggleColorPicker={handleColorPickerToggle}
+                  onDelete={handleDelete}
+                />
               )
             })
           )}
