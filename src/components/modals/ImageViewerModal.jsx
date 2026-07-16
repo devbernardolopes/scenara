@@ -8,6 +8,8 @@ function ImageViewerModal({ src, alt }) {
   const { t } = useTranslation('common')
   const { closeModal } = useModal()
   const pointerStart = useRef(null)
+  const pointerDownOnImage = useRef(false)
+  const imgRef = useRef(null)
 
   const handleDownload = (e) => {
     e.stopPropagation()
@@ -21,12 +23,13 @@ function ImageViewerModal({ src, alt }) {
 
   const handlePointerDown = (e) => {
     pointerStart.current = { x: e.clientX, y: e.clientY }
+    pointerDownOnImage.current = e.target === imgRef.current
   }
 
   const handleBackdropClick = (e) => {
     e.stopPropagation()
     const start = pointerStart.current
-    if (!start) return
+    if (!start || pointerDownOnImage.current) return
     const moved = Math.hypot(e.clientX - start.x, e.clientY - start.y)
     if (moved < 8) closeModal()
   }
@@ -54,7 +57,7 @@ function ImageViewerModal({ src, alt }) {
             alt={alt || ''}
             className="max-w-[90vw] max-h-[90vh] object-contain select-none"
             draggable={false}
-            onClick={(e) => e.stopPropagation()}
+            ref={imgRef}
           />
         </TransformComponent>
       </TransformWrapper>
