@@ -24,6 +24,7 @@ export function parseBundleEntries(bundleMessages) {
 
 export function computeMessageFlags(entryTypes, msgNumbers, currentMsgs) {
   if (!entryTypes) return null
+  const realMsgs = currentMsgs.filter((m) => !m.isSummaryMarker && !m.isAutoTitleMarker)
   return entryTypes.map((type, i) => {
     const flags = []
     if (type === 'system') {
@@ -38,7 +39,7 @@ export function computeMessageFlags(entryTypes, msgNumbers, currentMsgs) {
     }
     const num = msgNumbers?.[i]
     if (num != null) {
-      const dbMsg = currentMsgs[num - 1]
+      const dbMsg = realMsgs[num - 1]
       if (dbMsg?.bundleMessages) {
         try {
           const entries = JSON.parse(dbMsg.bundleMessages)

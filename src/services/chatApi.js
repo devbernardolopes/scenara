@@ -442,7 +442,13 @@ export async function buildOOCMessagesPayload({
 // Mirrors buildMsgNumbersArray formerly defined in ChatView: maps each payload
 // entry back to the originating message number for prompt-data inspection.
 export function buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload) {
-  const numMap = new Map(currentMsgs.map((m, i) => [m.id, i + 1]))
+  let num = 0
+  const numMap = new Map()
+  for (const m of currentMsgs) {
+    if (m.isSummaryMarker || m.isAutoTitleMarker) continue
+    num++
+    numMap.set(m.id, num)
+  }
   const numbers = [null]
   if (isFirstMessage) {
     if (payload.length > 1) numbers.push(null)
