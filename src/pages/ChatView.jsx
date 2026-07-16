@@ -1074,7 +1074,6 @@ function ChatView() {
 
   async function runPostGenerationTasks({
     threadId,
-    character,
     outcome,
     notifyMessageId,
     includeSummarization,
@@ -1163,16 +1162,16 @@ function ChatView() {
 
       if (
         includeSummarization &&
-        character &&
+        chr &&
         (await shouldTriggerSummarization({
-          character,
+          character: chr,
           messages: nonFailedMsgs,
-          includeOOC: character.includeOOC !== false,
+          includeOOC: chr.includeOOC !== false,
         }))
       ) {
         const currentThread = await getThread(threadId)
         const unsummarizedMessages = getUnsummarizedMessages(nonFailedMsgs, {
-          includeOOC: character.includeOOC !== false,
+          includeOOC: chr.includeOOC !== false,
         })
         if (unsummarizedMessages.length > 0) {
           const summAbort = new AbortController()
@@ -1197,7 +1196,7 @@ function ChatView() {
               execute: async (ctx) => {
                 return await triggerSummarization({
                   thread: currentThread,
-                  character,
+                  character: chr,
                   messages: nonFailedMsgs,
                   personaMap,
                   signal: summAbort.signal,
@@ -1297,7 +1296,6 @@ function ChatView() {
       }
       await runPostGenerationTasks({
         threadId,
-        character,
         outcome: sendOutcome,
         notifyMessageId: sendMessageId,
         includeSummarization: true,
@@ -1638,7 +1636,6 @@ function ChatView() {
       }
       await runPostGenerationTasks({
         threadId,
-        character,
         outcome,
         notifyMessageId: messageId,
         includeSummarization: true,

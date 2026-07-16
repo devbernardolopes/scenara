@@ -1,5 +1,5 @@
 import db from '../db'
-import { updateMessage } from './messages'
+import { getMessagesByThread, updateMessage } from './messages'
 import { updateThread } from './threads'
 import { buildTranscript, replaceVars, sendChatCompletion } from './chatApi'
 import { createThreadMemory, buildInjectedMemory } from './threadMemories'
@@ -133,13 +133,18 @@ export async function buildSummarizationPayload({
 export async function triggerSummarization({
   thread,
   character,
-  messages,
+  messages: _messages,
   personaMap,
   signal,
   currentPersona,
 }) {
   const includeOOC = character?.includeOOC !== false
-  const unsummarizedMessages = getUnsummarizedMessages(messages, { includeOOC })
+
+  // Re-fetch messages from DB so we never operate on a stale snapshot.
+  // Concurrent summarization jobs or rapid sends can mark messages as
+  // summarized between enqueue time and execution time.
+  const freshMessages = await getMessagesByThread(thread.id)
+  const unsummarizedMessages = getUnsummarizedMessages(freshMessages, { includeOOC })
   if (unsummarizedMessages.length === 0) {
     return ''
   }
