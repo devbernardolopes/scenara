@@ -117,6 +117,10 @@ export async function buildMessagesPayload({
     prefixAssistant?.enabled && prefixAssistant.value ? replaceVarsIn(prefixAssistant.value) : ''
   const userPrefix = prefixUser?.enabled && prefixUser.value ? replaceVarsIn(prefixUser.value) : ''
 
+  const userRolePrefixWithPersona = await getSetting('prompting.userRolePrefixWithPersona')
+  const userPersonaPrefixOverride = character?.userPersonaPrefix === false ? false : true
+  const personaNameForPrefix = currentPersonaName || personaName
+
   const prompt = replaceVarsIn(character?.prompt)
   if (prompt) systemParts.push(prompt)
 
@@ -172,8 +176,16 @@ export async function buildMessagesPayload({
       if (!msg.isOOC) {
         if (msg.role === 'assistant' && assistantPrefix) {
           content = assistantPrefix + content
-        } else if (msg.role === 'user' && userPrefix) {
-          content = userPrefix + content
+        } else if (msg.role === 'user') {
+          if (userPersonaPrefixOverride && userRolePrefixWithPersona) {
+            let resolved = userRolePrefixWithPersona
+              .replace(/{{name}}/gi, personaNameForPrefix)
+              .replace(/{{persona_name}}/gi, personaNameForPrefix)
+            if (resolved && !/\s$/.test(resolved)) resolved += '\n'
+            content = resolved + content
+          } else if (userPrefix) {
+            content = userPrefix + content
+          }
         }
       }
       result.push({ role: msg.role, content })
@@ -655,7 +667,7 @@ export async function sendChatCompletion({
               onFinish?.(choice.finish_reason)
             }
           } catch {
-            // TODO: Review this 
+            // TODO: Review this
             // skip unparseable chunks
           }
         }
