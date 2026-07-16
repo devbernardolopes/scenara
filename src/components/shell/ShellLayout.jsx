@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import SidebarToggle from './SidebarToggle'
 import ModelStatusBar from './ModelStatusBar'
@@ -9,6 +9,7 @@ import { initInferenceWorker } from '../../lib/inferenceClient'
 
 function ShellLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const location = useLocation()
 
   useEffect(() => {
     initInferenceWorker()
@@ -21,7 +22,7 @@ function ShellLayout() {
         <main className="flex-1 overflow-auto min-w-0">
           <Outlet />
         </main>
-        <ModelStatusBar />
+        {location.pathname !== '/' && <ModelStatusBar />}
       </div>
       <SidebarToggle open={sidebarOpen} onToggle={() => setSidebarOpen((prev) => !prev)} />
       <ToastContainer />
