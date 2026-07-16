@@ -58,7 +58,11 @@
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+
+  --thread-card-height: 112px;
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  --thread-card-height: 112px;
 }
 
 /* --- Dark --- */
@@ -1085,6 +1089,10 @@ main {
 }
 .shadow-surface-lg {
   box-shadow: var(--shadow-lg);
+}
+
+.thread-card {
+  height: var(--thread-card-height);
 }
 
 /* Marquee animation for thread card titles */

@@ -47,7 +47,7 @@ const ThreadCard = forwardRef(function ThreadCard(
   return (
     <div
       ref={ref}
-      className={`rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px] p-2 flex flex-col w-full min-h-[112px]`}
+      className={`thread-card rounded-lg border ${isActive ? 'border-primary' : 'border-border'} overflow-hidden border-l-[3px] p-2 flex flex-col w-full`}
       style={{
         borderLeftColor: threadColor || undefined,
         backgroundColor: threadColor
@@ -58,7 +58,7 @@ const ThreadCard = forwardRef(function ThreadCard(
       <Link
         to={`/chat/${thread.id}`}
         onClick={onClose}
-        className="flex items-stretch gap-0 min-w-0 flex-1 min-h-0"
+        className="flex items-stretch gap-0 min-w-0 flex-1 min-h-0 overflow-hidden"
       >
         <div className="w-22 flex-shrink-0 self-stretch min-h-0 rounded-l-lg overflow-hidden relative bg-surface-hover">
           {character?.avatar &&
@@ -79,7 +79,7 @@ const ThreadCard = forwardRef(function ThreadCard(
             </p>
           </div>
         </div>
-        <div className="flex-1 min-w-0 flex flex-col gap-1 pl-2">
+        <div className="flex-1 min-w-0 min-h-0 flex flex-col gap-1 pl-2">
           <div className="flex items-center gap-1">
             <div className="flex-1 min-w-0 flex items-center gap-1.5">
               <ThreadCardTitle
