@@ -1171,21 +1171,12 @@ function ChatView() {
         if (unsummarizedMessages.length > 0) {
           const summAbort = new AbortController()
           const showMarker = await getSetting('summarizationMarker')
-          let lastSummarizedCreatedAt = null
-          for (let i = nonFailedMsgs.length - 1; i >= 0; i--) {
-            if (nonFailedMsgs[i].summarizedAt) {
-              lastSummarizedCreatedAt = nonFailedMsgs[i].createdAt
-              break
-            }
-          }
           showToast('Generating summary', { type: 'info' })
           let summaryMarkerId = null
           try {
             if (showMarker && unsummarizedMessages.length > 0) {
               const anchorCreatedAt =
-                lastSummarizedCreatedAt != null
-                  ? lastSummarizedCreatedAt
-                  : unsummarizedMessages[unsummarizedMessages.length - 1].createdAt
+                unsummarizedMessages[unsummarizedMessages.length - 1].createdAt
               summaryMarkerId = await createSummaryMarker(threadId, anchorCreatedAt)
               const updated = await getMessagesByThread(threadId)
               if (Number(currentThreadIdRef.current) === Number(threadId)) {
