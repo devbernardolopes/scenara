@@ -824,6 +824,10 @@
       "label": "Slots de Memória",
       "desc": "Quantas entradas de memória (slots) por nível de memória o chat terá."
     },
+    "addCharacterPrompt": {
+      "label": "Adicionar Prompt do Personagem",
+      "desc": "Estado padrão para anteceder o prompt do personagem à transcrição enviada à API de sumarização ao criar um novo personagem."
+    },
     "firstMessage": {
       "label": "Mensagem Inicial",
       "desc": "Estado padrão do alternador de mensagem inicial."

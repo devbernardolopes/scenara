@@ -828,6 +828,15 @@ export const SETTINGS = [
     dependsOn: { key: 'defaultMemory', value: 'never', not: true },
   },
   {
+    key: 'defaultAddCharacterPrompt',
+    category: 'defaults',
+    type: 'toggle',
+    default: false,
+    labelKey: 'settings:defaults.addCharacterPrompt.label',
+    descKey: 'settings:defaults.addCharacterPrompt.desc',
+    dependsOn: { key: 'defaultMemory', value: 'never', not: true },
+  },
+  {
     key: 'defaultFirstMessage',
     category: 'defaults',
     type: 'toggle',

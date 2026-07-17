@@ -613,6 +613,10 @@
     "memorySlots": {
       "label": "Slots de Memória",
       "desc": "Cuántas entradas de memoria (slots) tendrá el chat por nivel de memoria."
+    },
+    "addCharacterPrompt": {
+      "label": "Añadir Prompt del Personaje",
+      "desc": "Estado predeterminado para anteponer el prompt del personaje a la transcripción enviada a la API de resumen al crear un personaje nuevo."
     }
   },
   "languageOptions": {

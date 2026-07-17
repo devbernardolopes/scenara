@@ -99,11 +99,32 @@ export async function buildSummarizationPayload({
   }
 
   const messagesHeader = (await getSetting('prompting.apiRequestSectionHeaders.messages')) || ''
+  const charPromptHeader =
+    (await getSetting('prompting.apiRequestSectionHeaders.characterPrompt')) || ''
+
   const memorySection = memoryText ? memoryText : ''
+
+  // Prepend the character prompt (when the per-character override is enabled)
+  // to the start of the transcript, preceded by the Character Prompt section
+  // header if configured — mirroring how the memory section is assembled above.
+  let charPromptSection = ''
+  if (character?.addCharacterPrompt) {
+    const prompt = replaceVarsIn(character?.prompt || '')
+    if (prompt) {
+      charPromptSection = charPromptHeader
+        ? `${replaceVarsIn(charPromptHeader)}\n\n${prompt}`
+        : prompt
+    }
+  }
+
   const transcriptSection = messagesHeader
     ? `${replaceVarsIn(messagesHeader)}\n\n${transcript}`
     : transcript
-  const fullContent = memorySection ? `${memorySection}\n\n${transcriptSection}` : transcriptSection
+
+  let fullContent = [charPromptSection, transcriptSection].filter(Boolean).join('\n\n')
+  if (memorySection) {
+    fullContent = `${memorySection}\n\n${fullContent}`
+  }
 
   systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, fullContent)
 

@@ -836,6 +836,10 @@
       "label": "Memory Slots",
       "desc": "How many memory entries (slots) per memory level the chat will have."
     },
+    "addCharacterPrompt": {
+      "label": "Add Character Prompt",
+      "desc": "Default state for prepending the character prompt to the transcript sent to the summarization API when creating a new character."
+    },
     "firstMessage": {
       "label": "First Message",
       "desc": "Default state for the first message toggle."

@@ -64,6 +64,7 @@
   "contextWindowThreshold": "Limite da Janela de Contexto",
   "messagesToKeep": "Mensagens a Manter",
   "memorySlots": "Slots de Memória",
+  "addCharacterPrompt": "Adicionar Prompt do Personagem",
   "messagesToKeepDesc": "Quantas das mensagens mais recentes que fizeram parte da última solicitação de resumo ainda serão passadas para as requisições de API até o próximo evento de resumo.",
   "memorySlotsDesc": "Quantas entradas de memória (slots) o chat terá por nível de memória.",
   "summarizationSystemInstructions": "Instruções SYSTEM para Resumo",

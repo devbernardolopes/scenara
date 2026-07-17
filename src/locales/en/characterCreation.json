@@ -68,6 +68,7 @@
   "contextWindowThreshold": "Context Window Threshold",
   "messagesToKeep": "Messages to Keep",
   "memorySlots": "Memory Slots",
+  "addCharacterPrompt": "Add Character Prompt",
   "messagesToKeepDesc": "How many of the most recent messages that were part of the last summarization request in a chat will still be passed to the API requests of a chat until the next summarization event.",
   "memorySlotsDesc": "How many memory entries (slots) the chat will have per memory level.",
   "summarizationSystemInstructions": "SYSTEM Summarization Instructions",
