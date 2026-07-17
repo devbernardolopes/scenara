@@ -781,6 +781,9 @@
 .ring-primary-hover {
   --tw-ring-color: var(--color-primary-hover);
 }
+.accent-primary {
+  accent-color: var(--color-primary);
+}
 .text-primary {
   color: var(--color-primary);
 }
