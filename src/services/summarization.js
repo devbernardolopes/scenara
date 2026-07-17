@@ -122,6 +122,7 @@ export async function buildSummarizationPayload({
       const scenarioText = resolveScenarioInjection(character, {
         isFirstMessage: false,
         lastSummarizationAt: thread?.lastSummarizationAt || null,
+        activeScenario: thread?.activeScenario || null,
       })
       const resolvedScenario = scenarioText ? replaceVarsIn(scenarioText) : ''
       const combined = resolvedScenario ? `${prompt}\n\n${resolvedScenario}` : prompt

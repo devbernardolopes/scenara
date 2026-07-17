@@ -7,8 +7,18 @@
 //   - 'firstSummary' → until (and including) the first summarization event,
 //                      gated on thread.lastSummarizationAt being null
 //   - 'always'       → on every call
+//
+// `activeScenario` (when provided) is a per-thread snapshot taken at thread
+// creation. When present it is used instead of reading the live character
+// scenarios, so mid-chat edits/deletions to the character's scenarios do not
+// affect an ongoing thread.
 
-export function getActiveScenario(character) {
+export function getActiveScenario(character, activeScenario) {
+  if (activeScenario) {
+    const content = (activeScenario.content || '').trim()
+    if (!content) return null
+    return activeScenario
+  }
   const scenarios = character?.scenarios
   if (!Array.isArray(scenarios)) return null
   const active = scenarios.find((s) => s?.active)
@@ -21,8 +31,11 @@ export function getActiveScenario(character) {
 // Returns the scenario text to inject (already var-substituted by the caller
 // is NOT done here — caller passes resolved content) or '' when none applies.
 // `lastSummarizationAt` is the thread's value (null before any summary).
-export function resolveScenarioInjection(character, { isFirstMessage, lastSummarizationAt }) {
-  const scenario = getActiveScenario(character)
+export function resolveScenarioInjection(
+  character,
+  { isFirstMessage, lastSummarizationAt, activeScenario },
+) {
+  const scenario = getActiveScenario(character, activeScenario)
   if (!scenario) return ''
 
   const hasSummary = Boolean(lastSummarizationAt)

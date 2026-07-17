@@ -14,7 +14,7 @@ import { downloadJson } from '../lib/download'
 import { showToast } from '../lib/toast'
 import { getSetting } from '../services/settings'
 import { getUIState, setUIState } from '../services/uiState'
-import { createThread } from '../services/threads'
+import { createThread, updateThread } from '../services/threads'
 import { createMessage } from '../services/messages'
 import { setBaseTitle } from '../services/titleManager'
 import CollapsibleSection from '../components/shared/CollapsibleSection'
@@ -344,6 +344,18 @@ function CharacterDiscovery() {
       personaId: personaId || null,
       initialMessages,
     })
+
+    const activeScenario = character.scenarios?.find((s) => s?.active && s?.content?.trim())
+    if (activeScenario) {
+      await updateThread(threadId, {
+        activeScenario: {
+          id: activeScenario.id,
+          name: activeScenario.name || '',
+          content: activeScenario.content,
+          lifetime: activeScenario.lifetime || 'firstSummary',
+        },
+      })
+    }
 
     if (!initialMessages && character.greeting) {
       await createMessage(threadId, 'assistant', character.greeting)

@@ -128,6 +128,21 @@ function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
   )
 }
 
+function ScenarioStatusBar({ scenario, charName, userName }) {
+  const display = (() => {
+    const raw = scenario.name?.trim() || (scenario.content || '').trim().split('\n')[0].trim()
+    return raw.replace(/\{\{char\}\}/gi, charName).replace(/\{\{user\}\}/gi, userName)
+  })()
+
+  return (
+    <div className="bg-surface border-b border-border-light px-4 md:px-8 py-1 text-center">
+      <MarqueeText className="text-xs text-tertiary" marquee>
+        {display}
+      </MarqueeText>
+    </div>
+  )
+}
+
 function ChatView() {
   const { threadId } = useParams()
   const navigate = useNavigate()
@@ -1887,6 +1902,14 @@ function ChatView() {
             )}
           </div>
         </div>
+
+        {thread?.activeScenario?.content?.trim() && (
+          <ScenarioStatusBar
+            scenario={thread.activeScenario}
+            charName={character?.name || ''}
+            userName={personaMap?.[thread?.personaId]?.name || ''}
+          />
+        )}
 
         <div className="px-4 md:px-8 py-4 space-y-4">
           {messages.length === 0 && !generating ? (

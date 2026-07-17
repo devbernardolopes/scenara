@@ -95,6 +95,7 @@ export async function buildMessagesPayload({
   memoryHeader,
   personaMap,
   lastSummarizationAt = null,
+  activeScenario = null,
 }) {
   const writingMessageRole =
     character?.writingMessageRole || settings.writingMessageRole || 'system'
@@ -133,6 +134,7 @@ export async function buildMessagesPayload({
     const rawScenarioText = resolveScenarioInjection(character, {
       isFirstMessage,
       lastSummarizationAt,
+      activeScenario,
     })
     const scenarioText = rawScenarioText ? replaceVarsIn(rawScenarioText) : ''
     systemParts.push(scenarioText ? `${prompt}\n\n${scenarioText}` : prompt)
@@ -361,6 +363,7 @@ export async function buildOOCMessagesPayload({
   memoryText,
   memoryHeader,
   lastSummarizationAt = null,
+  activeScenario = null,
   isFirstMessage = false,
 }) {
   const charName = character?.name || ''
@@ -413,6 +416,7 @@ export async function buildOOCMessagesPayload({
     const rawScenarioText = resolveScenarioInjection(character, {
       isFirstMessage,
       lastSummarizationAt,
+      activeScenario,
     })
     const scenarioText = rawScenarioText ? replaceVarsIn(rawScenarioText) : ''
     if (scenarioText) combinedPrompt = `${combinedPrompt}\n\n${scenarioText}`
@@ -548,6 +552,7 @@ export async function buildChatRequestPayload({
       memoryText,
       memoryHeader: '',
       lastSummarizationAt: latestThread?.lastSummarizationAt || null,
+      activeScenario: latestThread?.activeScenario || null,
       isFirstMessage,
       oocSettings: {
         oocSystemInstructions,
@@ -600,6 +605,7 @@ export async function buildChatRequestPayload({
       memoryHeader: '',
       personaMap,
       lastSummarizationAt: latestThread?.lastSummarizationAt || null,
+      activeScenario: latestThread?.activeScenario || null,
     })
     payload = chatResult.payload
     entryTypes = chatResult.entryTypes
