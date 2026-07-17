@@ -73,7 +73,10 @@ const ThreadCard = forwardRef(function ThreadCard(
               {character?.avatar || '👤'}
             </span>
           )}
-          <div className="absolute bottom-0 inset-x-0 bg-image-scrim px-1 py-0.5">
+          <div className="absolute bottom-0 inset-x-0 bg-image-scrim px-1 py-0.5 flex flex-col gap-0.5">
+            <p className="text-center text-[11px] text-on-image leading-none truncate">
+              {character?.name || t('sidebar.unknownCharacter')}
+            </p>
             <p className="text-center text-[11px] text-on-image leading-none truncate">
               #{thread.threadNumber} · {messageCount}
             </p>
@@ -118,11 +121,6 @@ const ThreadCard = forwardRef(function ThreadCard(
             </div>
           </div>
           <div className="flex items-center gap-1 mt-0.5">
-            <p className="text-xs text-secondary truncate flex-1 min-w-0">
-              {t('sidebar.characterNameWithId', {
-                name: character?.name || t('sidebar.unknownCharacter'),
-              })}
-            </p>
             <div className="w-[26px] shrink-0 flex justify-center">
               <button
                 type="button"
