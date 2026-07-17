@@ -3,7 +3,7 @@ import { useConfirm } from '../../../lib/confirm'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
-import { Plus, Trash2, Edit3 } from '../../../lib/icons'
+import { Plus, Trash2, Edit3, Zap, Square } from '../../../lib/icons'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
@@ -55,30 +55,6 @@ function LifetimeButtonGroup({ options, value, onChange }) {
         )
       })}
     </div>
-  )
-}
-
-function ActiveToggle({ checked, onChange, label }) {
-  return (
-    <label className="flex items-center justify-between gap-3 min-h-[44px] cursor-pointer">
-      <span className="text-sm text-text">{label}</span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={!!checked}
-        aria-label={label}
-        onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ${
-          checked ? 'bg-primary' : 'bg-gray-300'
-        }`}
-      >
-        <span
-          className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition-transform duration-200 ${
-            checked ? 'translate-x-5' : 'translate-x-0'
-          }`}
-        />
-      </button>
-    </label>
   )
 }
 
@@ -185,42 +161,54 @@ function ScenarioSection({ form, onChange, characterId }) {
             >
               <div className="relative mt-2">
                 <AutoResizeTextarea
-                  className={`${inputClass} resize-none pr-10`}
+                  className={`${inputClass} resize-none pr-12 min-h-[200px]`}
                   value={scenario.content}
                   onChange={(e) => handleContentChange(scenario.id, e.target.value)}
                   placeholder={t('scenarioPlaceholder')}
                   extraHeight={8}
                 />
-                <button
-                  type="button"
-                  onClick={(e) => handleDelete(scenario, e)}
-                  className="absolute top-2 right-2 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-delete text-on-delete hover:bg-delete-hover transition-colors"
-                  aria-label={t('deleteScenario')}
-                  title={t('deleteScenario')}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {}}
-                  className="absolute top-12 right-2 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-primary-subtle text-primary hover:bg-primary-hover transition-colors"
-                  aria-label={t('generateScenario')}
-                  title={t('generateScenario')}
-                >
-                  <Edit3 className="w-4 h-4" />
-                </button>
+                <div className="absolute top-2 right-2 flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => handleDelete(scenario, e)}
+                    className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-delete text-on-delete hover:bg-delete-hover transition-colors"
+                    aria-label={t('deleteScenario')}
+                    title={t('deleteScenario')}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {}}
+                    className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-primary-subtle text-primary hover:bg-primary-hover transition-colors"
+                    aria-label={t('generateScenario')}
+                    title={t('generateScenario')}
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={!!scenario.active}
+                    aria-label={t('scenarioActive')}
+                    title={t('scenarioActive')}
+                    onClick={() => handleActiveChange(scenario.id, !scenario.active)}
+                    className={`min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md border transition-colors ${
+                      scenario.active
+                        ? 'bg-primary text-on-primary border-primary'
+                        : 'bg-surface text-tertiary border-border hover:bg-surface-hover'
+                    }`}
+                  >
+                    {scenario.active ? <Zap className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
-              <div className="mt-3 pt-3 border-t border-border space-y-3">
+              <div className="mt-3 pt-3 border-t border-border">
                 <LifetimeButtonGroup
                   options={LIFETIME_OPTIONS}
                   value={scenario.lifetime || 'firstSummary'}
                   onChange={(value) => handleLifetimeChange(scenario.id, value)}
-                />
-                <ActiveToggle
-                  label={t('scenarioActive')}
-                  checked={!!scenario.active}
-                  onChange={(v) => handleActiveChange(scenario.id, v)}
                 />
               </div>
             </CollapsibleSection>

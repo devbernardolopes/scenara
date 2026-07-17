@@ -345,6 +345,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       initialMessages: (form.initialMessages || []).some((m) => m.content?.trim()),
       exampleMessages: (form.exampleMessages || []).some((m) => m.content?.trim()),
       tags: (form.tags || []).length > 0,
+      scenarios: (form.scenarios || []).some((s) => s?.active),
       postProcessing: ppEnabledDiff || ppOverrideDiff || ppRulesDiff,
       overrides: false,
       director:
