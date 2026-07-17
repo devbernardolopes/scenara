@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useRef, useMemo, useEffect } from 'react'
+import { addLog } from '../services/logs'
 
 const ToastContext = createContext(null)
 
@@ -122,6 +123,11 @@ export function ToastProvider({ children }) {
         pausedByBlur: isHidden,
         exiting: false,
       }
+      addLog({
+        type: 'toast',
+        level: type || 'info',
+        message: typeof message === 'string' ? message : JSON.stringify(message),
+      }).catch(() => {})
       setToasts((prev) => {
         if (!isHidden) {
           const timerId = setTimeout(() => removeToast(id), resolvedDuration)

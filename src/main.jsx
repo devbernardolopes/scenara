@@ -76,15 +76,8 @@ registerModal('logs', LogsModal)
 registerModal('logDetails', LogDetailsModal)
 
 // Global log capture (no per-call wiring needed).
-window.addEventListener('show-toast', (e) => {
-  const { message, type } = e.detail || {}
-  addLog({
-    type: 'toast',
-    level: type || 'info',
-    message: typeof message === 'string' ? message : JSON.stringify(message),
-  })
-})
-
+// Toast logs are captured centrally inside ToastProvider.addToast so that
+// every toast is recorded regardless of the call path.
 window.addEventListener('error', (e) => {
   const msg = e?.message || (e?.error && e.error.message) || 'Unknown error'
   const stack = e?.error?.stack
