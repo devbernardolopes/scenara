@@ -44,3 +44,11 @@
 .character-card__portrait-img {
   transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
+/* Active thread card pulse — mirrors the character Start Chat button ring
+   and respects the active theme via --color-primary-rgb. */
+@media (hover: hover) and (pointer: fine) {
+  .thread-card.is-active {
+    animation: scenara-pulse-ring 2.75s ease-in-out infinite;
+  }
+}
