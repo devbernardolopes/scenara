@@ -123,14 +123,12 @@ export async function buildMessagesPayload({
 
   const systemPrompt = replaceVarsIn(character?.systemPrompt)
   if (systemPrompt) {
-    systemParts.push(systemPrompt +  '\n\n')
+    systemParts.push(systemPrompt)
   }
 
   const prompt = replaceVarsIn(character?.prompt)
   if (prompt) {
-    // const systemPrompt = replaceVarsIn(character?.systemPrompt || '')
-    // systemParts.push(systemPrompt ? `${prompt}\n\n${systemPrompt}` : prompt)
-    systemParts.push(prompt + '\n\n')
+    systemParts.push(prompt)
   }
 
   const extraPrompt = replaceVarsIn(character?.extraPrompt)
