@@ -411,8 +411,14 @@
         "apiKey": "Chave de API",
         "noKeys": "Nenhuma chave configurada para este provedor.",
         "selectKey": "Selecione uma chave…",
+        "noApiKey": "Sem chave de API",
         "model": "Modelo",
         "parameters": "Parâmetros",
+        "resetParams": "Restaurar padrões",
+        "resetParamsConfirm": {
+          "title": "Restaurar parâmetros?",
+          "message": "Isso restaurará todos os parâmetros para seus valores padrão deste provedor."
+        },
         "reasoning": "Raciocínio",
         "reasoningEffort": "Esforço de Raciocínio",
         "includeReasoning": "Incluir Raciocínio",

@@ -232,10 +232,10 @@ function ModelSelect({
   models = [],
   modelNames = {},
   modelMeta = {},
-  onRefresh,
   fetching,
   onCancelFetch,
   cooldownRemaining,
+  refreshButton = null,
 }) {
   const { t } = useTranslation('settings')
   const [countdown, setCountdown] = useState(0)
@@ -357,46 +357,46 @@ function ModelSelect({
     </div>
   ) : null
 
+  const filterSection = providerId ? (
+    <CollapsibleSection
+      label={
+        <span className="flex items-center gap-2">
+          <SlidersHorizontal className="w-4 h-4" />
+          {t('api.modelFilterSection')}
+        </span>
+      }
+      summary={filter || sortBy !== 'name' || sortOrder !== 'asc' ? t('api.modelFilterActive') : ''}
+      storageKey={`modelSelectFilter.${providerId}`}
+      defaultExpanded={false}
+    >
+      <div className="pt-1 pb-2 space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
+          <input
+            type="text"
+            value={filter}
+            onChange={(e) => persistFilter(e.target.value)}
+            placeholder={t('api.modelSearchPlaceholder')}
+            className="w-full min-h-[44px] pl-10 pr-10 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+          {filter && (
+            <button
+              type="button"
+              onClick={() => persistFilter('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        {filterControl}
+      </div>
+    </CollapsibleSection>
+  ) : null
+
   return (
     <div className="space-y-2">
-      {providerId && (
-        <CollapsibleSection
-          label={
-            <span className="flex items-center gap-2">
-              <SlidersHorizontal className="w-4 h-4" />
-              {t('api.modelFilterSection')}
-            </span>
-          }
-          summary={
-            filter || sortBy !== 'name' || sortOrder !== 'asc' ? t('api.modelFilterActive') : ''
-          }
-          storageKey={`modelSelectFilter.${providerId}`}
-          defaultExpanded={false}
-        >
-          <div className="pt-1 pb-2 space-y-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
-              <input
-                type="text"
-                value={filter}
-                onChange={(e) => persistFilter(e.target.value)}
-                placeholder={t('api.modelSearchPlaceholder')}
-                className="w-full min-h-[44px] pl-10 pr-10 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              {filter && (
-                <button
-                  type="button"
-                  onClick={() => persistFilter('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-            {filterControl}
-          </div>
-        </CollapsibleSection>
-      )}
+      {refreshButton}
 
       <ModelDropdown
         models={processedModels}
@@ -430,16 +430,9 @@ function ModelSelect({
         <div className="flex items-center justify-center px-3 py-2 min-h-[44px] border border-border rounded-md">
           <span className="text-sm text-tertiary">{t('api.cooldown', { seconds: countdown })}</span>
         </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => onRefresh?.(providerId)}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] text-sm text-secondary hover:bg-surface-hover border border-border rounded-md"
-        >
-          <RefreshCw className="w-4 h-4" />
-          {t('api.refreshModels')}
-        </button>
-      )}
+      ) : null}
+
+      {filterSection}
     </div>
   )
 }

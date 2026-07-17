@@ -23,6 +23,7 @@ import { createProfile, updateProfile } from '../../services/connectionProfiles'
 import ModelSelect from './settings/controls/ModelSelect'
 import SettingSlider from './settings/controls/SettingSlider'
 import SettingToggle from './settings/controls/SettingToggle'
+import { RefreshCw, X } from '../../lib/icons'
 
 function StringListInput({ value, onChange, maxItems }) {
   const { t } = useTranslation('settings')
@@ -132,6 +133,8 @@ function ProfileFormModal({ profile }) {
   const abortRef = useRef(null)
   const savePendingRef = useRef(false)
 
+  const [providerKeyCounts, setProviderKeyCounts] = useState({})
+
   const selectedProvider = PROVIDERS.find((p) => p.id === form.providerId)
   const paramDefs = selectedProvider?.params || []
 
@@ -181,11 +184,32 @@ function ProfileFormModal({ profile }) {
 
   useEffect(() => {
     if (form.providerId) {
-      getKeys(form.providerId).then(setKeys)
+      getKeys(form.providerId).then((loaded) => {
+        setKeys(loaded)
+        if (loaded.length > 0 && !form.keyId) {
+          const active = loaded.find((k) => k.active)
+          setForm((prev) => ({ ...prev, keyId: active ? active.id : loaded[0].id }))
+        }
+      })
     } else {
       setKeys([])
     }
   }, [form.providerId])
+
+  useEffect(() => {
+    let cancelled = false
+    Promise.all(
+      PROVIDERS.map(async (p) => {
+        const k = await getKeys(p.id)
+        return [p.id, k.length]
+      }),
+    ).then((entries) => {
+      if (!cancelled) setProviderKeyCounts(Object.fromEntries(entries))
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const hordeMethod =
     form.providerId === 'ai-horde' ? form.params.hordeMethod || 'native' : undefined
@@ -319,6 +343,28 @@ function ProfileFormModal({ profile }) {
     abortRef.current = null
   }
 
+  async function handleResetParams() {
+    const ok = await confirm({
+      title: t('api.profile.form.resetParamsConfirm.title'),
+      message: t('api.profile.form.resetParamsConfirm.message'),
+      confirmLabel: t('api.profile.form.resetParams'),
+      cancelLabel: t('cancel', { ns: 'common' }),
+      variant: 'danger',
+    })
+    if (!ok) return
+    setForm((prev) => {
+      const merged = { ...prev.params }
+      for (const def of selectedProvider.params) {
+        if (def.default !== undefined && def.default !== null) {
+          merged[def.key] = def.default
+        } else {
+          delete merged[def.key]
+        }
+      }
+      return { ...prev, params: merged }
+    })
+  }
+
   async function handleCloseAttempt() {
     const result = await promptSave()
     if (result === 'save') {
@@ -372,10 +418,23 @@ function ProfileFormModal({ profile }) {
             value={form.providerId}
             onChange={(e) => {
               const nextProvider = e.target.value
+              const nextProviderDef = PROVIDERS.find((p) => p.id === nextProvider)
+              let keyId = null
+              if (nextProviderDef?.needsKey) {
+                getKeys(nextProvider).then((nextKeys) => {
+                  if (nextKeys.length > 0) {
+                    const active = nextKeys.find((k) => k.active)
+                    setForm((prev) => ({
+                      ...prev,
+                      keyId: active ? active.id : nextKeys[0].id,
+                    }))
+                  }
+                })
+              }
               setForm((prev) => ({
                 ...prev,
                 providerId: nextProvider,
-                keyId: null,
+                keyId,
                 model: '',
                 params: {},
               }))
@@ -383,11 +442,15 @@ function ProfileFormModal({ profile }) {
             className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm"
           >
             <option value="">{t('api.profile.form.selectProvider')}</option>
-            {PROVIDERS.map((p) => (
-              <option key={p.id} value={p.id}>
-                {t(p.nameKey.replace('settings:', ''))}
-              </option>
-            ))}
+            {PROVIDERS.map((p) => {
+              const noKey = p.needsKey && !providerKeyCounts[p.id]
+              return (
+                <option key={p.id} value={p.id} disabled={noKey}>
+                  {t(p.nameKey.replace('settings:', ''))}
+                  {noKey ? ` — ${t('api.profile.form.noApiKey')}` : ''}
+                </option>
+              )
+            })}
           </select>
         </div>
 
@@ -480,10 +543,42 @@ function ProfileFormModal({ profile }) {
                 models={cachedModels}
                 modelNames={modelNames}
                 modelMeta={modelMeta}
-                onRefresh={handleRefresh}
                 fetching={fetching}
                 onCancelFetch={handleCancelFetch}
                 cooldownRemaining={getCooldownRemaining()}
+                refreshButton={
+                  fetching ? (
+                    <div className="flex items-center justify-between px-3 py-2 min-h-[44px] border border-border rounded-md">
+                      <span className="flex items-center gap-2 text-sm text-secondary">
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        {t('api.fetchingModels')}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleCancelFetch}
+                        className="flex items-center gap-1 text-sm text-error hover:opacity-80 min-h-[44px] min-w-[44px] justify-center"
+                      >
+                        <X className="w-4 h-4" />
+                        {t('cancel', { ns: 'common' })}
+                      </button>
+                    </div>
+                  ) : getCooldownRemaining() > 0 ? (
+                    <div className="flex items-center justify-center px-3 py-2 min-h-[44px] border border-border rounded-md">
+                      <span className="text-sm text-tertiary">
+                        {t('api.cooldown', { seconds: Math.ceil(getCooldownRemaining() / 1000) })}
+                      </span>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleRefresh(selectedProvider.id)}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] text-sm text-secondary hover:bg-surface-hover border border-border rounded-md"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                      {t('api.refreshModels')}
+                    </button>
+                  )
+                }
               />
             ) : (
               <input
@@ -569,7 +664,17 @@ function ProfileFormModal({ profile }) {
 
         {paramDefs.length > 0 && (
           <div className="space-y-4 pt-2 border-t border-border">
-            <p className="text-sm font-medium text-text">{t('api.profile.form.parameters')}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-text">{t('api.profile.form.parameters')}</p>
+              <button
+                type="button"
+                onClick={handleResetParams}
+                className="min-h-[44px] px-4 py-2 rounded-md text-sm font-medium border border-border bg-surface text-secondary hover:bg-surface-hover inline-flex items-center gap-2"
+              >
+                <RefreshCw className="w-4 h-4" />
+                {t('api.profile.form.resetParams')}
+              </button>
+            </div>
             {paramDefs.map((param) => (
               <div key={param.key}>
                 <label className="block text-xs font-medium text-secondary mb-1">

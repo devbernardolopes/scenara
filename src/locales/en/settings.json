@@ -416,8 +416,14 @@
         "apiKey": "API Key",
         "noKeys": "No keys configured for this provider. Add one in the API Keys section below.",
         "selectKey": "Select a key…",
+        "noApiKey": "No API key",
         "model": "Model",
         "parameters": "Parameters",
+        "resetParams": "Reset to defaults",
+        "resetParamsConfirm": {
+          "title": "Reset parameters?",
+          "message": "This will restore all parameters to their default values for this provider."
+        },
         "reasoning": "Reasoning",
         "reasoningEffort": "Reasoning Effort",
         "includeReasoning": "Include Reasoning",
