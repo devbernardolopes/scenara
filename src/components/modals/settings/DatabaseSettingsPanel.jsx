@@ -128,6 +128,7 @@ function DatabaseSettingsPanel() {
     try {
       await resetDatabase()
       showToast(t('database.resetSuccess'), { type: 'success' })
+      window.location.reload()
     } catch (err) {
       showToast(err.message, { type: 'error' })
     } finally {
@@ -149,6 +150,7 @@ function DatabaseSettingsPanel() {
     try {
       await resetSettings()
       showToast(t('database.resetSettingsSuccess'), { type: 'success' })
+      window.location.reload()
     } catch (err) {
       showToast(err.message, { type: 'error' })
     } finally {
