@@ -159,6 +159,17 @@
       "exportedMultiple": "{{count}} writing instructions exported",
       "imported": "{{count}} writing instructions imported"
     },
+    "connectionProfile": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} connection profiles deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} connection profiles duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} connection profiles exported",
+      "imported": "{{count}} connection profiles imported"
+    },
     "export": {
       "failed": "Export failed",
       "invalidItem": "Item not found"

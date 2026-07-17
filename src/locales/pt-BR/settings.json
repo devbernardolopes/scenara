@@ -395,11 +395,13 @@
       "actions": {
         "edit": "Editar",
         "delete": "Excluir",
-        "duplicate": "Duplicar"
+        "duplicate": "Duplicar",
+        "export": "Exportar"
       },
       "confirmDelete": {
         "title": "Excluir Perfil",
-        "message": "Tem certeza que deseja excluir \"{{name}}\"?"
+        "message": "Tem certeza que deseja excluir \"{{name}}\"?",
+        "messageMultiple": "Tem certeza que deseja excluir {{count}} perfis de conexão?"
       },
       "form": {
         "title": "Criar Perfil",
@@ -428,7 +430,19 @@
       },
       "add": "Adicionar",
       "maxStopItems": "Limite atingido",
-      "addStopItem": "Digite e pressione Enter"
+      "addStopItem": "Digite e pressione Enter",
+      "importProfile": "Importar",
+      "import": {
+        "invalidFormat": "O arquivo não parece ser uma exportação válida de perfis de conexão.",
+        "fileError": "Falha ao ler o arquivo."
+      },
+      "batch": {
+        "selected": "{{count}} selecionados",
+        "delete": "Excluir ({{count}})",
+        "duplicate": "Duplicar ({{count}})",
+        "export": "Exportar ({{count}})",
+        "clear": "Limpar"
+      }
     },
     "noKeyWarning": {
       "title": "Nenhuma Chave de API",

@@ -1,6 +1,8 @@
 import db from '../db'
 import { getSetting, setSetting } from './settings'
 import { getActiveKey, getActiveProvider, getModel, PROVIDERS } from './apiProviders'
+import { showToast } from '../lib/toast'
+import i18n from '../lib/i18n'
 
 export const REQUEST_KINDS = ['chat', 'autoTitle', 'summarization', 'ooc', 'director', 'interface']
 
@@ -44,6 +46,13 @@ async function insertAfterInOrder(orderKey, afterId, newId) {
 async function removeFromOrder(orderKey, id) {
   let order = await getOrderIds(orderKey)
   order = order.filter((oid) => oid !== id)
+  await setSetting(orderKey, order)
+}
+
+async function removeManyFromOrder(orderKey, ids) {
+  const removeSet = new Set(ids)
+  let order = await getOrderIds(orderKey)
+  order = order.filter((oid) => !removeSet.has(oid))
   await setSetting(orderKey, order)
 }
 
@@ -128,6 +137,95 @@ export async function duplicateProfile(id) {
     }),
   )
   return newId
+}
+
+export async function deleteProfiles(ids) {
+  const all = await getAllProfiles()
+  if (ids.length >= all.length) {
+    throw new Error('Cannot delete all connection profiles')
+  }
+  await db.connectionProfiles.bulkDelete(ids)
+  await removeManyFromOrder('connectionProfileOrder', ids)
+  for (const id of ids) {
+    for (const kind of REQUEST_KINDS) {
+      const assigned = await getSetting(`requestKind.${kind}.profileId`)
+      if (assigned === id) {
+        await setSetting(`requestKind.${kind}.profileId`, null)
+      }
+    }
+  }
+  window.dispatchEvent(
+    new CustomEvent('connectionProfiles-changed', {
+      detail: { action: 'delete', count: ids.length },
+    }),
+  )
+}
+
+export async function duplicateProfiles(ids) {
+  for (const id of ids) {
+    await duplicateProfile(id)
+  }
+}
+
+export async function exportProfile(id) {
+  const profile = await db.connectionProfiles.get(id)
+  if (!profile) {
+    showToast(i18n.t('common:toast.export.invalidItem'), { type: 'error' })
+    throw new Error('Profile not found')
+  }
+  showToast(i18n.t('common:toast.connectionProfile.exported', { name: profile.name }), {
+    type: 'success',
+  })
+  return {
+    name: profile.name,
+    providerId: profile.providerId,
+    keyId: profile.keyId || null,
+    model: profile.model || null,
+    params: profile.params || {},
+  }
+}
+
+export async function exportProfiles(ids) {
+  const all = await Promise.all(ids.map((id) => exportProfile(id).catch(() => null)))
+  const exported = all.filter(Boolean)
+  if (exported.length > 0) {
+    showToast(
+      i18n.t('common:toast.connectionProfile.exportedMultiple', { count: exported.length }),
+      { type: 'success' },
+    )
+  }
+  return exported
+}
+
+export async function importProfiles(items) {
+  const validIds = new Set(PROVIDERS.map((p) => p.id))
+  const added = []
+  for (const item of items) {
+    if (!item || !item.name || !item.name.trim()) continue
+    if (!item.providerId || !validIds.has(item.providerId)) continue
+    const now = new Date()
+    const id = await db.connectionProfiles.add({
+      name: item.name.trim(),
+      providerId: item.providerId,
+      keyId: item.keyId || null,
+      model: item.model || null,
+      params: item.params || {},
+      createdAt: now,
+      updatedAt: now,
+    })
+    added.push(id)
+  }
+  if (added.length > 0) {
+    const order = await getOrderIds('connectionProfileOrder')
+    order.push(...added)
+    await setSetting('connectionProfileOrder', order)
+    window.dispatchEvent(
+      new CustomEvent('connectionProfiles-changed', {
+        detail: { action: 'import', count: added.length },
+      }),
+    )
+  }
+  return added
 }
 
 export async function usedByProfileCount(providerId, keyId) {

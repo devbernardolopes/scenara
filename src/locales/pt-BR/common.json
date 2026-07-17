@@ -158,6 +158,17 @@
       "exportedMultiple": "{{count}} instruções de escrita exportadas",
       "imported": "{{count}} instruções de escrita importadas"
     },
+    "connectionProfile": {
+      "created": "{{name}} criado",
+      "updated": "{{name}} atualizado",
+      "deleted": "{{name}} excluído",
+      "deletedMultiple": "{{count}} perfis de conexão excluídos",
+      "duplicated": "{{name}} duplicado",
+      "duplicatedMultiple": "{{count}} perfis de conexão duplicados",
+      "exported": "{{name}} exportado",
+      "exportedMultiple": "{{count}} perfis de conexão exportados",
+      "imported": "{{count}} perfis de conexão importados"
+    },
     "export": {
       "failed": "Exportação falhou",
       "invalidItem": "Item não encontrado"

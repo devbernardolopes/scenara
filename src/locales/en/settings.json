@@ -399,11 +399,13 @@
       "actions": {
         "edit": "Edit",
         "delete": "Delete",
-        "duplicate": "Duplicate"
+        "duplicate": "Duplicate",
+        "export": "Export"
       },
       "confirmDelete": {
         "title": "Delete Profile",
         "message": "Are you sure you want to delete \"{{name}}\"?",
+        "messageMultiple": "Are you sure you want to delete {{count}} connection profiles?",
         "assignedTo": "This profile is currently assigned to:"
       },
       "form": {
@@ -438,7 +440,19 @@
       },
       "add": "Add",
       "maxStopItems": "Limit reached",
-      "addStopItem": "Type and press Enter"
+      "addStopItem": "Type and press Enter",
+      "importProfile": "Import",
+      "import": {
+        "invalidFormat": "The file does not appear to be a valid connection profile export.",
+        "fileError": "Failed to read the file."
+      },
+      "batch": {
+        "selected": "{{count}} selected",
+        "delete": "Delete ({{count}})",
+        "duplicate": "Duplicate ({{count}})",
+        "export": "Export ({{count}})",
+        "clear": "Clear"
+      }
     },
     "noKeyWarning": {
       "title": "No API Key",
