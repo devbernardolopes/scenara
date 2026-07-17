@@ -3,6 +3,7 @@ import { getMessagesByThread, updateMessage, deleteMessage } from './messages'
 import { updateThread } from './threads'
 import { buildTranscript, replaceVars, sendChatCompletion } from './chatApi'
 import { createThreadMemory, buildInjectedMemory } from './threadMemories'
+import { resolveScenarioInjection } from './scenarios'
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { getSetting } from './settings'
 import { estimateTokens } from './tokenEstimator'
@@ -112,13 +113,20 @@ export async function buildSummarizationPayload({
   // Prepend the character prompt (when the per-character override is enabled)
   // to the start of the transcript, preceded by the Character Prompt section
   // header if configured — mirroring how the memory section is assembled above.
+  // The active scenario is appended right after the character prompt, but only
+  // when the character prompt is injected (i.e. the override is on).
   let charPromptSection = ''
   if (character?.addCharacterPrompt) {
     const prompt = replaceVarsIn(character?.prompt || '')
     if (prompt) {
+      const scenarioText = resolveScenarioInjection(character, {
+        isFirstMessage: false,
+        lastSummarizationAt: thread?.lastSummarizationAt || null,
+      })
+      const combined = scenarioText ? `${prompt}\n\n${scenarioText}` : prompt
       charPromptSection = charPromptHeader
-        ? `${replaceVarsIn(charPromptHeader)}\n\n${prompt}`
-        : prompt
+        ? `${replaceVarsIn(charPromptHeader)}\n\n${combined}`
+        : combined
     }
   }
 

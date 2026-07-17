@@ -3,6 +3,7 @@ import { getSetting } from './settings'
 import { getThread } from './threads'
 import { getWritingInstruction } from './writingInstructions'
 import { buildInjectedMemory } from './threadMemories'
+import { resolveScenarioInjection } from './scenarios'
 
 const BASE_URLS = {
   groq: 'https://api.groq.com/openai/v1',
@@ -93,6 +94,7 @@ export async function buildMessagesPayload({
   memoryText,
   memoryHeader,
   personaMap,
+  lastSummarizationAt = null,
 }) {
   const writingMessageRole =
     character?.writingMessageRole || settings.writingMessageRole || 'system'
@@ -128,7 +130,11 @@ export async function buildMessagesPayload({
 
   const prompt = replaceVarsIn(character?.prompt)
   if (prompt) {
-    systemParts.push(prompt)
+    const scenarioText = resolveScenarioInjection(character, {
+      isFirstMessage,
+      lastSummarizationAt,
+    })
+    systemParts.push(scenarioText ? `${prompt}\n\n${scenarioText}` : prompt)
   }
 
   const extraPrompt = replaceVarsIn(character?.extraPrompt)
@@ -353,6 +359,8 @@ export async function buildOOCMessagesPayload({
   personaMap,
   memoryText,
   memoryHeader,
+  lastSummarizationAt = null,
+  isFirstMessage = false,
 }) {
   const charName = character?.name || ''
   const personaName = chatPersona?.name || ''
@@ -400,7 +408,12 @@ export async function buildOOCMessagesPayload({
   const prompt = replaceVarsIn(character?.prompt)
   if (prompt) {
     const systemPrompt = replaceVarsIn(character?.systemPrompt || '')
-    const combinedPrompt = systemPrompt ? `${prompt}\n\n${systemPrompt}` : prompt
+    let combinedPrompt = systemPrompt ? `${prompt}\n\n${systemPrompt}` : prompt
+    const scenarioText = resolveScenarioInjection(character, {
+      isFirstMessage,
+      lastSummarizationAt,
+    })
+    if (scenarioText) combinedPrompt = `${combinedPrompt}\n\n${scenarioText}`
     const charPromptHeader = oocSettings.characterPromptHeader
     if (charPromptHeader) {
       systemParts.push(replaceVarsIn(charPromptHeader) + '\n\n' + combinedPrompt)
@@ -532,6 +545,8 @@ export async function buildChatRequestPayload({
       personaMap,
       memoryText,
       memoryHeader: '',
+      lastSummarizationAt: latestThread?.lastSummarizationAt || null,
+      isFirstMessage,
       oocSettings: {
         oocSystemInstructions,
         oocUserInstructions,
@@ -582,6 +597,7 @@ export async function buildChatRequestPayload({
       memoryText,
       memoryHeader: '',
       personaMap,
+      lastSummarizationAt: latestThread?.lastSummarizationAt || null,
     })
     payload = chatResult.payload
     entryTypes = chatResult.entryTypes
