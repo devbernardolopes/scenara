@@ -24,6 +24,7 @@ function ExportDatabaseModal() {
   const [writingInstructions, setWritingInstructions] = useState([])
   const [inChatShortcuts, setInChatShortcuts] = useState([])
   const [connectionProfiles, setConnectionProfiles] = useState([])
+  const [logs, setLogs] = useState([])
 
   const [selectedCharacterIds, setSelectedCharacterIds] = useState(new Set())
   const [selectedPersonaIds, setSelectedPersonaIds] = useState(new Set())
