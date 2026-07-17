@@ -202,16 +202,13 @@ function MessageBubble({
   generating,
   requestFailed,
   errorText,
-  charName,
-  personaName,
   isUnread,
   slotCreatedAt,
   apiDurationMs,
   character,
 }) {
   function renderContent(text) {
-    if (!text || role === 'user') return text
-    return text.replace(/{{char}}/gi, charName || '').replace(/{{user}}/gi, personaName || '')
+    return text
   }
   const { t } = useTranslation('chat')
   const { openModal } = useModal()

@@ -2016,8 +2016,6 @@ function ChatView() {
                       errorText={errorText}
                       isUnread={msg.isUnread || false}
                       character={character}
-                      charName={character?.name || ''}
-                      personaName={personaMap[thread?.personaId]?.name || ''}
                     />
                   </div>
                 )
