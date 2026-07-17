@@ -122,7 +122,10 @@ export async function buildMessagesPayload({
   const userPersonaPrefixOverride = character?.userPersonaPrefix === false ? false : true
 
   const prompt = replaceVarsIn(character?.prompt)
-  if (prompt) systemParts.push(prompt)
+  if (prompt) {
+    const systemPrompt = replaceVarsIn(character?.systemPrompt || '')
+    systemParts.push(systemPrompt ? `${prompt}\n\n${systemPrompt}` : prompt)
+  }
 
   const extraPrompt = replaceVarsIn(character?.extraPrompt)
   if (isFirstMessage && extraPrompt) systemParts.push(extraPrompt)
@@ -392,11 +395,13 @@ export async function buildOOCMessagesPayload({
 
   const prompt = replaceVarsIn(character?.prompt)
   if (prompt) {
+    const systemPrompt = replaceVarsIn(character?.systemPrompt || '')
+    const combinedPrompt = systemPrompt ? `${prompt}\n\n${systemPrompt}` : prompt
     const charPromptHeader = oocSettings.characterPromptHeader
     if (charPromptHeader) {
-      systemParts.push(replaceVarsIn(charPromptHeader) + '\n\n' + prompt)
+      systemParts.push(replaceVarsIn(charPromptHeader) + '\n\n' + combinedPrompt)
     } else {
-      systemParts.push(prompt)
+      systemParts.push(combinedPrompt)
     }
   }
 

@@ -121,10 +121,11 @@ export async function buildSummarizationPayload({
     ? `${replaceVarsIn(messagesHeader)}\n\n${transcript}`
     : transcript
 
-  let fullContent = [charPromptSection, transcriptSection].filter(Boolean).join('\n\n')
-  if (memorySection) {
-    fullContent = `${memorySection}\n\n${fullContent}`
-  }
+  // Character prompt is placed at the very top of the payload, before any
+  // memory injection, when the per-character override is enabled.
+  const fullContent = [charPromptSection, memorySection, transcriptSection]
+    .filter(Boolean)
+    .join('\n\n')
 
   systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, fullContent)
 

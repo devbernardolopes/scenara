@@ -131,7 +131,26 @@ function CharacterSection({ form, onChange, characterId }) {
       </div>
 
       <CollapsibleSection
-        label={t('promptLabel')}
+        label={t('systemPromptLabel')}
+        summary={
+          form.systemPrompt
+            ? t('common:tokenCount', { count: estimateTokens(form.systemPrompt) })
+            : null
+        }
+        storageKey={characterId ? `charSection.systemPrompt.${characterId}` : undefined}
+        defaultExpanded={false}
+      >
+        <AutoResizeTextarea
+          className={`${inputClass} resize-none mt-2`}
+          value={form.systemPrompt || ''}
+          onChange={(e) => onChange('systemPrompt', e.target.value)}
+          placeholder={t('systemPromptPlaceholder')}
+          extraHeight={8}
+        />
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        label={t('characterPromptLabel')}
         summary={
           form.prompt ? t('common:tokenCount', { count: estimateTokens(form.prompt) }) : null
         }

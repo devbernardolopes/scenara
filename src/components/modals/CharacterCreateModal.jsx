@@ -25,6 +25,7 @@ const INITIAL_FORM = {
   avatar: '',
   tagline: '',
   prompt: '',
+  systemPrompt: '',
   writingInstruction: null,
   extraPrompt: '',
   postHistoryInstructions: '',
