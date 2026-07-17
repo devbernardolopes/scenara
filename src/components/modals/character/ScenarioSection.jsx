@@ -168,7 +168,7 @@ function ScenarioSection({ form, onChange, characterId }) {
             >
               <div className="relative mt-2">
                 <AutoResizeTextarea
-                  className={`${inputClass} resize-none pr-12 min-h-[200px]`}
+                  className={`${inputClass} resize-none pr-12 min-h-[128px]`}
                   value={scenario.content}
                   onChange={(e) => handleContentChange(scenario.id, e.target.value)}
                   placeholder={t('scenarioPlaceholder')}
