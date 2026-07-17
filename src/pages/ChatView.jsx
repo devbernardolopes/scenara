@@ -129,8 +129,11 @@ function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
 }
 
 function ScenarioStatusBar({ scenario, charName, userName }) {
+  const { t } = useTranslation('chat')
   const display = (() => {
-    const raw = scenario.name?.trim() || (scenario.content || '').trim().split('\n')[0].trim()
+    const raw =
+      scenario.name?.trim() ||
+      `${t('scenarioLabel', { ns: 'characterCreation' })} #${scenario.scenarioNumber ?? ''}`
     return raw.replace(/\{\{char\}\}/gi, charName).replace(/\{\{user\}\}/gi, userName)
   })()
 

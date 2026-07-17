@@ -345,14 +345,18 @@ function CharacterDiscovery() {
       initialMessages,
     })
 
-    const activeScenario = character.scenarios?.find((s) => s?.active && s?.content?.trim())
-    if (activeScenario) {
+    const activeScenarioIndex = character.scenarios?.findIndex(
+      (s) => s?.active && s?.content?.trim(),
+    )
+    if (activeScenarioIndex != null && activeScenarioIndex >= 0) {
+      const activeScenario = character.scenarios[activeScenarioIndex]
       await updateThread(threadId, {
         activeScenario: {
           id: activeScenario.id,
           name: activeScenario.name || '',
           content: activeScenario.content,
           lifetime: activeScenario.lifetime || 'firstSummary',
+          scenarioNumber: activeScenarioIndex + 1,
         },
       })
     }
