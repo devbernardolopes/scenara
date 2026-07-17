@@ -28,5 +28,20 @@
   "tagsSectionNoTags": "No hay tags asignados aún.",
   "tagsSectionBrowseTags": "Explorar Todos los Tags",
   "tagsSectionBrowseActive": "Activo",
-  "sectionScenarios": "Scenarios"
+  "sectionScenarios": "Scenarios",
+  "addScenario": "Añadir Escenario",
+  "scenarioLabel": "Escenario",
+  "scenarioPlaceholder": "Escribe un escenario para ambientar la conversación…",
+  "deleteScenario": "Eliminar",
+  "generateScenario": "Generar",
+  "confirmDeleteScenario": "¿Estás seguro de que deseas eliminar este escenario?",
+  "confirmDeleteScenarioTitle": "Eliminar Escenario",
+  "noScenarios": "Aún no hay escenarios. Añade uno para ambientar una conversación.",
+  "scenarioLifetime": "Vida Útil",
+  "scenarioLifetimeOptions": {
+    "oneTime": "Una vez",
+    "firstSummary": "1º Resumen",
+    "always": "Siempre"
+  },
+  "scenarioActive": "Activo"
 }

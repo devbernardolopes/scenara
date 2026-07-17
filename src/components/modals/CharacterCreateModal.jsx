@@ -19,6 +19,7 @@ import InitialMessagesSection from './character/InitialMessagesSection'
 import ExampleMessagesSection from './character/ExampleMessagesSection'
 import DirectorSection from './character/DirectorSection'
 import TagsSection from './character/TagsSection'
+import ScenarioSection from './character/ScenarioSection'
 
 const INITIAL_FORM = {
   name: '',
@@ -31,6 +32,7 @@ const INITIAL_FORM = {
   postHistoryInstructions: '',
   initialMessages: [],
   exampleMessages: [],
+  scenarios: [],
   autoTitle: true,
   autoTitleThreshold: 1,
   autoTitleSystemInstructions: '',
@@ -178,7 +180,7 @@ const SECTION_COMPONENTS = {
   postProcessing: PostProcessingSection,
   initialMessages: InitialMessagesSection,
   exampleMessages: ExampleMessagesSection,
-  scenarios: PlaceholderSection,
+  scenarios: ScenarioSection,
   director: DirectorSection,
   lorebooks: PlaceholderSection,
   tags: TagsSection,
