@@ -1189,12 +1189,22 @@ function ChatView() {
           const summAbort = new AbortController()
           const showMarker = await getSetting('summarizationMarker')
           showToast('Generating summary', { type: 'info' })
+
+          const cancelledMarkerId = await cancelPendingSummarizationAndClearMarker(threadId)
+          if (cancelledMarkerId) {
+            const updated = await getMessagesByThread(threadId)
+            if (Number(currentThreadIdRef.current) === Number(threadId)) {
+              setMessages(dedupeMessages(updated))
+            }
+          }
+
           let summaryMarkerId = null
           try {
             if (showMarker && unsummarizedMessages.length > 0) {
               const anchorCreatedAt =
                 unsummarizedMessages[unsummarizedMessages.length - 1].createdAt
               summaryMarkerId = await createSummaryMarker(threadId, anchorCreatedAt)
+              registerPendingMarker(threadId, summaryMarkerId)
               const updated = await getMessagesByThread(threadId)
               if (Number(currentThreadIdRef.current) === Number(threadId)) {
                 setMessages(dedupeMessages(updated))
@@ -1233,6 +1243,7 @@ function ChatView() {
               }
             }
           } finally {
+            clearPendingMarker(threadId)
             if (showMarker) {
               setPendingMarkers((prev) => prev.filter((m) => m.type !== 'summarization'))
             }

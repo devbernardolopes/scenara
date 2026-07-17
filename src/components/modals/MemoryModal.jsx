@@ -12,7 +12,7 @@ import {
   deleteMemoryAndRevert,
   markMemoryRead,
 } from '../../services/threadMemories'
-import { getThread, updateThread } from '../../services/threads'
+import { updateThread } from '../../services/threads'
 import { ChevronDown, Trash2, RefreshCw, Eye } from '../../lib/icons'
 import db from '../../db'
 import { replaceVars } from '../../services/chatApi'

@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
-import { getState, cancelSummarizationRequests } from '../../services/apiQueue'
+import { getState } from '../../services/apiQueue'
+import { cancelPendingSummarizationAndClearMarker } from '../../services/summarization'
 import ModalShell from '../shared/ModalShell'
 
 function SummaryCancelModal({ threadId }) {
@@ -25,10 +26,10 @@ function SummaryCancelModal({ threadId }) {
     return () => window.removeEventListener('api-queue-changed', update)
   }, [update])
 
-  function handleConfirm() {
+  async function handleConfirm() {
     if (!active || cancelling) return
     setCancelling(true)
-    cancelSummarizationRequests(threadId)
+    await cancelPendingSummarizationAndClearMarker(threadId)
     closeModal()
   }
 
