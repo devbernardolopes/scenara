@@ -41,7 +41,8 @@ export async function getLogs({
 
   if (type) rows = rows.filter((r) => r.type === type)
   if (level) rows = rows.filter((r) => r.level === level)
-  if (threadId != null) rows = rows.filter((r) => r.threadId === Number(threadId))
+  if (threadId != null && threadId !== '')
+    rows = rows.filter((r) => r.threadId === Number(threadId))
 
   if (search) {
     const q = search.toLowerCase()

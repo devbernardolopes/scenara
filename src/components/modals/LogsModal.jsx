@@ -6,8 +6,19 @@ import { showToast } from '../../lib/toast'
 import { downloadJson } from '../../lib/download'
 import { getLogs, deleteLogs, clearLogs, exportLogs } from '../../services/logs'
 import { getAllThreads } from '../../services/threads'
+import { getUIState, setUIState } from '../../services/uiState'
 import ModalShell from '../shared/ModalShell'
 import { Search, Trash2, Download, ScrollText } from '../../lib/icons'
+
+const FILTERS_KEY = 'logsModal.filters'
+
+const DEFAULT_FILTERS = {
+  type: '',
+  threadId: '',
+  level: '',
+  search: '',
+  sort: 'desc',
+}
 
 const TYPES = ['toast', 'api', 'error']
 const LEVELS = ['info', 'success', 'warning', 'error']
@@ -32,14 +43,16 @@ function LogsModal() {
   const [logs, setLogs] = useState([])
   const [threads, setThreads] = useState([])
   const [selectedIds, setSelectedIds] = useState(new Set())
-  const [filters, setFilters] = useState({
-    type: '',
-    threadId: '',
-    level: '',
-    search: '',
-    sort: 'desc',
-  })
+  const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const searchRef = useRef(null)
+
+  useEffect(() => {
+    getUIState(FILTERS_KEY).then((saved) => {
+      if (saved && typeof saved === 'object') {
+        setFilters({ ...DEFAULT_FILTERS, ...saved })
+      }
+    })
+  }, [])
 
   const load = useCallback(async () => {
     const rows = await getLogs(filters)
@@ -47,12 +60,22 @@ function LogsModal() {
   }, [filters])
 
   useEffect(() => {
-    getAllThreads().then(setThreads)
+    getAllThreads().then((all) => setThreads(all))
   }, [])
+
+  useEffect(() => {
+    setUIState(FILTERS_KEY, filters)
+  }, [filters])
 
   useEffect(() => {
     load()
   }, [load])
+
+  useEffect(() => {
+    if (filters.threadId && !threads.some((t) => String(t.id) === String(filters.threadId))) {
+      setFilters((f) => ({ ...f, threadId: '' }))
+    }
+  }, [threads, filters.threadId])
 
   function toggleSelect(id) {
     setSelectedIds((prev) => {
