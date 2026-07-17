@@ -10,6 +10,7 @@ function CollapsibleSection({
   defaultExpanded = true,
   open: controlledOpen,
   onOpenChange,
+  headerExtra,
   children,
 }) {
   const isControlled = controlledOpen !== undefined
@@ -61,6 +62,7 @@ function CollapsibleSection({
         >
           {label}
         </span>
+        {headerExtra}
         <span className="flex items-center gap-2">
           {summary && <span className="text-xs text-tertiary">{summary}</span>}
           <ChevronDown
