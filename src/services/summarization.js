@@ -123,7 +123,8 @@ export async function buildSummarizationPayload({
         isFirstMessage: false,
         lastSummarizationAt: thread?.lastSummarizationAt || null,
       })
-      const combined = scenarioText ? `${prompt}\n\n${scenarioText}` : prompt
+      const resolvedScenario = scenarioText ? replaceVarsIn(scenarioText) : ''
+      const combined = resolvedScenario ? `${prompt}\n\n${resolvedScenario}` : prompt
       charPromptSection = charPromptHeader
         ? `${replaceVarsIn(charPromptHeader)}\n\n${combined}`
         : combined

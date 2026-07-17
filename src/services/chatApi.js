@@ -130,10 +130,11 @@ export async function buildMessagesPayload({
 
   const prompt = replaceVarsIn(character?.prompt)
   if (prompt) {
-    const scenarioText = resolveScenarioInjection(character, {
+    const rawScenarioText = resolveScenarioInjection(character, {
       isFirstMessage,
       lastSummarizationAt,
     })
+    const scenarioText = rawScenarioText ? replaceVarsIn(rawScenarioText) : ''
     systemParts.push(scenarioText ? `${prompt}\n\n${scenarioText}` : prompt)
   }
 
@@ -409,10 +410,11 @@ export async function buildOOCMessagesPayload({
   if (prompt) {
     const systemPrompt = replaceVarsIn(character?.systemPrompt || '')
     let combinedPrompt = systemPrompt ? `${prompt}\n\n${systemPrompt}` : prompt
-    const scenarioText = resolveScenarioInjection(character, {
+    const rawScenarioText = resolveScenarioInjection(character, {
       isFirstMessage,
       lastSummarizationAt,
     })
+    const scenarioText = rawScenarioText ? replaceVarsIn(rawScenarioText) : ''
     if (scenarioText) combinedPrompt = `${combinedPrompt}\n\n${scenarioText}`
     const charPromptHeader = oocSettings.characterPromptHeader
     if (charPromptHeader) {
