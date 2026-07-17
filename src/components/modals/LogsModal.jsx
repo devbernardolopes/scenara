@@ -7,7 +7,7 @@ import { downloadJson } from '../../lib/download'
 import { getLogs, deleteLogs, clearLogs, exportLogs } from '../../services/logs'
 import { getAllThreads } from '../../services/threads'
 import { getUIState, setUIState } from '../../services/uiState'
-import ModalShell from '../shared/ModalShell'
+import CloseButton from '../shared/CloseButton'
 import { Search, Trash2, Download, ScrollText } from '../../lib/icons'
 
 const FILTERS_KEY = 'logsModal.filters'
@@ -156,8 +156,13 @@ function LogsModal() {
   const allChecked = logs.length > 0 && validSelectedCount === logs.length
 
   return (
-    <ModalShell title={t('logs:title')} onClose={closeModal}>
-      <div className="space-y-3">
+    <div className="flex flex-col min-h-0 flex-1">
+      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
+        <h2 className="text-xl font-semibold text-text">{t('logs:title')}</h2>
+        <CloseButton onClick={closeModal} />
+      </div>
+
+      <div className="p-6 pt-4 space-y-3 border-b border-border shrink-0">
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative flex-1 min-w-[160px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
@@ -214,7 +219,9 @@ function LogsModal() {
             <option value="asc">{t('logs:sortOldest')}</option>
           </select>
         </div>
+      </div>
 
+      <div className="flex-1 overflow-y-auto px-6 py-4 min-h-0">
         {logs.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-tertiary gap-2">
             <ScrollText className="w-8 h-8" />
@@ -236,7 +243,7 @@ function LogsModal() {
               </span>
             </div>
 
-            <div className="space-y-1 max-h-[55vh] overflow-y-auto">
+            <div className="space-y-1">
               {logs.map((log) => (
                 <div
                   key={log.id}
@@ -274,38 +281,38 @@ function LogsModal() {
             </div>
           </>
         )}
-
-        <div className="flex items-center gap-2 pt-2 border-t border-border">
-          <button
-            type="button"
-            onClick={handleExport}
-            disabled={logs.length === 0}
-            className="min-h-[44px] px-3 text-sm text-text hover:bg-surface-hover rounded-md border border-border inline-flex items-center gap-2 disabled:opacity-50"
-          >
-            <Download className="w-4 h-4" />
-            {t('logs:export')}
-          </button>
-          <button
-            type="button"
-            onClick={handleDeleteSelected}
-            disabled={validSelectedCount === 0}
-            className="min-h-[44px] px-3 text-sm text-on-delete bg-delete hover:bg-delete-hover rounded-md inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Trash2 className="w-4 h-4" />
-            {t('logs:deleteSelected', { count: validSelectedCount })}
-          </button>
-          <button
-            type="button"
-            onClick={handleClearAll}
-            disabled={logs.length === 0}
-            className="min-h-[44px] px-3 text-sm text-text hover:bg-surface-hover rounded-md border border-border inline-flex items-center gap-2 disabled:opacity-50 ml-auto"
-          >
-            <Trash2 className="w-4 h-4" />
-            {t('logs:clearAll')}
-          </button>
-        </div>
       </div>
-    </ModalShell>
+
+      <div className="flex items-center gap-2 px-6 py-4 border-t border-border shrink-0">
+        <button
+          type="button"
+          onClick={handleExport}
+          disabled={logs.length === 0}
+          className="min-h-[44px] px-3 text-sm text-text hover:bg-surface-hover rounded-md border border-border inline-flex items-center gap-2 disabled:opacity-50"
+        >
+          <Download className="w-4 h-4" />
+          {t('logs:export')}
+        </button>
+        <button
+          type="button"
+          onClick={handleDeleteSelected}
+          disabled={validSelectedCount === 0}
+          className="min-h-[44px] px-3 text-sm text-on-delete bg-delete hover:bg-delete-hover rounded-md inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Trash2 className="w-4 h-4" />
+          {t('logs:deleteSelected', { count: validSelectedCount })}
+        </button>
+        <button
+          type="button"
+          onClick={handleClearAll}
+          disabled={logs.length === 0}
+          className="min-h-[44px] px-3 text-sm text-text hover:bg-surface-hover rounded-md border border-border inline-flex items-center gap-2 disabled:opacity-50 ml-auto"
+        >
+          <Trash2 className="w-4 h-4" />
+          {t('logs:clearAll')}
+        </button>
+      </div>
+    </div>
   )
 }
 
