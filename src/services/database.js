@@ -43,6 +43,12 @@ export async function exportDatabase(selection) {
     data.connectionProfiles = [...filtered]
   }
 
+  if (selection.logIds?.size > 0) {
+    const allLogs = await db.logs.toArray()
+    const filtered = allLogs.filter((l) => selection.logIds.has(l.id))
+    data.logs = [...filtered]
+  }
+
   if (selection.inChatShortcutIds?.size > 0) {
     const items = await db.inChatShortcuts.toArray()
     const filtered = items.filter((i) => selection.inChatShortcutIds.has(i.id))
@@ -108,6 +114,7 @@ export async function importDatabase(data) {
     'promptHistory',
     'tags',
     'threadMemories',
+    'logs',
   ]
 
   function addWithId(table, record) {
@@ -205,6 +212,12 @@ export async function importDatabase(data) {
       if (Array.isArray(data.threadMemories)) {
         for (const item of data.threadMemories) {
           await addWithId(db.threadMemories, item)
+        }
+      }
+
+      if (Array.isArray(data.logs)) {
+        for (const item of data.logs) {
+          await addWithId(db.logs, item)
         }
       }
     },

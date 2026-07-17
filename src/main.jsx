@@ -10,6 +10,7 @@ import { ToastProvider } from './lib/toast'
 import App from './App'
 import './lib/i18n'
 import './index.css'
+import { addLog } from './services/logs'
 
 import CharacterCreateModal from './components/modals/CharacterCreateModal'
 import PersonaEditorModal from './components/modals/PersonaEditorModal'
@@ -36,6 +37,8 @@ import AutoTitleCancelModal from './components/modals/AutoTitleCancelModal'
 import SummaryCancelModal from './components/modals/SummaryCancelModal'
 import ProgressModal from './components/modals/ProgressModal'
 import ImportSourceModal from './components/modals/ImportSourceModal'
+import LogsModal from './components/modals/LogsModal'
+import LogDetailsModal from './components/modals/LogDetailsModal'
 
 const SettingsModal = lazy(() => import('./components/modals/settings/SettingsModal'))
 const ImageViewerModal = lazy(() => import('./components/modals/ImageViewerModal'))
@@ -69,6 +72,32 @@ registerModal('summaryCancel', SummaryCancelModal)
 registerModal('progress', ProgressModal)
 registerModal('exportDatabase', ExportDatabaseModal)
 registerModal('importSource', ImportSourceModal)
+registerModal('logs', LogsModal)
+registerModal('logDetails', LogDetailsModal)
+
+// Global log capture (no per-call wiring needed).
+window.addEventListener('show-toast', (e) => {
+  const { message, type } = e.detail || {}
+  addLog({
+    type: 'toast',
+    level: type || 'info',
+    message: typeof message === 'string' ? message : JSON.stringify(message),
+  })
+})
+
+window.addEventListener('error', (e) => {
+  const msg = e?.message || (e?.error && e.error.message) || 'Unknown error'
+  const stack = e?.error?.stack
+  addLog({ type: 'error', level: 'error', message: msg, error: stack || null })
+})
+
+window.addEventListener('unhandledrejection', (e) => {
+  const reason = e?.reason
+  const msg =
+    reason?.message || (typeof reason === 'string' ? reason : 'Unhandled promise rejection')
+  const stack = reason?.stack
+  addLog({ type: 'error', level: 'error', message: msg, error: stack || null })
+})
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

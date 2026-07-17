@@ -37,6 +37,7 @@ import {
   Globe,
   FileUp,
   SlidersHorizontal,
+  ScrollText,
 } from '../../lib/icons'
 import { getGeneratingThreads } from '../../services/generatingState'
 import * as apiQueue from '../../services/apiQueue'
@@ -501,6 +502,7 @@ function Sidebar({ open, onClose }) {
               icon: BrainCog,
               labelKey: 'sidebar.localInference',
             },
+            { onClick: () => openModal('logs'), icon: ScrollText, labelKey: 'sidebar.logs' },
             { onClick: () => openModal('settings'), icon: Settings, labelKey: 'topbar.settings' },
           ]
           if (sidebarNavLayout === 'compact') {

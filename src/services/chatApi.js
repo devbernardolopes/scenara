@@ -592,6 +592,8 @@ export async function sendChatCompletion({
   onStreamingStarted,
   onActivity,
   onTiming,
+  threadId = null,
+  kind = null,
 }) {
   let baseUrl = getChatBaseUrl(profile.providerId)
   if (!baseUrl) {
@@ -621,6 +623,10 @@ export async function sendChatCompletion({
     timingReported = true
     onTiming?.(Math.round(performance.now() - startedAt))
   }
+
+  let apiResponse = null
+  let apiError = null
+  let status = 'success'
 
   try {
     if (profile.params.stream) {
@@ -735,6 +741,7 @@ export async function sendChatCompletion({
         usage: lastUsage || null,
       }
 
+      apiResponse = response
       return { content: fullContent, response }
     }
 
@@ -758,8 +765,31 @@ export async function sendChatCompletion({
     const content = json.choices?.[0]?.message?.content || ''
     const finishReason = json.choices?.[0]?.finish_reason || null
     if (finishReason) onFinish?.(finishReason)
+    apiResponse = json
     return { content, response: json }
+  } catch (err) {
+    apiError = err
+    status = 'error'
+    throw err
   } finally {
     reportTiming()
+    const durationMs = Math.round(performance.now() - startedAt)
+    import('../services/logs')
+      .then(({ addLog }) =>
+        addLog({
+          type: 'api',
+          threadId,
+          kind,
+          level: status === 'error' ? 'error' : 'info',
+          providerId: profile.providerId,
+          model: profile.model || null,
+          request: body,
+          response: apiResponse,
+          status,
+          durationMs,
+          error: apiError ? apiError.message : null,
+        }),
+      )
+      .catch(() => {})
   }
 }

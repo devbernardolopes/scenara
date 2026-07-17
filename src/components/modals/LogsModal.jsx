@@ -1,0 +1,289 @@
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useModal } from '../../hooks/useModal'
+import { useConfirm } from '../../lib/confirm'
+import { showToast } from '../../lib/toast'
+import { downloadJson } from '../../lib/download'
+import { getLogs, deleteLogs, clearLogs, exportLogs } from '../../services/logs'
+import { getAllThreads } from '../../services/threads'
+import ModalShell from '../shared/ModalShell'
+import { Search, Trash2, Download, ScrollText } from '../../lib/icons'
+
+const TYPES = ['toast', 'api', 'error']
+const LEVELS = ['info', 'success', 'warning', 'error']
+
+function levelClass(level) {
+  switch (level) {
+    case 'error':
+      return 'bg-error/10 text-error'
+    case 'warning':
+      return 'bg-warning/10 text-warning'
+    case 'success':
+      return 'bg-success/10 text-success'
+    default:
+      return 'bg-primary-subtle text-primary'
+  }
+}
+
+function LogsModal() {
+  const { t } = useTranslation(['common', 'logs'])
+  const { openModal, closeModal } = useModal()
+  const { confirm } = useConfirm()
+  const [logs, setLogs] = useState([])
+  const [threads, setThreads] = useState([])
+  const [selectedIds, setSelectedIds] = useState(new Set())
+  const [filters, setFilters] = useState({
+    type: '',
+    threadId: '',
+    level: '',
+    search: '',
+    sort: 'desc',
+  })
+  const searchRef = useRef(null)
+
+  const load = useCallback(async () => {
+    const rows = await getLogs(filters)
+    setLogs(rows)
+  }, [filters])
+
+  useEffect(() => {
+    getAllThreads().then(setThreads)
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  function toggleSelect(id) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function toggleAll() {
+    setSelectedIds((prev) => {
+      if (prev.size === logs.length && logs.length > 0) return new Set()
+      return new Set(logs.map((l) => l.id))
+    })
+  }
+
+  async function handleClearAll() {
+    const ok = await confirm({
+      title: t('logs:clearConfirmTitle'),
+      message: t('logs:clearConfirmMessage'),
+      confirmLabel: t('common:confirm'),
+      cancelLabel: t('common:cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
+    await clearLogs()
+    setSelectedIds(new Set())
+    await load()
+    showToast(t('logs:cleared'), { type: 'success' })
+  }
+
+  async function handleDeleteSelected() {
+    if (selectedIds.size === 0) return
+    const ok = await confirm({
+      title: t('logs:deleteConfirmTitle'),
+      message: t('logs:deleteConfirmMessage', { count: validSelectedCount }),
+      confirmLabel: t('common:confirm'),
+      cancelLabel: t('common:cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
+    await deleteLogs([...selectedIds])
+    setSelectedIds(new Set())
+    await load()
+  }
+
+  async function handleExport() {
+    const rows = await exportLogs({
+      type: filters.type || null,
+      threadId: filters.threadId || null,
+      search: filters.search || '',
+    })
+    downloadJson({ logs: rows }, 'logs-export.json')
+  }
+
+  function openDetails(log) {
+    openModal('logDetails', { log })
+  }
+
+  function formatTime(ts) {
+    const d = new Date(ts)
+    if (isNaN(d.getTime())) return ''
+    return d.toLocaleString()
+  }
+
+  function summaryFor(log) {
+    if (log.type === 'api') {
+      return `${log.kind || 'api'} · ${log.providerId || ''}${log.model ? ` · ${log.model}` : ''}${
+        log.durationMs != null ? ` · ${log.durationMs}ms` : ''
+      }`
+    }
+    if (log.type === 'error') return log.message || ''
+    return log.message || ''
+  }
+
+  const validSelectedCount = logs.filter((l) => selectedIds.has(l.id)).length
+  const allChecked = logs.length > 0 && validSelectedCount === logs.length
+
+  return (
+    <ModalShell title={t('logs:title')} onClose={closeModal}>
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[160px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
+            <input
+              ref={searchRef}
+              value={filters.search}
+              onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
+              placeholder={t('logs:search')}
+              className="w-full min-h-[44px] pl-10 pr-3 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          <select
+            value={filters.type}
+            onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value }))}
+            className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="">{t('logs:filterType')}</option>
+            {TYPES.map((tp) => (
+              <option key={tp} value={tp}>
+                {t(`logs:types.${tp}`)}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filters.level}
+            onChange={(e) => setFilters((f) => ({ ...f, level: e.target.value }))}
+            className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="">{t('logs:filterLevel')}</option>
+            {LEVELS.map((lv) => (
+              <option key={lv} value={lv}>
+                {t(`logs:levels.${lv}`)}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filters.threadId}
+            onChange={(e) => setFilters((f) => ({ ...f, threadId: e.target.value }))}
+            className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="">{t('logs:filterThread')}</option>
+            {threads.map((thr) => (
+              <option key={thr.id} value={thr.id}>
+                {thr.title || `#${thr.threadNumber}`}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filters.sort}
+            onChange={(e) => setFilters((f) => ({ ...f, sort: e.target.value }))}
+            className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="desc">{t('logs:sortNewest')}</option>
+            <option value="asc">{t('logs:sortOldest')}</option>
+          </select>
+        </div>
+
+        {logs.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-tertiary gap-2">
+            <ScrollText className="w-8 h-8" />
+            <p className="text-sm">{t('logs:noEntries')}</p>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 pb-1">
+              <label className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={allChecked}
+                  onChange={toggleAll}
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                />
+              </label>
+              <span className="text-xs text-tertiary">
+                {t('logs:selectedCount', { count: validSelectedCount })}
+              </span>
+            </div>
+
+            <div className="space-y-1 max-h-[55vh] overflow-y-auto">
+              {logs.map((log) => (
+                <div
+                  key={log.id}
+                  className={`flex items-start gap-3 p-2 rounded-md border cursor-pointer hover:bg-surface-hover ${
+                    selectedIds.has(log.id) ? 'border-primary ring-1 ring-primary' : 'border-border'
+                  }`}
+                  onClick={() => openDetails(log)}
+                >
+                  <label
+                    className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(log.id)}
+                      onChange={() => toggleSelect(log.id)}
+                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                    />
+                  </label>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span
+                        className={`text-[11px] leading-none px-1.5 py-0.5 rounded font-medium ${levelClass(
+                          log.level,
+                        )}`}
+                      >
+                        {t(`logs:types.${log.type}`)}
+                      </span>
+                      <span className="text-xs text-tertiary">{formatTime(log.createdAt)}</span>
+                    </div>
+                    <p className="text-sm text-text truncate mt-1">{summaryFor(log)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        <div className="flex items-center gap-2 pt-2 border-t border-border">
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={logs.length === 0}
+            className="min-h-[44px] px-3 text-sm text-text hover:bg-surface-hover rounded-md border border-border inline-flex items-center gap-2 disabled:opacity-50"
+          >
+            <Download className="w-4 h-4" />
+            {t('logs:export')}
+          </button>
+          <button
+            type="button"
+            onClick={handleDeleteSelected}
+            disabled={validSelectedCount === 0}
+            className="min-h-[44px] px-3 text-sm text-on-delete bg-delete hover:bg-delete-hover rounded-md inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Trash2 className="w-4 h-4" />
+            {t('logs:deleteSelected', { count: validSelectedCount })}
+          </button>
+          <button
+            type="button"
+            onClick={handleClearAll}
+            disabled={logs.length === 0}
+            className="min-h-[44px] px-3 text-sm text-text hover:bg-surface-hover rounded-md border border-border inline-flex items-center gap-2 disabled:opacity-50 ml-auto"
+          >
+            <Trash2 className="w-4 h-4" />
+            {t('logs:clearAll')}
+          </button>
+        </div>
+      </div>
+    </ModalShell>
+  )
+}
+
+export default LogsModal

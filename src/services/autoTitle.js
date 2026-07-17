@@ -175,6 +175,8 @@ export async function triggerAutoTitle({
       profile,
       messages: payloadWithMemory,
       signal,
+      threadId: thread.id,
+      kind: 'autoTitle',
       onTiming: (ms) => {
         autoTitleDurationMs = ms
       },
@@ -220,6 +222,8 @@ export async function triggerAutoTitle({
           profile: dProfile,
           messages: dPayload,
           signal,
+          threadId: thread.id,
+          kind: 'director',
           onTiming: (ms) => {
             directorDurationMs = ms
           },

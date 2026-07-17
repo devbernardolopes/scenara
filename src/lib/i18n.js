@@ -5,11 +5,13 @@ import enCommon from '../locales/en/common.json'
 import enChat from '../locales/en/chat.json'
 import enSettings from '../locales/en/settings.json'
 import enCharacterCreation from '../locales/en/characterCreation.json'
+import enLogs from '../locales/en/logs.json'
 
 import ptCommon from '../locales/pt-BR/common.json'
 import ptChat from '../locales/pt-BR/chat.json'
 import ptSettings from '../locales/pt-BR/settings.json'
 import ptCharacterCreation from '../locales/pt-BR/characterCreation.json'
+import ptLogs from '../locales/pt-BR/logs.json'
 
 import frCommon from '../locales/fr/common.json'
 import frChat from '../locales/fr/chat.json'
@@ -35,14 +37,50 @@ i18n.use(initReactI18next).init({
   debug: false,
   fallbackLng: 'en',
   defaultNS: 'common',
-  ns: ['common', 'chat', 'settings', 'characterCreation'],
+  ns: ['common', 'chat', 'settings', 'characterCreation', 'logs'],
   resources: {
-    en: { common: enCommon, chat: enChat, settings: enSettings, characterCreation: enCharacterCreation },
-    'pt-BR': { common: ptCommon, chat: ptChat, settings: ptSettings, characterCreation: ptCharacterCreation },
-    fr: { common: frCommon, chat: frChat, settings: frSettings, characterCreation: frCharacterCreation },
-    it: { common: itCommon, chat: itChat, settings: itSettings, characterCreation: itCharacterCreation },
-    de: { common: deCommon, chat: deChat, settings: deSettings, characterCreation: deCharacterCreation },
-    es: { common: esCommon, chat: esChat, settings: esSettings, characterCreation: esCharacterCreation },
+    en: {
+      common: enCommon,
+      chat: enChat,
+      settings: enSettings,
+      characterCreation: enCharacterCreation,
+      logs: enLogs,
+    },
+    'pt-BR': {
+      common: ptCommon,
+      chat: ptChat,
+      settings: ptSettings,
+      characterCreation: ptCharacterCreation,
+      logs: ptLogs,
+    },
+    fr: {
+      common: frCommon,
+      chat: frChat,
+      settings: frSettings,
+      characterCreation: frCharacterCreation,
+      logs: enLogs,
+    },
+    it: {
+      common: itCommon,
+      chat: itChat,
+      settings: itSettings,
+      characterCreation: itCharacterCreation,
+      logs: enLogs,
+    },
+    de: {
+      common: deCommon,
+      chat: deChat,
+      settings: deSettings,
+      characterCreation: deCharacterCreation,
+      logs: enLogs,
+    },
+    es: {
+      common: esCommon,
+      chat: esChat,
+      settings: esSettings,
+      characterCreation: esCharacterCreation,
+      logs: enLogs,
+    },
   },
   interpolation: {
     escapeValue: false,

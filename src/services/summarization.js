@@ -169,6 +169,8 @@ export async function triggerSummarization({
     profile,
     messages: payload,
     signal,
+    threadId: thread.id,
+    kind: 'summarization',
     onTiming: (ms) => {
       apiDurationMs = ms
     },

@@ -65,4 +65,5 @@ export {
   PinOff,
   Clock,
   Theater,
+  ScrollText,
 } from 'lucide-react'

@@ -31,19 +31,21 @@ function ExportDatabaseModal() {
   const [selectedWritingInstructionIds, setSelectedWritingInstructionIds] = useState(new Set())
   const [selectedInChatShortcutIds, setSelectedInChatShortcutIds] = useState(new Set())
   const [selectedConnectionProfileIds, setSelectedConnectionProfileIds] = useState(new Set())
+  const [selectedLogIds, setSelectedLogIds] = useState(new Set())
   const [selectedTags, setSelectedTags] = useState(true)
   const [selectedSettings, setSelectedSettings] = useState(true)
 
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      const [chars, pers, thrs, wi, ics, cp] = await Promise.all([
+      const [chars, pers, thrs, wi, ics, cp, logs] = await Promise.all([
         db.characters.toArray(),
         db.personas.toArray(),
         db.threads.toArray(),
         db.writingInstructions.toArray(),
         db.inChatShortcuts.toArray(),
         db.connectionProfiles.toArray(),
+        db.logs.toArray(),
       ])
 
       chars.sort((a, b) => (b.id || 0) - (a.id || 0))
@@ -59,6 +61,7 @@ function ExportDatabaseModal() {
       setWritingInstructions(wi)
       setInChatShortcuts(ics)
       setConnectionProfiles(cp)
+      setLogs(logs)
 
       setSelectedCharacterIds(new Set(chars.map((c) => c.id)))
       setSelectedPersonaIds(new Set(pers.map((p) => p.id)))
@@ -66,6 +69,7 @@ function ExportDatabaseModal() {
       setSelectedWritingInstructionIds(new Set(wi.map((w) => w.id)))
       setSelectedInChatShortcutIds(new Set(ics.map((i) => i.id)))
       setSelectedConnectionProfileIds(new Set(cp.map((p) => p.id)))
+      setSelectedLogIds(new Set(logs.map((l) => l.id)))
     } finally {
       setLoading(false)
     }
@@ -108,6 +112,7 @@ function ExportDatabaseModal() {
         writingInstructionIds: selectedWritingInstructionIds,
         inChatShortcutIds: selectedInChatShortcutIds,
         connectionProfileIds: selectedConnectionProfileIds,
+        logIds: selectedLogIds,
         tags: selectedTags,
         settings: selectedSettings,
       })
@@ -145,6 +150,7 @@ function ExportDatabaseModal() {
   const allWritingInstructionIds = writingInstructions.map((w) => w.id)
   const allInChatShortcutIds = inChatShortcuts.map((i) => i.id)
   const allConnectionProfileIds = connectionProfiles.map((p) => p.id)
+  const allLogIds = logs.map((l) => l.id)
 
   const charToggleAll = toggleAll(setSelectedCharacterIds, allCharacterIds)
   const persToggleAll = toggleAll(setSelectedPersonaIds, allPersonaIds)
@@ -152,6 +158,7 @@ function ExportDatabaseModal() {
   const wiToggleAll = toggleAll(setSelectedWritingInstructionIds, allWritingInstructionIds)
   const icsToggleAll = toggleAll(setSelectedInChatShortcutIds, allInChatShortcutIds)
   const cpToggleAll = toggleAll(setSelectedConnectionProfileIds, allConnectionProfileIds)
+  const logsToggleAll = toggleAll(setSelectedLogIds, allLogIds)
 
   const charToggle = toggleItem(setSelectedCharacterIds)
   const persToggle = toggleItem(setSelectedPersonaIds)
@@ -159,6 +166,7 @@ function ExportDatabaseModal() {
   const wiToggle = toggleItem(setSelectedWritingInstructionIds)
   const icsToggle = toggleItem(setSelectedInChatShortcutIds)
   const cpToggle = toggleItem(setSelectedConnectionProfileIds)
+  const logsToggle = toggleItem(setSelectedLogIds)
 
   function renderSectionHeader(label, count, selectedCount, allIds, toggleAllFn) {
     const allChecked = allIds.length > 0 && selectedCount === allIds.length
@@ -392,6 +400,36 @@ function ExportDatabaseModal() {
                   onChange={() => cpToggle(p.id)}
                   title={p.name}
                   id={p.id}
+                />
+              ))
+            )}
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          label={t('database.exportModal.logs')}
+          summary={`${logs.length}`}
+          hasContent={selectedLogIds.size > 0}
+          storageKey="export.logs"
+        >
+          {renderSectionHeader(
+            t('database.exportModal.logs'),
+            logs.length,
+            selectedLogIds.size,
+            allLogIds,
+            logsToggleAll,
+          )}
+          <div className="space-y-1 max-h-64 overflow-y-auto">
+            {logs.length === 0 ? (
+              <p className="text-xs text-tertiary py-2">{t('database.exportModal.noItems')}</p>
+            ) : (
+              logs.map((l) => (
+                <ExportItemRow
+                  key={l.id}
+                  checked={selectedLogIds.has(l.id)}
+                  onChange={() => logsToggle(l.id)}
+                  title={l.type}
+                  id={l.id}
                 />
               ))
             )}
