@@ -54,6 +54,9 @@ import {
   shouldTriggerSummarization,
   triggerSummarization,
   getUnsummarizedMessages,
+  cancelPendingSummarizationAndClearMarker,
+  registerPendingMarker,
+  clearPendingMarker,
 } from '../services/summarization'
 import { setBaseTitle } from '../services/titleManager'
 import {

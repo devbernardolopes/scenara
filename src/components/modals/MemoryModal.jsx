@@ -9,7 +9,7 @@ import { estimateTokens } from '../../services/tokenEstimator'
 import {
   getThreadMemories,
   updateThreadMemory,
-  deleteThreadMemory,
+  deleteMemoryAndRevert,
   markMemoryRead,
 } from '../../services/threadMemories'
 import { getThread, updateThread } from '../../services/threads'
@@ -134,15 +134,7 @@ function MemoryModal({ threadId }) {
     })
     if (!ok) return
 
-    const isLatest = sortedMemories[0]?.id === entry.id
-    await deleteThreadMemory(entry.id, threadId)
-
-    if (isLatest) {
-      const refreshed = await getThreadMemories(threadId)
-      const nextMemory = refreshed[0]?.content || null
-      await updateThread(threadId, { memory: nextMemory })
-    }
-
+    await deleteMemoryAndRevert(entry.id, threadId)
     await loadMemories()
   }
 

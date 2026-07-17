@@ -1,6 +1,8 @@
 import db from '../db'
 import { getSetting } from './settings'
 import { replaceVars } from './chatApi'
+import { getMessagesByThread, updateMessage, deleteMessage } from './messages'
+import { updateThread } from './threads'
 
 export async function getThreadMemories(threadId) {
   const id = Number(threadId)
@@ -157,4 +159,55 @@ export async function getUnreadMemoryCount(threadId) {
   const id = Number(threadId)
   const memories = await db.threadMemories.where('threadId').equals(id).toArray()
   return memories.filter((m) => m.isRead === false).length
+}
+
+async function resequenceMemories(threadId) {
+  const tid = Number(threadId)
+  const memories = await db.threadMemories.where('threadId').equals(tid).sortBy('createdAt')
+  await Promise.all(memories.map((m, i) => db.threadMemories.update(m.id, { seq: i + 1 })))
+}
+
+export async function deleteMemoryAndRevert(threadMemoryId, threadId) {
+  const id = Number(threadMemoryId)
+  const tid = Number(threadId)
+
+  const memory = await db.threadMemories.get(id)
+  if (!memory) return { markerDeleted: false, messagesReverted: 0 }
+
+  const allMessages = await getMessagesByThread(tid)
+  const markers = allMessages
+    .filter((m) => m.isSummaryMarker)
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+
+  const memories = await db.threadMemories.where('threadId').equals(tid).sortBy('createdAt')
+  const memIdx = memories.findIndex((m) => m.id === id)
+
+  const prevMarker = memIdx > 0 ? markers[memIdx - 1] : null
+  const thisMarker = markers[memIdx] || null
+
+  const lowerBound = prevMarker ? new Date(prevMarker.createdAt).getTime() : 0
+  const upperBound = thisMarker ? new Date(thisMarker.createdAt).getTime() : Infinity
+
+  const messagesToRevert = allMessages.filter((m) => {
+    if (!m.summarizedAt) return false
+    if (m.isSummaryMarker || m.isAutoTitleMarker) return false
+    const msgTime = new Date(m.createdAt).getTime()
+    return msgTime > lowerBound && msgTime < upperBound
+  })
+
+  await Promise.all([
+    db.threadMemories.delete(id),
+    thisMarker ? deleteMessage(thisMarker.id) : Promise.resolve(),
+    ...messagesToRevert.map((m) => updateMessage(m.id, { summarizedAt: null })),
+  ])
+
+  await resequenceMemories(tid)
+
+  const remaining = await db.threadMemories.where('threadId').equals(tid).sortBy('createdAt')
+  const nextMemory = remaining.length > 0 ? remaining[remaining.length - 1].content : null
+  await updateThread(tid, { memory: nextMemory })
+
+  window.dispatchEvent(new CustomEvent('memories-changed', { detail: { threadId: tid } }))
+
+  return { markerDeleted: !!thisMarker, messagesReverted: messagesToRevert.length }
 }

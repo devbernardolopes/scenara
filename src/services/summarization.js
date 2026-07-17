@@ -1,11 +1,16 @@
 import db from '../db'
-import { getMessagesByThread, updateMessage } from './messages'
+import { getMessagesByThread, updateMessage, deleteMessage } from './messages'
 import { updateThread } from './threads'
 import { buildTranscript, replaceVars, sendChatCompletion } from './chatApi'
 import { createThreadMemory, buildInjectedMemory } from './threadMemories'
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { getSetting } from './settings'
 import { estimateTokens } from './tokenEstimator'
+import {
+  cancelSummarizationRequests,
+  getThreadQueuedCount,
+  getThreadInflightCount,
+} from './apiQueue'
 
 const DEFAULT_SYSTEM_INSTRUCTION = 'You are a memory generator for conversational AI.'
 
@@ -216,4 +221,40 @@ export async function triggerSummarization({
   await updateThread(thread.id, { lastSummarizationAt: timestamp })
 
   return cleanedSummary
+}
+
+const pendingMarkers = new Map()
+
+export function registerPendingMarker(threadId, markerId) {
+  pendingMarkers.set(Number(threadId), markerId)
+}
+
+export function clearPendingMarker(threadId) {
+  pendingMarkers.delete(Number(threadId))
+}
+
+export async function cancelPendingSummarizationAndClearMarker(threadId) {
+  const tid = Number(threadId)
+
+  const wasActive =
+    getThreadQueuedCount(tid, { kinds: ['summarization'] }) > 0 ||
+    getThreadInflightCount(tid, { kinds: ['summarization'] }) > 0
+
+  cancelSummarizationRequests(tid)
+
+  if (wasActive) {
+    const markerId = pendingMarkers.get(tid)
+    if (markerId != null) {
+      pendingMarkers.delete(tid)
+      try {
+        await deleteMessage(markerId)
+      } catch {
+        // Marker might already be deleted
+      }
+      return markerId
+    }
+  }
+
+  pendingMarkers.delete(tid)
+  return null
 }
