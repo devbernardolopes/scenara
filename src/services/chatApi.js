@@ -172,7 +172,7 @@ export async function buildMessagesPayload({
   } else {
     for (const msg of messages) {
       if (msg.isSummaryMarker || msg.isAutoTitleMarker) continue
-      let content = replaceVarsIn(msg.content)
+      let content = msg.role === 'user' ? msg.content : replaceVarsIn(msg.content)
       if (!msg.isOOC) {
         if (msg.role === 'assistant' && assistantPrefix) {
           content = assistantPrefix + content

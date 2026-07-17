@@ -210,7 +210,7 @@ function MessageBubble({
   character,
 }) {
   function renderContent(text) {
-    if (!text) return text
+    if (!text || role === 'user') return text
     return text.replace(/{{char}}/gi, charName || '').replace(/{{user}}/gi, personaName || '')
   }
   const { t } = useTranslation('chat')
