@@ -350,7 +350,15 @@ function ChatView() {
     messagesGrewRef.current = messagesGrew
     prevMessagesLengthRef.current = messages.length
 
-    if (!messagesGrew && scrollCommits.current > 0) return
+    if (!messagesGrew && scrollCommits.current > 0) {
+      const el = scrollRef.current
+      if (el) {
+        const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
+        isAtBottomRef.current = atBottom
+        setShowScrollButton(!atBottom)
+      }
+      return
+    }
 
     const el = scrollRef.current
     if (!el) return
