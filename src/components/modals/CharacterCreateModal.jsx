@@ -395,6 +395,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
         ...form,
         initialMessages: (form.initialMessages || []).filter((m) => m.content?.trim()),
         exampleMessages: (form.exampleMessages || []).filter((m) => m.content?.trim()),
+        scenarios: (form.scenarios || []).filter((s) => s.content?.trim()),
       }
       if (isEditing) {
         await updateCharacter(existing.id, data)

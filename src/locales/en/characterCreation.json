@@ -141,6 +141,7 @@
   "sectionScenarios": "Scenarios",
   "addScenario": "Add Scenario",
   "scenarioLabel": "Scenario",
+  "scenarioNamePlaceholder": "Scenario name (optional)",
   "scenarioPlaceholder": "Write a scenario to set the stage for the conversation…",
   "deleteScenario": "Delete",
   "generateScenario": "Generate",

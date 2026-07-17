@@ -137,6 +137,7 @@
   "sectionScenarios": "Cenários",
   "addScenario": "Adicionar Cenário",
   "scenarioLabel": "Cenário",
+  "scenarioNamePlaceholder": "Nome do cenário (opcional)",
   "scenarioPlaceholder": "Escreva um cenário para ambientar a conversa…",
   "deleteScenario": "Excluir",
   "generateScenario": "Gerar",

@@ -76,7 +76,16 @@ function ScenarioSection({ form, onChange, characterId }) {
   function handleContentChange(id, content) {
     onChange(
       'scenarios',
-      scenarios.map((s) => (s.id === id ? { ...s, content } : s)),
+      scenarios.map((s) =>
+        s.id === id ? { ...s, content, active: content.trim() ? s.active : false } : s,
+      ),
+    )
+  }
+
+  function handleNameChange(id, name) {
+    onChange(
+      'scenarios',
+      scenarios.map((s) => (s.id === id ? { ...s, name } : s)),
     )
   }
 
@@ -142,7 +151,7 @@ function ScenarioSection({ form, onChange, characterId }) {
         scenarios.map((scenario, idx) => (
           <div key={scenario.id} className="border border-border rounded-md">
             <CollapsibleSection
-              label={`${t('scenarioLabel')} #${idx + 1}`}
+              label={scenario.name?.trim() || `${t('scenarioLabel')} #${idx + 1}`}
               headerExtra={
                 scenario.active ? (
                   <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
@@ -166,6 +175,14 @@ function ScenarioSection({ form, onChange, characterId }) {
               }
               defaultExpanded={!scenario.content}
             >
+              <input
+                type="text"
+                className={`${inputClass} mb-2`}
+                value={scenario.name || ''}
+                onChange={(e) => handleNameChange(scenario.id, e.target.value)}
+                placeholder={t('scenarioNamePlaceholder')}
+              />
+
               <div className="relative mt-2">
                 <AutoResizeTextarea
                   className={`${inputClass} resize-none pr-12 min-h-[128px]`}
@@ -199,19 +216,20 @@ function ScenarioSection({ form, onChange, characterId }) {
                     aria-checked={!!scenario.active}
                     aria-label={t('scenarioActive')}
                     title={t('scenarioActive')}
+                    disabled={!scenario.content?.trim()}
                     onClick={() => handleActiveChange(scenario.id, !scenario.active)}
                     className={`min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md border transition-colors ${
                       scenario.active
                         ? 'bg-primary text-on-primary border-primary'
                         : 'bg-surface text-tertiary border-border hover:bg-surface-hover'
-                    }`}
+                    } disabled:opacity-40 disabled:cursor-not-allowed`}
                   >
                     {scenario.active ? <Zap className="w-4 h-4" /> : <Square className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              <div className="mt-3 pt-3 border-t border-border">
+              <div className="mt-3">
                 <LifetimeButtonGroup
                   options={LIFETIME_OPTIONS}
                   value={scenario.lifetime || 'firstSummary'}
