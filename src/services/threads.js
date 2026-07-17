@@ -180,6 +180,7 @@ export async function duplicateThread(id) {
     autoTitleGenerated: original.autoTitleGenerated || false,
     memory: original.memory || null,
     lastSummarizationAt: original.lastSummarizationAt || null,
+    activeScenario: original.activeScenario || null,
   })
   const messages = await db.messages.where('threadId').equals(Number(id)).toArray()
   if (messages.length > 0) {
@@ -240,6 +241,7 @@ export async function forkThread(id, messageId) {
     autoTitleGenerated: original.autoTitleGenerated || false,
     memory: original.memory || null,
     lastSummarizationAt: original.lastSummarizationAt || null,
+    activeScenario: original.activeScenario || null,
   })
 
   const allMessages = await db.messages.where('threadId').equals(Number(id)).sortBy('createdAt')
