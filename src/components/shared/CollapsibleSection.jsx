@@ -57,12 +57,14 @@ function CollapsibleSection({
         onClick={toggle}
         className="w-full flex items-center justify-between min-h-[44px] px-3 py-2 rounded-md hover:bg-surface-hover gap-2"
       >
-        <span
-          className={`text-sm font-medium ${(hasContent ?? !!summary) ? 'text-highlight' : 'text-text'}`}
-        >
-          {label}
+        <span className="flex items-center gap-2 min-w-0">
+          <span
+            className={`text-sm font-medium ${(hasContent ?? !!summary) ? 'text-highlight' : 'text-text'}`}
+          >
+            {label}
+          </span>
+          {headerExtra}
         </span>
-        {headerExtra}
         <span className="flex items-center gap-2">
           {summary && <span className="text-xs text-tertiary">{summary}</span>}
           <ChevronDown
