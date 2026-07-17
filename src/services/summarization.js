@@ -68,9 +68,11 @@ export async function buildSummarizationPayload({
 }) {
   const charName = character?.name || ''
   let personaName = ''
+  let personaDescription = currentPersona?.description || ''
   if (thread?.personaId) {
     const persona = await db.personas.get(thread.personaId)
     personaName = persona?.name || ''
+    personaDescription = persona?.description || personaDescription
   }
   const currentPersonaName = currentPersona?.name || personaName
 
@@ -102,10 +104,7 @@ export async function buildSummarizationPayload({
       (await getSetting('prompting.personaInjectionPlacement'))
     const personaTemplate = await getSetting('prompting.personaInjectionTemplate')
     if (personaTiming === 'always' && personaTemplate && personaPlacement === 'endOfSystemPrompt') {
-      const resolvedPersona = personaTemplate.replace(
-        /{{description}}/gi,
-        currentPersona?.description || '',
-      )
+      const resolvedPersona = personaTemplate.replace(/{{description}}/gi, personaDescription)
       const injected = replaceVarsIn(resolvedPersona)
       if (injected) transcript = `${injected}\n\n${transcript}`
     }
