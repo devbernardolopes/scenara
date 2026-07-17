@@ -138,7 +138,7 @@ function ScenarioStatusBar({ scenario, charName, userName }) {
   })()
 
   return (
-    <div className="sticky top-0 z-10 bg-surface border-b border-border-light px-4 md:px-8 py-1 text-center">
+    <div className="sticky top-[49px] z-10 bg-surface border-b border-border-light px-4 md:px-8 py-1 text-center">
       <MarqueeText className="text-xs text-tertiary" marquee>
         {display}
       </MarqueeText>
