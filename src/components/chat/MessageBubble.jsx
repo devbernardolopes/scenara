@@ -621,351 +621,347 @@ function MessageBubble({
   const { headerBtnRef, headerKeys, overflowKeys } = useOverflowButtons(allButtonKeys)
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className="overflow-hidden">
-        <div
-          ref={bubbleRef}
-          className={`${BUBBLE_SIZES[messageBubbleSize] || BUBBLE_SIZES.normal} rounded-lg ${unreadClass} ${
-            isUser
-              ? userBgClass
-              : isOOC
-                ? 'bg-ooc-subtle text-text border border-border'
-                : isSystem
-                  ? 'bg-surface-secondary text-secondary text-sm italic'
-                  : 'bg-surface-secondary text-text'
-          }`}
-          style={{
-            willChange: isMobile && hasMultipleSlots ? 'transform' : undefined,
-            ...(isUser ? userBgStyle : {}),
-            ...(!isUser && isOOC
-              ? { borderLeftColor: 'var(--color-ooc)', borderLeftWidth: '3px' }
-              : {}),
-            ...(editing && editWidth ? { minWidth: editWidth } : {}),
-          }}
-        >
-          {/* Header */}
-          {(() => {
-            const hasBundleNav = bundleMessages && bundleMessages.length > 1
-            return (
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} overflow-hidden`}>
+      <div
+        ref={bubbleRef}
+        className={`${BUBBLE_SIZES[messageBubbleSize] || BUBBLE_SIZES.normal} rounded-lg ${unreadClass} ${
+          isUser
+            ? userBgClass
+            : isOOC
+              ? 'bg-ooc-subtle text-text border border-border'
+              : isSystem
+                ? 'bg-surface-secondary text-secondary text-sm italic'
+                : 'bg-surface-secondary text-text'
+        }`}
+        style={{
+          willChange: isMobile && hasMultipleSlots ? 'transform' : undefined,
+          ...(isUser ? userBgStyle : {}),
+          ...(!isUser && isOOC
+            ? { borderLeftColor: 'var(--color-ooc)', borderLeftWidth: '3px' }
+            : {}),
+          ...(editing && editWidth ? { minWidth: editWidth } : {}),
+        }}
+      >
+        {/* Header */}
+        {(() => {
+          const hasBundleNav = bundleMessages && bundleMessages.length > 1
+          return (
+            <div
+              className={`px-3 pt-2 pb-1.5 border-b border-border-light ${
+                hasBundleNav
+                  ? 'flex flex-col md:flex-row md:items-center gap-1'
+                  : 'flex items-center gap-1'
+              }`}
+            >
               <div
-                className={`px-3 pt-2 pb-1.5 border-b border-border-light ${
-                  hasBundleNav
-                    ? 'flex flex-col md:flex-row md:items-center gap-1'
-                    : 'flex items-center gap-1'
-                }`}
+                className={`flex items-center gap-1 min-w-0 ${hasBundleNav ? 'w-full md:w-auto' : ''}`}
               >
-                <div
-                  className={`flex items-center gap-1 min-w-0 ${hasBundleNav ? 'w-full md:w-auto' : ''}`}
-                >
-                  <Avatar
-                    src={avatarSrc}
-                    size={avatarSize}
-                    className="flex-shrink-0"
-                    onClick={handleAvatarClick}
-                  />
-                  {nameLabel && (
-                    <span
-                      className={`text-xs font-medium truncate min-w-0 ${
+                <Avatar
+                  src={avatarSrc}
+                  size={avatarSize}
+                  className="flex-shrink-0"
+                  onClick={handleAvatarClick}
+                />
+                {nameLabel && (
+                  <span
+                    className={`text-xs font-medium truncate min-w-0 ${
+                      isUser
+                        ? userMutedClass || 'text-on-primary-muted'
+                        : isOOC
+                          ? 'text-ooc'
+                          : 'text-text'
+                    }`}
+                    style={isUser ? userMutedStyle : undefined}
+                  >
+                    {nameLabel}
+                  </span>
+                )}
+                {isOOC && (
+                  <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-ooc-subtle text-ooc border border-ooc/30 leading-none shrink-0">
+                    {t('oocLabel')}
+                  </span>
+                )}
+              </div>
+              <div
+                className={`flex items-center gap-1 ${hasBundleNav ? 'w-full md:flex-1 md:min-w-0' : 'flex-1 min-w-0'}`}
+              >
+                {bundleMessages && bundleMessages.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newIdx =
+                          (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
+                        onBundleNavigate?.(message.id, newIdx)
+                      }}
+                      disabled={streaming}
+                      className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                         isUser
-                          ? userMutedClass || 'text-on-primary-muted'
+                          ? `${userHoverBg} ${userMutedClass}`
                           : isOOC
-                            ? 'text-ooc'
-                            : 'text-text'
-                      }`}
+                            ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
+                            : 'hover:bg-black/10 text-tertiary hover:text-text'
+                      } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''}`}
+                      style={isUser ? userMutedStyle : undefined}
+                      title={t('previousInitialMessage')}
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                    </button>
+                    <span
+                      className={`text-xs whitespace-nowrap ${isUser ? userMutedClass || '' : isOOC ? 'text-ooc-muted' : 'text-tertiary'}`}
                       style={isUser ? userMutedStyle : undefined}
                     >
-                      {nameLabel}
+                      {bundleIndex + 1}/{bundleMessages.length}
                     </span>
-                  )}
-                  {isOOC && (
-                    <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-ooc-subtle text-ooc border border-ooc/30 leading-none shrink-0">
-                      {t('oocLabel')}
-                    </span>
-                  )}
-                </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newIdx = (bundleIndex + 1) % bundleMessages.length
+                        onBundleNavigate?.(message.id, newIdx)
+                      }}
+                      disabled={streaming}
+                      className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                        isUser
+                          ? `${userHoverBg} ${userMutedClass}`
+                          : isOOC
+                            ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
+                            : 'hover:bg-black/10 text-tertiary hover:text-text'
+                      } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''}`}
+                      style={isUser ? userMutedStyle : undefined}
+                      title={t('nextInitialMessage')}
+                    >
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                )}
                 <div
-                  className={`flex items-center gap-1 ${hasBundleNav ? 'w-full md:flex-1 md:min-w-0' : 'flex-1 min-w-0'}`}
+                  ref={headerBtnRef}
+                  className="flex flex-1 min-w-0 items-center justify-end gap-1 overflow-hidden"
                 >
-                  {bundleMessages && bundleMessages.length > 1 && (
-                    <>
+                  {headerKeys.map((key) => {
+                    const def = BUTTON_DEFS[key]
+                    if (!def) return null
+                    const Icon = def.icon
+                    const isDelete =
+                      key === 'delete' || key === 'deleteAll' || key === 'deleteFromHere'
+                    const disabled = isButtonDisabled(key)
+                    return (
                       <button
+                        key={key}
                         type="button"
-                        onClick={() => {
-                          const newIdx =
-                            (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
-                          onBundleNavigate?.(message.id, newIdx)
-                        }}
-                        disabled={streaming}
+                        onClick={getButtonHandler(key)}
+                        disabled={disabled}
                         className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                           isUser
-                            ? `${userHoverBg} ${userMutedClass}`
+                            ? userMutedClass
+                              ? `${userHoverBg} ${userMutedClass}`
+                              : userHoverBg
                             : isOOC
                               ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
                               : 'hover:bg-black/10 text-tertiary hover:text-text'
-                        } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''}`}
-                        style={isUser ? userMutedStyle : undefined}
-                        title={t('previousInitialMessage')}
+                        } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
+                        style={isUser && !isDelete && userMutedStyle ? userMutedStyle : undefined}
+                        title={t(def.labelKey)}
                       >
-                        <ChevronLeft className="w-3.5 h-3.5" />
+                        <Icon className="w-3.5 h-3.5" />
                       </button>
-                      <span
-                        className={`text-xs whitespace-nowrap ${isUser ? userMutedClass || '' : isOOC ? 'text-ooc-muted' : 'text-tertiary'}`}
-                        style={isUser ? userMutedStyle : undefined}
-                      >
-                        {bundleIndex + 1}/{bundleMessages.length}
-                      </span>
+                    )
+                  })}
+                  {overflowKeys.length > 0 && (
+                    <div ref={overflowRef} className="relative flex-shrink-0">
                       <button
+                        ref={overflowBtnRef}
                         type="button"
-                        onClick={() => {
-                          const newIdx = (bundleIndex + 1) % bundleMessages.length
-                          onBundleNavigate?.(message.id, newIdx)
-                        }}
-                        disabled={streaming}
-                        className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
+                        onClick={handleOverflowClick}
+                        className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded ${
                           isUser
-                            ? `${userHoverBg} ${userMutedClass}`
+                            ? userMutedClass
+                              ? `${userHoverBg} ${userMutedClass}`
+                              : userHoverBg
                             : isOOC
                               ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
                               : 'hover:bg-black/10 text-tertiary hover:text-text'
-                        } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''}`}
-                        style={isUser ? userMutedStyle : undefined}
-                        title={t('nextInitialMessage')}
+                        }`}
+                        style={isUser && userMutedStyle ? userMutedStyle : undefined}
+                        title={t('moreOptions')}
                       >
-                        <ChevronRight className="w-3.5 h-3.5" />
+                        <MoreHorizontal className="w-4 h-4" />
                       </button>
-                    </>
+                      {overflowOpen && (
+                        <div
+                          style={overflowMenuStyle}
+                          className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
+                        >
+                          {overflowKeys.map((key) => {
+                            const def = BUTTON_DEFS[key]
+                            if (!def) return null
+                            const Icon = def.icon
+                            const isDelete =
+                              key === 'delete' || key === 'deleteAll' || key === 'deleteFromHere'
+                            return (
+                              <button
+                                key={key}
+                                type="button"
+                                onClick={() => {
+                                  getButtonHandler(key)()
+                                  setOverflowOpen(false)
+                                }}
+                                disabled={
+                                  (key === 'prompt' && !promptData) || isButtonDisabled(key)
+                                }
+                                className={`w-full flex items-center gap-2 px-3 py-2 text-sm min-h-[44px] disabled:opacity-30 disabled:pointer-events-none ${
+                                  isDelete
+                                    ? 'text-error hover:bg-surface-hover'
+                                    : 'text-text hover:bg-surface-hover'
+                                }`}
+                              >
+                                <Icon className="w-4 h-4" />
+                                <span>{t(def.labelKey)}</span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
                   )}
-                  <div
-                    ref={headerBtnRef}
-                    className="flex flex-1 min-w-0 items-center justify-end gap-1 overflow-hidden"
-                  >
-                    {headerKeys.map((key) => {
-                      const def = BUTTON_DEFS[key]
-                      if (!def) return null
-                      const Icon = def.icon
-                      const isDelete =
-                        key === 'delete' || key === 'deleteAll' || key === 'deleteFromHere'
-                      const disabled = isButtonDisabled(key)
-                      return (
-                        <button
-                          key={key}
-                          type="button"
-                          onClick={getButtonHandler(key)}
-                          disabled={disabled}
-                          className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
-                            isUser
-                              ? userMutedClass
-                                ? `${userHoverBg} ${userMutedClass}`
-                                : userHoverBg
-                              : isOOC
-                                ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
-                                : 'hover:bg-black/10 text-tertiary hover:text-text'
-                          } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
-                          style={isUser && !isDelete && userMutedStyle ? userMutedStyle : undefined}
-                          title={t(def.labelKey)}
-                        >
-                          <Icon className="w-3.5 h-3.5" />
-                        </button>
-                      )
-                    })}
-                    {overflowKeys.length > 0 && (
-                      <div ref={overflowRef} className="relative flex-shrink-0">
-                        <button
-                          ref={overflowBtnRef}
-                          type="button"
-                          onClick={handleOverflowClick}
-                          className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded ${
-                            isUser
-                              ? userMutedClass
-                                ? `${userHoverBg} ${userMutedClass}`
-                                : userHoverBg
-                              : isOOC
-                                ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
-                                : 'hover:bg-black/10 text-tertiary hover:text-text'
-                          }`}
-                          style={isUser && userMutedStyle ? userMutedStyle : undefined}
-                          title={t('moreOptions')}
-                        >
-                          <MoreHorizontal className="w-4 h-4" />
-                        </button>
-                        {overflowOpen && (
-                          <div
-                            style={overflowMenuStyle}
-                            className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
-                          >
-                            {overflowKeys.map((key) => {
-                              const def = BUTTON_DEFS[key]
-                              if (!def) return null
-                              const Icon = def.icon
-                              const isDelete =
-                                key === 'delete' || key === 'deleteAll' || key === 'deleteFromHere'
-                              return (
-                                <button
-                                  key={key}
-                                  type="button"
-                                  onClick={() => {
-                                    getButtonHandler(key)()
-                                    setOverflowOpen(false)
-                                  }}
-                                  disabled={
-                                    (key === 'prompt' && !promptData) || isButtonDisabled(key)
-                                  }
-                                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm min-h-[44px] disabled:opacity-30 disabled:pointer-events-none ${
-                                    isDelete
-                                      ? 'text-error hover:bg-surface-hover'
-                                      : 'text-text hover:bg-surface-hover'
-                                  }`}
-                                >
-                                  <Icon className="w-4 h-4" />
-                                  <span>{t(def.labelKey)}</span>
-                                </button>
-                              )
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
                 </div>
               </div>
-            )
-          })()}
+            </div>
+          )
+        })()}
 
-          {/* Content */}
-          <div
-            onDoubleClick={
-              streaming || requestFailed || !message.content?.trim() ? undefined : handleStartEdit
-            }
-            className={editing ? '' : 'px-3 py-2'}
-          >
-            {editing ? (
-              <AutoResizeTextarea
-                ref={editRef}
-                value={editedContent}
-                onChange={(e) => setEditedContent(e.target.value)}
-                onBlur={handleSaveEdit}
-                onKeyDown={handleEditKeyDown}
-                extraHeight={8}
-                className={`w-full resize-none rounded border whitespace-pre-wrap break-words px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
-                  isOOC
-                    ? 'bg-ooc-subtle text-text border-border focus:ring-ooc'
-                    : isUser
-                      ? `${userBgClass || 'bg-transparent'} border-white/20 focus:ring-white/40`
-                      : 'bg-surface text-text border-border focus:ring-primary/40'
-                }`}
-                style={{
-                  ...(isOOC
-                    ? { borderLeftColor: 'var(--color-ooc)', borderLeftWidth: '3px' }
-                    : isUser
-                      ? userBgStyle
-                      : undefined),
-                  fontFamily: CHAT_FONTS[chatFontFamily],
-                  fontSize: CHAT_FONT_SIZES[chatFontSize],
-                }}
-              />
-            ) : requestFailed ? (
-              <div className="bg-error-subtle rounded p-3 text-sm max-w-full overflow-hidden">
-                <p className="font-bold text-error">Error:</p>
-                <pre className="mt-1 text-error text-xs overflow-x-auto max-w-full whitespace-pre-wrap break-words">
-                  {errorText || '(No content)'}
-                </pre>
-              </div>
-            ) : (
-              <div
-                className="text-sm markdown-body w-full overflow-hidden"
-                style={{
-                  fontFamily: CHAT_FONTS[chatFontFamily],
-                  fontSize: CHAT_FONT_SIZES[chatFontSize],
-                }}
-              >
-                {renderMarkdown ? (
-                  <CodeBlocksMarkdown
-                    content={displayContentForRender}
-                    activeRules={activeRules}
-                    collapsedCodeBlocks={collapsedCodeBlocks}
-                    onToggleCodeBlock={onToggleCodeBlock}
-                    messageId={message.id}
-                  />
-                ) : plainSegments ? (
-                  <p className="mb-2 last:mb-0 whitespace-pre-wrap">
-                    {plainSegments.map((seg, idx) =>
-                      seg.type === 'styled' ? (
-                        <span
-                          key={idx}
-                          style={{
-                            color: activeRules[seg.ruleIndex].color,
-                            fontSize: `${activeRules[seg.ruleIndex].fontSizePercent}%`,
-                          }}
-                        >
-                          {seg.content}
-                        </span>
-                      ) : (
-                        <span key={idx}>{seg.content}</span>
-                      ),
-                    )}
-                  </p>
-                ) : (
-                  <p className="mb-2 last:mb-0 whitespace-pre-wrap">{displayContent}</p>
-                )}
-                {streaming && (!bundleMessages || bundleIndex === streamingSlotIndex) && (
-                  <RefreshCw className="inline-block w-4 h-4 text-primary animate-spin ml-0.5 align-text-bottom" />
-                )}
-              </div>
+        {/* Content */}
+        <div
+          onDoubleClick={
+            streaming || requestFailed || !message.content?.trim() ? undefined : handleStartEdit
+          }
+          className={editing ? '' : 'px-3 py-2'}
+        >
+          {editing ? (
+            <AutoResizeTextarea
+              ref={editRef}
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+              onBlur={handleSaveEdit}
+              onKeyDown={handleEditKeyDown}
+              extraHeight={8}
+              className={`w-full resize-none rounded border whitespace-pre-wrap break-words px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+                isOOC
+                  ? 'bg-ooc-subtle text-text border-border focus:ring-ooc'
+                  : isUser
+                    ? `${userBgClass || 'bg-transparent'} border-white/20 focus:ring-white/40`
+                    : 'bg-surface text-text border-border focus:ring-primary/40'
+              }`}
+              style={{
+                ...(isOOC
+                  ? { borderLeftColor: 'var(--color-ooc)', borderLeftWidth: '3px' }
+                  : isUser
+                    ? userBgStyle
+                    : undefined),
+                fontFamily: CHAT_FONTS[chatFontFamily],
+                fontSize: CHAT_FONT_SIZES[chatFontSize],
+              }}
+            />
+          ) : requestFailed ? (
+            <div className="bg-error-subtle rounded p-3 text-sm max-w-full overflow-hidden">
+              <p className="font-bold text-error">Error:</p>
+              <pre className="mt-1 text-error text-xs overflow-x-auto max-w-full whitespace-pre-wrap break-words">
+                {errorText || '(No content)'}
+              </pre>
+            </div>
+          ) : (
+            <div
+              className="text-sm markdown-body w-full overflow-hidden"
+              style={{
+                fontFamily: CHAT_FONTS[chatFontFamily],
+                fontSize: CHAT_FONT_SIZES[chatFontSize],
+              }}
+            >
+              {renderMarkdown ? (
+                <CodeBlocksMarkdown
+                  content={displayContentForRender}
+                  activeRules={activeRules}
+                  collapsedCodeBlocks={collapsedCodeBlocks}
+                  onToggleCodeBlock={onToggleCodeBlock}
+                  messageId={message.id}
+                />
+              ) : plainSegments ? (
+                <p className="mb-2 last:mb-0 whitespace-pre-wrap">
+                  {plainSegments.map((seg, idx) =>
+                    seg.type === 'styled' ? (
+                      <span
+                        key={idx}
+                        style={{
+                          color: activeRules[seg.ruleIndex].color,
+                          fontSize: `${activeRules[seg.ruleIndex].fontSizePercent}%`,
+                        }}
+                      >
+                        {seg.content}
+                      </span>
+                    ) : (
+                      <span key={idx}>{seg.content}</span>
+                    ),
+                  )}
+                </p>
+              ) : (
+                <p className="mb-2 last:mb-0 whitespace-pre-wrap">{displayContent}</p>
+              )}
+              {streaming && (!bundleMessages || bundleIndex === streamingSlotIndex) && (
+                <RefreshCw className="inline-block w-4 h-4 text-primary animate-spin ml-0.5 align-text-bottom" />
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div
+          className={`flex items-center justify-between px-3 pb-2 ${isUser ? userMutedClass || '' : ''}`}
+          style={isUser && userMutedStyle ? userMutedStyle : undefined}
+        >
+          <span className="flex items-center gap-2">
+            <span
+              className={`text-xs font-medium ${isUser ? '' : isOOC ? 'text-ooc-muted' : 'text-tertiary'}`}
+            >{`#${messageNumber}`}</span>
+            <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
+              {new Date(slotCreatedAt || message.createdAt).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </span>
+          </span>
+          <span className="flex items-center gap-2">
+            {currentOrigin === 'initial' && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>{t('initialMessage')}</span>
             )}
-          </div>
-
-          {/* Footer */}
-          <div
-            className={`flex items-center justify-between px-3 pb-2 ${isUser ? userMutedClass || '' : ''}`}
-            style={isUser && userMutedStyle ? userMutedStyle : undefined}
-          >
-            <span className="flex items-center gap-2">
-              <span
-                className={`text-xs font-medium ${isUser ? '' : isOOC ? 'text-ooc-muted' : 'text-tertiary'}`}
-              >{`#${messageNumber}`}</span>
-              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
-                {new Date(slotCreatedAt || message.createdAt).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+            {currentOrigin === 'edit' && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>{t('edited')}</span>
+            )}
+            {directorReviewed && (
+              <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300">
+                DIR
               </span>
-            </span>
-            <span className="flex items-center gap-2">
-              {currentOrigin === 'initial' && (
-                <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
-                  {t('initialMessage')}
-                </span>
-              )}
-              {currentOrigin === 'edit' && (
-                <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>{t('edited')}</span>
-              )}
-              {directorReviewed && (
-                <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300">
-                  DIR
-                </span>
-              )}
-              {streaming && elapsedMs != null && (
-                <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
-                  {t('apiDuration', { duration: formatDuration(elapsedMs) })}
-                </span>
-              )}
-              {!streaming && typeof apiDurationMs === 'number' && (
-                <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
-                  {t('apiDuration', { duration: formatDuration(apiDurationMs) })}
-                </span>
-              )}
-              {!streaming && displayContent?.trim() && (
-                <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
-                  {t('tokens', { count: tokenCount })}
-                </span>
-              )}
-              {!streaming && displayContent?.trim() && (
-                <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
-                  {t('words', { count: wordCount })}
-                </span>
-              )}
-            </span>
-          </div>
+            )}
+            {streaming && elapsedMs != null && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
+                {t('apiDuration', { duration: formatDuration(elapsedMs) })}
+              </span>
+            )}
+            {!streaming && typeof apiDurationMs === 'number' && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
+                {t('apiDuration', { duration: formatDuration(apiDurationMs) })}
+              </span>
+            )}
+            {!streaming && displayContent?.trim() && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
+                {t('tokens', { count: tokenCount })}
+              </span>
+            )}
+            {!streaming && displayContent?.trim() && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
+                {t('words', { count: wordCount })}
+              </span>
+            )}
+          </span>
         </div>
       </div>
     </div>
