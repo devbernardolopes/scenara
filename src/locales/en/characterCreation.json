@@ -161,6 +161,9 @@
     "always": "Always"
   },
   "scenarioActive": "Active",
+  "confirmLifetimeTitle": "Change Lifetime for all Scenarios",
+  "confirmLifetime": "This Lifetime option will be applied to all existing scenarios. Continue?",
+  "confirmLifetimeConfirm": "Apply to all",
   "promptUser": "Prompt User",
   "promptUserDesc": "Ask which scenario to use when starting a new chat",
   "scenarioSelector": {

@@ -155,6 +155,9 @@
     "always": "Sempre"
   },
   "scenarioActive": "Ativo",
+  "confirmLifetimeTitle": "Alterar Duração de todos os Cenários",
+  "confirmLifetime": "Esta opção de Duração será aplicada a todos os cenários existentes. Continuar?",
+  "confirmLifetimeConfirm": "Aplicar a todos",
   "promptUser": "Perguntar ao usuário",
   "promptUserDesc": "Perguntar qual cenário usar ao iniciar um novo chat",
   "scenarioSelector": {

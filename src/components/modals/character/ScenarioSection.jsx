@@ -172,9 +172,17 @@ function ScenarioSection({ form, onChange, characterId }) {
         <LifetimeButtonGroup
           options={LIFETIME_OPTIONS}
           value={scenarios[0]?.lifetime || 'firstSummary'}
-          onChange={(value) => {
+          onChange={async (value) => {
             // Section-level default: applies to every existing scenario and is
             // inherited by newly added ones (see handleAdd).
+            const ok = await confirm({
+              title: t('confirmLifetimeTitle'),
+              message: t('confirmLifetime'),
+              confirmLabel: t('confirmLifetimeConfirm'),
+              cancelLabel: t('cancel'),
+              variant: 'warning',
+            })
+            if (!ok) return
             onChange(
               'scenarios',
               scenarios.map((s) => ({ ...s, lifetime: value })),
