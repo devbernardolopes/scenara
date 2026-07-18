@@ -8,31 +8,13 @@ import { Plus, Trash2, Edit3, Zap, Square } from '../../../lib/icons'
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
 
-const LIFETIME_OPTIONS = [
+export const LIFETIME_OPTIONS = [
   { value: 'oneTime', labelKey: 'scenarioLifetimeOptions.oneTime' },
   { value: 'firstSummary', labelKey: 'scenarioLifetimeOptions.firstSummary' },
   { value: 'always', labelKey: 'scenarioLifetimeOptions.always' },
 ]
 
-function countWords(text) {
-  const trimmed = (text || '').trim()
-  return trimmed ? trimmed.split(/\s+/).length : 0
-}
-
-function AddButton({ onClick, label }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full min-h-[44px] flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-md text-secondary hover:text-text hover:border-border-light transition-colors"
-    >
-      <Plus className="w-4 h-4" />
-      <span className="text-sm">{label}</span>
-    </button>
-  )
-}
-
-function LifetimeButtonGroup({ options, value, onChange }) {
+export function LifetimeButtonGroup({ options, value, onChange }) {
   const { t } = useTranslation('characterCreation')
   return (
     <div className="flex flex-wrap gap-1.5">
@@ -55,6 +37,24 @@ function LifetimeButtonGroup({ options, value, onChange }) {
         )
       })}
     </div>
+  )
+}
+
+function countWords(text) {
+  const trimmed = (text || '').trim()
+  return trimmed ? trimmed.split(/\s+/).length : 0
+}
+
+function AddButton({ onClick, label }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full min-h-[44px] flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-md text-secondary hover:text-text hover:border-border-light transition-colors"
+    >
+      <Plus className="w-4 h-4" />
+      <span className="text-sm">{label}</span>
+    </button>
   )
 }
 

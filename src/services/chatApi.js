@@ -3,7 +3,7 @@ import { getSetting } from './settings'
 import { getThread } from './threads'
 import { getWritingInstruction } from './writingInstructions'
 import { buildInjectedMemory } from './threadMemories'
-import { resolveScenarioInjection } from './scenarios'
+import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
 
 const BASE_URLS = {
   groq: 'https://api.groq.com/openai/v1',
@@ -83,6 +83,43 @@ export function appendMemoryToPayload(payload, memoryText, memoryHeader) {
   return payload.map((entry) => (entry === systemEntry ? { ...entry, content } : entry))
 }
 
+// Assembles the character-prompt block for a request: the Character Prompt,
+// followed (in modal order) by Personality and Global Context/Scenario — each
+// separated by one blank line and only when non-empty — then the active
+// scenario appended last. All text is var-substituted by `replaceVarsIn`.
+// Returns '' when the Character Prompt itself is empty (so personality and
+// global context only inject wherever the Character Prompt would).
+function buildCharacterPromptBlock(
+  character,
+  { isFirstMessage, lastSummarizationAt, activeScenario, replaceVarsIn },
+) {
+  const prompt = replaceVarsIn(character?.prompt)
+  if (!prompt) return ''
+
+  const parts = [prompt]
+
+  const personality = replaceVarsIn(character?.personality)
+  if (personality) parts.push(personality)
+
+  const globalContextRaw = resolveGlobalContextInjection(character, {
+    isFirstMessage,
+    lastSummarizationAt,
+  })
+  if (globalContextRaw) parts.push(replaceVarsIn(globalContextRaw))
+
+  let block = parts.join('\n\n')
+
+  const rawScenarioText = resolveScenarioInjection(character, {
+    isFirstMessage,
+    lastSummarizationAt,
+    activeScenario,
+  })
+  const scenarioText = rawScenarioText ? replaceVarsIn(rawScenarioText) : ''
+  if (scenarioText) block = `${block}\n\n${scenarioText}`
+
+  return block
+}
+
 export async function buildMessagesPayload({
   character,
   chatPersona,
@@ -129,15 +166,14 @@ export async function buildMessagesPayload({
     systemParts.push(systemPrompt)
   }
 
-  const prompt = replaceVarsIn(character?.prompt)
-  if (prompt) {
-    const rawScenarioText = resolveScenarioInjection(character, {
-      isFirstMessage,
-      lastSummarizationAt,
-      activeScenario,
-    })
-    const scenarioText = rawScenarioText ? replaceVarsIn(rawScenarioText) : ''
-    systemParts.push(scenarioText ? `${prompt}\n\n${scenarioText}` : prompt)
+  const promptBlock = buildCharacterPromptBlock(character, {
+    isFirstMessage,
+    lastSummarizationAt,
+    activeScenario,
+    replaceVarsIn,
+  })
+  if (promptBlock) {
+    systemParts.push(promptBlock)
   }
 
   const extraPrompt = replaceVarsIn(character?.extraPrompt)
@@ -409,17 +445,15 @@ export async function buildOOCMessagesPayload({
     )
   }
 
-  const prompt = replaceVarsIn(character?.prompt)
-  if (prompt) {
+  const promptBlock = buildCharacterPromptBlock(character, {
+    isFirstMessage,
+    lastSummarizationAt,
+    activeScenario,
+    replaceVarsIn,
+  })
+  if (promptBlock) {
     const systemPrompt = replaceVarsIn(character?.systemPrompt || '')
-    let combinedPrompt = systemPrompt ? `${prompt}\n\n${systemPrompt}` : prompt
-    const rawScenarioText = resolveScenarioInjection(character, {
-      isFirstMessage,
-      lastSummarizationAt,
-      activeScenario,
-    })
-    const scenarioText = rawScenarioText ? replaceVarsIn(rawScenarioText) : ''
-    if (scenarioText) combinedPrompt = `${combinedPrompt}\n\n${scenarioText}`
+    let combinedPrompt = systemPrompt ? `${promptBlock}\n\n${systemPrompt}` : promptBlock
     const charPromptHeader = oocSettings.characterPromptHeader
     if (charPromptHeader) {
       systemParts.push(replaceVarsIn(charPromptHeader) + '\n\n' + combinedPrompt)

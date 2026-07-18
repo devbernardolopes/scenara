@@ -3,7 +3,7 @@ import { getMessagesByThread, updateMessage, deleteMessage } from './messages'
 import { updateThread } from './threads'
 import { buildTranscript, replaceVars, sendChatCompletion } from './chatApi'
 import { createThreadMemory, buildInjectedMemory } from './threadMemories'
-import { resolveScenarioInjection } from './scenarios'
+import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { getSetting } from './settings'
 import { estimateTokens } from './tokenEstimator'
@@ -138,13 +138,27 @@ export async function buildSummarizationPayload({
   if (character?.addCharacterPrompt) {
     const prompt = replaceVarsIn(character?.prompt || '')
     if (prompt) {
+      const parts = [prompt]
+
+      const personality = replaceVarsIn(character?.personality || '')
+      if (personality) parts.push(personality)
+
+      const globalContextRaw = resolveGlobalContextInjection(character, {
+        isFirstMessage: false,
+        lastSummarizationAt: thread?.lastSummarizationAt || null,
+      })
+      if (globalContextRaw) parts.push(replaceVarsIn(globalContextRaw))
+
+      let combined = parts.join('\n\n')
+
       const scenarioText = resolveScenarioInjection(character, {
         isFirstMessage: false,
         lastSummarizationAt: thread?.lastSummarizationAt || null,
         activeScenario: thread?.activeScenario || null,
       })
       const resolvedScenario = scenarioText ? replaceVarsIn(scenarioText) : ''
-      let combined = resolvedScenario ? `${prompt}\n\n${resolvedScenario}` : prompt
+      if (resolvedScenario) combined = `${combined}\n\n${resolvedScenario}`
+
       if (personaInjection) combined = `${combined}\n\n${personaInjection}`
       charPromptSection = charPromptHeader
         ? `${replaceVarsIn(charPromptHeader)}\n\n${combined}`

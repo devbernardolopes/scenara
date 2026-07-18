@@ -28,6 +28,7 @@ const INITIAL_FORM = {
   prompt: '',
   personality: '',
   globalContext: '',
+  globalContextLifetime: 'always',
   systemPrompt: '',
   writingInstruction: null,
   extraPrompt: '',

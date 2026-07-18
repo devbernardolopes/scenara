@@ -50,3 +50,20 @@ export function resolveScenarioInjection(
   // 'always'
   return scenario.content
 }
+
+// Mirrors resolveScenarioInjection but for the character-level
+// "Global Context/Scenario" field, which carries its own `globalContextLifetime`.
+// Returns the raw (un-substituted) content to inject, or '' when none applies.
+export function resolveGlobalContextInjection(character, { isFirstMessage, lastSummarizationAt }) {
+  const content = (character?.globalContext || '').trim()
+  if (!content) return ''
+  const lifetime = character?.globalContextLifetime || 'always'
+  if (lifetime === 'oneTime') {
+    return isFirstMessage ? character.globalContext : ''
+  }
+  if (lifetime === 'firstSummary') {
+    return lastSummarizationAt ? '' : character.globalContext
+  }
+  // 'always'
+  return character.globalContext
+}

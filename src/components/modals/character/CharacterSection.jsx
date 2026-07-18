@@ -8,6 +8,7 @@ import { estimateTokens } from '../../../services/tokenEstimator'
 import { getAllWritingInstructions } from '../../../services/writingInstructions'
 import Avatar from '../../shared/Avatar'
 import { FileText, X } from '../../../lib/icons'
+import { LIFETIME_OPTIONS, LifetimeButtonGroup } from './ScenarioSection'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
@@ -203,6 +204,15 @@ function CharacterSection({ form, onChange, characterId }) {
           extraHeight={8}
         />
       </CollapsibleSection>
+
+      <div className="flex items-center gap-3 px-3">
+        <label className="text-sm text-text shrink-0">{t('scenarioLifetime')}</label>
+        <LifetimeButtonGroup
+          options={LIFETIME_OPTIONS}
+          value={form.globalContextLifetime || 'always'}
+          onChange={(value) => onChange('globalContextLifetime', value)}
+        />
+      </div>
 
       <CollapsibleSection
         label={t('extraPromptLabel')}
