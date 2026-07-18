@@ -350,6 +350,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       character:
         form.name?.trim() ||
         form.avatar?.trim() ||
+        form.writingInstruction ||
         form.prompt?.trim() ||
         form.personality?.trim() ||
         form.globalContext?.trim() ||

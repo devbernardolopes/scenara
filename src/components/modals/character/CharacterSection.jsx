@@ -54,7 +54,9 @@ function CharacterSection({ form, onChange, characterId }) {
   return (
     <div className="space-y-4">
       <div>
-        <Label required>{t('nameLabel')}</Label>
+        <Label required className={form.name?.trim() ? 'text-highlight' : 'text-text'}>
+          {t('nameLabel')}
+        </Label>
         <div className="relative">
           <input
             className={`${inputClass} pr-20`}
@@ -70,7 +72,11 @@ function CharacterSection({ form, onChange, characterId }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-text mb-1">{t('avatarLabel')}</label>
+        <label
+          className={`block text-sm font-medium mb-1 ${form.avatar?.trim() ? 'text-highlight' : 'text-text'}`}
+        >
+          {t('avatarLabel')}
+        </label>
         <div className="flex items-center gap-2">
           <Avatar
             src={form.avatar}
@@ -253,7 +259,9 @@ function CharacterSection({ form, onChange, characterId }) {
       </CollapsibleSection>
 
       <div>
-        <label className="block text-sm font-medium text-text mb-1">
+        <label
+          className={`block text-sm font-medium mb-1 ${form.writingInstruction ? 'text-highlight' : 'text-text'}`}
+        >
           {t('writingInstructionLabel')}
         </label>
         <div className="flex items-center gap-2">
@@ -297,7 +305,11 @@ function CharacterSection({ form, onChange, characterId }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-text mb-1">{t('taglineLabel')}</label>
+        <label
+          className={`block text-sm font-medium mb-1 ${form.tagline?.trim() ? 'text-highlight' : 'text-text'}`}
+        >
+          {t('taglineLabel')}
+        </label>
         <input
           type="text"
           className={inputClass}
