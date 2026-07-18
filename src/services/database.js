@@ -1,5 +1,6 @@
 import db from '../db'
 import { SETTINGS, applySettingEffect } from './settings'
+import { getUIState } from './uiState'
 
 export async function exportDatabase(selection) {
   const data = {
@@ -57,6 +58,19 @@ export async function exportDatabase(selection) {
 
   if (selection.settings) {
     data.settings = await db.settings.toArray()
+  }
+
+  // Discovery filter & sorting state is stored in uiState. Include it so the
+  // main/discovery view restores the same Filter & Sorting after import.
+  const discoverySortBy = await getUIState('discovery.sortBy')
+  const discoverySortOrder = await getUIState('discovery.sortOrder')
+  const discoverySearchQuery = await getUIState('discovery.searchQuery')
+  if (discoverySortBy != null || discoverySortOrder != null || discoverySearchQuery != null) {
+    data.discoveryView = {
+      sortBy: discoverySortBy,
+      sortOrder: discoverySortOrder,
+      searchQuery: discoverySearchQuery,
+    }
   }
 
   const threadIds = new Set(selection.threadIds || [])
@@ -125,103 +139,118 @@ export async function importDatabase(data) {
     return table.add(rest)
   }
 
-  await db.transaction(
-    'rw',
-    tablesToClear.map((t) => db[t]),
-    async () => {
-      for (const table of tablesToClear) {
-        await db[table].clear()
+  await db.transaction('rw', [...tablesToClear.map((t) => db[t]), db.uiState], async () => {
+    for (const table of tablesToClear) {
+      await db[table].clear()
+    }
+
+    const tagIdMap = {}
+
+    if (Array.isArray(data.tags)) {
+      for (const tag of data.tags) {
+        const { id: oldId, ...tagData } = tag
+        const addData = oldId != null ? { id: oldId, ...tagData } : tagData
+        const newId = await db.tags.add(addData)
+        if (tag.name) tagIdMap[tag.name] = newId
       }
+    }
 
-      const tagIdMap = {}
-
-      if (Array.isArray(data.tags)) {
-        for (const tag of data.tags) {
-          const { id: oldId, ...tagData } = tag
-          const addData = oldId != null ? { id: oldId, ...tagData } : tagData
-          const newId = await db.tags.add(addData)
-          if (tag.name) tagIdMap[tag.name] = newId
-        }
+    if (Array.isArray(data.personas)) {
+      for (const persona of data.personas) {
+        await addWithId(db.personas, persona)
       }
+    }
 
-      if (Array.isArray(data.personas)) {
-        for (const persona of data.personas) {
-          await addWithId(db.personas, persona)
-        }
-      }
-
-      if (Array.isArray(data.characters)) {
-        for (const character of data.characters) {
-          const { id: oldId, tags: tagNames, ...characterData } = character
-          if (Array.isArray(tagNames) && tagNames.length > 0) {
-            const resolvedTags = tagNames.map((name) => tagIdMap[name]).filter(Boolean)
-            if (resolvedTags.length > 0) {
-              characterData.tags = resolvedTags
-            }
-          }
-          if (oldId != null) {
-            await db.characters.add({ id: oldId, ...characterData })
-          } else {
-            await db.characters.add(characterData)
+    if (Array.isArray(data.characters)) {
+      for (const character of data.characters) {
+        const { id: oldId, tags: tagNames, ...characterData } = character
+        if (Array.isArray(tagNames) && tagNames.length > 0) {
+          const resolvedTags = tagNames.map((name) => tagIdMap[name]).filter(Boolean)
+          if (resolvedTags.length > 0) {
+            characterData.tags = resolvedTags
           }
         }
-      }
-
-      if (Array.isArray(data.threads)) {
-        for (const thread of data.threads) {
-          await addWithId(db.threads, thread)
+        if (oldId != null) {
+          await db.characters.add({ id: oldId, ...characterData })
+        } else {
+          await db.characters.add(characterData)
         }
       }
+    }
 
-      if (Array.isArray(data.writingInstructions)) {
-        for (const item of data.writingInstructions) {
-          await addWithId(db.writingInstructions, item)
-        }
+    if (Array.isArray(data.threads)) {
+      for (const thread of data.threads) {
+        await addWithId(db.threads, thread)
       }
+    }
 
-      if (Array.isArray(data.connectionProfiles)) {
-        for (const profile of data.connectionProfiles) {
-          await addWithId(db.connectionProfiles, profile)
-        }
+    if (Array.isArray(data.writingInstructions)) {
+      for (const item of data.writingInstructions) {
+        await addWithId(db.writingInstructions, item)
       }
+    }
 
-      if (Array.isArray(data.inChatShortcuts)) {
-        for (const item of data.inChatShortcuts) {
-          await addWithId(db.inChatShortcuts, item)
-        }
+    if (Array.isArray(data.connectionProfiles)) {
+      for (const profile of data.connectionProfiles) {
+        await addWithId(db.connectionProfiles, profile)
       }
+    }
 
-      if (Array.isArray(data.settings)) {
-        for (const setting of data.settings) {
-          await addWithId(db.settings, setting)
-        }
+    if (Array.isArray(data.inChatShortcuts)) {
+      for (const item of data.inChatShortcuts) {
+        await addWithId(db.inChatShortcuts, item)
       }
+    }
 
-      if (Array.isArray(data.messages)) {
-        for (const message of data.messages) {
-          await addWithId(db.messages, message)
-        }
+    if (Array.isArray(data.settings)) {
+      for (const setting of data.settings) {
+        await addWithId(db.settings, setting)
       }
+    }
 
-      if (Array.isArray(data.promptHistory)) {
-        for (const item of data.promptHistory) {
-          await addWithId(db.promptHistory, item)
-        }
+    if (Array.isArray(data.messages)) {
+      for (const message of data.messages) {
+        await addWithId(db.messages, message)
       }
+    }
 
-      if (Array.isArray(data.threadMemories)) {
-        for (const item of data.threadMemories) {
-          await addWithId(db.threadMemories, item)
-        }
+    if (Array.isArray(data.promptHistory)) {
+      for (const item of data.promptHistory) {
+        await addWithId(db.promptHistory, item)
       }
+    }
 
-      if (Array.isArray(data.logs)) {
-        for (const item of data.logs) {
-          await addWithId(db.logs, item)
-        }
+    if (Array.isArray(data.threadMemories)) {
+      for (const item of data.threadMemories) {
+        await addWithId(db.threadMemories, item)
       }
-    },
-  )
+    }
+
+    if (Array.isArray(data.logs)) {
+      for (const item of data.logs) {
+        await addWithId(db.logs, item)
+      }
+    }
+
+    if (data.discoveryView && typeof data.discoveryView === 'object') {
+      await db.uiState.where('key').startsWith('discovery.').delete()
+      if (data.discoveryView.sortBy != null) {
+        await db.uiState.add({ key: 'discovery.sortBy', value: data.discoveryView.sortBy })
+      }
+      if (data.discoveryView.sortOrder != null) {
+        await db.uiState.add({
+          key: 'discovery.sortOrder',
+          value: data.discoveryView.sortOrder,
+        })
+      }
+      if (data.discoveryView.searchQuery != null) {
+        await db.uiState.add({
+          key: 'discovery.searchQuery',
+          value: data.discoveryView.searchQuery,
+        })
+      }
+    }
+  })
 
   return true
 }
