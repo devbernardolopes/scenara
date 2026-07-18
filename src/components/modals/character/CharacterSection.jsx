@@ -167,6 +167,44 @@ function CharacterSection({ form, onChange, characterId }) {
       </CollapsibleSection>
 
       <CollapsibleSection
+        label={t('personalityLabel')}
+        summary={
+          form.personality
+            ? t('common:tokenCount', { count: estimateTokens(form.personality) })
+            : null
+        }
+        storageKey={characterId ? `charSection.personality.${characterId}` : undefined}
+        defaultExpanded={false}
+      >
+        <AutoResizeTextarea
+          className={`${inputClass} resize-none mt-2`}
+          value={form.personality || ''}
+          onChange={(e) => onChange('personality', e.target.value)}
+          placeholder={t('personalityPlaceholder')}
+          extraHeight={8}
+        />
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        label={t('globalContextLabel')}
+        summary={
+          form.globalContext
+            ? t('common:tokenCount', { count: estimateTokens(form.globalContext) })
+            : null
+        }
+        storageKey={characterId ? `charSection.globalContext.${characterId}` : undefined}
+        defaultExpanded={false}
+      >
+        <AutoResizeTextarea
+          className={`${inputClass} resize-none mt-2`}
+          value={form.globalContext || ''}
+          onChange={(e) => onChange('globalContext', e.target.value)}
+          placeholder={t('globalContextPlaceholder')}
+          extraHeight={8}
+        />
+      </CollapsibleSection>
+
+      <CollapsibleSection
         label={t('extraPromptLabel')}
         summary={
           form.extraPrompt

@@ -26,6 +26,8 @@ const INITIAL_FORM = {
   avatar: '',
   tagline: '',
   prompt: '',
+  personality: '',
+  globalContext: '',
   systemPrompt: '',
   writingInstruction: null,
   extraPrompt: '',
@@ -252,6 +254,10 @@ function CharacterCreateModal({ character: existing, initialData }) {
 
       if (form.prompt) total += estimateTokens(replaceVars(form.prompt))
 
+      if (form.personality) total += estimateTokens(replaceVars(form.personality))
+
+      if (form.globalContext) total += estimateTokens(replaceVars(form.globalContext))
+
       if (form.systemPrompt) total += estimateTokens(replaceVars(form.systemPrompt))
 
       if (form.postHistoryInstructions)
@@ -275,6 +281,8 @@ function CharacterCreateModal({ character: existing, initialData }) {
     compute()
   }, [
     form.prompt,
+    form.personality,
+    form.globalContext,
     form.systemPrompt,
     form.postHistoryInstructions,
     form.writingInstruction,
@@ -342,6 +350,8 @@ function CharacterCreateModal({ character: existing, initialData }) {
         form.name?.trim() ||
         form.avatar?.trim() ||
         form.prompt?.trim() ||
+        form.personality?.trim() ||
+        form.globalContext?.trim() ||
         form.extraPrompt?.trim() ||
         form.postHistoryInstructions?.trim() ||
         form.tagline?.trim(),
