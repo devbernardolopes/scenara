@@ -71,9 +71,10 @@ export function getMessagesForApiRequest(messages, { includeOOC = true, keepMess
 }
 
 const CODE_BLOCK_RE = /(```[\s\S]*?```|~~~[\s\S]*?~~~)/g
+const CODE_BLOCK_TEST_RE = /(```[\s\S]*?```|~~~[\s\S]*?~~~)/
 
 function hasCodeBlocks(text) {
-  return typeof text === 'string' && CODE_BLOCK_RE.test(text)
+  return typeof text === 'string' && CODE_BLOCK_TEST_RE.test(text)
 }
 
 function stripCodeBlocks(text) {
