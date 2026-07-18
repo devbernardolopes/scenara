@@ -264,7 +264,7 @@ function ScenarioSection({ form, onChange, characterId }) {
                   <button
                     type="button"
                     onClick={() => {}}
-                    className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-primary-subtle text-primary hover:bg-primary-hover transition-colors"
+                    className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-surface text-secondary hover:bg-surface-hover transition-colors"
                     aria-label={t('generateScenario')}
                     title={t('generateScenario')}
                   >
