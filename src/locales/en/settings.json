@@ -683,6 +683,10 @@
       "label": "Trim Whitespaces",
       "desc": "Remove leading and trailing whitespace from USER messages after they are sent."
     },
+    "keepCodeBlocks": {
+      "label": "Keep Code Blocks",
+      "desc": "Strip fenced code blocks (``` and ~~~) from message content before sending to the API. Options control how many recent messages keep their code blocks intact."
+    },
     "toggleInputPlaceholder": "Enter value"
   },
   "toastPositionOptions": {

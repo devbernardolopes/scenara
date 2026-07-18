@@ -454,6 +454,10 @@
       },
       "writingInstruction": {
         "label": "Writing Instruction"
+      },
+      "keepCodeBlocks": {
+        "label": "Keep Code Blocks",
+        "desc": "Strip fenced code blocks (``` and ~~~) from message content before sending to the API. Options control how many recent messages keep their code blocks intact."
       }
     }
   },

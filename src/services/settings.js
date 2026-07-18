@@ -1428,6 +1428,15 @@ export const SETTINGS = [
     descKey: 'settings:prompting.trimWhitespaces.desc',
   },
   {
+    key: 'prompting.keepCodeBlocks',
+    category: 'prompting',
+    type: 'select',
+    options: ['always', 'never', '1', '2', '3', '4', '5'],
+    default: 'always',
+    labelKey: 'settings:prompting.keepCodeBlocks.label',
+    descKey: 'settings:prompting.keepCodeBlocks.desc',
+  },
+  {
     key: 'database.importUrl',
     category: 'database',
     type: 'text',

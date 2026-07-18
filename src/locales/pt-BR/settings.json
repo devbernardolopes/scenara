@@ -673,6 +673,10 @@
       "label": "Limpar Espaços em Branco",
       "desc": "Remover espaços em branco no início e fim das mensagens USER após o envio."
     },
+    "keepCodeBlocks": {
+      "label": "Keep Code Blocks",
+      "desc": "Strip fenced code blocks (``` and ~~~) from message content before sending to the API. Options control how many recent messages keep their code blocks intact."
+    },
     "toggleInputPlaceholder": "Digite o valor"
   },
   "toastPositionOptions": {

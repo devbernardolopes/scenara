@@ -70,6 +70,25 @@ export function getMessagesForApiRequest(messages, { includeOOC = true, keepMess
   return eligible.filter((m) => !m.summarizedAt || keptIds.has(m.id))
 }
 
+const CODE_BLOCK_RE = /(```[\s\S]*?```|~~~[\s\S]*?~~~)/g
+
+function stripCodeBlocks(text) {
+  if (!text) return text
+  return text.replace(CODE_BLOCK_RE, '').trim()
+}
+
+export function removeCodeBlocksFromMessages(messages, keepCodeBlocks) {
+  if (!Array.isArray(messages) || keepCodeBlocks === 'always') return messages
+
+  const keepCount = keepCodeBlocks === 'never' ? 0 : Number(keepCodeBlocks)
+  const stripFromIndex = messages.length - keepCount
+
+  return messages.map((msg, i) => {
+    if (i >= stripFromIndex || (msg.role !== 'user' && msg.role !== 'assistant')) return msg
+    return { ...msg, content: stripCodeBlocks(msg.content) }
+  })
+}
+
 export function appendMemoryToPayload(payload, memoryText, memoryHeader) {
   if (!Array.isArray(payload) || payload.length === 0) return payload
   if (!memoryText) return payload
@@ -550,6 +569,9 @@ export async function buildChatRequestPayload({
 
   const apiMessages = getMessagesForApiRequest(effectiveMessages, { includeOOC, keepMessages })
 
+  const keepCodeBlocks = await getSetting('prompting.keepCodeBlocks')
+  const processedMessages = removeCodeBlocksFromMessages(apiMessages, keepCodeBlocks)
+
   const latestThread = await getThread(threadId)
   const memoryText = await buildInjectedMemory(character, latestThread, { beforeDate })
 
@@ -580,7 +602,7 @@ export async function buildChatRequestPayload({
       character,
       chatPersona,
       currentPersona,
-      messages: apiMessages.slice(0, -1),
+      messages: processedMessages.slice(0, -1),
       userMessage: lastUserMsg,
       personaMap,
       memoryText,
@@ -631,7 +653,7 @@ export async function buildChatRequestPayload({
       character,
       chatPersona,
       currentPersona,
-      messages: apiMessages,
+      messages: processedMessages,
       isFirstMessage,
       settings,
       writingInstruction,
