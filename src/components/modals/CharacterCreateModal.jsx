@@ -36,6 +36,7 @@ const INITIAL_FORM = {
   initialMessages: [],
   exampleMessages: [],
   scenarios: [],
+  promptUser: true,
   autoTitle: true,
   autoTitleThreshold: 1,
   autoTitleSystemInstructions: '',

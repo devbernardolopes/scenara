@@ -1,0 +1,110 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useModal } from '../../hooks/useModal'
+import ModalShell from '../shared/ModalShell'
+import { replaceVars } from '../../services/chatApi'
+import { ChevronLeft, ChevronRight } from '../../lib/icons'
+
+function ScenarioSelectorModal({ character, persona, scenarios, onSelect }) {
+  const { t } = useTranslation('characterCreation')
+  const { closeModal } = useModal()
+
+  const activeIdx = scenarios.findIndex((s) => s.active)
+  const [currentIndex, setCurrentIndex] = useState(activeIdx >= 0 ? activeIdx : 0)
+
+  const scenario = scenarios[currentIndex]
+  const charName = character?.name || ''
+  const personaName = persona?.name || ''
+
+  const resolvedContent = replaceVars(scenario?.content || '', {
+    charName,
+    personaName,
+    currentPersonaName: personaName,
+  })
+
+  const scenarioTitle = scenario?.name?.trim() || `${t('scenarioLabel')} #${currentIndex + 1}`
+
+  function handlePrev() {
+    setCurrentIndex((i) => (i - 1 + scenarios.length) % scenarios.length)
+  }
+
+  function handleNext() {
+    setCurrentIndex((i) => (i + 1) % scenarios.length)
+  }
+
+  function handleCancel() {
+    onSelect(null)
+    closeModal()
+  }
+
+  function handleSelect() {
+    onSelect(scenario)
+    closeModal()
+  }
+
+  return (
+    <ModalShell
+      title={t('scenarioSelector.title')}
+      onClose={handleCancel}
+      footer={
+        <>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="min-h-[44px] px-4 py-2 rounded-md text-sm font-medium border border-border bg-surface text-text hover:bg-surface-hover transition-colors"
+          >
+            {t('scenarioSelector.cancel')}
+          </button>
+          <button
+            type="button"
+            onClick={handleSelect}
+            className="min-h-[44px] px-4 py-2 rounded-md text-sm font-medium bg-primary text-on-primary hover:bg-primary-hover transition-colors"
+          >
+            {t('scenarioSelector.startWithScenario')}
+          </button>
+        </>
+      }
+    >
+      <div className="flex items-stretch gap-2 h-full min-h-0">
+        <button
+          type="button"
+          onClick={handlePrev}
+          className="flex items-center justify-center w-10 shrink-0 rounded-md hover:bg-surface-hover text-tertiary hover:text-text transition-colors"
+          aria-label={t('scenarioSelector.previousScenario')}
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+
+        <div className="flex-1 min-w-0 flex flex-col min-h-0 overflow-hidden">
+          <div className="mb-3">
+            <h3 className="text-base font-semibold text-text truncate">{scenarioTitle}</h3>
+            <span className="text-xs text-tertiary">
+              {currentIndex + 1} / {scenarios.length}
+            </span>
+          </div>
+
+          <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-border bg-surface-secondary p-4">
+            {resolvedContent ? (
+              <p className="text-sm text-text whitespace-pre-wrap leading-relaxed">
+                {resolvedContent}
+              </p>
+            ) : (
+              <p className="text-sm text-tertiary italic">{t('scenarioSelector.noContent')}</p>
+            )}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleNext}
+          className="flex items-center justify-center w-10 shrink-0 rounded-md hover:bg-surface-hover text-tertiary hover:text-text transition-colors"
+          aria-label={t('scenarioSelector.nextScenario')}
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+    </ModalShell>
+  )
+}
+
+export default ScenarioSelectorModal

@@ -23,5 +23,16 @@
   "tagsSectionNoTags": "Nessun tag assegnato ancora.",
   "tagsSectionBrowseTags": "Sfoglia Tutti i Tag",
   "tagsSectionBrowseActive": "Attivo",
-  "sectionScenarios": "Scenarios"
+  "sectionScenarios": "Scenarios",
+  "scenarioActive": "Attivo",
+  "promptUser": "Chiedi all'utente",
+  "promptUserDesc": "Chiedi quale scenario usare all'avvio di una nuova chat",
+  "scenarioSelector": {
+    "title": "Scegli uno scenario",
+    "startWithScenario": "Inizia con questo scenario",
+    "cancel": "Annulla",
+    "noContent": "Questo scenario non ha contenuto.",
+    "previousScenario": "Scenario precedente",
+    "nextScenario": "Scenario successivo"
+  }
 }

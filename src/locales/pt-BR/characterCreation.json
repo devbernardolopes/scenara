@@ -155,6 +155,16 @@
     "always": "Sempre"
   },
   "scenarioActive": "Ativo",
+  "promptUser": "Perguntar ao usuário",
+  "promptUserDesc": "Perguntar qual cenário usar ao iniciar um novo chat",
+  "scenarioSelector": {
+    "title": "Escolher um cenário",
+    "startWithScenario": "Começar com este cenário",
+    "cancel": "Cancelar",
+    "noContent": "Este cenário não tem conteúdo.",
+    "previousScenario": "Cenário anterior",
+    "nextScenario": "Próximo cenário"
+  },
   "sectionDirector": "Diretor",
   "directorEnable": "Ativar Diretor",
   "directorGroupAutoTitle": "Título Automático",

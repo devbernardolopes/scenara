@@ -130,6 +130,31 @@ function ScenarioSection({ form, onChange, characterId }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
+        <label className="text-sm text-text shrink-0">{t('promptUser')}</label>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={form.promptUser !== false}
+          aria-label={t('promptUser')}
+          onClick={() => onChange('promptUser', form.promptUser === false)}
+          className={`relative min-h-[28px] min-w-[44px] rounded-full border transition-colors ${
+            form.promptUser !== false
+              ? 'bg-primary border-primary'
+              : 'bg-surface border-border hover:bg-surface-hover'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform ${
+              form.promptUser !== false
+                ? 'translate-x-[16px] bg-on-primary'
+                : 'translate-x-0 bg-tertiary'
+            }`}
+          />
+        </button>
+        <span className="text-xs text-tertiary">{t('promptUserDesc')}</span>
+      </div>
+
+      <div className="flex items-center gap-3">
         <label className="text-sm text-text shrink-0">{t('scenarioLifetime')}</label>
         <LifetimeButtonGroup
           options={LIFETIME_OPTIONS}

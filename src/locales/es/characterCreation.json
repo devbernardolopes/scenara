@@ -44,5 +44,15 @@
     "firstSummary": "1º Resumen",
     "always": "Siempre"
   },
-  "scenarioActive": "Activo"
+  "scenarioActive": "Activo",
+  "promptUser": "Preguntar al usuario",
+  "promptUserDesc": "Preguntar qué escenario usar al iniciar un nuevo chat",
+  "scenarioSelector": {
+    "title": "Elegir un escenario",
+    "startWithScenario": "Comenzar con este escenario",
+    "cancel": "Cancelar",
+    "noContent": "Este escenario no tiene contenido.",
+    "previousScenario": "Escenario anterior",
+    "nextScenario": "Siguiente escenario"
+  }
 }

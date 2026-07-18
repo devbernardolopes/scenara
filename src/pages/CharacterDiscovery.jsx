@@ -330,12 +330,7 @@ function CharacterDiscovery() {
     openModal('characterCreate', { character })
   }
 
-  async function handleSelectCharacter(character, persona) {
-    const chatProfileId = await getSetting('requestKind.chat.profileId')
-    if (!chatProfileId) {
-      showToast(t('toast.chatProfileRequired', { ns: 'common' }), { type: 'warning' })
-      return
-    }
+  async function createAndNavigateThread(character, persona, selectedScenario) {
     const personaId = persona?.id || (await getSetting('defaultPersonaId'))
     const initialMessages = character.initialMessages?.length ? character.initialMessages : null
 
@@ -346,18 +341,28 @@ function CharacterDiscovery() {
       initialMessages,
     })
 
-    const activeScenarioIndex = character.scenarios?.findIndex(
-      (s) => s?.active && s?.content?.trim(),
-    )
-    if (activeScenarioIndex != null && activeScenarioIndex >= 0) {
-      const activeScenario = character.scenarios[activeScenarioIndex]
+    let scenarioToUse = selectedScenario
+    if (!scenarioToUse) {
+      const activeScenarioIndex = character.scenarios?.findIndex(
+        (s) => s?.active && s?.content?.trim(),
+      )
+      if (activeScenarioIndex != null && activeScenarioIndex >= 0) {
+        const active = character.scenarios[activeScenarioIndex]
+        scenarioToUse = { ...active, scenarioNumber: activeScenarioIndex + 1 }
+      }
+    } else {
+      const selectedIdx = character.scenarios?.findIndex((s) => s.id === scenarioToUse.id)
+      scenarioToUse = { ...scenarioToUse, scenarioNumber: (selectedIdx ?? 0) + 1 }
+    }
+
+    if (scenarioToUse) {
       await updateThread(threadId, {
         activeScenario: {
-          id: activeScenario.id,
-          name: activeScenario.name || '',
-          content: activeScenario.content,
-          lifetime: activeScenario.lifetime || 'firstSummary',
-          scenarioNumber: activeScenarioIndex + 1,
+          id: scenarioToUse.id,
+          name: scenarioToUse.name || '',
+          content: scenarioToUse.content,
+          lifetime: scenarioToUse.lifetime || 'firstSummary',
+          scenarioNumber: scenarioToUse.scenarioNumber,
         },
       })
     }
@@ -366,6 +371,30 @@ function CharacterDiscovery() {
       await createMessage(threadId, 'assistant', character.greeting)
     }
     navigate(`/chat/${threadId}`)
+  }
+
+  async function handleSelectCharacter(character, persona) {
+    const chatProfileId = await getSetting('requestKind.chat.profileId')
+    if (!chatProfileId) {
+      showToast(t('toast.chatProfileRequired', { ns: 'common' }), { type: 'warning' })
+      return
+    }
+
+    const promptUser = character.promptUser !== false
+    const contentScenarios = (character.scenarios || []).filter((s) => s.content?.trim())
+
+    if (promptUser && contentScenarios.length >= 2) {
+      openModal('scenarioSelector', {
+        character,
+        persona,
+        scenarios: contentScenarios,
+        onSelect: (selectedScenario) =>
+          createAndNavigateThread(character, persona, selectedScenario),
+      })
+      return
+    }
+
+    await createAndNavigateThread(character, persona, null)
   }
 
   async function handleDelete(character) {

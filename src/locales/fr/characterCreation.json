@@ -23,5 +23,16 @@
   "tagsSectionNoTags": "Aucun tag attribué pour le moment.",
   "tagsSectionBrowseTags": "Parcourir Tous les Tags",
   "tagsSectionBrowseActive": "Actif",
-  "sectionScenarios": "Scenarios"
+  "sectionScenarios": "Scenarios",
+  "scenarioActive": "Actif",
+  "promptUser": "Demander à l'utilisateur",
+  "promptUserDesc": "Demander quel scénario utiliser lors du démarrage d'un nouveau chat",
+  "scenarioSelector": {
+    "title": "Choisir un scénario",
+    "startWithScenario": "Commencer avec ce scénario",
+    "cancel": "Annuler",
+    "noContent": "Ce scénario n'a pas de contenu.",
+    "previousScenario": "Scénario précédent",
+    "nextScenario": "Scénario suivant"
+  }
 }

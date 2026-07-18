@@ -159,6 +159,16 @@
     "always": "Always"
   },
   "scenarioActive": "Active",
+  "promptUser": "Prompt User",
+  "promptUserDesc": "Ask which scenario to use when starting a new chat",
+  "scenarioSelector": {
+    "title": "Choose a Scenario",
+    "startWithScenario": "Start with this Scenario",
+    "cancel": "Cancel",
+    "noContent": "This scenario has no content.",
+    "previousScenario": "Previous scenario",
+    "nextScenario": "Next scenario"
+  },
   "sectionDirector": "Director",
   "directorEnable": "Enable Director",
   "directorGroupAutoTitle": "Auto-Title",
