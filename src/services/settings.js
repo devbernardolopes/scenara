@@ -1432,6 +1432,10 @@ export const SETTINGS = [
     category: 'prompting',
     type: 'select',
     options: ['always', 'never', '1', '2', '3', '4', '5'],
+    optionLabels: {
+      always: 'settings:prompting.keepCodeBlocks.always',
+      never: 'settings:prompting.keepCodeBlocks.never',
+    },
     default: 'always',
     labelKey: 'settings:prompting.keepCodeBlocks.label',
     descKey: 'settings:prompting.keepCodeBlocks.desc',
