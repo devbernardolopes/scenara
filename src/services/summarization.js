@@ -95,7 +95,8 @@ export async function buildSummarizationPayload({
 
   // When Add Character Prompt is enabled and persona injection is set to
   // "always" + "end of system prompt", mirror the chat payload by injecting the
-  // persona template at the very top of the transcript.
+  // persona template just after the character prompt (outside the transcript).
+  let personaInjection = ''
   if (character?.addCharacterPrompt) {
     const personaTiming =
       character?.personaInjectionTiming || (await getSetting('prompting.personaInjectionTiming'))
@@ -105,8 +106,7 @@ export async function buildSummarizationPayload({
     const personaTemplate = await getSetting('prompting.personaInjectionTemplate')
     if (personaTiming === 'always' && personaTemplate && personaPlacement === 'endOfSystemPrompt') {
       const resolvedPersona = personaTemplate.replace(/{{description}}/gi, personaDescription)
-      const injected = replaceVarsIn(resolvedPersona)
-      if (injected) transcript = `${injected}\n\n${transcript}`
+      personaInjection = replaceVarsIn(resolvedPersona)
     }
   }
 
@@ -144,7 +144,8 @@ export async function buildSummarizationPayload({
         activeScenario: thread?.activeScenario || null,
       })
       const resolvedScenario = scenarioText ? replaceVarsIn(scenarioText) : ''
-      const combined = resolvedScenario ? `${prompt}\n\n${resolvedScenario}` : prompt
+      let combined = resolvedScenario ? `${prompt}\n\n${resolvedScenario}` : prompt
+      if (personaInjection) combined = `${combined}\n\n${personaInjection}`
       charPromptSection = charPromptHeader
         ? `${replaceVarsIn(charPromptHeader)}\n\n${combined}`
         : combined
