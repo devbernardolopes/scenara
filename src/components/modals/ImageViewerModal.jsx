@@ -1,8 +1,29 @@
 import { useRef } from 'react'
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
+import { TransformWrapper, TransformComponent, useControls } from 'react-zoom-pan-pinch'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { Download, X } from '../../lib/icons'
+
+function ImageViewerInner({ src, alt, imgRef, onZoomRef }) {
+  const { centerView } = useControls()
+  onZoomRef.current = (scale, animationTime, animationType) =>
+    centerView(scale, animationTime, animationType)
+
+  return (
+    <TransformComponent
+      wrapperClass="!w-full !h-full"
+      contentClass="!w-full !h-full flex items-center justify-center"
+    >
+      <img
+        src={src}
+        alt={alt || ''}
+        className="max-w-[90vw] max-h-[90vh] object-contain select-none"
+        draggable={false}
+        ref={imgRef}
+      />
+    </TransformComponent>
+  )
+}
 
 function ImageViewerModal({ src, alt }) {
   const { t } = useTranslation('common')
@@ -10,6 +31,7 @@ function ImageViewerModal({ src, alt }) {
   const pointerStart = useRef(null)
   const pointerDownOnImage = useRef(false)
   const imgRef = useRef(null)
+  const centerViewRef = useRef(null)
 
   const handleDownload = (e) => {
     e.stopPropagation()
@@ -40,6 +62,10 @@ function ImageViewerModal({ src, alt }) {
     if (moved < 8) closeModal()
   }
 
+  const handleZoom = () => {
+    centerViewRef.current?.(undefined, 0)
+  }
+
   return (
     <div
       className="relative w-full h-full flex items-center justify-center"
@@ -54,19 +80,9 @@ function ImageViewerModal({ src, alt }) {
         doubleClick={{ mode: 'reset' }}
         panning={{ disabled: false }}
         pinch={{ disabled: false }}
+        onZoom={handleZoom}
       >
-        <TransformComponent
-          wrapperClass="!w-full !h-full"
-          contentClass="!w-full !h-full flex items-center justify-center"
-        >
-          <img
-            src={src}
-            alt={alt || ''}
-            className="max-w-[90vw] max-h-[90vh] object-contain select-none"
-            draggable={false}
-            ref={imgRef}
-          />
-        </TransformComponent>
+        <ImageViewerInner src={src} alt={alt} imgRef={imgRef} onZoomRef={centerViewRef} />
       </TransformWrapper>
 
       <div
