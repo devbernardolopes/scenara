@@ -27,7 +27,11 @@ import {
   trimLeadingTrailingNewlines,
   trimWhitespace,
 } from '../services/messages'
-import { getEffectiveProfileFor, getProfile } from '../services/connectionProfiles'
+import {
+  getEffectiveProfileFor,
+  getEffectiveTopP,
+  getProfile,
+} from '../services/connectionProfiles'
 import { getSetting } from '../services/settings'
 import { generateChatResponse, parseBundleEntries } from '../services/chatGeneration'
 import * as apiQueue from '../services/apiQueue'
@@ -197,6 +201,7 @@ function ChatView() {
   const [chatTitleMarquee, setChatTitleMarquee] = useState(true)
   const [chatModelName, setChatModelName] = useState('')
   const [chatModelTemp, setChatModelTemp] = useState(null)
+  const [chatModelTopP, setChatModelTopP] = useState(null)
   const [chatProfile, setChatProfile] = useState(null)
   const [showStatus, setShowStatus] = useState(true)
   const [statusBarRefresh, setStatusBarRefresh] = useState(30)
@@ -488,6 +493,7 @@ function ChatView() {
       setChatModelName(profile?.model || '')
       const temp = profile?.params?.temperature
       setChatModelTemp(typeof temp === 'number' ? temp : null)
+      setChatModelTopP(getEffectiveTopP(profile))
       const profileId = await getSetting(`requestKind.${kind}.profileId`)
       setChatProfile(profileId ? await getProfile(profileId) : null)
     }
@@ -2139,7 +2145,7 @@ function ChatView() {
         {' '}
         {/* Wrap input for better control */}
         {showStatus && chatModelName && (
-          <div className="px-3 text-center">
+          <div className="px-3 py-1.5 text-center">
             {chatProfile ? (
               <button
                 type="button"
@@ -2147,7 +2153,8 @@ function ChatView() {
                 className="text-xs text-tertiary hover:text-text hover:underline inline-flex items-center gap-1 max-w-full"
                 title={t('statusBar.editProfile')}
               >
-                {chatModelTemp != null && <>T {chatModelTemp} · </>}
+                {chatModelTemp != null && <>{chatModelTemp}t · </>}
+                {chatModelTopP != null && <>{chatModelTopP}p · </>}
                 <MarqueeText className="inline-block align-bottom max-w-full">
                   {chatModelName.split('/').pop()}
                 </MarqueeText>
@@ -2155,7 +2162,8 @@ function ChatView() {
               </button>
             ) : (
               <span className="text-xs text-tertiary">
-                {chatModelTemp != null && <>T {chatModelTemp} · </>}
+                {chatModelTemp != null && <>{chatModelTemp}t · </>}
+                {chatModelTopP != null && <>{chatModelTopP}p · </>}
                 <MarqueeText className="inline-block align-bottom max-w-full">
                   {chatModelName.split('/').pop()}
                 </MarqueeText>

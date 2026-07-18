@@ -66,9 +66,11 @@ export default function ModelStatusBar({ embedded = false }) {
 
   const info = (
     <span className="flex items-center gap-2 whitespace-nowrap">
-      {temperature != null && <span>T {temperature}</span>}
-      {topP != null && <span>{t('topP', { value: topP })}</span>}
-      {hordeEta && <span>{t('eta', { value: hordeEta })}</span>}
+      {temperature != null && <span>{temperature}t</span>}
+      {temperature != null && topP != null && <span>·</span>}
+      {topP != null && <span>{topP}p</span>}
+      {topP != null && hordeEta && <span>·</span>}
+      {hordeEta && <span>{hordeEta}</span>}
     </span>
   )
 
@@ -77,7 +79,7 @@ export default function ModelStatusBar({ embedded = false }) {
       <div className="flex-1 min-w-0 flex justify-center text-xs text-tertiary">
         <MarqueeText className="max-w-full">{modelName}</MarqueeText>
       </div>
-      <span className="shrink-0 text-xs text-tertiary">{info}</span>
+      {info && <span className="shrink-0 text-xs text-tertiary">· {info}</span>}
       <button
         type="button"
         onClick={handleDismiss}
