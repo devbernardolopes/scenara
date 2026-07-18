@@ -47,7 +47,7 @@ function MemoryRegenerationModal({ threadId, entry }) {
 
   useEffect(() => {
     let cancelled = false
-    buildCurrentSummarizationPayload(threadId)
+    buildCurrentSummarizationPayload(threadId, entry)
       .then((payload) => {
         if (cancelled) return
         if (payload) {
@@ -65,7 +65,7 @@ function MemoryRegenerationModal({ threadId, entry }) {
     return () => {
       cancelled = true
     }
-  }, [threadId])
+  }, [threadId, entry])
 
   const systemTokens = useMemo(() => estimateTokens(systemContent || ''), [systemContent])
   const userTokens = useMemo(() => estimateTokens(userContent || ''), [userContent])

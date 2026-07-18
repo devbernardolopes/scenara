@@ -2,7 +2,11 @@ import db from '../db'
 import { getMessagesByThread, updateMessage, deleteMessage } from './messages'
 import { updateThread } from './threads'
 import { buildTranscript, replaceVars, replacePersonaTemplate, sendChatCompletion } from './chatApi'
-import { createThreadMemory, buildInjectedMemory } from './threadMemories'
+import {
+  createThreadMemory,
+  buildInjectedMemory,
+  getThreadMemoriesAscending,
+} from './threadMemories'
 import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { getSetting } from './settings'
@@ -67,7 +71,10 @@ export async function buildSummarizationPayload({
   rolePrefixes,
   currentPersona,
   memoryText,
+  lastSummarizationAt,
 }) {
+  const effectiveLastSummarizationAt =
+    lastSummarizationAt !== undefined ? lastSummarizationAt : thread?.lastSummarizationAt || null
   const keepCodeBlocks = await getSetting('prompting.keepCodeBlocks')
   let processedMessages = removeCodeBlocksFromMessages(messages, keepCodeBlocks)
 
@@ -163,7 +170,7 @@ export async function buildSummarizationPayload({
 
       const globalContextRaw = resolveGlobalContextInjection(character, {
         isFirstMessage: false,
-        lastSummarizationAt: thread?.lastSummarizationAt || null,
+        lastSummarizationAt: effectiveLastSummarizationAt,
       })
       if (globalContextRaw) parts.push(replaceVarsIn(globalContextRaw))
 
@@ -171,7 +178,7 @@ export async function buildSummarizationPayload({
 
       const scenarioText = resolveScenarioInjection(character, {
         isFirstMessage: false,
-        lastSummarizationAt: thread?.lastSummarizationAt || null,
+        lastSummarizationAt: effectiveLastSummarizationAt,
         activeScenario: thread?.activeScenario || null,
       })
       const resolvedScenario = scenarioText ? replaceVarsIn(scenarioText) : ''
@@ -219,20 +226,49 @@ async function buildSummarizationRolePrefixes() {
   }
 }
 
-// Rebuilds the summarization payload for a thread using the *current* chat
-// state (messages, memory, character prompt, settings, personas), mirroring the
-// regular summarization flow. Returns the `[system, user]` payload array, or
-// `null` when there are no unsummarized messages to summarize.
-export async function buildCurrentSummarizationPayload(threadId, { currentPersona = null } = {}) {
+// Rebuilds the summarization payload for regenerating an existing memory entry,
+// using the *current* chat state (character overrides, settings, personas,
+// currently-selected message slots) but scoped to the point in the chat where
+// that entry was originally produced. Returns the `[system, user]` payload
+// array, or `null` when there is nothing to re-summarize.
+//
+// The entry's point in the chat is defined by its summary marker (1:1 with
+// memory entries, sorted by createdAt) — mirroring `deleteMemoryAndRevert`. The
+// messages summarized by this entry are those created between the previous
+// marker and this one, that carry a `summarizedAt` timestamp.
+export async function buildCurrentSummarizationPayload(threadId, entry) {
   const thread = await db.threads.get(Number(threadId))
   if (!thread) return null
   const character = thread.characterId ? await db.characters.get(thread.characterId) : null
   if (!character) return null
 
-  const includeOOC = character?.includeOOC !== false
-  const freshMessages = await getMessagesByThread(thread.id)
-  const unsummarizedMessages = getUnsummarizedMessages(freshMessages, { includeOOC })
-  if (unsummarizedMessages.length === 0) return null
+  const allMessages = await getMessagesByThread(thread.id)
+
+  const markers = allMessages
+    .filter((m) => m.isSummaryMarker)
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+
+  const memories = await getThreadMemoriesAscending(thread.id)
+  const memIdx = memories.findIndex((m) => m.id === entry?.id)
+
+  const thisMarker = memIdx >= 0 ? markers[memIdx] || null : null
+  const prevMarker = memIdx > 0 ? markers[memIdx - 1] || null : null
+
+  const upperBound = thisMarker
+    ? new Date(thisMarker.createdAt).getTime()
+    : entry?.createdAt
+      ? new Date(entry.createdAt).getTime()
+      : Infinity
+  const lowerBound = prevMarker ? new Date(prevMarker.createdAt).getTime() : 0
+
+  const windowMessages = allMessages.filter((m) => {
+    if (m.isSummaryMarker || m.isAutoTitleMarker) return false
+    if (m.summarizedAt == null) return false
+    const t = new Date(m.createdAt).getTime()
+    return t > lowerBound && t < upperBound
+  })
+
+  if (windowMessages.length === 0) return null
 
   const personaList = await getAllPersonas()
   const personaMap = {}
@@ -241,16 +277,21 @@ export async function buildCurrentSummarizationPayload(threadId, { currentPerson
   })
 
   const rolePrefixes = await buildSummarizationRolePrefixes()
-  const memoryText = await buildInjectedMemory(character, thread)
+
+  const beforeDate = Number.isFinite(upperBound) ? new Date(upperBound) : undefined
+  const memoryText = await buildInjectedMemory(character, thread, { beforeDate })
 
   return buildSummarizationPayload({
     character,
     thread,
-    messages: unsummarizedMessages,
+    messages: windowMessages,
     personaMap,
     rolePrefixes,
-    currentPersona,
+    currentPersona: null,
     memoryText,
+    lastSummarizationAt: prevMarker
+      ? new Date(prevMarker.createdAt).toISOString()
+      : thread?.lastSummarizationAt || null,
   })
 }
 
