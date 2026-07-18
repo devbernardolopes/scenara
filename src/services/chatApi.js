@@ -510,13 +510,11 @@ export async function buildOOCMessagesPayload({
     replaceVarsIn,
   })
   if (promptBlock) {
-    const systemPrompt = replaceVarsIn(character?.systemPrompt || '')
-    let combinedPrompt = systemPrompt ? `${promptBlock}\n\n${systemPrompt}` : promptBlock
     const charPromptHeader = oocSettings.characterPromptHeader
     if (charPromptHeader) {
-      systemParts.push(replaceVarsIn(charPromptHeader) + '\n\n' + combinedPrompt)
+      systemParts.push(replaceVarsIn(charPromptHeader) + '\n\n' + promptBlock)
     } else {
-      systemParts.push(combinedPrompt)
+      systemParts.push(promptBlock)
     }
   }
 
