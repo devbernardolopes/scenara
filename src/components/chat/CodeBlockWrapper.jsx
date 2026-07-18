@@ -25,25 +25,27 @@ function CodeBlockWrapperBase({ collapsed, onToggle, codeText, children }) {
         {children}
       </pre>
 
-      <button
-        onClick={onToggle}
-        className="absolute top-2 left-2 p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border transition-all active:scale-95 focus:opacity-100"
-        title={collapsed ? 'Expand code block' : 'Collapse code block'}
-        aria-label={collapsed ? 'Expand code block' : 'Collapse code block'}
-      >
-        {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-      </button>
-
-      {codeText && (
+      <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
         <button
-          onClick={() => handleCodeCopy(codeText)}
-          className="absolute top-2 right-2 p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border transition-all active:scale-95 focus:opacity-100"
-          title="Copy code"
-          aria-label="Copy code"
+          onClick={onToggle}
+          className="p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border transition-all active:scale-95 focus:opacity-100"
+          title={collapsed ? 'Expand code block' : 'Collapse code block'}
+          aria-label={collapsed ? 'Expand code block' : 'Collapse code block'}
         >
-          <Copy className="w-4 h-4" />
+          {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
         </button>
-      )}
+
+        {codeText && (
+          <button
+            onClick={() => handleCodeCopy(codeText)}
+            className="p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border transition-all active:scale-95 focus:opacity-100"
+            title="Copy code"
+            aria-label="Copy code"
+          >
+            <Copy className="w-4 h-4" />
+          </button>
+        )}
+      </div>
     </div>
   )
 }
