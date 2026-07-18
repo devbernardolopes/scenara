@@ -593,7 +593,7 @@ function ChatInputArea({
 
   return (
     <div className="border-t border-border p-4">
-      <div className="relative max-w-4xl mx-auto">
+      <div className="relative">
         {/* Prompt History Panel */}
         {promptHistoryOpen && (
           <div
