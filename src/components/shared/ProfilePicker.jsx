@@ -4,7 +4,7 @@ import { getAllProfiles } from '../../services/connectionProfiles'
 import { PROVIDERS } from '../../services/apiProviders'
 import ProviderIcon from './ProviderIcon'
 
-function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
+function ProfilePicker({ open, onClose, onSelect, currentId, label, triggerRef }) {
   const { t } = useTranslation('common')
   const [profiles, setProfiles] = useState([])
   const [dropUp, setDropUp] = useState(false)
@@ -24,13 +24,17 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
   useEffect(() => {
     if (!open) return
     function handleClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) {
+      if (
+        ref.current &&
+        !ref.current.contains(e.target) &&
+        !triggerRef?.current?.contains(e.target)
+      ) {
         onClose()
       }
     }
     document.addEventListener('click', handleClick, true)
     return () => document.removeEventListener('click', handleClick, true)
-  }, [open, onClose])
+  }, [open, onClose, triggerRef])
 
   useEffect(() => {
     if (!open) return
@@ -44,13 +48,17 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
   useEffect(() => {
     if (!open) return
     function handleScroll(e) {
-      if (ref.current && !ref.current.contains(e.target)) {
+      if (
+        ref.current &&
+        !ref.current.contains(e.target) &&
+        !triggerRef?.current?.contains(e.target)
+      ) {
         onClose()
       }
     }
     window.addEventListener('scroll', handleScroll, { capture: true })
     return () => window.removeEventListener('scroll', handleScroll, { capture: true })
-  }, [open, onClose])
+  }, [open, onClose, triggerRef])
 
   useEffect(() => {
     if (!open || !ref.current) return
@@ -61,8 +69,8 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
     const triggerRect = trigger.getBoundingClientRect()
     const scrollerRect = scroller.getBoundingClientRect()
     const panelHeight = el.offsetHeight || 256
-    const spaceBelow = scrollerRect.bottom - triggerRect.bottom
-    const spaceAbove = triggerRect.top - scrollerRect.top
+    const spaceBelow = Math.min(scrollerRect.bottom, window.innerHeight) - triggerRect.bottom
+    const spaceAbove = triggerRect.top - Math.max(scrollerRect.top, 0)
     setDropUp(spaceBelow < panelHeight + 8 && spaceAbove > spaceBelow)
   }, [open, profiles])
 
@@ -71,7 +79,7 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label }) {
   return (
     <div
       ref={ref}
-      className={`absolute right-0 w-72 max-h-64 overflow-y-auto bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1 ${
+      className={`absolute right-0 w-72 max-w-[calc(100vw-2rem)] max-h-64 overflow-y-auto bg-surface border border-border rounded-lg shadow-surface-lg z-50 py-1 ${
         dropUp ? 'bottom-full mb-1' : 'top-full mt-1'
       }`}
     >

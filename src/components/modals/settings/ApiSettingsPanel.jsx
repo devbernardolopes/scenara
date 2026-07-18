@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../../hooks/useModal'
 import { PROVIDERS, getBaseUrl, setBaseUrl } from '../../../services/apiProviders'
@@ -24,6 +24,7 @@ function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle, onClo
   const { t } = useTranslation('settings')
   const { openModal } = useModal()
   const [profiles, setProfiles] = useState([])
+  const triggerRef = useRef(null)
 
   useEffect(() => {
     function load() {
@@ -46,14 +47,19 @@ function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle, onClo
     if (currentProfile) openModal('profileForm', { profile: currentProfile })
   }
 
+  function handleToggle(e) {
+    e.stopPropagation()
+    onToggle()
+  }
+
   return (
     <div className="relative flex items-center justify-between min-h-[44px]">
       <span className="text-sm text-text">{t(kind.labelKey.replace('settings:', ''))}</span>
       <div className="flex items-center gap-1">
-        <div className="relative">
+        <div className="relative" ref={triggerRef}>
           <button
             type="button"
-            onClick={onToggle}
+            onClick={handleToggle}
             className="min-h-[44px] px-3 text-sm border border-border rounded-md bg-surface text-text hover:bg-surface-hover flex items-center gap-2"
           >
             {currentProfile ? (
@@ -81,6 +87,7 @@ function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle, onClo
             onClose={onClose}
             onSelect={handleSelect}
             currentId={currentId}
+            triggerRef={triggerRef}
           />
         </div>
         {currentProfile && (
