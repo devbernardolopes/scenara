@@ -2055,10 +2055,6 @@ function ChatView() {
 
                 const entries = parseBundleEntries(msg.bundleMessages)
                 const bundleMessages = entries ? entries.map((e) => e.content) : null
-                const collapsedCodeBlocks =
-                  entries && bundleIndex >= 0 && bundleIndex < entries.length
-                    ? entries[bundleIndex].collapsedCodeBlocks || null
-                    : null
                 const trackIdx = msg.activeSlotIndex ?? activeSlotIndices[msg.id]
                 const bundleIndex =
                   trackIdx != null && bundleMessages
@@ -2066,6 +2062,10 @@ function ChatView() {
                     : bundleMessages && msg.content
                       ? Math.max(0, bundleMessages.indexOf(msg.content))
                       : 0
+                const collapsedCodeBlocks =
+                  entries && bundleIndex >= 0 && bundleIndex < entries.length
+                    ? entries[bundleIndex].collapsedCodeBlocks || null
+                    : null
                 const currentOrigin =
                   entries && bundleIndex >= 0 && bundleIndex < entries.length
                     ? entries[bundleIndex].origin || null
