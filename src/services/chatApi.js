@@ -88,14 +88,22 @@ export function removeCodeBlocksFromMessages(messages, keepCodeBlocks) {
 
   // Only messages that actually contain code blocks and are user/assistant
   // roles consume the "keep" budget. Slots without code blocks don't move
-  // the counter, so the cap targets recent code-bearing messages.
-  let seenCodeBlocks = 0
-  const stripFlags = messages.map((msg) => {
-    if (msg.role !== 'user' && msg.role !== 'assistant') return false
-    if (!hasCodeBlocks(msg.content)) return false
-    const shouldKeep = seenCodeBlocks < keepCount
-    seenCodeBlocks += 1
-    return !shouldKeep
+  // the counter, so the cap targets the most recent code-bearing messages.
+  // Count total code-bearing messages first, then strip the oldest ones
+  // beyond the keep budget (keeping the LAST N).
+  const codeBearingIndexes = messages.reduce((acc, msg, i) => {
+    if ((msg.role === 'user' || msg.role === 'assistant') && hasCodeBlocks(msg.content)) {
+      acc.push(i)
+    }
+    return acc
+  }, [])
+
+  const totalCount = codeBearingIndexes.length
+  const stripBefore = Math.max(0, totalCount - keepCount)
+
+  const stripFlags = messages.map(() => false)
+  codeBearingIndexes.forEach((idx, positionFromOldest) => {
+    stripFlags[idx] = positionFromOldest < stripBefore
   })
 
   return messages.map((msg, i) => {
