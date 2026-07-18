@@ -264,6 +264,17 @@ export async function getEffectiveProfileFor(requestKind) {
   }
 }
 
+// Resolves the effective Top P for a resolved profile, falling back to the
+// provider's declared default when the profile does not override it.
+export function getEffectiveTopP(profile) {
+  if (!profile) return null
+  const raw = profile.params?.top_p
+  if (raw !== undefined && raw !== null && raw !== '') return Number(raw)
+  const provider = PROVIDERS.find((p) => p.id === profile.providerId)
+  const def = provider?.params?.find((p) => p.key === 'top_p')?.default
+  return def !== undefined ? Number(def) : null
+}
+
 export async function migrateFromOldSettings() {
   const already = await db.connectionProfiles.count()
   if (already > 0) return

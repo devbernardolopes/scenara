@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X } from '../../lib/icons'
 import { getSetting, setSetting } from '../../services/settings'
-import { getEffectiveProfileFor } from '../../services/connectionProfiles'
+import { getEffectiveProfileFor, getEffectiveTopP } from '../../services/connectionProfiles'
 import MarqueeText from '../shared/MarqueeText'
 
 export default function ModelStatusBar({ embedded = false }) {
   const { t } = useTranslation('common')
   const [show, setShow] = useState(true)
   const [modelName, setModelName] = useState('')
+  const [topP, setTopP] = useState(null)
 
   useEffect(() => {
     async function load() {
@@ -18,6 +19,7 @@ export default function ModelStatusBar({ embedded = false }) {
       if (!val) return
       const profile = await getEffectiveProfileFor('chat')
       setModelName(profile?.model ? profile.model.split('/').pop() : '')
+      setTopP(getEffectiveTopP(profile))
     }
     load()
     function onSettingsChanged(e) {
@@ -48,6 +50,11 @@ export default function ModelStatusBar({ embedded = false }) {
       <div className="flex-1 min-w-0 flex justify-center text-xs text-tertiary">
         <MarqueeText className="max-w-full">{modelName}</MarqueeText>
       </div>
+      {topP !== null && (
+        <span className="shrink-0 text-xs text-tertiary whitespace-nowrap">
+          {t('topP', { value: topP })}
+        </span>
+      )}
       <button
         type="button"
         onClick={handleDismiss}
