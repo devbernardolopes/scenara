@@ -495,7 +495,11 @@ function Sidebar({ open, onClose }) {
               icon: Zap,
               labelKey: 'sidebar.inChatShortcuts',
             },
-            { onClick: null, icon: BookOpen, labelKey: 'sidebar.lorebooks' },
+            {
+              onClick: () => openModal('lorebookManagement'),
+              icon: BookOpen,
+              labelKey: 'sidebar.lorebooks',
+            },
             { onClick: () => openModal('tagManagement'), icon: Tags, labelKey: 'sidebar.tags' },
             {
               onClick: () => openModal('localInference'),

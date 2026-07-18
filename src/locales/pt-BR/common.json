@@ -178,7 +178,29 @@
       "invalidFormat": "Formato de arquivo inválido",
       "fileError": "Falha ao ler o arquivo"
     },
-    "chatProfileRequired": "Atribua um perfil de Chat em Configurações > API para começar a conversar."
+    "chatProfileRequired": "Atribua um perfil de Chat em Configurações > API para começar a conversar.",
+    "inChatShortcut": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} in-chat shortcuts deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} in-chat shortcuts duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} in-chat shortcuts exported",
+      "imported": "{{count}} in-chat shortcuts imported"
+    },
+    "lorebook": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} lorebooks deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} lorebooks duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} lorebooks exported",
+      "imported": "{{count}} lorebooks imported"
+    }
   },
   "personaPicker": {
     "title": "Iniciar com persona",
@@ -235,5 +257,14 @@
   },
   "localInference": {
     "placeholder": "As configurações de inferência local estarão disponíveis aqui."
+  },
+  "list": {
+    "actions": {
+      "edit": "Edit",
+      "setDefault": "Set as default",
+      "duplicate": "Duplicate",
+      "export": "Export",
+      "delete": "Delete"
+    }
   }
 }

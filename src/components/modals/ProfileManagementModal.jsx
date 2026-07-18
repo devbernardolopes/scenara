@@ -1,23 +1,85 @@
 import { useTranslation } from 'react-i18next'
-import { useModal } from '../../hooks/useModal'
-import ProfileSettingsPanel from './settings/ProfileSettingsPanel'
-import CloseButton from '../shared/CloseButton'
+import { useConfirm } from '../../lib/confirm'
+import ListManagementModal from './shared/ListManagementModal'
+import ProviderIcon from '../shared/ProviderIcon'
+import {
+  getAllProfiles,
+  deleteProfile,
+  deleteProfiles,
+  duplicateProfile,
+  duplicateProfiles,
+  exportProfile,
+  exportProfiles,
+  importProfiles,
+  updateConnectionProfileOrder,
+  REQUEST_KINDS,
+} from '../../services/connectionProfiles'
+import { PROVIDERS } from '../../services/apiProviders'
+import { getSetting } from '../../services/settings'
 
 function ProfileManagementModal() {
-  const { closeModal } = useModal()
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('settings')
+  const { confirm } = useConfirm()
 
-  return (
-    <div className="flex flex-col min-h-0 flex-1">
-      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
-        <h2 className="text-xl font-semibold text-text">{t('sidebar.connectionProfiles')}</h2>
-        <CloseButton onClick={closeModal} />
+  const config = {
+    entityKey: 'api.profile',
+    titleKey: 'sidebar.connectionProfiles',
+    changeEvent: 'connectionProfiles-changed',
+    showImage: false,
+    formModal: 'profileForm',
+    formProp: 'profile',
+    getTile: (p) => (
+      <div className="flex items-center justify-center size-[44px] shrink-0 rounded-md bg-primary-subtle">
+        <ProviderIcon providerId={p.providerId} size={24} />
       </div>
-      <div className="flex-1 overflow-y-auto px-6 py-4">
-        <ProfileSettingsPanel />
-      </div>
-    </div>
-  )
+    ),
+    getTitle: (p) => p.name,
+    getSubtitle: (p) => {
+      const provider = PROVIDERS.find((pr) => pr.id === p.providerId)
+      const base = provider ? t(provider.nameKey.replace('settings:', '')) : p.providerId
+      return p.model ? `${base} · ${p.model}` : base
+    },
+    confirmDelete: async (p) => {
+      const assignedKinds = []
+      for (const kind of REQUEST_KINDS) {
+        const assignedId = await getSetting(`requestKind.${kind}.profileId`)
+        if (assignedId === p.id) assignedKinds.push(kind)
+      }
+      const children =
+        assignedKinds.length > 0 ? (
+          <div className="text-sm text-secondary mb-4">
+            <p>{t('api.profile.confirmDelete.assignedTo')}</p>
+            <ul className="list-disc pl-5 mt-1 space-y-0.5">
+              {assignedKinds.map((kind) => (
+                <li key={kind}>{t(`api.${kind}Profile.label`)}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null
+      const ok = await confirm({
+        title: t('api.profile.confirmDelete.title'),
+        message: t('api.profile.confirmDelete.message', { name: p.name }),
+        confirmLabel: t('api.profile.actions.delete'),
+        cancelLabel: t('common:cancel'),
+        variant: 'danger',
+        children,
+      })
+      return { ok }
+    },
+    service: {
+      getAll: getAllProfiles,
+      delete: deleteProfile,
+      deleteMany: deleteProfiles,
+      duplicate: duplicateProfile,
+      duplicateMany: duplicateProfiles,
+      exportOne: exportProfile,
+      exportMany: exportProfiles,
+      importMany: importProfiles,
+      updateOrder: updateConnectionProfileOrder,
+    },
+  }
+
+  return <ListManagementModal config={config} />
 }
 
 export default ProfileManagementModal

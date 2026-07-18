@@ -592,11 +592,13 @@
     "actions": {
       "edit": "Bearbeiten",
       "delete": "Löschen",
-      "duplicate": "Duplizieren"
+      "duplicate": "Duplizieren",
+      "export": "Export"
     },
     "confirmDelete": {
       "title": "Verknüpfungssatz löschen",
-      "message": "Bist du sicher, dass du \"{{name}}\" löschen möchtest?"
+      "message": "Bist du sicher, dass du \"{{name}}\" löschen möchtest?",
+      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?"
     },
     "form": {
       "title": "Verknüpfungssatz erstellen",
@@ -608,6 +610,19 @@
       "save": "Speichern",
       "saving": "Speichern…",
       "cancel": "Abbrechen"
+    },
+    "create": "Create Shortcut Set",
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "importLabel": "Import",
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid in-chat shortcut export.",
+      "fileError": "Failed to read the file."
     }
   },
   "versionLabel": "Version",
@@ -618,5 +633,34 @@
     "it": "Italiano",
     "de": "Deutsch",
     "es": "Español"
+  },
+  "lorebook": {
+    "title": "Lorebooks",
+    "create": "Create Lorebook",
+    "noItems": "No lorebooks yet.",
+    "comingSoon": "Creating and editing lorebooks is coming soon. You can still import, reorder, duplicate, and delete existing lorebooks.",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "confirmDelete": {
+      "title": "Delete Lorebook",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} lorebooks?"
+    },
+    "importLabel": "Import",
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid lorebook export.",
+      "fileError": "Failed to read the file."
+    }
   }
 }

@@ -1,23 +1,67 @@
 import { useTranslation } from 'react-i18next'
-import { useModal } from '../../hooks/useModal'
-import PersonaSettingsPanel from './settings/PersonaSettingsPanel'
-import CloseButton from '../shared/CloseButton'
+import { useConfirm } from '../../lib/confirm'
+import ListManagementModal from './shared/ListManagementModal'
+import {
+  getAllPersonas,
+  deletePersona,
+  deletePersonas,
+  duplicatePersona,
+  duplicatePersonas,
+  setDefaultPersona,
+  exportPersona,
+  exportPersonas,
+  importPersonas,
+  updatePersonaOrder,
+} from '../../services/personas'
 
 function PersonaManagementModal() {
-  const { closeModal } = useModal()
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('settings')
+  const { confirm } = useConfirm()
 
-  return (
-    <div className="flex flex-col min-h-0 flex-1">
-      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
-        <h2 className="text-xl font-semibold text-text">{t('sidebar.personas')}</h2>
-        <CloseButton onClick={closeModal} />
-      </div>
-      <div className="flex-1 overflow-y-auto px-6 py-4">
-        <PersonaSettingsPanel />
-      </div>
-    </div>
-  )
+  const config = {
+    entityKey: 'persona',
+    changeEvent: 'personas-changed',
+    showImage: true,
+    squaredImage: true,
+    showSetDefault: true,
+    formModal: 'personaForm',
+    formProp: 'persona',
+    getTitle: (p) => p.name,
+    getSubtitle: (p) => p.title || null,
+    getImageSrc: (p) => p.avatar,
+    getBadges: (p) =>
+      p.isDefault ? (
+        <span className="text-xs bg-primary-subtle text-primary px-1.5 py-0.5 rounded font-medium">
+          {t('persona.defaultBadge')}
+        </span>
+      ) : null,
+    isDefault: (p) => !!p.isDefault,
+    onSetDefault: (p) => setDefaultPersona(p.id),
+    disableDelete: (p, all) => all.length <= 1,
+    confirmDelete: async (p) => {
+      const ok = await confirm({
+        title: t('persona.confirmDelete.title'),
+        message: t('persona.confirmDelete.message', { name: p.name }),
+        confirmLabel: t('persona.actions.delete'),
+        cancelLabel: t('common:cancel'),
+        variant: 'danger',
+      })
+      return { ok }
+    },
+    service: {
+      getAll: getAllPersonas,
+      delete: deletePersona,
+      deleteMany: deletePersonas,
+      duplicate: duplicatePersona,
+      duplicateMany: duplicatePersonas,
+      exportOne: exportPersona,
+      exportMany: exportPersonas,
+      importMany: importPersonas,
+      updateOrder: updatePersonaOrder,
+    },
+  }
+
+  return <ListManagementModal config={config} />
 }
 
 export default PersonaManagementModal

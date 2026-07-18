@@ -111,6 +111,15 @@
   "eta": "ETA: {{value}}",
   "moveUp": "Move up",
   "moveDown": "Move down",
+  "list": {
+    "actions": {
+      "edit": "Edit",
+      "setDefault": "Set as default",
+      "duplicate": "Duplicate",
+      "export": "Export",
+      "delete": "Delete"
+    }
+  },
   "uploadImage": "Upload image",
   "downloadImage": "Download image",
   "tokenCount": "{{count}} tokens",
@@ -172,6 +181,28 @@
       "exported": "{{name}} exported",
       "exportedMultiple": "{{count}} connection profiles exported",
       "imported": "{{count}} connection profiles imported"
+    },
+    "inChatShortcut": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} in-chat shortcuts deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} in-chat shortcuts duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} in-chat shortcuts exported",
+      "imported": "{{count}} in-chat shortcuts imported"
+    },
+    "lorebook": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} lorebooks deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} lorebooks duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} lorebooks exported",
+      "imported": "{{count}} lorebooks imported"
     },
     "export": {
       "failed": "Export failed",

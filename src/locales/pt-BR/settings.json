@@ -1004,11 +1004,13 @@
     "actions": {
       "edit": "Editar",
       "delete": "Excluir",
-      "duplicate": "Duplicar"
+      "duplicate": "Duplicar",
+      "export": "Export"
     },
     "confirmDelete": {
       "title": "Excluir Conjunto de Atalhos",
-      "message": "Tem certeza que deseja excluir \"{{name}}\"?"
+      "message": "Tem certeza que deseja excluir \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?"
     },
     "form": {
       "title": "Criar Conjunto de Atalhos",
@@ -1020,6 +1022,19 @@
       "save": "Salvar",
       "saving": "Salvando…",
       "cancel": "Cancelar"
+    },
+    "create": "Create Shortcut Set",
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "importLabel": "Import",
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid in-chat shortcut export.",
+      "fileError": "Failed to read the file."
     }
   },
   "versionLabel": "Versão",
@@ -1030,5 +1045,34 @@
     "it": "Italiano",
     "de": "Deutsch",
     "es": "Español"
+  },
+  "lorebook": {
+    "title": "Lorebooks",
+    "create": "Create Lorebook",
+    "noItems": "No lorebooks yet.",
+    "comingSoon": "Creating and editing lorebooks is coming soon. You can still import, reorder, duplicate, and delete existing lorebooks.",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "confirmDelete": {
+      "title": "Delete Lorebook",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} lorebooks?"
+    },
+    "importLabel": "Import",
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid lorebook export.",
+      "fileError": "Failed to read the file."
+    }
   }
 }

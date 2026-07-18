@@ -114,6 +114,28 @@
     "import": {
       "invalidFormat": "Format de fichier invalide",
       "fileError": "Échec de la lecture du fichier"
+    },
+    "inChatShortcut": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} in-chat shortcuts deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} in-chat shortcuts duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} in-chat shortcuts exported",
+      "imported": "{{count}} in-chat shortcuts imported"
+    },
+    "lorebook": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} lorebooks deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} lorebooks duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} lorebooks exported",
+      "imported": "{{count}} lorebooks imported"
     }
   },
   "ok": "OK",
@@ -152,5 +174,14 @@
   },
   "localInference": {
     "placeholder": "Les paramètres d'inférence locale seront disponibles ici."
+  },
+  "list": {
+    "actions": {
+      "edit": "Edit",
+      "setDefault": "Set as default",
+      "duplicate": "Duplicate",
+      "export": "Export",
+      "delete": "Delete"
+    }
   }
 }

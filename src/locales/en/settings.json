@@ -1014,15 +1014,34 @@
   "inChatShortcut": {
     "title": "In-Chat Shortcuts",
     "createShortcut": "Create Shortcut Set",
+    "create": "Create Shortcut Set",
+    "importLabel": "Import",
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid in-chat shortcut export.",
+      "fileError": "Failed to read the file."
+    },
     "noShortcuts": "No shortcut sets yet.",
     "actions": {
       "edit": "Edit",
       "delete": "Delete",
-      "duplicate": "Duplicate"
+      "duplicate": "Duplicate",
+      "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
     },
     "confirmDelete": {
       "title": "Delete Shortcut Set",
-      "message": "Are you sure you want to delete \"{{name}}\"?"
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?"
+    },
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid in-chat shortcut export.",
+      "fileError": "Failed to read the file."
     },
     "form": {
       "title": "Create Shortcut Set",
@@ -1034,6 +1053,39 @@
       "save": "Save",
       "saving": "Saving…",
       "cancel": "Cancel"
+    }
+  },
+  "lorebook": {
+    "title": "Lorebooks",
+    "create": "Create Lorebook",
+    "importLabel": "Import",
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid lorebook export.",
+      "fileError": "Failed to read the file."
+    },
+    "noItems": "No lorebooks yet.",
+    "comingSoon": "Creating and editing lorebooks is coming soon. You can still import, reorder, duplicate, and delete existing lorebooks.",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "confirmDelete": {
+      "title": "Delete Lorebook",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} lorebooks?"
+    },
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid lorebook export.",
+      "fileError": "Failed to read the file."
     }
   },
   "versionLabel": "Version",
