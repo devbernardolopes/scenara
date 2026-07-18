@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useModal } from '../../hooks/useModal'
-import { useConfirm } from '../../lib/confirm'
-import { showToast } from '../../lib/toast'
-import { downloadJson } from '../../lib/download'
-import CloseButton from '../shared/CloseButton'
-import ListEntryCard from '../shared/ListEntryCard'
-import { Plus, Upload } from '../../lib/icons'
+import { useModal } from '../../../hooks/useModal'
+import { useConfirm } from '../../../lib/confirm'
+import { showToast } from '../../../lib/toast'
+import { downloadJson } from '../../../lib/download'
+import CloseButton from '../../shared/CloseButton'
+import ListEntryCard from '../../shared/ListEntryCard'
+import { Plus, Upload } from '../../../lib/icons'
 
 /**
  * Generic "list management" modal shared by the Persona, Connection Profile,
