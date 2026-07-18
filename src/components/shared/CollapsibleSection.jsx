@@ -52,26 +52,32 @@ function CollapsibleSection({
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={toggle}
-        className="w-full flex items-center justify-between min-h-[44px] px-3 py-2 rounded-md hover:bg-surface-hover gap-2"
-      >
-        <span className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center justify-between gap-2 min-h-[44px] px-3 py-2 rounded-md hover:bg-surface-hover">
+        <button
+          type="button"
+          onClick={toggle}
+          className="flex items-center gap-2 min-w-0 min-h-[44px] flex-1 text-left"
+        >
           <span
             className={`text-sm font-medium ${(hasContent ?? !!summary) ? 'text-highlight' : 'text-text'}`}
           >
             {label}
           </span>
-          {headerExtra}
-        </span>
+        </button>
         <span className="flex items-center gap-2">
           {summary && <span className="text-xs text-tertiary">{summary}</span>}
-          <ChevronDown
-            className={`w-4 h-4 text-tertiary transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-          />
+          {headerExtra}
+          <button
+            type="button"
+            onClick={toggle}
+            className="flex items-center justify-center min-w-[44px] min-h-[44px]"
+          >
+            <ChevronDown
+              className={`w-4 h-4 text-tertiary transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+            />
+          </button>
         </span>
-      </button>
+      </div>
       <div
         className="overflow-hidden transition-all duration-200"
         style={{ maxHeight: open ? contentHeight : 0 }}
