@@ -181,6 +181,10 @@
       "label": "Usuário – Excluir a Partir Daqui",
       "desc": "Mostrar o botão que exclui esta mensagem e todas abaixo dela."
     },
+    "showUserMakeShortcut": {
+      "label": "Usuário – Criar Atalho",
+      "desc": "Mostrar o botão de criar atalho nas bolhas de mensagem do usuário."
+    },
     "characterCardMarquee": {
       "label": "Rolagem no Card do Personagem",
       "desc": "Rolar nomes de personagens quando eles transbordam o card. Desative para truncar com reticências."

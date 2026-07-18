@@ -23,6 +23,7 @@ import ProfileManagementModal from './components/modals/ProfileManagementModal'
 import ProfileFormModal from './components/modals/ProfileFormModal'
 import InChatShortcutManagementModal from './components/modals/InChatShortcutManagementModal'
 import InChatShortcutFormModal from './components/modals/InChatShortcutFormModal'
+import MakeShortcutModal from './components/modals/MakeShortcutModal'
 import ShowPromptModal from './components/modals/ShowPromptModal'
 import RequestDetailsModal from './components/modals/RequestDetailsModal'
 import DirectorDetailsModal from './components/modals/DirectorDetailsModal'
@@ -58,6 +59,7 @@ registerModal('profileManagement', ProfileManagementModal)
 registerModal('profileForm', ProfileFormModal)
 registerModal('inChatShortcutManagement', InChatShortcutManagementModal)
 registerModal('inChatShortcutForm', InChatShortcutFormModal)
+registerModal('makeShortcut', MakeShortcutModal)
 registerModal('showPrompt', ShowPromptModal)
 registerModal('requestDetails', RequestDetailsModal)
 registerModal('directorDetails', DirectorDetailsModal)

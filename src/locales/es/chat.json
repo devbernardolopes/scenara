@@ -64,5 +64,25 @@
   "summaryCancelDoneHint": "Puedes cerrar este diálogo — la solicitud terminó por sí sola.",
   "summarizationProgressMessages_one": "Próximo resumen en {{count}} mensaje",
   "summarizationProgressMessages_other": "Próximo resumen en {{count}} mensajes",
-  "summarizationProgressTokens": "Memoria {{current}} / {{threshold}} tokens"
+  "summarizationProgressTokens": "Memoria {{current}} / {{threshold}} tokens",
+  "makeShortcut": "Crear Acceso Rápido",
+  "makeShortcutModal": {
+    "title": "Crear Acceso Rápido",
+    "shortcutSet": "Conjunto de Accesos Rápidos",
+    "noSets": "No hay conjuntos de accesos rápidos. Crea uno primero.",
+    "createSet": "Crear Conjunto",
+    "name": "Nombre",
+    "message": "Mensaje",
+    "insertionType": "Tipo de Inserción",
+    "autoSend": "Envío Automático",
+    "clearAfterSend": "Limpiar Después de Enviar",
+    "insertionReplace": "Reemplazar",
+    "insertionStart": "Inicio",
+    "insertionEnd": "Fin",
+    "insertionCursor": "Cursor",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "created": "Acceso rápido creado"
+  }
 }

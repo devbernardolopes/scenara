@@ -181,6 +181,10 @@
       "label": "User – Delete From Here",
       "desc": "Show the button that deletes this message and every message below it."
     },
+    "showUserMakeShortcut": {
+      "label": "User – Make Shortcut",
+      "desc": "Show the make shortcut button on user message bubbles."
+    },
     "characterCardMarquee": {
       "label": "Character Card Marquee",
       "desc": "Scroll character names when they overflow the card. Disable to truncate with ellipsis instead."

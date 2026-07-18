@@ -64,5 +64,25 @@
   "summaryCancelDoneHint": "Du kannst diesen Dialog schließen — die Anfrage wurde von selbst beendet.",
   "summarizationProgressMessages_one": "Nächste Zusammenfassung in {{count}} Nachricht",
   "summarizationProgressMessages_other": "Nächste Zusammenfassung in {{count}} Nachrichten",
-  "summarizationProgressTokens": "Speicher {{current}} / {{threshold}} Token"
+  "summarizationProgressTokens": "Speicher {{current}} / {{threshold}} Token",
+  "makeShortcut": "Verknüpfung Erstellen",
+  "makeShortcutModal": {
+    "title": "Verknüpfung Erstellen",
+    "shortcutSet": "Verknüpfungssatz",
+    "noSets": "Keine Verknüpfungssätze. Erstelle zuerst einen.",
+    "createSet": "Satz Erstellen",
+    "name": "Name",
+    "message": "Nachricht",
+    "insertionType": "Einfügeart",
+    "autoSend": "Auto-Senden",
+    "clearAfterSend": "Nach Senden Leeren",
+    "insertionReplace": "Ersetzen",
+    "insertionStart": "Anfang",
+    "insertionEnd": "Ende",
+    "insertionCursor": "Cursor",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Speichern…",
+    "created": "Verknüpfung erstellt"
+  }
 }

@@ -161,5 +161,25 @@
   "retryingInterrupted": "Tentando novamente mensagem interrompida…",
   "summarizationProgressMessages_one": "Próximo resumo em {{count}} mensagem",
   "summarizationProgressMessages_other": "Próximo resumo em {{count}} mensagens",
-  "summarizationProgressTokens": "Memória {{current}} / {{threshold}} tokens"
+  "summarizationProgressTokens": "Memória {{current}} / {{threshold}} tokens",
+  "makeShortcut": "Criar Atalho",
+  "makeShortcutModal": {
+    "title": "Criar Atalho",
+    "shortcutSet": "Conjunto de Atalhos",
+    "noSets": "Nenhum conjunto de atalhos. Crie um primeiro.",
+    "createSet": "Criar Conjunto",
+    "name": "Nome",
+    "message": "Mensagem",
+    "insertionType": "Tipo de Inserção",
+    "autoSend": "Envio Automático",
+    "clearAfterSend": "Limpar Após Envio",
+    "insertionReplace": "Substituir",
+    "insertionStart": "Início",
+    "insertionEnd": "Fim",
+    "insertionCursor": "Cursor",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "saving": "Salvando…",
+    "created": "Atalho criado"
+  }
 }

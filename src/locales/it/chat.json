@@ -64,5 +64,25 @@
   "summaryCancelDoneHint": "Puoi chiudere questa finestra — la richiesta è terminata da sola.",
   "summarizationProgressMessages_one": "Prossimo riepilogo tra {{count}} messaggio",
   "summarizationProgressMessages_other": "Prossimo riepilogo tra {{count}} messaggi",
-  "summarizationProgressTokens": "Memoria {{current}} / {{threshold}} token"
+  "summarizationProgressTokens": "Memoria {{current}} / {{threshold}} token",
+  "makeShortcut": "Crea Scorciatoia",
+  "makeShortcutModal": {
+    "title": "Crea Scorciatoia",
+    "shortcutSet": "Set di Scorciatoie",
+    "noSets": "Nessun set di scorciatoie. Creane uno prima.",
+    "createSet": "Crea Set",
+    "name": "Nome",
+    "message": "Messaggio",
+    "insertionType": "Tipo di Inserimento",
+    "autoSend": "Invio Automatico",
+    "clearAfterSend": "Cancella Dopo Invio",
+    "insertionReplace": "Sostituisci",
+    "insertionStart": "Inizio",
+    "insertionEnd": "Fine",
+    "insertionCursor": "Cursore",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "saving": "Salvataggio…",
+    "created": "Scorciatoia creata"
+  }
 }

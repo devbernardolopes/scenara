@@ -23,6 +23,7 @@ import {
   Layers,
   ChevronsDown,
   Theater,
+  Zap,
 } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
@@ -46,6 +47,7 @@ const VISIBILITY_KEYS = [
   'showUserEdit',
   'showUserCopy',
   'showUserFork',
+  'showUserMakeShortcut',
 ]
 
 const ORDER_KEYS = ['assistantButtonOrder', 'userButtonOrder']
@@ -62,7 +64,15 @@ const DEFAULT_ASSISTANT_ORDER = [
   'requestDetails',
   'directorDetails',
 ]
-const DEFAULT_USER_ORDER = ['delete', 'deleteAll', 'deleteFromHere', 'edit', 'copy', 'fork']
+const DEFAULT_USER_ORDER = [
+  'delete',
+  'deleteAll',
+  'deleteFromHere',
+  'edit',
+  'copy',
+  'fork',
+  'makeShortcut',
+]
 
 const BUTTON_DEFS = {
   delete: { icon: Trash2, placement: 'header', labelKey: 'delete' },
@@ -71,6 +81,7 @@ const BUTTON_DEFS = {
   edit: { icon: Edit3, placement: 'header', labelKey: 'edit' },
   copy: { icon: Copy, placement: 'header', labelKey: 'copy' },
   fork: { icon: GitBranch, placement: 'header', labelKey: 'fork' },
+  makeShortcut: { icon: Zap, placement: 'header', labelKey: 'makeShortcut' },
   regenerate: { icon: RefreshCw, placement: 'overflow', labelKey: 'regenerate' },
   speak: { icon: Play, placement: 'overflow', labelKey: 'speak' },
   prompt: { icon: Terminal, placement: 'overflow', labelKey: 'showPrompt' },
@@ -104,6 +115,7 @@ const VIS_KEY = {
     edit: 'showUserEdit',
     copy: 'showUserCopy',
     fork: 'showUserFork',
+    makeShortcut: 'showUserMakeShortcut',
   },
   assistant: {
     delete: 'showAssistantDelete',
@@ -367,7 +379,8 @@ function MessageBubble({
     if (key === 'regenerate' && generating) return true
     if (key === 'requestDetails' && (!promptData || streaming || generating)) return true
     if (key === 'directorDetails' && (!promptData?.directorAttempted || streaming)) return true
-    if (!message.content?.trim() && ['edit', 'copy', 'fork', 'speak'].includes(key)) return true
+    if (!message.content?.trim() && ['edit', 'copy', 'fork', 'speak', 'makeShortcut'].includes(key))
+      return true
     return false
   }
   const unreadClass = isUnread ? 'ring-1 ring-primary/40' : ''
@@ -562,6 +575,8 @@ function MessageBubble({
         return handleCopy
       case 'fork':
         return () => onFork?.(message.id)
+      case 'makeShortcut':
+        return () => openModal('makeShortcut', { content: message.content })
       case 'regenerate':
         return () => onRegenerate?.(message.id)
       case 'speak':

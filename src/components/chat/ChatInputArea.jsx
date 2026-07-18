@@ -103,16 +103,22 @@ function parseShortcuts(content) {
   const blocks = content.split(/\n\s*\n/)
   const result = []
   for (const raw of blocks) {
-    const lines = raw.split('\n').filter((l) => l.trim() !== '')
+    const lines = raw.split('\n')
     if (lines.length === 0) continue
     const entry = {}
     for (const line of lines) {
+      if (!line.trim()) continue
       const m = line.match(/^@([A-Za-z]+)=(.*)$/)
-      if (!m) return null
-      const k = m[1]
-      if (!SHORTCUT_KEYS.includes(k)) return null
-      if (k in entry) return null
-      entry[k] = m[2]
+      if (m) {
+        const k = m[1]
+        if (!SHORTCUT_KEYS.includes(k)) return null
+        if (k in entry) return null
+        entry[k] = m[2]
+      } else {
+        const lastKey = Object.keys(entry).pop()
+        if (!lastKey) return null
+        entry[lastKey] += '\n' + line
+      }
     }
     if (!entry.name || !entry.message) return null
     result.push({ name: entry.name, message: entry.message })

@@ -64,5 +64,25 @@
   "summaryCancelDoneHint": "Vous pouvez fermer cette fenêtre — la requête s'est terminée d'elle-même.",
   "summarizationProgressMessages_one": "Prochain résumé dans {{count}} message",
   "summarizationProgressMessages_other": "Prochain résumé dans {{count}} messages",
-  "summarizationProgressTokens": "Mémoire {{current}} / {{threshold}} tokens"
+  "summarizationProgressTokens": "Mémoire {{current}} / {{threshold}} tokens",
+  "makeShortcut": "Créer un Raccourci",
+  "makeShortcutModal": {
+    "title": "Créer un Raccourci",
+    "shortcutSet": "Ensemble de Raccourcis",
+    "noSets": "Aucun ensemble de raccourcis. Créez-en un d'abord.",
+    "createSet": "Créer un Ensemble",
+    "name": "Nom",
+    "message": "Message",
+    "insertionType": "Type d'Insertion",
+    "autoSend": "Envoi Automatique",
+    "clearAfterSend": "Effacer Après Envoi",
+    "insertionReplace": "Remplacer",
+    "insertionStart": "Début",
+    "insertionEnd": "Fin",
+    "insertionCursor": "Curseur",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "created": "Raccourci créé"
+  }
 }

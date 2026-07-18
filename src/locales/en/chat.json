@@ -164,5 +164,25 @@
   "retryingInterrupted": "Retrying interrupted message…",
   "summarizationProgressMessages_one": "Next summary in {{count}} message",
   "summarizationProgressMessages_other": "Next summary in {{count}} messages",
-  "summarizationProgressTokens": "Memory {{current}} / {{threshold}} tokens"
+  "summarizationProgressTokens": "Memory {{current}} / {{threshold}} tokens",
+  "makeShortcut": "Make Shortcut",
+  "makeShortcutModal": {
+    "title": "Create Shortcut",
+    "shortcutSet": "Shortcut Set",
+    "noSets": "No shortcut sets. Create one first.",
+    "createSet": "Create Set",
+    "name": "Name",
+    "message": "Message",
+    "insertionType": "Insertion Type",
+    "autoSend": "Auto Send",
+    "clearAfterSend": "Clear After Send",
+    "insertionReplace": "Replace",
+    "insertionStart": "Start",
+    "insertionEnd": "End",
+    "insertionCursor": "Cursor",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "created": "Shortcut created"
+  }
 }
