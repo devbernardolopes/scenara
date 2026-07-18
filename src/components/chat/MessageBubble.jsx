@@ -151,11 +151,6 @@ function estimateTokens(text) {
   return Math.ceil((text || '').length / 4)
 }
 
-function formatTokenCount(count) {
-  if (count >= 1000) return `${(count / 1000).toFixed(1)}K`
-  return String(count)
-}
-
 function formatDuration(ms) {
   if (ms >= 1000) return `${(ms / 1000).toFixed(2)}s`
   return `${ms}ms`
@@ -944,15 +939,10 @@ function MessageBubble({
             )}
             {!streaming && displayContent?.trim() && (
               <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
-                {t('tokens', { count: formatTokenCount(tokenCount) })}
+                {t('tokens', { count: tokenCount })}
               </span>
             )}
             {!streaming && displayContent?.trim() && (
-              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
-                {t('words', { count: wordCount })}
-              </span>
-            )}
-            {!streaming && typeof apiDurationMs === 'number' && (
               <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
                 {t('words', { count: wordCount })}
               </span>
