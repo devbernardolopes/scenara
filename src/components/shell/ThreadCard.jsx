@@ -16,6 +16,8 @@ import {
 } from '../../lib/icons'
 import ThreadCardTitle from './ThreadCardTitle'
 import { getColorHex } from '../../config/colorPalettes'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus'
+import { isExternalImageUrl } from '../../lib/image'
 
 const ThreadCard = forwardRef(function ThreadCard(
   {
@@ -42,6 +44,7 @@ const ThreadCard = forwardRef(function ThreadCard(
   ref,
 ) {
   const { t } = useTranslation('common')
+  const online = useOnlineStatus()
   const threadColor = thread.colorSlot >= 0 ? getColorHex(theme, thread.colorSlot) : thread.color
 
   return (
@@ -62,7 +65,8 @@ const ThreadCard = forwardRef(function ThreadCard(
       >
         <div className="w-22 flex-shrink-0 self-stretch min-h-0 rounded-l-lg overflow-hidden relative bg-surface-hover">
           {character?.avatar &&
-          (/^https?:\/\//.test(character.avatar) || character.avatar.startsWith('data:image/')) ? (
+          (character.avatar.startsWith('data:image/') ||
+            (isExternalImageUrl(character.avatar) && online)) ? (
             <img
               src={character.avatar}
               alt={character?.displayName || character?.name || ''}

@@ -1,3 +1,6 @@
+import { useOnlineStatus } from '../../hooks/useOnlineStatus'
+import { isExternalImageUrl } from '../../lib/image'
+
 const SIZES = {
   sm: 'text-xl w-7 h-7',
   md: 'text-2xl w-8 h-8',
@@ -8,14 +11,16 @@ const SIZES = {
 
 function Avatar({ src, alt = '', size = 'md', className = '', onClick }) {
   const cls = `${SIZES[size] || SIZES.md} ${className}`
-  if (!src) {
+  const online = useOnlineStatus()
+  const showFallback = !src || (isExternalImageUrl(src) && !online)
+  if (showFallback) {
     return (
       <span data-avatar className={cls}>
         {'👤'}
       </span>
     )
   }
-  if (/^https?:\/\//.test(src) || src.startsWith('data:image/')) {
+  if (src.startsWith('data:image/') || isExternalImageUrl(src)) {
     return (
       <img
         src={src}

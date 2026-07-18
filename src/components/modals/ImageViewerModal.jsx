@@ -2,6 +2,8 @@ import { useRef } from 'react'
 import { TransformWrapper, TransformComponent, useControls } from 'react-zoom-pan-pinch'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus'
+import { isExternalImageUrl } from '../../lib/image'
 import { Download, X } from '../../lib/icons'
 
 function ImageViewerInner({ src, alt, imgRef, onZoomRef }) {
@@ -28,10 +30,12 @@ function ImageViewerInner({ src, alt, imgRef, onZoomRef }) {
 function ImageViewerModal({ src, alt }) {
   const { t } = useTranslation('common')
   const { closeModal } = useModal()
+  const online = useOnlineStatus()
   const pointerStart = useRef(null)
   const pointerDownOnImage = useRef(false)
   const imgRef = useRef(null)
   const centerViewRef = useRef(null)
+  const canShowImage = !isExternalImageUrl(src) || online
 
   const handleDownload = (e) => {
     e.stopPropagation()
@@ -72,18 +76,22 @@ function ImageViewerModal({ src, alt }) {
       onPointerDown={handlePointerDown}
       onClick={handleBackdropClick}
     >
-      <TransformWrapper
-        minScale={0.5}
-        maxScale={5}
-        smooth={false}
-        wheel={{ step: 0.12, wheelDisabled: false }}
-        doubleClick={{ mode: 'reset' }}
-        panning={{ disabled: false }}
-        pinch={{ disabled: false }}
-        onZoom={handleZoom}
-      >
-        <ImageViewerInner src={src} alt={alt} imgRef={imgRef} onZoomRef={centerViewRef} />
-      </TransformWrapper>
+      {canShowImage ? (
+        <TransformWrapper
+          minScale={0.5}
+          maxScale={5}
+          smooth={false}
+          wheel={{ step: 0.12, wheelDisabled: false }}
+          doubleClick={{ mode: 'reset' }}
+          panning={{ disabled: false }}
+          pinch={{ disabled: false }}
+          onZoom={handleZoom}
+        >
+          <ImageViewerInner src={src} alt={alt} imgRef={imgRef} onZoomRef={centerViewRef} />
+        </TransformWrapper>
+      ) : (
+        <div className="flex items-center justify-center text-6xl text-tertiary">{'👤'}</div>
+      )}
 
       <div
         className="absolute top-4 right-4 flex items-center gap-2 z-10"

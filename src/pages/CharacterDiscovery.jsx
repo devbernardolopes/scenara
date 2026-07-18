@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } fr
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../hooks/useModal'
+import { useOnlineStatus } from '../hooks/useOnlineStatus'
+import { isExternalImageUrl } from '../lib/image'
 import { useConfirm } from '../lib/confirm'
 import {
   getAllCharacters,
@@ -158,6 +160,14 @@ function CharacterNameCell({ name, characterCardMarquee }) {
 
 function CharacterPortraitImage({ src, alt }) {
   const [loaded, setLoaded] = useState(false)
+  const online = useOnlineStatus()
+  if (isExternalImageUrl(src) && !online) {
+    return (
+      <span className="flex items-center justify-center w-full h-full text-4xl leading-none">
+        {'👤'}
+      </span>
+    )
+  }
   return (
     <img
       src={src}

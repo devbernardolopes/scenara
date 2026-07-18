@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus'
+import { isExternalImageUrl } from '../../lib/image'
 import IconButton from './IconButton'
 import { Edit3, Star, Copy, Download, Trash2, ChevronUp, ChevronDown } from '../../lib/icons'
 
@@ -28,6 +30,7 @@ function ListEntryCard({
 }) {
   const { t } = useTranslation('settings')
   const { openModal } = useModal()
+  const online = useOnlineStatus()
 
   return (
     <div
@@ -63,7 +66,8 @@ function ListEntryCard({
               if (imageSrc) openModal('imageViewer', { src: imageSrc, modalSize: 'fullscreen' })
             }}
           >
-            {imageSrc && (/^https?:\/\//.test(imageSrc) || imageSrc.startsWith('data:image/')) ? (
+            {imageSrc &&
+            (imageSrc.startsWith('data:image/') || (isExternalImageUrl(imageSrc) && online)) ? (
               <img src={imageSrc} alt="" className="size-[44px] object-cover rounded-md" />
             ) : (
               <span className="text-2xl leading-none">{imageSrc || '👤'}</span>
