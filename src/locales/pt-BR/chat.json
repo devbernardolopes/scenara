@@ -83,7 +83,7 @@
   "deleteAllConfirmMessage": "Isso excluirá todos os slots desta bolha de mensagem. Não pode ser desfeito.",
   "deleteFromHereConfirmTitle": "Excluir a partir daqui",
   "deleteFromHereConfirmMessage": "Isso excluirá esta mensagem e todas abaixo dela na conversa. Não pode ser desfeito.",
-  "tokens": "~{{count}} tokens",
+  "tokens": "{{count}} tokens",
   "apiDuration": "{{duration}}",
   "words": "{{count}} palavras",
   "edited": "(editado)",

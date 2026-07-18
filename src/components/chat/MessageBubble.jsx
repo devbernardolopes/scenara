@@ -1020,9 +1020,14 @@ function MessageBubble({
                 {t('apiDuration', { duration: formatDuration(apiDurationMs) })}
               </span>
             )}
-            {!streaming && typeof apiDurationMs === 'number' && (
+            {!streaming && displayContent?.trim() && (
               <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
                 {t('tokens', { count: formatTokenCount(tokenCount) })}
+              </span>
+            )}
+            {!streaming && displayContent?.trim() && (
+              <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
+                {t('words', { count: wordCount })}
               </span>
             )}
             {!streaming && typeof apiDurationMs === 'number' && (

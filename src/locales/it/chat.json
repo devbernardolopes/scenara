@@ -35,7 +35,7 @@
   "cancel": "Annulla",
   "messageDeleteTitle": "Elimina messaggio",
   "messageDeleteConfirm": "Eliminare il messaggio #{{number}}?",
-  "tokens": "~{{count}} token",
+  "tokens": "{{count}} token",
   "apiDuration": "{{duration}}",
   "words": "{{count}} parole",
   "edited": "(modificato)",

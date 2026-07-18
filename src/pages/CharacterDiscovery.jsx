@@ -526,6 +526,14 @@ function CharacterDiscovery() {
                         name={char.name}
                         characterCardMarquee={characterCardMarquee}
                       />
+                      {char.tagline?.trim() && (
+                        <MarqueeText
+                          className="text-xs text-on-image-muted"
+                          marquee={characterCardMarquee}
+                        >
+                          {char.tagline}
+                        </MarqueeText>
+                      )}
                       {displayTags.length > 0 && <TagRow tags={displayTags} />}
                       {(chatCount > 0 || has1st || hasMem || hasDir) && (
                         <div className="flex items-center gap-1 text-on-image-muted">
