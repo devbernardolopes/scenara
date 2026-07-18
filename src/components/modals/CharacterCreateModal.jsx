@@ -77,6 +77,7 @@ const INITIAL_FORM = {
   personaInjectionPlacement: 'endOfSystemPrompt',
   personaInjectionMessageRole: 'system',
   tags: [],
+  lastSection: null,
 }
 
 const DEFAULTS_MAP = {
@@ -206,7 +207,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
   const initialRef = useRef(isImport ? buildInitialForm(initialData) : buildInitialForm(existing))
   const [form, setForm] = useState(initialRef.current)
   const [saving, setSaving] = useState(false)
-  const [activeSection, setActiveSection] = useState('character')
+  const [activeSection, setActiveSection] = useState(form.lastSection || 'character')
   const savePendingRef = useRef(false)
   const [totalPermTokens, setTotalPermTokens] = useState(0)
   const [defaultPersonaName, setDefaultPersonaName] = useState('')
@@ -418,6 +419,14 @@ function CharacterCreateModal({ character: existing, initialData }) {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
+  function handleSectionChange(section) {
+    setActiveSection(section)
+    handleChange('lastSection', section)
+    if (characterId && section !== existing?.lastSection) {
+      updateCharacter(characterId, { lastSection: section })
+    }
+  }
+
   async function saveCharacter() {
     setSaving(true)
     try {
@@ -478,7 +487,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       <div className="px-6 pt-4 pb-2 shrink-0 md:hidden">
         <select
           value={activeSection}
-          onChange={(e) => setActiveSection(e.target.value)}
+          onChange={(e) => handleSectionChange(e.target.value)}
           className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text text-sm"
         >
           {[
@@ -504,7 +513,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       <div className="flex flex-1 min-h-0">
         <CharacterSidebar
           active={activeSection}
-          onSelect={setActiveSection}
+          onSelect={handleSectionChange}
           highlights={sectionHighlights}
         />
         <div className="flex-1 overflow-y-auto px-6 py-4">
