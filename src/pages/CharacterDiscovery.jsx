@@ -21,6 +21,7 @@ import CollapsibleSection from '../components/shared/CollapsibleSection'
 import IconButton from '../components/shared/IconButton'
 import Pagination from '../components/shared/Pagination'
 import ModelStatusBar from '../components/shell/ModelStatusBar'
+import MarqueeText from '../components/shared/MarqueeText'
 import PersonaPicker from '../components/shared/PersonaPicker'
 import { getAllTags } from '../services/tags'
 import {
