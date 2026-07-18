@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import ModalShell from '../shared/ModalShell'
 import { replaceVars } from '../../services/chatApi'
+import { getSetting } from '../../services/settings'
+import { getPersona } from '../../services/personas'
 import { ChevronLeft, ChevronRight } from '../../lib/icons'
 
 function ScenarioSelectorModal({ character, persona, scenarios, onSelect }) {
@@ -11,15 +13,29 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect }) {
 
   const activeIdx = scenarios.findIndex((s) => s.active)
   const [currentIndex, setCurrentIndex] = useState(activeIdx >= 0 ? activeIdx : 0)
+  const [resolvedPersonaName, setResolvedPersonaName] = useState(persona?.name || '')
+
+  useEffect(() => {
+    if (persona?.name) return
+    let cancelled = false
+    getSetting('defaultPersonaId').then((id) => {
+      if (cancelled || !id) return
+      getPersona(id).then((p) => {
+        if (!cancelled && p?.name) setResolvedPersonaName(p.name)
+      })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [persona?.name])
 
   const scenario = scenarios[currentIndex]
   const charName = character?.name || ''
-  const personaName = persona?.name || ''
 
   const resolvedContent = replaceVars(scenario?.content || '', {
     charName,
-    personaName,
-    currentPersonaName: personaName,
+    personaName: resolvedPersonaName,
+    currentPersonaName: resolvedPersonaName,
   })
 
   const scenarioTitle = scenario?.name?.trim() || `${t('scenarioLabel')} #${currentIndex + 1}`
@@ -65,25 +81,25 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect }) {
         </>
       }
     >
-      <div className="flex items-stretch gap-2 h-full min-h-0">
+      <div className="flex items-start gap-2">
         <button
           type="button"
           onClick={handlePrev}
-          className="flex items-center justify-center w-10 shrink-0 rounded-md hover:bg-surface-hover text-tertiary hover:text-text transition-colors"
+          className="flex items-center justify-center w-10 shrink-0 mt-1 rounded-md hover:bg-surface-hover text-tertiary hover:text-text transition-colors"
           aria-label={t('scenarioSelector.previousScenario')}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        <div className="flex-1 min-w-0 flex flex-col min-h-0 overflow-hidden">
-          <div className="mb-3">
+        <div className="flex-1 min-w-0">
+          <div className="mb-2">
             <h3 className="text-base font-semibold text-text truncate">{scenarioTitle}</h3>
             <span className="text-xs text-tertiary">
               {currentIndex + 1} / {scenarios.length}
             </span>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-border bg-surface-secondary p-4">
+          <div className="max-h-64 overflow-y-auto rounded-md border border-border bg-surface-secondary p-4">
             {resolvedContent ? (
               <p className="text-sm text-text whitespace-pre-wrap leading-relaxed">
                 {resolvedContent}
@@ -97,7 +113,7 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect }) {
         <button
           type="button"
           onClick={handleNext}
-          className="flex items-center justify-center w-10 shrink-0 rounded-md hover:bg-surface-hover text-tertiary hover:text-text transition-colors"
+          className="flex items-center justify-center w-10 shrink-0 mt-1 rounded-md hover:bg-surface-hover text-tertiary hover:text-text transition-colors"
           aria-label={t('scenarioSelector.nextScenario')}
         >
           <ChevronRight className="w-5 h-5" />
