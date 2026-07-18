@@ -6,7 +6,7 @@ import { createThreadMemory, buildInjectedMemory } from './threadMemories'
 import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { getSetting } from './settings'
-import { getPersona } from './personas'
+import { getPersona, getAllPersonas } from './personas'
 import { estimateTokens } from './tokenEstimator'
 import {
   cancelSummarizationRequests,
@@ -207,6 +207,53 @@ export async function buildSummarizationPayload({
   return payload
 }
 
+async function buildSummarizationRolePrefixes() {
+  return {
+    systemRolePrefix: await getSetting('prompting.systemRolePrefix'),
+    assistantRolePrefix: await getSetting('prompting.assistantRolePrefix'),
+    userRolePrefix: await getSetting('prompting.userRolePrefix'),
+    userRolePrefixWithPersona: await getSetting('prompting.userRolePrefixWithPersona'),
+    systemRolePrefixOoc: await getSetting('prompting.systemRolePrefixOoc'),
+    assistantRolePrefixOoc: await getSetting('prompting.assistantRolePrefixOoc'),
+    userRolePrefixOoc: await getSetting('prompting.userRolePrefixOoc'),
+  }
+}
+
+// Rebuilds the summarization payload for a thread using the *current* chat
+// state (messages, memory, character prompt, settings, personas), mirroring the
+// regular summarization flow. Returns the `[system, user]` payload array, or
+// `null` when there are no unsummarized messages to summarize.
+export async function buildCurrentSummarizationPayload(threadId, { currentPersona = null } = {}) {
+  const thread = await db.threads.get(Number(threadId))
+  if (!thread) return null
+  const character = thread.characterId ? await db.characters.get(thread.characterId) : null
+  if (!character) return null
+
+  const includeOOC = character?.includeOOC !== false
+  const freshMessages = await getMessagesByThread(thread.id)
+  const unsummarizedMessages = getUnsummarizedMessages(freshMessages, { includeOOC })
+  if (unsummarizedMessages.length === 0) return null
+
+  const personaList = await getAllPersonas()
+  const personaMap = {}
+  personaList.forEach((p) => {
+    personaMap[p.id] = p
+  })
+
+  const rolePrefixes = await buildSummarizationRolePrefixes()
+  const memoryText = await buildInjectedMemory(character, thread)
+
+  return buildSummarizationPayload({
+    character,
+    thread,
+    messages: unsummarizedMessages,
+    personaMap,
+    rolePrefixes,
+    currentPersona,
+    memoryText,
+  })
+}
+
 export async function triggerSummarization({
   thread,
   character,
@@ -226,15 +273,7 @@ export async function triggerSummarization({
     return ''
   }
 
-  const rolePrefixes = {
-    systemRolePrefix: await getSetting('prompting.systemRolePrefix'),
-    assistantRolePrefix: await getSetting('prompting.assistantRolePrefix'),
-    userRolePrefix: await getSetting('prompting.userRolePrefix'),
-    userRolePrefixWithPersona: await getSetting('prompting.userRolePrefixWithPersona'),
-    systemRolePrefixOoc: await getSetting('prompting.systemRolePrefixOoc'),
-    assistantRolePrefixOoc: await getSetting('prompting.assistantRolePrefixOoc'),
-    userRolePrefixOoc: await getSetting('prompting.userRolePrefixOoc'),
-  }
+  const rolePrefixes = await buildSummarizationRolePrefixes()
 
   const memoryText = await buildInjectedMemory(character, thread)
 

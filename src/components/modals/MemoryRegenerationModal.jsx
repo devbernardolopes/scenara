@@ -6,6 +6,7 @@ import ModalShell from '../shared/ModalShell'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../services/tokenEstimator'
 import { getEffectiveProfileFor } from '../../services/connectionProfiles'
+import { buildCurrentSummarizationPayload } from '../../services/summarization'
 import { ChevronDown } from '../../lib/icons'
 
 function formatTokenCount(count) {
@@ -18,10 +19,18 @@ function MemoryRegenerationModal({ threadId, entry }) {
   const { closeModal, openModal, setCloseGuard } = useModal()
   const { confirm } = useConfirm()
 
-  const originalUserContent = entry?.payload?.[1]?.content || ''
-  const originalSystemContent = entry?.payload?.[0]?.content || ''
-  const [userContent, setUserContent] = useState(originalUserContent)
-  const [systemContent, setSystemContent] = useState(originalSystemContent)
+  // Fallback to the stored payload if the current-state rebuild is unavailable.
+  const fallbackUserContent = entry?.payload?.[1]?.content || ''
+  const fallbackSystemContent = entry?.payload?.[0]?.content || ''
+  const [userContent, setUserContent] = useState(fallbackUserContent)
+  const [systemContent, setSystemContent] = useState(fallbackSystemContent)
+  // Baseline the dirty comparison is measured against. Initially the fallback,
+  // then updated once the current-state payload has been rebuilt.
+  const [baseline, setBaseline] = useState({
+    system: fallbackSystemContent,
+    user: fallbackUserContent,
+  })
+  const [loaded, setLoaded] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [expanded, setExpanded] = useState(() => new Set([0, 1]))
   const [profile, setProfile] = useState(null)
@@ -35,6 +44,28 @@ function MemoryRegenerationModal({ threadId, entry }) {
       cancelled = true
     }
   }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    buildCurrentSummarizationPayload(threadId)
+      .then((payload) => {
+        if (cancelled) return
+        if (payload) {
+          const system = payload[0]?.content || ''
+          const user = payload[1]?.content || ''
+          setBaseline({ system, user })
+          setSystemContent(system)
+          setUserContent(user)
+        }
+        setLoaded(true)
+      })
+      .catch(() => {
+        if (!cancelled) setLoaded(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [threadId])
 
   const systemTokens = useMemo(() => estimateTokens(systemContent || ''), [systemContent])
   const userTokens = useMemo(() => estimateTokens(userContent || ''), [userContent])
@@ -82,13 +113,15 @@ function MemoryRegenerationModal({ threadId, entry }) {
   }, [dirty, setCloseGuard])
 
   function handleUserChange(e) {
-    setUserContent(e.target.value)
-    setDirty(e.target.value !== originalUserContent || systemContent !== originalSystemContent)
+    const value = e.target.value
+    setUserContent(value)
+    setDirty(value !== baseline.user || systemContent !== baseline.system)
   }
 
   function handleSystemChange(e) {
-    setSystemContent(e.target.value)
-    setDirty(e.target.value !== originalSystemContent || userContent !== originalUserContent)
+    const value = e.target.value
+    setSystemContent(value)
+    setDirty(value !== baseline.system || userContent !== baseline.user)
   }
 
   function toggleExpand(idx) {
@@ -100,7 +133,7 @@ function MemoryRegenerationModal({ threadId, entry }) {
     })
   }
 
-  const canRegenerate = systemContent.trim().length > 0 && userContent.trim().length > 0
+  const canRegenerate = loaded && systemContent.trim().length > 0 && userContent.trim().length > 0
 
   function handleRegenerate() {
     if (!canRegenerate) return
