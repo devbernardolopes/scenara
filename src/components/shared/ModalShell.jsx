@@ -7,7 +7,7 @@ function ModalShell({ title, onClose, children, footer }) {
         <h2 className="text-xl font-semibold text-text">{title}</h2>
         {onClose && <CloseButton onClick={onClose} />}
       </div>
-      <div className="flex-1 overflow-y-auto p-6 pt-4">{children}</div>
+      <div className="flex-1 overflow-y-auto flex flex-col p-6 pt-4 min-h-0">{children}</div>
       {footer && (
         <div className="flex justify-end gap-3 px-6 py-4 border-t border-border shrink-0">
           {footer}

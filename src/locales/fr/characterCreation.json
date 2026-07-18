@@ -35,5 +35,6 @@
     "noContent": "Ce scénario n'a pas de contenu.",
     "previousScenario": "Scénario précédent",
     "nextScenario": "Scénario suivant"
-  }
+  },
+  "duplicateScenario": "Duplicate"
 }

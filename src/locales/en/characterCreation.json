@@ -150,6 +150,7 @@
   "scenarioPlaceholder": "Write a scenario to set the stage for the conversation…",
   "deleteScenario": "Delete",
   "generateScenario": "Generate",
+  "duplicateScenario": "Duplicate",
   "confirmDeleteScenario": "Are you sure you want to delete this scenario?",
   "confirmDeleteScenarioTitle": "Delete Scenario",
   "noScenarios": "No scenarios yet. Add one to set the stage for a conversation.",

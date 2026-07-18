@@ -55,5 +55,6 @@
     "noContent": "Este escenario no tiene contenido.",
     "previousScenario": "Escenario anterior",
     "nextScenario": "Siguiente escenario"
-  }
+  },
+  "duplicateScenario": "Duplicate"
 }

@@ -81,25 +81,25 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect }) {
         </>
       }
     >
-      <div className="flex items-start gap-2">
+      <div className="flex-1 min-h-0 flex items-stretch gap-2">
         <button
           type="button"
           onClick={handlePrev}
-          className="flex items-center justify-center w-10 shrink-0 mt-1 rounded-md hover:bg-surface-hover text-tertiary hover:text-text transition-colors"
+          className="flex items-center justify-center w-10 shrink-0 rounded-md hover:bg-surface-hover text-tertiary hover:text-text transition-colors"
           aria-label={t('scenarioSelector.previousScenario')}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        <div className="flex-1 min-w-0">
-          <div className="mb-2">
-            <h3 className="text-base font-semibold text-text truncate">{scenarioTitle}</h3>
+        <div className="flex-1 min-w-0 flex flex-col min-h-0">
+          <div className="mb-2 text-center">
+            <h3 className="text-base font-semibold text-text">{scenarioTitle}</h3>
             <span className="text-xs text-tertiary">
               {currentIndex + 1} / {scenarios.length}
             </span>
           </div>
 
-          <div className="max-h-64 overflow-y-auto rounded-md border border-border bg-surface-secondary p-4">
+          <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-border bg-surface-secondary p-4">
             {resolvedContent ? (
               <p className="text-sm text-text whitespace-pre-wrap leading-relaxed">
                 {resolvedContent}
@@ -113,7 +113,7 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect }) {
         <button
           type="button"
           onClick={handleNext}
-          className="flex items-center justify-center w-10 shrink-0 mt-1 rounded-md hover:bg-surface-hover text-tertiary hover:text-text transition-colors"
+          className="flex items-center justify-center w-10 shrink-0 rounded-md hover:bg-surface-hover text-tertiary hover:text-text transition-colors"
           aria-label={t('scenarioSelector.nextScenario')}
         >
           <ChevronRight className="w-5 h-5" />

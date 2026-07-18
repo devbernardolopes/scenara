@@ -139,7 +139,6 @@
   "confirmDeleteExampleMessage": "Tem certeza que deseja excluir esta mensagem de exemplo?",
   "confirmDeleteExampleMessageTitle": "Excluir Mensagem de Exemplo",
   "noExampleMessages": "Nenhuma mensagem de exemplo ainda. Adicione uma para instruir o modelo sobre como responder.",
-  "sectionScenarios": "Cenários",
   "addScenario": "Adicionar Cenário",
   "scenarioLabel": "Cenário",
   "scenarioNamePlaceholder": "Nome do cenário (opcional)",
@@ -197,5 +196,6 @@
   "tagsSectionPlaceholder": "Digite o nome de uma tag ou cole tags separadas por vírgula…",
   "tagsSectionNoTags": "Nenhuma tag atribuída ainda.",
   "tagsSectionBrowseTags": "Explorar Todas as Tags",
-  "tagsSectionBrowseActive": "Ativo"
+  "tagsSectionBrowseActive": "Ativo",
+  "duplicateScenario": "Duplicate"
 }

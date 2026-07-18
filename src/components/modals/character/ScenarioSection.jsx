@@ -3,7 +3,7 @@ import { useConfirm } from '../../../lib/confirm'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
-import { Plus, Trash2, Edit3, Zap, Square } from '../../../lib/icons'
+import { Plus, Trash2, Edit3, Zap, Square, Copy } from '../../../lib/icons'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
@@ -127,6 +127,19 @@ function ScenarioSection({ form, onChange, characterId }) {
     )
   }
 
+  function handleDuplicate(scenario) {
+    const hasActive = scenarios.some((s) => s.active)
+    const clone = {
+      ...scenario,
+      id: crypto.randomUUID(),
+      active: !hasActive ? true : false,
+    }
+    const idx = scenarios.findIndex((s) => s.id === scenario.id)
+    const next = [...scenarios]
+    next.splice(idx + 1, 0, clone)
+    onChange('scenarios', next)
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -248,6 +261,16 @@ function ScenarioSection({ form, onChange, characterId }) {
                     title={t('generateScenario')}
                   >
                     <Edit3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDuplicate(scenario)}
+                    disabled={!scenario.content?.trim()}
+                    className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-surface text-secondary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label={t('duplicateScenario')}
+                    title={t('duplicateScenario')}
+                  >
+                    <Copy className="w-4 h-4" />
                   </button>
                 </div>
               </div>

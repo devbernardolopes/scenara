@@ -35,5 +35,6 @@
     "noContent": "Questo scenario non ha contenuto.",
     "previousScenario": "Scenario precedente",
     "nextScenario": "Scenario successivo"
-  }
+  },
+  "duplicateScenario": "Duplicate"
 }
