@@ -150,17 +150,13 @@ function ScenarioSection({ form, onChange, characterId }) {
           aria-checked={form.promptUser !== false}
           aria-label={t('promptUser')}
           onClick={() => onChange('promptUser', form.promptUser === false)}
-          className={`relative min-h-[28px] min-w-[44px] rounded-full border transition-colors ${
-            form.promptUser !== false
-              ? 'bg-primary border-primary'
-              : 'bg-surface border-border hover:bg-surface-hover'
+          className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ${
+            form.promptUser !== false ? 'bg-primary' : 'bg-gray-300'
           }`}
         >
           <span
-            className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform ${
-              form.promptUser !== false
-                ? 'translate-x-[16px] bg-on-primary'
-                : 'translate-x-0 bg-tertiary'
+            className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition-transform duration-200 ${
+              form.promptUser !== false ? 'translate-x-5' : 'translate-x-0'
             }`}
           />
         </button>
