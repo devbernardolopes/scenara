@@ -153,11 +153,25 @@ function ScenarioSection({ form, onChange, characterId }) {
             <CollapsibleSection
               label={scenario.name?.trim() || `${t('scenarioLabel')} #${idx + 1}`}
               headerExtra={
-                scenario.active ? (
-                  <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-                    ACTIVE
-                  </span>
-                ) : null
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={!!scenario.active}
+                  aria-label={t('scenarioActive')}
+                  title={t('scenarioActive')}
+                  disabled={!scenario.content?.trim()}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleActiveChange(scenario.id, !scenario.active)
+                  }}
+                  className={`min-h-[28px] min-w-[28px] flex items-center justify-center rounded-md border transition-colors ${
+                    scenario.active
+                      ? 'bg-primary text-on-primary border-primary'
+                      : 'bg-surface text-tertiary border-border hover:bg-surface-hover'
+                  } disabled:opacity-40 disabled:cursor-not-allowed`}
+                >
+                  {scenario.active ? <Zap className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                </button>
               }
               summary={
                 scenario.content ? (
@@ -209,22 +223,6 @@ function ScenarioSection({ form, onChange, characterId }) {
                     title={t('generateScenario')}
                   >
                     <Edit3 className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={!!scenario.active}
-                    aria-label={t('scenarioActive')}
-                    title={t('scenarioActive')}
-                    disabled={!scenario.content?.trim()}
-                    onClick={() => handleActiveChange(scenario.id, !scenario.active)}
-                    className={`min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md border transition-colors ${
-                      scenario.active
-                        ? 'bg-primary text-on-primary border-primary'
-                        : 'bg-surface text-tertiary border-border hover:bg-surface-hover'
-                    } disabled:opacity-40 disabled:cursor-not-allowed`}
-                  >
-                    {scenario.active ? <Zap className="w-4 h-4" /> : <Square className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
