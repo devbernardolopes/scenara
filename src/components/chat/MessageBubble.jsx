@@ -736,15 +736,13 @@ function MessageBubble({
                         onClick={getButtonHandler(key)}
                         disabled={disabled}
                         className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
-                          isDelete
-                            ? 'bg-delete text-on-delete hover:bg-delete-hover'
-                            : isUser
-                              ? userMutedClass
-                                ? `${userHoverBg} ${userMutedClass}`
-                                : userHoverBg
-                              : isOOC
-                                ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
-                                : 'hover:bg-black/10 text-tertiary hover:text-text'
+                          isUser
+                            ? userMutedClass
+                              ? `${userHoverBg} ${userMutedClass}`
+                              : userHoverBg
+                            : isOOC
+                              ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
+                              : 'hover:bg-black/10 text-tertiary hover:text-text'
                         } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
                         style={isUser && !isDelete && userMutedStyle ? userMutedStyle : undefined}
                         title={t(def.labelKey)}
@@ -797,7 +795,7 @@ function MessageBubble({
                                 }
                                 className={`w-full flex items-center gap-2 px-3 py-2 text-sm min-h-[44px] disabled:opacity-30 disabled:pointer-events-none ${
                                   isDelete
-                                    ? 'bg-delete text-on-delete hover:bg-delete-hover'
+                                    ? 'text-error hover:bg-surface-hover'
                                     : 'text-text hover:bg-surface-hover'
                                 }`}
                               >
