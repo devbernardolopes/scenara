@@ -799,7 +799,6 @@ function ChatView() {
   const handleScroll = useCallback(() => {
     const el = scrollRef.current
     if (!el) return
-    console.log('[chat scrollTop]', el.scrollTop)
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100
     setShowScrollButton(!atBottom)
     isAtBottomRef.current = atBottom
