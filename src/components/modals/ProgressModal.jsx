@@ -27,7 +27,7 @@ function ProgressModal({ status, label, onDone }) {
   }
 
   function handleRestart() {
-    window.location.reload()
+    window.location.href = '/'
   }
 
   return (
