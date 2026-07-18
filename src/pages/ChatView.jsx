@@ -1062,17 +1062,31 @@ function ChatView() {
       }
 
       if (result.status === 'success') {
+        const successEntry = {
+          content: result.content,
+          promptData: result.promptData || null,
+          responseData: result.responseData || null,
+          apiDurationMs: result.apiDurationMs ?? null,
+          createdAt: new Date().toISOString(),
+        }
+        const successBundleJson = JSON.stringify([successEntry])
         await updateMessage(assistantMsgId, {
           content: result.content,
           promptData: result.promptData,
           responseData: result.responseData,
           apiDurationMs: result.apiDurationMs,
+          bundleMessages: successBundleJson,
         })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages((prev) =>
             prev.map((m) =>
               m.id === assistantMsgId
-                ? { ...m, content: result.content, apiDurationMs: result.apiDurationMs }
+                ? {
+                    ...m,
+                    content: result.content,
+                    apiDurationMs: result.apiDurationMs,
+                    bundleMessages: successBundleJson,
+                  }
                 : m,
             ),
           )
