@@ -695,7 +695,9 @@
     "bottom-center": "Inferior Central",
     "top-left": "Superior Esquerdo",
     "top-right": "Superior Direito",
-    "top-center": "Superior Central"
+    "top-center": "Superior Central",
+    "left-center": "Esquerdo Central",
+    "right-center": "Direito Central"
   },
   "sidebarNavLayoutOptions": {
     "vertical": "Vertical (rótulos visíveis)",

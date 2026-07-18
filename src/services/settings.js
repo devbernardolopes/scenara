@@ -261,6 +261,8 @@ export const SETTINGS = [
       'top-left',
       'top-right',
       'top-center',
+      'left-center',
+      'right-center',
     ],
     labelKey: 'settings:appearance.sidebarTogglePosition.label',
     descKey: 'settings:appearance.sidebarTogglePosition.desc',
@@ -271,6 +273,8 @@ export const SETTINGS = [
       'top-left': 'settings:sidebarTogglePositionOptions.top-left',
       'top-right': 'settings:sidebarTogglePositionOptions.top-right',
       'top-center': 'settings:sidebarTogglePositionOptions.top-center',
+      'left-center': 'settings:sidebarTogglePositionOptions.left-center',
+      'right-center': 'settings:sidebarTogglePositionOptions.right-center',
     },
   },
   {

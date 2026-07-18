@@ -11,6 +11,8 @@ const POSITION_CLASSES = {
   'top-left': 'top-4 left-4',
   'top-right': 'top-4 right-4',
   'top-center': 'top-4 left-1/2 -translate-x-1/2',
+  'left-center': 'top-1/2 left-4 -translate-y-1/2',
+  'right-center': 'top-1/2 right-4 -translate-y-1/2',
 }
 
 function SidebarToggle({ open, onToggle }) {

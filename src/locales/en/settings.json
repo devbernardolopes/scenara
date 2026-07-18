@@ -705,7 +705,9 @@
     "bottom-center": "Bottom Center",
     "top-left": "Top Left",
     "top-right": "Top Right",
-    "top-center": "Top Center"
+    "top-center": "Top Center",
+    "left-center": "Left Center",
+    "right-center": "Right Center"
   },
   "sidebarNavLayoutOptions": {
     "vertical": "Vertical (labels visible)",
