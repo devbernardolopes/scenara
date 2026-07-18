@@ -194,7 +194,7 @@ function MemoryRegenerationModal({ threadId, entry }) {
                   </span>
                   <span className="text-sm font-medium text-text">{section.label}</span>
                   <span className="text-xs text-tertiary shrink-0">
-                    {t('tokens', { count: formatTokenCount(section.tokens) })}
+                    {t('tokens', { count: section.tokens })}
                   </span>
                   <div className="flex-1" />
                   <ChevronDown

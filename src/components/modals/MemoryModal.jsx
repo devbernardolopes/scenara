@@ -17,11 +17,6 @@ import { ChevronDown, Trash2, RefreshCw, Eye } from '../../lib/icons'
 import db from '../../db'
 import { replaceVars } from '../../services/chatApi'
 
-function formatTokenCount(count) {
-  if (count >= 1000) return `${(count / 1000).toFixed(1)}K`
-  return String(count)
-}
-
 function MemoryModal({ threadId }) {
   const { t } = useTranslation(['chat', 'common'])
   const { closeModal, setCloseGuard, openModal } = useModal()
@@ -220,7 +215,7 @@ function MemoryModal({ threadId }) {
                       {t('memoryEntry', { number: sortedMemories.length - index })}
                     </span>
                     <span className="text-xs text-tertiary">
-                      {t('tokens', { count: formatTokenCount(tokenCount) })}
+                      {t('tokens', { count: tokenCount })}
                     </span>
                     {isUnread && (
                       <span className="inline-block w-2 h-2 rounded-full bg-primary shrink-0" />
