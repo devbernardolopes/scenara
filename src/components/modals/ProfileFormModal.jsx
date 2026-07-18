@@ -23,7 +23,7 @@ import { createProfile, updateProfile } from '../../services/connectionProfiles'
 import ModelSelect from './settings/controls/ModelSelect'
 import SettingSlider from './settings/controls/SettingSlider'
 import SettingToggle from './settings/controls/SettingToggle'
-import { RefreshCw, X } from '../../lib/icons'
+import { RefreshCw } from '../../lib/icons'
 
 function StringListInput({ value, onChange, maxItems }) {
   const { t } = useTranslation('settings')
@@ -547,28 +547,7 @@ function ProfileFormModal({ profile }) {
                 onCancelFetch={handleCancelFetch}
                 cooldownRemaining={getCooldownRemaining()}
                 refreshButton={
-                  fetching ? (
-                    <div className="flex items-center justify-between px-3 py-2 min-h-[44px] border border-border rounded-md">
-                      <span className="flex items-center gap-2 text-sm text-secondary">
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        {t('api.fetchingModels')}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={handleCancelFetch}
-                        className="flex items-center gap-1 text-sm text-error hover:opacity-80 min-h-[44px] min-w-[44px] justify-center"
-                      >
-                        <X className="w-4 h-4" />
-                        {t('cancel', { ns: 'common' })}
-                      </button>
-                    </div>
-                  ) : getCooldownRemaining() > 0 ? (
-                    <div className="flex items-center justify-center px-3 py-2 min-h-[44px] border border-border rounded-md">
-                      <span className="text-sm text-tertiary">
-                        {t('api.cooldown', { seconds: Math.ceil(getCooldownRemaining() / 1000) })}
-                      </span>
-                    </div>
-                  ) : (
+                  fetching || getCooldownRemaining() > 0 ? null : (
                     <button
                       type="button"
                       onClick={() => handleRefresh(selectedProvider.id)}
