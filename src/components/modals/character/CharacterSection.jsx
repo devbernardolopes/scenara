@@ -72,6 +72,19 @@ function CharacterSection({ form, onChange, characterId }) {
       </div>
 
       <div>
+        <Label className={form.displayName?.trim() ? 'text-highlight' : 'text-text'}>
+          {t('displayNameLabel')}
+        </Label>
+        <input
+          className={`${inputClass}`}
+          value={form.displayName || ''}
+          onChange={(e) => onChange('displayName', e.target.value)}
+          placeholder={t('displayNamePlaceholder')}
+        />
+        <p className="text-xs text-tertiary mt-1">{t('displayNameDesc')}</p>
+      </div>
+
+      <div>
         <label
           className={`block text-sm font-medium mb-1 ${form.avatar?.trim() ? 'text-highlight' : 'text-text'}`}
         >

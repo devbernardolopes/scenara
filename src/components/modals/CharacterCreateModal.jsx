@@ -23,6 +23,7 @@ import ScenarioSection from './character/ScenarioSection'
 
 const INITIAL_FORM = {
   name: '',
+  displayName: '',
   avatar: '',
   tagline: '',
   prompt: '',

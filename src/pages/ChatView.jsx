@@ -1914,7 +1914,7 @@ function ChatView() {
     if (msg.isOOC && msg.role === 'user') return t('oocLabel')
     if (msg.isOOC) return oocMessageRole.toUpperCase()
     if (msg.role === 'user') return personaMap[msg.personaId]?.name || null
-    return character?.name || null
+    return character?.displayName || character?.name || null
   }
 
   const deletedMsgNumber = confirmDeleteId
@@ -2002,7 +2002,11 @@ function ChatView() {
               />
             )}
             <div className="flex items-center gap-2 min-w-0">
-              {character && <h1 className="font-semibold text-text shrink-0">{character.name}</h1>}
+              {character && (
+                <h1 className="font-semibold text-text shrink-0">
+                  {character.displayName || character.name}
+                </h1>
+              )}
               <ChatTitle
                 title={thread.title}
                 chatTitleMarquee={chatTitleMarquee}

@@ -65,7 +65,7 @@ const ThreadCard = forwardRef(function ThreadCard(
           (/^https?:\/\//.test(character.avatar) || character.avatar.startsWith('data:image/')) ? (
             <img
               src={character.avatar}
-              alt={character?.name || ''}
+              alt={character?.displayName || character?.name || ''}
               className="h-full w-full object-cover"
             />
           ) : (
@@ -126,7 +126,7 @@ const ThreadCard = forwardRef(function ThreadCard(
           <div className="flex items-center gap-1 mt-0.5 justify-end">
             <p className="text-xs text-secondary truncate flex-1 min-w-0 text-left">
               {t('sidebar.characterNameWithId', {
-                name: character?.name || t('sidebar.unknownCharacter'),
+                name: character?.displayName || character?.name || t('sidebar.unknownCharacter'),
               })}
             </p>
             <div className="w-[26px] shrink-0 flex justify-center">

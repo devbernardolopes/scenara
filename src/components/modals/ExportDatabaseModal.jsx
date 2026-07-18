@@ -244,7 +244,7 @@ function ExportDatabaseModal() {
                   checked={selectedCharacterIds.has(c.id)}
                   onChange={() => charToggle(c.id)}
                   avatar={c.avatar}
-                  title={c.name}
+                  title={c.displayName || c.name}
                   id={c.characterNumber}
                 />
               ))

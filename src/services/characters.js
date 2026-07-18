@@ -165,7 +165,8 @@ export async function duplicateCharacter(id) {
   const { id: _id, createdAt: _ca, updatedAt: _ua, characterNumber: _cn, ...rest } = original
   const newId = await db.characters.add({
     ...rest,
-    name: `${original.name} (Copy)`,
+    name: original.displayName ? original.name : `${original.name} (Copy)`,
+    displayName: original.displayName ? `${original.displayName} (Copy)` : original.name,
     characterNumber,
     createdAt: now,
     updatedAt: now,

@@ -545,7 +545,10 @@ function CharacterDiscovery() {
                 >
                   <div className="relative flex-1 overflow-hidden">
                     {char.avatar ? (
-                      <CharacterPortraitImage src={char.avatar} alt={char.name} />
+                      <CharacterPortraitImage
+                        src={char.avatar}
+                        alt={char.displayName || char.name}
+                      />
                     ) : (
                       <div className="w-full h-full bg-surface-secondary flex items-center justify-center text-4xl">
                         {'👤'}
@@ -553,7 +556,7 @@ function CharacterDiscovery() {
                     )}
                     <div className="absolute bottom-0 left-0 right-0 bg-image-scrim p-3 space-y-1">
                       <CharacterNameCell
-                        name={char.name}
+                        name={char.displayName || char.name}
                         characterCardMarquee={characterCardMarquee}
                       />
                       {char.tagline?.trim() && (
