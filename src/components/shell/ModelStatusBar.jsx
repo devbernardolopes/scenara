@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X } from '../../lib/icons'
 import { getSetting, setSetting } from '../../services/settings'
-import { getEffectiveProfileFor, getEffectiveTopP } from '../../services/connectionProfiles'
+import {
+  getEffectiveProfileFor,
+  getEffectiveTopP,
+  getEffectiveTemperature,
+} from '../../services/connectionProfiles'
+import { useHordeEta } from '../../hooks/useHordeEta'
 import MarqueeText from '../shared/MarqueeText'
 
 export default function ModelStatusBar({ embedded = false }) {
@@ -10,6 +15,11 @@ export default function ModelStatusBar({ embedded = false }) {
   const [show, setShow] = useState(true)
   const [modelName, setModelName] = useState('')
   const [topP, setTopP] = useState(null)
+  const [temperature, setTemperature] = useState(null)
+  const [statusEnabled, setStatusEnabled] = useState(false)
+  const [statusBarRefresh, setStatusBarRefresh] = useState(30)
+
+  const hordeEta = useHordeEta(statusEnabled, 'chat', statusBarRefresh)
 
   useEffect(() => {
     async function load() {
@@ -20,10 +30,19 @@ export default function ModelStatusBar({ embedded = false }) {
       const profile = await getEffectiveProfileFor('chat')
       setModelName(profile?.model ? profile.model.split('/').pop() : '')
       setTopP(getEffectiveTopP(profile))
+      setTemperature(getEffectiveTemperature(profile))
+      setStatusEnabled((await getSetting('showStatus')) !== false)
+      const refresh = await getSetting('statusBarRefresh')
+      if (typeof refresh === 'number') setStatusBarRefresh(refresh)
     }
     load()
     function onSettingsChanged(e) {
-      if (e.detail?.key === 'showChatModel' || e.detail?.key === 'requestKind.chat.profileId') {
+      if (
+        e.detail?.key === 'showChatModel' ||
+        e.detail?.key === 'showStatus' ||
+        e.detail?.key === 'statusBarRefresh' ||
+        e.detail?.key === 'requestKind.chat.profileId'
+      ) {
         load()
       }
     }
@@ -45,16 +64,20 @@ export default function ModelStatusBar({ embedded = false }) {
     setSetting('showChatModel', false)
   }
 
+  const info = (
+    <span className="flex items-center gap-2 whitespace-nowrap">
+      {temperature != null && <span>T {temperature}</span>}
+      {topP != null && <span>{t('topP', { value: topP })}</span>}
+      {hordeEta && <span>{t('eta', { value: hordeEta })}</span>}
+    </span>
+  )
+
   const content = (
     <div className="flex items-center gap-2 px-3 py-1.5 min-w-0">
       <div className="flex-1 min-w-0 flex justify-center text-xs text-tertiary">
         <MarqueeText className="max-w-full">{modelName}</MarqueeText>
       </div>
-      {topP !== null && (
-        <span className="shrink-0 text-xs text-tertiary whitespace-nowrap">
-          {t('topP', { value: topP })}
-        </span>
-      )}
+      <span className="shrink-0 text-xs text-tertiary">{info}</span>
       <button
         type="button"
         onClick={handleDismiss}

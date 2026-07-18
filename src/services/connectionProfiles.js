@@ -275,6 +275,17 @@ export function getEffectiveTopP(profile) {
   return def !== undefined ? Number(def) : null
 }
 
+// Resolves the effective Temperature for a resolved profile, falling back to
+// the provider's declared default when the profile does not override it.
+export function getEffectiveTemperature(profile) {
+  if (!profile) return null
+  const raw = profile.params?.temperature
+  if (raw !== undefined && raw !== null && raw !== '') return Number(raw)
+  const provider = PROVIDERS.find((p) => p.id === profile.providerId)
+  const def = provider?.params?.find((p) => p.key === 'temperature')?.default
+  return def !== undefined ? Number(def) : null
+}
+
 export async function migrateFromOldSettings() {
   const already = await db.connectionProfiles.count()
   if (already > 0) return

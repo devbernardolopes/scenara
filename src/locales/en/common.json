@@ -108,6 +108,7 @@
   "close": "Close",
   "dismissModelBar": "Dismiss chat model bar",
   "topP": "Top P: {{value}}",
+  "eta": "ETA: {{value}}",
   "moveUp": "Move up",
   "moveDown": "Move down",
   "uploadImage": "Upload image",
