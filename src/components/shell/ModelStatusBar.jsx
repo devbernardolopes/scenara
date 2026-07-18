@@ -1,21 +1,24 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X } from '../../lib/icons'
-import { getSetting, setSetting } from '../../services/settings'
+import { useModal } from '../../hooks/useModal'
+import { getSetting } from '../../services/settings'
 import {
   getEffectiveProfileFor,
   getEffectiveTopP,
   getEffectiveTemperature,
+  getProfile,
 } from '../../services/connectionProfiles'
 import { useHordeEta } from '../../hooks/useHordeEta'
 import MarqueeText from '../shared/MarqueeText'
 
 export default function ModelStatusBar({ embedded = false }) {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('chat')
+  const { openModal } = useModal()
   const [show, setShow] = useState(true)
   const [modelName, setModelName] = useState('')
   const [topP, setTopP] = useState(null)
   const [temperature, setTemperature] = useState(null)
+  const [profile, setProfile] = useState(null)
   const [statusEnabled, setStatusEnabled] = useState(false)
   const [statusBarRefresh, setStatusBarRefresh] = useState(30)
 
@@ -31,6 +34,8 @@ export default function ModelStatusBar({ embedded = false }) {
       setModelName(profile?.model ? profile.model.split('/').pop() : '')
       setTopP(getEffectiveTopP(profile))
       setTemperature(getEffectiveTemperature(profile))
+      const profileId = await getSetting('requestKind.chat.profileId')
+      setProfile(profileId ? await getProfile(profileId) : null)
       setStatusEnabled((await getSetting('showStatus')) !== false)
       const refresh = await getSetting('statusBarRefresh')
       if (typeof refresh === 'number') setStatusBarRefresh(refresh)
@@ -59,40 +64,32 @@ export default function ModelStatusBar({ embedded = false }) {
 
   if (!show || !modelName) return null
 
-  const handleDismiss = () => {
-    setShow(false)
-    setSetting('showChatModel', false)
-  }
-
-  const info = (
-    <span className="flex items-center gap-2 whitespace-nowrap">
-      {temperature != null && <span>{temperature}t</span>}
-      {temperature != null && topP != null && <span>·</span>}
-      {topP != null && <span>{topP}p</span>}
-      {topP != null && hordeEta && <span>·</span>}
-      {hordeEta && <span>{hordeEta}</span>}
-    </span>
-  )
-
-  const content = (
-    <div className="flex items-center gap-2 px-3 py-1.5 min-w-0">
-      <div className="flex-1 min-w-0 flex justify-center text-xs text-tertiary">
-        <MarqueeText className="max-w-full">{modelName}</MarqueeText>
-      </div>
-      {info && <span className="shrink-0 text-xs text-tertiary">· {info}</span>}
-      <button
-        type="button"
-        onClick={handleDismiss}
-        className="shrink-0 w-[26px] h-[26px] flex items-center justify-center rounded text-tertiary hover:text-text hover:bg-surface-hover"
-        aria-label={t('dismissModelBar')}
-        title={t('dismissModelBar')}
-      >
-        <X className="w-3.5 h-3.5" />
-      </button>
+  const bar = (
+    <div className="px-3 py-1.5 text-center">
+      {profile ? (
+        <button
+          type="button"
+          onClick={() => openModal('profileForm', { profile })}
+          className="text-xs text-tertiary hover:text-text hover:underline inline-flex items-center gap-1 max-w-full"
+          title={t('statusBar.editProfile')}
+        >
+          {temperature != null && <>{temperature}t · </>}
+          {topP != null && <>{topP}p · </>}
+          <MarqueeText className="inline-block align-bottom max-w-full">{modelName}</MarqueeText>
+          {hordeEta && <> · {hordeEta}</>}
+        </button>
+      ) : (
+        <span className="text-xs text-tertiary">
+          {temperature != null && <>{temperature}t · </>}
+          {topP != null && <>{topP}p · </>}
+          <MarqueeText className="inline-block align-bottom max-w-full">{modelName}</MarqueeText>
+          {hordeEta && <> · {hordeEta}</>}
+        </span>
+      )}
     </div>
   )
 
-  if (embedded) return content
+  if (embedded) return bar
 
-  return <div className="flex-shrink-0 border-t border-border bg-surface">{content}</div>
+  return <div className="flex-shrink-0 border-t border-border bg-surface">{bar}</div>
 }
