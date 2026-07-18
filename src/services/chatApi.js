@@ -4,6 +4,7 @@ import { getThread } from './threads'
 import { getWritingInstruction } from './writingInstructions'
 import { buildInjectedMemory } from './threadMemories'
 import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
+import { getPersona } from './personas'
 
 const BASE_URLS = {
   groq: 'https://api.groq.com/openai/v1',
@@ -37,6 +38,26 @@ export function replaceVars(text, { charName, personaName, currentPersonaName })
     .replace(/{{char}}/gi, charName || '')
     .replace(/{{user}}/gi, personaName || '')
     .replace(/{{name}}/gi, currentPersonaName || personaName || '')
+}
+
+// Substitutes persona description tokens in addition to the base {{char}}/{{user}}/{{name}}
+// variables. Token semantics:
+//   {{description}}        -> the active user persona in the current chat (currentPersona)
+//   {{description_chat}}   -> the persona that started the chat (chatPersona, from thread.personaId)
+//   {{description_default}}-> the global default user persona (defaultPersonaId setting)
+export function replacePersonaTemplate(
+  text,
+  { charName, personaName, currentPersonaName, currentPersona, chatPersona, defaultPersona },
+) {
+  if (!text) return text
+  const resolved = replaceVars(text, { charName, personaName, currentPersonaName })
+  const desc = currentPersona?.description || ''
+  const descChat = chatPersona?.description || ''
+  const descDefault = defaultPersona?.description || ''
+  return resolved
+    .replace(/{{description}}/gi, desc)
+    .replace(/{{description_chat}}/gi, descChat)
+    .replace(/{{description_default}}/gi, descDefault)
 }
 
 export function getMessagesForApiRequest(messages, { includeOOC = true, keepMessages = 0 } = {}) {
@@ -202,13 +223,20 @@ export async function buildMessagesPayload({
   const personaName = chatPersona?.name || ''
   const currentPersonaName = currentPersona?.name || personaName
 
+  const defaultPersonaId = await getSetting('defaultPersonaId')
+  const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
+
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
 
-  const replaceVarsWithDesc = (text) => {
-    if (!text) return text
-    const desc = currentPersona?.description || ''
-    return replaceVarsIn(text).replace(/{{description}}/gi, desc)
-  }
+  const replaceVarsWithDesc = (text) =>
+    replacePersonaTemplate(text, {
+      charName,
+      personaName,
+      currentPersonaName,
+      currentPersona,
+      chatPersona,
+      defaultPersona,
+    })
 
   const prefixAssistant = await getSetting('prompting.prefixAssistantRole')
   const prefixUser = await getSetting('prompting.prefixUserRole')

@@ -6,12 +6,12 @@ This document describes how Scenara constructs and sends OpenAI-compatible API r
 
 ## 1. Overview: The Four Request Kinds
 
-| Kind | Trigger | Builder Function | Profile Key | Fallback |
-|------|---------|-----------------|-------------|----------|
-| **chat** | User sends a message, regeneration | `buildMessagesPayload()` | `requestKind.chat.profileId` | — |
-| **ooc** | User sends with OOC toggle on | `buildOOCMessagesPayload()` | `requestKind.ooc.profileId` | → chat profile |
-| **autoTitle** | After chat response, threshold met | `triggerAutoTitle()` (builds inline) | `requestKind.autoTitle.profileId` | → chat profile |
-| **summarization** | After chat response, memory threshold met | `buildSummarizationPayload()` | `requestKind.summarization.profileId` | → chat profile |
+| Kind              | Trigger                                   | Builder Function                     | Profile Key                           | Fallback       |
+| ----------------- | ----------------------------------------- | ------------------------------------ | ------------------------------------- | -------------- |
+| **chat**          | User sends a message, regeneration        | `buildMessagesPayload()`             | `requestKind.chat.profileId`          | —              |
+| **ooc**           | User sends with OOC toggle on             | `buildOOCMessagesPayload()`          | `requestKind.ooc.profileId`           | → chat profile |
+| **autoTitle**     | After chat response, threshold met        | `triggerAutoTitle()` (builds inline) | `requestKind.autoTitle.profileId`     | → chat profile |
+| **summarization** | After chat response, memory threshold met | `buildSummarizationPayload()`        | `requestKind.summarization.profileId` | → chat profile |
 
 All four use the same transport function: `sendChatCompletion()` in `src/services/chatApi.js`.
 
@@ -71,6 +71,7 @@ Deprecated params (e.g. `max_tokens`) are filtered out by `getActiveParams()` in
 ### Zero-valued params
 
 In `sendChatCompletion` (lines 284-286), zero-valued params are deleted from the body:
+
 - `top_p: 0` → deleted
 - `frequency_penalty: 0` → deleted
 - `presence_penalty: 0` → deleted
@@ -122,14 +123,14 @@ In `ChatView.doChatRequest()` (lines 546-558):
 
 Character-level settings (on `character`) take precedence over the global settings object above:
 
-| Character field | Fallback Setting |
-|----------------|-----------------|
-| `character.writingInjectionTiming` | `prompting.writingInjectionTiming` |
-| `character.writingPlacement` | `prompting.writingPlacement` |
-| `character.writingMessageRole` | `prompting.writingMessageRole` |
-| `character.personaInjectionTiming` | `prompting.personaInjectionTiming` |
-| `character.personaInjectionPlacement` | `personaInjectionPlacement` |
-| `character.personaInjectionMessageRole` | `personaInjectionMessageRole` |
+| Character field                         | Fallback Setting                   |
+| --------------------------------------- | ---------------------------------- |
+| `character.writingInjectionTiming`      | `prompting.writingInjectionTiming` |
+| `character.writingPlacement`            | `prompting.writingPlacement`       |
+| `character.writingMessageRole`          | `prompting.writingMessageRole`     |
+| `character.personaInjectionTiming`      | `prompting.personaInjectionTiming` |
+| `character.personaInjectionPlacement`   | `personaInjectionPlacement`        |
+| `character.personaInjectionMessageRole` | `personaInjectionMessageRole`      |
 
 ### Payload Construction Steps
 
@@ -144,7 +145,7 @@ currentPersonaName = currentPersona?.name || personaName
 Three variable replacement functions are created:
 
 - `replaceVarsIn(text)` — replaces `{{char}}`, `{{user}}`, `{{name}}`
-- `replaceVarsWithDesc(text)` — same as above, plus replaces `{{description}}` with `chatPersona.description`
+- `replacePersonaTemplate(text, { currentPersona, chatPersona, defaultPersona })` — same as above, plus replaces `{{description}}` (currentPersona), `{{description_chat}}` (chatPersona), `{{description_default}}` (default persona)
 
 The `{{user}}` variable uses `chatPersona` (the thread's default persona), not `currentPersona` (the message-specific persona). The `{{name}}` variable prefers `currentPersona` but falls back to `chatPersona`.
 
@@ -209,9 +210,11 @@ If `memoryText` is non-empty, `appendMemoryToPayload()` is called. This function
 After the main message array is built (and before memory appending), elements configured with `placement: 'endOfMessages'` are injected as **new entries at the end**:
 
 1. **Writing Instruction** (when `placement: 'endOfMessages'`):
+
    ```js
    result.push({ role: writingMessageRole, content: writingInstruction })
    ```
+
    Where `writingMessageRole` comes from `character.writingMessageRole ?? settings.writingMessageRole ?? 'system'`.
 
 2. **Persona Injection** (when `placement: 'endOfMessages'`):
@@ -299,9 +302,15 @@ If `messages.length > 0`:
 ```js
 if (userMessage) {
   if (oocUserInstructions.includes('{content}')) {
-    result.push({ role: 'user', content: replaceVarsIn(oocUserInstructions).replace('{content}', userMessage) })
+    result.push({
+      role: 'user',
+      content: replaceVarsIn(oocUserInstructions).replace('{content}', userMessage),
+    })
   } else {
-    result.push({ role: 'user', content: replaceVarsIn(oocUserInstructions) + '\n\n' + userMessage })
+    result.push({
+      role: 'user',
+      content: replaceVarsIn(oocUserInstructions) + '\n\n' + userMessage,
+    })
   }
 }
 ```
@@ -316,9 +325,9 @@ Same as regular chat — `appendMemoryToPayload()` appends memory to the system 
 
 Two character fields affect OOC transcript behavior:
 
-| Character field | Effect | Default (if unset) |
-|----------------|--------|-------------------|
-| `includeOOC` | If `false`, OOC messages are excluded from the transcript | `true` (via `!== false` check) |
+| Character field     | Effect                                                       | Default (if unset)             |
+| ------------------- | ------------------------------------------------------------ | ------------------------------ |
+| `includeOOC`        | If `false`, OOC messages are excluded from the transcript    | `true` (via `!== false` check) |
 | `userPersonaPrefix` | If `false`, user persona prefixes are not used in transcript | `true` (via `!== false` check) |
 
 These are also used by `getMessagesForApiRequest` and `buildTranscript` respectively.
@@ -345,9 +354,9 @@ These are also used by `getMessagesForApiRequest` and `buildTranscript` respecti
 ### Trigger Conditions (`shouldAutoTitle`)
 
 ```js
-character.autoTitle === true           // must be enabled per-character
-thread.titleEdited !== true            // user hasn't manually edited the title
-thread.autoTitleGenerated !== true     // hasn't been auto-titled already
+character.autoTitle === true // must be enabled per-character
+thread.titleEdited !== true // user hasn't manually edited the title
+thread.autoTitleGenerated !== true // hasn't been auto-titled already
 getCountedMessageCount(messages, includeOOC) >= character.autoTitleThreshold // default: 3
 ```
 
@@ -372,13 +381,14 @@ payload = [{ role: 'system', content: systemContent }]
 
 ```js
 if (userContent) {
-  payload.push({ role: 'user', content: userContent })  // with {{transcript}} replaced
+  payload.push({ role: 'user', content: userContent }) // with {{transcript}} replaced
 } else {
   payload.push({ role: 'user', content: transcript })
 }
 ```
 
 Global default for `prompting.autoTitleUser`:
+
 > "Read the following thread and create one concise title (7 words max, in Title Case) capturing its core topic in plain-text (output the title ONLY, no markup, no formatting):\n\n{{transcript}}"
 
 6. The response from the API is trimmed and stored as `thread.title`, and `thread.autoTitleGenerated` is set to `true`.
@@ -407,11 +417,11 @@ resolvedMemory = character.memory ?? globalDefault('defaultMemory') ?? 'messages
 
 Three modes:
 
-| `memory` value | Threshold Source | Trigger Condition |
-|---------------|-----------------|-------------------|
-| `'never'` | — | Never triggers |
-| `'messages'` (default) | `character.messagesThreshold` ?? `defaultMessagesThreshold` ?? 7 | Unsummarized count >= threshold |
-| `'contextWindow'` | `character.contextWindowThreshold` ?? `defaultContextWindowThreshold` ?? 1024 | Token estimate of unsummarized content >= threshold |
+| `memory` value         | Threshold Source                                                              | Trigger Condition                                   |
+| ---------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------- |
+| `'never'`              | —                                                                             | Never triggers                                      |
+| `'messages'` (default) | `character.messagesThreshold` ?? `defaultMessagesThreshold` ?? 7              | Unsummarized count >= threshold                     |
+| `'contextWindow'`      | `character.contextWindowThreshold` ?? `defaultContextWindowThreshold` ?? 1024 | Token estimate of unsummarized content >= threshold |
 
 ### Message Filtering for Summarization
 
@@ -446,13 +456,15 @@ payload = [{ role: 'system', content: systemContent }]
 2. **Transcript Assembly**: A plain-text transcript of unsummarized messages is built via `buildTranscript()`, with `{{char}}`, `{{user}}`, `{{name}}` replaced.
 
 3. **Memory Prepending**: If `memoryText` is non-empty, it is prepended to the transcript with the `memoryHeader` as a section title (if non-empty):
+
    ```
    {memoryHeader}
-   
+
    {memoryText}
-   
+
    {unsummarized transcript}
    ```
+
    This ensures the model can see prior memory context and de-duplicate / build upon it rather than starting fresh.
 
 4. The system content has `{{char}}`, `{{user}}`, `{{name}}` replaced, and `{{transcript}}` replaced with the **memory-prepended transcript** from step 3.
@@ -461,7 +473,7 @@ payload = [{ role: 'system', content: systemContent }]
 
 ```js
 if (userContent) {
-  payload.push({ role: 'user', content: userContent })  // with {{transcript}} replaced
+  payload.push({ role: 'user', content: userContent }) // with {{transcript}} replaced
 } else {
   payload.push({ role: 'user', content: transcript })
 }
@@ -517,6 +529,7 @@ function getMessagesForApiRequest(messages, { includeOOC = true, keepMessages = 
 ```
 
 Key behavior:
+
 - `includeOOC` is determined by `character.includeOOC !== false` (defaults to `true`)
 - `keepMessages` is determined by `character.messagesToKeep ?? globalSetting('defaultMessagesToKeep') ?? 0`
 - When `keepMessages > 0`, the most recent N messages are always included regardless of summarization state
@@ -548,21 +561,22 @@ This function creates a plain-text representation of messages, used in OOC, auto
 
 For OOC messages (`msg.isOOC === true`):
 
-| Original role | Prefix setting | Default |
-|--------------|----------------|---------|
-| `system` | `systemRolePrefixOoc` | `[SYSTEM in OOC]:` |
-| `assistant` | `assistantRolePrefixOoc` | `[ASSISTANT in OOC]:` |
-| `user` | `userRolePrefixOoc` | `[USER in OOC]:` |
+| Original role | Prefix setting           | Default               |
+| ------------- | ------------------------ | --------------------- |
+| `system`      | `systemRolePrefixOoc`    | `[SYSTEM in OOC]:`    |
+| `assistant`   | `assistantRolePrefixOoc` | `[ASSISTANT in OOC]:` |
+| `user`        | `userRolePrefixOoc`      | `[USER in OOC]:`      |
 
 For regular messages:
 
-| Original role | Prefix setting | Default |
-|--------------|----------------|---------|
-| `system` | `systemRolePrefix` | `[SYSTEM]:` |
-| `assistant` | `assistantRolePrefix` | `[ASSISTANT]:` |
-| `user` | `userRolePrefix` or `userRolePrefixWithPersona` | `[USER]:` or `[USER as {{persona_name}}]:` |
+| Original role | Prefix setting                                  | Default                                    |
+| ------------- | ----------------------------------------------- | ------------------------------------------ |
+| `system`      | `systemRolePrefix`                              | `[SYSTEM]:`                                |
+| `assistant`   | `assistantRolePrefix`                           | `[ASSISTANT]:`                             |
+| `user`        | `userRolePrefix` or `userRolePrefixWithPersona` | `[USER]:` or `[USER as {{persona_name}}]:` |
 
 The user role prefix has two modes:
+
 - If `userPersonaPrefixOverride` is `true` and the message has a `personaId`, the persona's name is resolved from `personaMap` and the `userRolePrefixWithPersona` template is used (with `{{name}}` and `{{persona_name}}` replaced)
 - Otherwise, the simple `userRolePrefix` is used
 
@@ -596,26 +610,28 @@ function replaceVars(text, { charName, personaName, currentPersonaName }) {
 }
 ```
 
-| Variable | Source | Resolves To |
-|----------|--------|-------------|
-| `{{char}}` | `character.name` | Character name |
-| `{{user}}` | `chatPersona.name` (from `thread.personaId`) | The thread's default persona name |
-| `{{name}}` | `currentPersona?.name ?? chatPersona.name` | The message-specific persona name (from ChatInputArea), falls back to the thread's default |
+| Variable   | Source                                       | Resolves To                                                                                |
+| ---------- | -------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `{{char}}` | `character.name`                             | Character name                                                                             |
+| `{{user}}` | `chatPersona.name` (from `thread.personaId`) | The thread's default persona name                                                          |
+| `{{name}}` | `currentPersona?.name ?? chatPersona.name`   | The message-specific persona name (from ChatInputArea), falls back to the thread's default |
 
-In `buildMessagesPayload` only, there's also `{{description}}` via `replaceVarsWithDesc()`:
+In `buildMessagesPayload` and `buildSummarizationPayload`, there are also persona description tokens via `replacePersonaTemplate()`:
 
-| Variable | Source | Resolves To |
-|----------|--------|-------------|
-| `{{description}}` | `chatPersona.description` | The thread's default persona description |
+| Variable                  | Source                       | Resolves To                                                                    |
+| ------------------------- | ---------------------------- | ------------------------------------------------------------------------------ |
+| `{{description}}`         | `currentPersona.description` | The active user persona description (may differ from the thread's default)     |
+| `{{description_chat}}`    | `chatPersona.description`    | The description of the persona that started the chat (from `thread.personaId`) |
+| `{{description_default}}` | `defaultPersonaId` persona   | The description of the global default user persona                             |
 
 ### Where Variables are Replaced
 
-| Payload Type | Variables Replaced In |
-|-------------|----------------------|
-| Chat | All system parts, message content, first message prompt, continue prompt, persona injection template, writing instruction content |
-| OOC | System instructions, character prompt, headers, transcript (via `buildTranscript` → prefix templates) |
-| Auto-title | System instruction, user instruction, transcript (the transcript itself is built from raw messages — variables in the messages themselves are replaced in the chat flow, not in auto-title) |
-| Summarization | System instruction, user instruction |
+| Payload Type  | Variables Replaced In                                                                                                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chat          | All system parts, message content, first message prompt, continue prompt, persona injection template, writing instruction content                                                           |
+| OOC           | System instructions, character prompt, headers, transcript (via `buildTranscript` → prefix templates)                                                                                       |
+| Auto-title    | System instruction, user instruction, transcript (the transcript itself is built from raw messages — variables in the messages themselves are replaced in the chat flow, not in auto-title) |
+| Summarization | System instruction, user instruction                                                                                                                                                        |
 
 ---
 
@@ -645,9 +661,9 @@ In `buildMessagesPayload` only, there's also `{{description}}` via `replaceVarsW
 
 ```js
 const BASE_URLS = {
-  groq:        'https://api.groq.com/openai/v1',
-  openrouter:  'https://openrouter.ai/api/v1',
-  'ai-horde':  'https://oai.aihorde.net/v1',
+  groq: 'https://api.groq.com/openai/v1',
+  openrouter: 'https://openrouter.ai/api/v1',
+  'ai-horde': 'https://oai.aihorde.net/v1',
 }
 ```
 
@@ -730,6 +746,7 @@ if (!initialMessages && character.greeting) {
 ```
 
 Two paths:
+
 - **If `character.initialMessages` exist**: they're stored as JSON on the thread, deferred for migration
 - **If no initial messages but `character.greeting` (legacy field)**: a single assistant message is created immediately
 
@@ -755,6 +772,7 @@ Each initial message becomes a bundle entry in a single assistant message. The `
 **File**: `src/pages/ChatView.jsx:384-395`
 
 When all conditions are met:
+
 - Loading is complete
 - Character exists
 - Chat profile is configured
@@ -809,6 +827,7 @@ ChatInputArea.handleSend()
 ### Unread Tracking
 
 After a successful chat completion:
+
 - If user is away from the thread or not at the bottom of the scroll: `addUnread(threadId, assistantMsgId)`
 - If `unreadSound` is enabled: play notification sound
 - Messages are marked `isUnread` in React state for visual highlighting
@@ -821,66 +840,66 @@ All settings that affect API payloads, with their keys and defaults:
 
 ### Prompting Category (`prompting.*`)
 
-| Key | Type | Default | Used In |
-|-----|------|---------|---------|
-| `prompting.autoTitleSystem` | textarea | "You are a title generator for conversational AI." | autoTitle |
-| `prompting.autoTitleUser` | textarea | "Read the following thread..." with `{{transcript}}` | autoTitle |
-| `prompting.summarizationSystem` | textarea | Detailed summarization instructions | summarization |
-| `prompting.summarizationUser` | textarea | "Summarize this:" | summarization |
-| `prompting.oocSystem` | textarea | "This is an OOC request. Reply in OOC..." | OOC |
-| `prompting.oocUser` | textarea | "((OOC: {content}))" | OOC |
-| `prompting.oocDelimiters` | oocDelimiters | `{ enabled: false, left: '((OOC: ', right: '))' }` | (UI only) |
-| `prompting.oocMessageRole` | select | `'system'` | OOC (display) |
-| `prompting.firstMessageRole` | select | `'user'` | Chat |
-| `prompting.firstMessagePrompt` | textarea | "((OOC: Start with the first message...))" | Chat |
-| `prompting.continueRole` | select | `'user'` | Chat |
-| `prompting.continuePrompt` | textarea | "((OOC: Continue the current scene...))" | Chat |
-| `prompting.personaInjectionTemplate` | textarea | `"\n\n---\n\n**User**:\n\n- Name: {{name}}\n- {{description}}"` | Chat |
-| `prompting.writingInjectionTiming` | select | `'always'` | Chat |
-| `prompting.writingPlacement` | select | `'endOfSystemPrompt'` | Chat |
-| `prompting.writingMessageRole` | select | `'system'` | Chat |
-| `prompting.personaInjectionTiming` | select | `'always'` | Chat |
-| `personaInjectionPlacement` | select | `'endOfSystemPrompt'` | Chat |
-| `personaInjectionMessageRole` | select | `'system'` | Chat |
+| Key                                  | Type          | Default                                                         | Used In       |
+| ------------------------------------ | ------------- | --------------------------------------------------------------- | ------------- |
+| `prompting.autoTitleSystem`          | textarea      | "You are a title generator for conversational AI."              | autoTitle     |
+| `prompting.autoTitleUser`            | textarea      | "Read the following thread..." with `{{transcript}}`            | autoTitle     |
+| `prompting.summarizationSystem`      | textarea      | Detailed summarization instructions                             | summarization |
+| `prompting.summarizationUser`        | textarea      | "Summarize this:"                                               | summarization |
+| `prompting.oocSystem`                | textarea      | "This is an OOC request. Reply in OOC..."                       | OOC           |
+| `prompting.oocUser`                  | textarea      | "((OOC: {content}))"                                            | OOC           |
+| `prompting.oocDelimiters`            | oocDelimiters | `{ enabled: false, left: '((OOC: ', right: '))' }`              | (UI only)     |
+| `prompting.oocMessageRole`           | select        | `'system'`                                                      | OOC (display) |
+| `prompting.firstMessageRole`         | select        | `'user'`                                                        | Chat          |
+| `prompting.firstMessagePrompt`       | textarea      | "((OOC: Start with the first message...))"                      | Chat          |
+| `prompting.continueRole`             | select        | `'user'`                                                        | Chat          |
+| `prompting.continuePrompt`           | textarea      | "((OOC: Continue the current scene...))"                        | Chat          |
+| `prompting.personaInjectionTemplate` | textarea      | `"\n\n---\n\n**User**:\n\n- Name: {{name}}\n- {{description}}"` | Chat          |
+| `prompting.writingInjectionTiming`   | select        | `'always'`                                                      | Chat          |
+| `prompting.writingPlacement`         | select        | `'endOfSystemPrompt'`                                           | Chat          |
+| `prompting.writingMessageRole`       | select        | `'system'`                                                      | Chat          |
+| `prompting.personaInjectionTiming`   | select        | `'always'`                                                      | Chat          |
+| `personaInjectionPlacement`          | select        | `'endOfSystemPrompt'`                                           | Chat          |
+| `personaInjectionMessageRole`        | select        | `'system'`                                                      | Chat          |
 
 ### Role Prefixes
 
-| Key | Default | Used In |
-|-----|---------|---------|
-| `prompting.systemRolePrefix` | `[SYSTEM]:` | All transcripts |
-| `prompting.assistantRolePrefix` | `[ASSISTANT]:` | All transcripts |
-| `prompting.userRolePrefix` | `[USER]:` | All transcripts |
+| Key                                   | Default                       | Used In         |
+| ------------------------------------- | ----------------------------- | --------------- |
+| `prompting.systemRolePrefix`          | `[SYSTEM]:`                   | All transcripts |
+| `prompting.assistantRolePrefix`       | `[ASSISTANT]:`                | All transcripts |
+| `prompting.userRolePrefix`            | `[USER]:`                     | All transcripts |
 | `prompting.userRolePrefixWithPersona` | `[USER as {{persona_name}}]:` | All transcripts |
-| `prompting.systemRolePrefixOoc` | `[SYSTEM in OOC]:` | OOC transcripts |
-| `prompting.assistantRolePrefixOoc` | `[ASSISTANT in OOC]:` | OOC transcripts |
-| `prompting.userRolePrefixOoc` | `[USER in OOC]:` | OOC transcripts |
+| `prompting.systemRolePrefixOoc`       | `[SYSTEM in OOC]:`            | OOC transcripts |
+| `prompting.assistantRolePrefixOoc`    | `[ASSISTANT in OOC]:`         | OOC transcripts |
+| `prompting.userRolePrefixOoc`         | `[USER in OOC]:`              | OOC transcripts |
 
 ### API Request Section Headers
 
-| Key | Default | Used In |
-|-----|---------|---------|
-| `prompting.apiRequestSectionHeaders.characterPrompt` | `Description:` | OOC payload |
-| `prompting.apiRequestSectionHeaders.messages` | `Messages:` | OOC payload |
-| `prompting.apiRequestSectionHeaders.memories` | `Memories:` | Chat, OOC, autoTitle, summarization |
-| `prompting.apiRequestSectionHeaders.memoryEntry` | `Memory Level {{level}} Entry {{slot}}:` | (future use) |
-| `prompting.apiRequestSectionHeaders.loreContext` | `Lore:` | (future use) |
+| Key                                                  | Default                                  | Used In                             |
+| ---------------------------------------------------- | ---------------------------------------- | ----------------------------------- |
+| `prompting.apiRequestSectionHeaders.characterPrompt` | `Description:`                           | OOC payload                         |
+| `prompting.apiRequestSectionHeaders.messages`        | `Messages:`                              | OOC payload                         |
+| `prompting.apiRequestSectionHeaders.memories`        | `Memories:`                              | Chat, OOC, autoTitle, summarization |
+| `prompting.apiRequestSectionHeaders.memoryEntry`     | `Memory Level {{level}} Entry {{slot}}:` | (future use)                        |
+| `prompting.apiRequestSectionHeaders.loreContext`     | `Lore:`                                  | (future use)                        |
 
 ### Defaults Category (`defaults.*`)
 
-| Key | Type | Default | Used In |
-|-----|------|---------|---------|
-| `defaultAutoTitle` | toggle | `true` | Character creation default |
-| `defaultAutoTitleThreshold` | text | `3` | Character creation default |
-| `defaultMemory` | select | `'messages'` | Character creation default |
-| `defaultMessagesThreshold` | text | `7` | Summarization trigger |
-| `defaultContextWindowThreshold` | slider | `1024` | Summarization trigger |
-| `defaultMessagesToKeep` | text | `5` | Message filtering |
-| `defaultMemorySlots` | text | `3` | (future use) |
-| `defaultFirstMessage` | toggle | `true` | Character creation default |
-| `defaultIncludeOOC` | toggle | `true` | Character creation default |
-| `defaultUserPersonaPrefix` | toggle | `true` | Character creation default |
-| `defaultMessageThreshold` | text | `0` | Chat view (message load limit) |
-| `defaultPostProcessing` | toggle | `true` | Character creation default |
+| Key                             | Type   | Default      | Used In                        |
+| ------------------------------- | ------ | ------------ | ------------------------------ |
+| `defaultAutoTitle`              | toggle | `true`       | Character creation default     |
+| `defaultAutoTitleThreshold`     | text   | `3`          | Character creation default     |
+| `defaultMemory`                 | select | `'messages'` | Character creation default     |
+| `defaultMessagesThreshold`      | text   | `7`          | Summarization trigger          |
+| `defaultContextWindowThreshold` | slider | `1024`       | Summarization trigger          |
+| `defaultMessagesToKeep`         | text   | `5`          | Message filtering              |
+| `defaultMemorySlots`            | text   | `3`          | (future use)                   |
+| `defaultFirstMessage`           | toggle | `true`       | Character creation default     |
+| `defaultIncludeOOC`             | toggle | `true`       | Character creation default     |
+| `defaultUserPersonaPrefix`      | toggle | `true`       | Character creation default     |
+| `defaultMessageThreshold`       | text   | `0`          | Chat view (message load limit) |
+| `defaultPostProcessing`         | toggle | `true`       | Character creation default     |
 
 ### Character-Level Overrides
 

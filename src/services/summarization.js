@@ -1,11 +1,12 @@
 import db from '../db'
 import { getMessagesByThread, updateMessage, deleteMessage } from './messages'
 import { updateThread } from './threads'
-import { buildTranscript, replaceVars, sendChatCompletion } from './chatApi'
+import { buildTranscript, replaceVars, replacePersonaTemplate, sendChatCompletion } from './chatApi'
 import { createThreadMemory, buildInjectedMemory } from './threadMemories'
 import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { getSetting } from './settings'
+import { getPersona } from './personas'
 import { estimateTokens } from './tokenEstimator'
 import {
   cancelSummarizationRequests,
@@ -76,13 +77,16 @@ export async function buildSummarizationPayload({
 
   const charName = character?.name || ''
   let personaName = ''
-  let personaDescription = currentPersona?.description || ''
+  let chatPersona = currentPersona
   if (thread?.personaId) {
     const persona = await db.personas.get(thread.personaId)
+    chatPersona = persona || chatPersona
     personaName = persona?.name || ''
-    personaDescription = persona?.description || personaDescription
   }
   const currentPersonaName = currentPersona?.name || personaName
+
+  const defaultPersonaId = await getSetting('defaultPersonaId')
+  const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
 
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
 
@@ -113,8 +117,14 @@ export async function buildSummarizationPayload({
       (await getSetting('prompting.personaInjectionPlacement'))
     const personaTemplate = await getSetting('prompting.personaInjectionTemplate')
     if (personaTiming === 'always' && personaTemplate && personaPlacement === 'endOfSystemPrompt') {
-      const resolvedPersona = personaTemplate.replace(/{{description}}/gi, personaDescription)
-      personaInjection = replaceVarsIn(resolvedPersona)
+      personaInjection = replacePersonaTemplate(personaTemplate, {
+        charName,
+        personaName,
+        currentPersonaName,
+        currentPersona,
+        chatPersona,
+        defaultPersona,
+      })
     }
   }
 

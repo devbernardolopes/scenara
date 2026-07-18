@@ -210,13 +210,18 @@ function CharacterCreateModal({ character: existing, initialData }) {
   const savePendingRef = useRef(false)
   const [totalPermTokens, setTotalPermTokens] = useState(0)
   const [defaultPersonaName, setDefaultPersonaName] = useState('')
+  const [defaultPersonaDescription, setDefaultPersonaDescription] = useState('')
   const [overrideDefaults, setOverrideDefaults] = useState(null)
   const [wiRevision, setWiRevision] = useState(0)
   const [ppGlobals, setPpGlobals] = useState({ rules: [], enabled: true })
 
   useEffect(() => {
     getSetting('defaultPersonaId').then((id) => {
-      if (id) getPersona(id).then((p) => setDefaultPersonaName(p?.name || ''))
+      if (id)
+        getPersona(id).then((p) => {
+          setDefaultPersonaName(p?.name || '')
+          setDefaultPersonaDescription(p?.description || '')
+        })
     })
   }, [])
 
@@ -253,7 +258,12 @@ function CharacterCreateModal({ character: existing, initialData }) {
       const charName = form.name || ''
       const userName = defaultPersonaName || ''
       const replaceVars = (text) =>
-        text.replace(/{{char}}/gi, charName).replace(/{{user}}/gi, userName)
+        text
+          .replace(/{{char}}/gi, charName)
+          .replace(/{{user}}/gi, userName)
+          .replace(/{{description}}/gi, defaultPersonaDescription)
+          .replace(/{{description_chat}}/gi, defaultPersonaDescription)
+          .replace(/{{description_default}}/gi, defaultPersonaDescription)
 
       let total = 0
 
@@ -295,6 +305,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
     form.personaInjectionTiming,
     form.name,
     defaultPersonaName,
+    defaultPersonaDescription,
     wiRevision,
   ])
 

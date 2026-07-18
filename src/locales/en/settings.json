@@ -587,7 +587,7 @@
     },
     "personaInjectionTemplate": {
       "label": "Persona Injection Template",
-      "desc": "Template for injecting persona context into prompts."
+      "desc": "Template for injecting persona context into prompts. Supported variables: {{char}} (character name), {{user}} (active persona name), {{name}} (active persona name), {{description}} (active user persona description), {{description_chat}} (description of the persona that started the chat), {{description_default}} (description of the default user persona)."
     },
     "oocMessageRole": {
       "label": "AI OOC Message Role",
