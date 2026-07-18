@@ -123,8 +123,8 @@ function MemoryModal({ threadId }) {
     const ok = await confirm({
       title: t('memoryDeleteTitle'),
       message: t('memoryDeleteConfirm'),
-      confirmLabel: t('delete', { ns: 'common' }),
-      cancelLabel: t('cancel', { ns: 'common' }),
+      confirmLabel: t('delete'),
+      cancelLabel: t('common:cancel'),
       variant: 'danger',
     })
     if (!ok) return
@@ -245,7 +245,7 @@ function MemoryModal({ threadId }) {
                         type="button"
                         onClick={() => handleDelete(entry)}
                         className="p-2 rounded-md hover:bg-surface-hover text-error"
-                        title={t('delete', { ns: 'common' })}
+                        title={t('delete')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
