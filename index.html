@@ -6,12 +6,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Scenara</title>
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Atkinson+Hyperlegible:wght@400;700&family=Roboto:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
+    <script>
+      // Load Google Fonts non-blocking and only while online, so the app
+      // works fully offline (no ERR_NAME_NOT_RESOLVED) and falls back to
+      // system fonts via the existing CHAT_FONTS fallbacks.
+      ;(function () {
+        var FONT_HREF =
+          'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Atkinson+Hyperlegible:wght@400;700&family=Roboto:wght@400;500;700&display=swap'
+        var loaded = false
+        function loadFonts() {
+          if (loaded || navigator.onLine === false) return
+          loaded = true
+          var pre1 = document.createElement('link')
+          pre1.rel = 'preconnect'
+          pre1.href = 'https://fonts.googleapis.com'
+          document.head.appendChild(pre1)
+          var pre2 = document.createElement('link')
+          pre2.rel = 'preconnect'
+          pre2.href = 'https://fonts.gstatic.com'
+          pre2.crossOrigin = 'anonymous'
+          document.head.appendChild(pre2)
+          var link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = FONT_HREF
+          link.media = 'print'
+          link.onload = function () {
+            link.media = 'all'
+          }
+          document.head.appendChild(link)
+        }
+        function resetFonts() {
+          loaded = false
+        }
+        window.addEventListener('online', loadFonts)
+        window.addEventListener('offline', resetFonts)
+        loadFonts()
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
