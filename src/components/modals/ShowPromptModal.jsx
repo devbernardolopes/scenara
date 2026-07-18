@@ -118,7 +118,7 @@ function ShowPromptModal({ payload, model, params, msgNumbers, messageFlags, dir
                     onToggleExpand={() => setExpandedIdx(isOpen ? null : idx)}
                   />
                   <span className="text-xs text-tertiary shrink-0">
-                    {t('tokens', { count: formatTokenCount(tokenCount) })}
+                    {t('tokens', { count: tokenCount })}
                   </span>
                   <div className="flex-1" />
                   <ChevronDown
