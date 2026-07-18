@@ -1134,15 +1134,6 @@ export const SETTINGS = [
     descKey: 'settings:prompting.oocUser.desc',
   },
   {
-    key: 'prompting.personaInjectionTemplate',
-    category: 'prompting',
-    type: 'textarea',
-    default: 'Current User Persona:\n\n- Name: {{name}}.\n- Description: {{description}}.',
-    props: { rows: 6, collapsible: true, summary: 'tokens' },
-    labelKey: 'settings:prompting.personaInjectionTemplate.label',
-    descKey: 'settings:prompting.personaInjectionTemplate.desc',
-  },
-  {
     key: 'prompting.systemRolePrefix',
     category: 'prompting',
     type: 'text',
@@ -1410,6 +1401,15 @@ export const SETTINGS = [
     default: { enabled: false, value: '{{name}}: ' },
     labelKey: 'settings:prompting.prefixUserRole.label',
     descKey: 'settings:prompting.prefixUserRole.desc',
+  },
+  {
+    key: 'prompting.personaInjectionTemplate',
+    category: 'prompting',
+    type: 'textarea',
+    default: 'Current User Persona:\n\n- Name: {{name}}.\n- Description: {{description}}.',
+    props: { rows: 6, collapsible: true, summary: 'tokens' },
+    labelKey: 'settings:prompting.personaInjectionTemplate.label',
+    descKey: 'settings:prompting.personaInjectionTemplate.desc',
   },
   {
     key: 'prompting.trimMessages',

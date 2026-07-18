@@ -214,7 +214,7 @@ function ApiSettingsPanel() {
         </div>
       </div>
 
-      <div className="border-t border-border pt-6">
+      <div className="pt-6">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-text">{t('api.requestTimeout.label')}</h3>
