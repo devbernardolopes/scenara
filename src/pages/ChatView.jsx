@@ -601,6 +601,16 @@ function ChatView() {
   }, [threadId])
 
   useEffect(() => {
+    function handleMessagesChanged(e) {
+      if (Number(e.detail?.threadId) !== Number(threadId)) return
+      if (generatingRef.current) return
+      getMessagesByThread(threadId).then((msgs) => setMessages(dedupeMessages(msgs)))
+    }
+    window.addEventListener('messages-changed', handleMessagesChanged)
+    return () => window.removeEventListener('messages-changed', handleMessagesChanged)
+  }, [threadId])
+
+  useEffect(() => {
     if (loading || !character || noChatProfile) return
     if (
       !autoTriggeredRef.current &&

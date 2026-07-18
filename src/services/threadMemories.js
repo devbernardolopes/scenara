@@ -205,7 +205,11 @@ export async function deleteMemoryAndRevert(threadMemoryId, threadId) {
 
   const remaining = await db.threadMemories.where('threadId').equals(tid).sortBy('createdAt')
   const nextMemory = remaining.length > 0 ? remaining[remaining.length - 1].content : null
-  await updateThread(tid, { memory: nextMemory })
+  const threadUpdate = { memory: nextMemory }
+  if (remaining.length === 0) {
+    threadUpdate.lastSummarizationAt = null
+  }
+  await updateThread(tid, threadUpdate)
 
   window.dispatchEvent(new CustomEvent('memories-changed', { detail: { threadId: tid } }))
 
