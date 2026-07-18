@@ -1386,6 +1386,43 @@ function ChatView() {
     setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
   }
 
+  async function handleToggleCodeBlock(messageId, blockIndex) {
+    const msg = messagesRef.current.find((m) => m.id === messageId)
+    if (!msg) return
+    const entries = parseBundleEntries(msg.bundleMessages)
+    if (!entries || entries.length === 0) return
+
+    const trackIdx = msg.activeSlotIndex ?? activeSlotIndices[messageId] ?? 0
+    const idx = Math.min(trackIdx, entries.length - 1)
+    const entry = { ...entries[idx] }
+    const collapsed = new Set(entry.collapsedCodeBlocks || [])
+
+    if (collapsed.has(blockIndex)) {
+      collapsed.delete(blockIndex)
+    } else {
+      collapsed.add(blockIndex)
+    }
+
+    entry.collapsedCodeBlocks = [...collapsed].sort((a, b) => a - b)
+    entries[idx] = entry
+    const nextBundleJson = JSON.stringify(entries)
+
+    await updateMessage(messageId, { bundleMessages: nextBundleJson })
+
+    setMessages((prev) =>
+      prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: nextBundleJson } : m)),
+    )
+
+    requestAnimationFrame(() => {
+      const el = scrollRef.current
+      if (!el) return
+      if (isAtBottomRef.current) {
+        el.scrollTop = el.scrollHeight
+        setShowScrollButton(false)
+      }
+    })
+  }
+
   async function handleRegenerate(messageId, skipConfirmation = false) {
     if (!skipConfirmation) {
       const regenConfirm = await getSetting('regenerationConfirmation')
@@ -2012,6 +2049,10 @@ function ChatView() {
 
                 const entries = parseBundleEntries(msg.bundleMessages)
                 const bundleMessages = entries ? entries.map((e) => e.content) : null
+                const collapsedCodeBlocks =
+                  entries && bundleIndex >= 0 && bundleIndex < entries.length
+                    ? entries[bundleIndex].collapsedCodeBlocks || null
+                    : null
                 const trackIdx = msg.activeSlotIndex ?? activeSlotIndices[msg.id]
                 const bundleIndex =
                   trackIdx != null && bundleMessages
@@ -2050,6 +2091,7 @@ function ChatView() {
                       streamingSlotIndex={streamingSlotIndices[msg.id]}
                       bundleMessages={bundleMessages}
                       bundleIndex={bundleIndex}
+                      collapsedCodeBlocks={collapsedCodeBlocks}
                       currentOrigin={currentOrigin}
                       slotCreatedAt={slotCreatedAt}
                       apiDurationMs={slotApiDurationMs}
@@ -2066,6 +2108,7 @@ function ChatView() {
                       errorText={errorText}
                       isUnread={msg.isUnread || false}
                       character={character}
+                      onToggleCodeBlock={handleToggleCodeBlock}
                     />
                   </div>
                 )

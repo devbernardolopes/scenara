@@ -7,10 +7,6 @@ import { useOverflowButtons } from '../../hooks/useOverflowButtons'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
 import { getStreamingStartTime } from '../../services/generatingState'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
-import rehypeRaw from 'rehype-raw'
 import { injectRuleTags, applyRulesToPlainText, DEFAULT_PP_RULES } from '../../lib/postProcessing'
 import {
   Trash2,
@@ -30,6 +26,7 @@ import {
 } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
+import { CodeBlocksMarkdown } from './CodeBlockWrapper'
 
 const VISIBILITY_KEYS = [
   'showAssistantDelete',
@@ -154,15 +151,6 @@ function estimateTokens(text) {
   return Math.ceil((text || '').length / 4)
 }
 
-const PP_SANITIZE_SCHEMA = {
-  ...defaultSchema,
-  tagNames: [...(defaultSchema.tagNames || []), 'pp'],
-  attributes: {
-    ...defaultSchema.attributes,
-    pp: ['r'],
-  },
-}
-
 function formatTokenCount(count) {
   if (count >= 1000) return `${(count / 1000).toFixed(1)}K`
   return String(count)
@@ -206,6 +194,8 @@ function MessageBubble({
   slotCreatedAt,
   apiDurationMs,
   character,
+  collapsedCodeBlocks,
+  onToggleCodeBlock,
 }) {
   function renderContent(text) {
     return text
@@ -444,14 +434,6 @@ function MessageBubble({
       .writeText(displayContent)
       .then(() => showToast(t('messageCopied'), { type: 'success' }))
       .catch(() => {})
-  }
-
-  function handleCodeCopy(codeContent) {
-    if (!codeContent) return
-    navigator.clipboard
-      .writeText(codeContent.trim())
-      .then(() => showToast(t('messageCopied') || 'Code copied!', { type: 'success' })) // reuse existing translation or fallback
-      .catch(() => showToast('Failed to copy', { type: 'error' }))
   }
 
   function handleStartEdit() {
@@ -887,73 +869,13 @@ function MessageBubble({
               }}
             >
               {renderMarkdown ? (
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeRaw, [rehypeSanitize, PP_SANITIZE_SCHEMA]]}
-                  components={{
-                    pp: ({ r, children }) => {
-                      const rule = activeRules[Number(r)]
-                      if (!rule) return <>{children}</>
-                      return (
-                        <span style={{ color: rule.color, fontSize: `${rule.fontSizePercent}%` }}>
-                          {children}
-                        </span>
-                      )
-                    },
-                    p: ({ children }) => (
-                      <p className="mb-2 last:mb-0 whitespace-pre-wrap">{children}</p>
-                    ),
-                    code: ({ children, className }) => (
-                      <code
-                        className={`font-mono text-[0.85em] px-1.5 py-0.5 rounded bg-code border border-border ${className || ''} break-words`}
-                      >
-                        {children}
-                      </code>
-                    ),
-                    pre: ({ children }) => {
-                      // Extract code text without React.isValidElement
-                      let codeText = ''
-
-                      if (typeof children === 'string') {
-                        codeText = children
-                      } else if (children && children.props && children.props.children) {
-                        // <pre><code>text</code></pre> case
-                        const inner = children.props.children
-                        codeText =
-                          typeof inner === 'string'
-                            ? inner
-                            : Array.isArray(inner)
-                              ? inner.join('')
-                              : String(inner || '')
-                      } else if (Array.isArray(children)) {
-                        codeText = children
-                          .map((c) => (typeof c === 'string' ? c : c?.props?.children || ''))
-                          .join('')
-                      }
-
-                      return (
-                        <div className="relative group">
-                          <pre className="bg-code border border-border rounded-md p-3 my-2 overflow-x-auto max-w-full whitespace-pre-wrap break-words pr-12">
-                            {children}
-                          </pre>
-
-                          {codeText && (
-                            <button
-                              onClick={() => handleCodeCopy(codeText)}
-                              className="absolute top-3 right-3 p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border transition-all active:scale-95 focus:opacity-100"
-                              title={t('copy') || 'Copy code'}
-                              aria-label="Copy code"
-                            >
-                              <Copy className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      )
-                    },
-                  }}
-                >
-                  {displayContentForRender}
-                </ReactMarkdown>
+                <CodeBlocksMarkdown
+                  content={displayContentForRender}
+                  activeRules={activeRules}
+                  collapsedCodeBlocks={collapsedCodeBlocks}
+                  onToggleCodeBlock={onToggleCodeBlock}
+                  messageId={message.id}
+                />
               ) : plainSegments ? (
                 <p className="mb-2 last:mb-0 whitespace-pre-wrap">
                   {plainSegments.map((seg, idx) =>
