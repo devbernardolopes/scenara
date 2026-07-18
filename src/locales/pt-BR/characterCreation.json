@@ -81,6 +81,7 @@
   "firstMessage": "Mensagem Inicial",
   "userPersonaPrefix": "Prefixo da Persona do Usuário",
   "includeOOC": "Incluir OOC",
+  "removeMarkdownImages": "Remover Sintaxe de Imagem Markdown",
   "postProcessing": "Pós-processamento",
   "postProcessingEnable": "Ativar Pós-processamento",
   "postProcessingOverride": "Substituir regras globais",

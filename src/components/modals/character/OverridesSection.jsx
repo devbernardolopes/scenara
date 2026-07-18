@@ -62,6 +62,7 @@ const OVERRIDE_DEFAULTS_MAP = [
   ['firstMessage', 'defaultFirstMessage'],
   ['userPersonaPrefix', 'defaultUserPersonaPrefix'],
   ['includeOOC', 'defaultIncludeOOC'],
+  ['removeMarkdownImages', 'defaultRemoveMarkdownImages'],
   ['systemAvatarScale', 'defaultSystemAvatarScale'],
   ['characterAvatarScale', 'defaultCharacterAvatarScale'],
   ['userPersonaAvatarScale', 'defaultUserPersonaAvatarScale'],
@@ -381,6 +382,12 @@ function OverridesSection({ form, onChange, characterId }) {
         label={t('includeOOC')}
         checked={form.includeOOC}
         onChange={(v) => onChange('includeOOC', v)}
+      />
+
+      <ToggleRow
+        label={t('removeMarkdownImages')}
+        checked={form.removeMarkdownImages}
+        onChange={(v) => onChange('removeMarkdownImages', v)}
       />
 
       <hr className="border-border" />

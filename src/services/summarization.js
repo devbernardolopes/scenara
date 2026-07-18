@@ -12,7 +12,7 @@ import {
   getThreadQueuedCount,
   getThreadInflightCount,
 } from './apiQueue'
-import { removeCodeBlocksFromMessages } from './chatApi'
+import { removeCodeBlocksFromMessages, removeMarkdownImagesFromMessages } from './chatApi'
 
 const DEFAULT_SYSTEM_INSTRUCTION = 'You are a memory generator for conversational AI.'
 
@@ -68,7 +68,11 @@ export async function buildSummarizationPayload({
   memoryText,
 }) {
   const keepCodeBlocks = await getSetting('prompting.keepCodeBlocks')
-  const processedMessages = removeCodeBlocksFromMessages(messages, keepCodeBlocks)
+  let processedMessages = removeCodeBlocksFromMessages(messages, keepCodeBlocks)
+
+  if (character?.removeMarkdownImages !== false) {
+    processedMessages = removeMarkdownImagesFromMessages(processedMessages)
+  }
 
   const charName = character?.name || ''
   let personaName = ''

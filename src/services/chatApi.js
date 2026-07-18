@@ -82,6 +82,21 @@ function stripCodeBlocks(text) {
   return text.replace(CODE_BLOCK_RE, '').trim()
 }
 
+const MD_IMAGE_RE = /\[!\[.*?\]\(.*?\)\]\(.*?\)|!\[.*?\]\(.*?\)/g
+
+function stripMarkdownImages(text) {
+  if (!text) return text
+  return text.replace(MD_IMAGE_RE, '').trim()
+}
+
+export function removeMarkdownImagesFromMessages(messages) {
+  if (!Array.isArray(messages)) return messages
+  return messages.map((msg) => {
+    if (!msg.content) return msg
+    return { ...msg, content: stripMarkdownImages(msg.content) }
+  })
+}
+
 export function removeCodeBlocksFromMessages(messages, keepCodeBlocks) {
   if (!Array.isArray(messages) || keepCodeBlocks === 'always') return messages
 
@@ -594,7 +609,11 @@ export async function buildChatRequestPayload({
   const apiMessages = getMessagesForApiRequest(effectiveMessages, { includeOOC, keepMessages })
 
   const keepCodeBlocks = await getSetting('prompting.keepCodeBlocks')
-  const processedMessages = removeCodeBlocksFromMessages(apiMessages, keepCodeBlocks)
+  let processedMessages = removeCodeBlocksFromMessages(apiMessages, keepCodeBlocks)
+
+  if (character?.removeMarkdownImages !== false) {
+    processedMessages = removeMarkdownImagesFromMessages(processedMessages)
+  }
 
   const latestThread = await getThread(threadId)
   const memoryText = await buildInjectedMemory(character, latestThread, { beforeDate })

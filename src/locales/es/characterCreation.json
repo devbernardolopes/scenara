@@ -45,6 +45,7 @@
     "always": "Siempre"
   },
   "scenarioActive": "Activo",
+  "removeMarkdownImages": "Eliminar sintaxis de imagen Markdown",
   "promptUser": "Preguntar al usuario",
   "promptUserDesc": "Preguntar qué escenario usar al iniciar un nuevo chat",
   "scenarioSelector": {

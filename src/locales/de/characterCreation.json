@@ -25,6 +25,7 @@
   "tagsSectionBrowseActive": "Aktiv",
   "sectionScenarios": "Scenarios",
   "scenarioActive": "Aktiv",
+  "removeMarkdownImages": "Markdown-Bildsyntax entfernen",
   "promptUser": "Benutzer fragen",
   "promptUserDesc": "Beim Start eines neuen Chats nach dem zu verwendenden Szenario fragen",
   "scenarioSelector": {

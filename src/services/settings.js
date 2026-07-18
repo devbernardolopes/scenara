@@ -865,6 +865,14 @@ export const SETTINGS = [
     descKey: 'settings:defaults.includeOOC.desc',
   },
   {
+    key: 'defaultRemoveMarkdownImages',
+    category: 'defaults',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:defaults.removeMarkdownImages.label',
+    descKey: 'settings:defaults.removeMarkdownImages.desc',
+  },
+  {
     key: 'defaultMessageThreshold',
     category: 'defaults',
     type: 'slider',

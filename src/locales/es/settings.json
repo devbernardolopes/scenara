@@ -623,6 +623,10 @@
     "addCharacterPrompt": {
       "label": "Añadir Prompt del Personaje",
       "desc": "Estado predeterminado para anteponer el prompt del personaje a la transcripción enviada a la API de resumen al crear un personaje nuevo."
+    },
+    "removeMarkdownImages": {
+      "label": "Eliminar sintaxis de imagen Markdown",
+      "desc": "Elimina la sintaxis de imagen markdown (![]()) del contenido de los mensajes antes de enviarlos a la API."
     }
   },
   "languageOptions": {

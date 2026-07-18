@@ -860,6 +860,10 @@
       "label": "Include OOC",
       "desc": "Default state for the include OOC toggle."
     },
+    "removeMarkdownImages": {
+      "label": "Remove Markdown Image Syntax",
+      "desc": "Strip markdown image syntax (![]()) from message content before sending to the API."
+    },
     "unloadMessagesThreshold": {
       "label": "Unload Messages Threshold",
       "desc": "Maximum number of recent messages kept in the chat view. Older messages are unloaded from view but kept. 0 = unlimited."

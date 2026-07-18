@@ -848,6 +848,10 @@
       "label": "Incluir OOC",
       "desc": "Estado padrão do alternador de inclusão de OOC."
     },
+    "removeMarkdownImages": {
+      "label": "Remover Sintaxe de Imagem Markdown",
+      "desc": "Remove a sintaxe de imagem markdown (![]()) do conteúdo das mensagens antes de enviar à API."
+    },
     "unloadMessagesThreshold": {
       "label": "Limite de Mensagens para Descarregar",
       "desc": "Número máximo de mensagens recentes mantidas na visualização. 0 = ilimitado."
