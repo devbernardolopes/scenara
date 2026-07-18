@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react'
+import { useState, useEffect, useRef, useCallback, useLayoutEffect, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, RefreshCw, Clock, Square } from '../lib/icons'
@@ -63,6 +63,7 @@ import {
   clearPendingMarker,
 } from '../services/summarization'
 import { setBaseTitle } from '../services/titleManager'
+import { estimateTokens } from '../services/tokenEstimator'
 import {
   isAwayFromThread,
   addUnread,
@@ -207,6 +208,11 @@ function ChatView() {
   const [statusBarRefresh, setStatusBarRefresh] = useState(30)
   const [oocActive, setOocActive] = useState(false)
   const [pendingRecovery, setPendingRecovery] = useState(null)
+  const [memoryDefaults, setMemoryDefaults] = useState({
+    mode: 'messages',
+    messagesThreshold: 7,
+    contextWindowThreshold: 1024,
+  })
   const scrollHeightBeforeRef = useRef(null)
   const hordeEta = useHordeEta(showStatus, oocActive ? 'ooc' : 'chat', statusBarRefresh)
 
@@ -264,6 +270,17 @@ function ChatView() {
       }
       const chatProfileId = await getSetting('requestKind.chat.profileId')
       setNoChatProfile(!chatProfileId)
+
+      const [defMemory, defMsgThreshold, defCtxThreshold] = await Promise.all([
+        getSetting('defaultMemory'),
+        getSetting('defaultMessagesThreshold'),
+        getSetting('defaultContextWindowThreshold'),
+      ])
+      setMemoryDefaults({
+        mode: defMemory ?? 'messages',
+        messagesThreshold: Number(defMsgThreshold) || 7,
+        contextWindowThreshold: Number(defCtxThreshold) || 1024,
+      })
 
       const [charScaleDefault, personaScaleDefault] = await Promise.all([
         getSetting('defaultCharacterAvatarScale'),
@@ -1905,6 +1922,37 @@ function ChatView() {
     ? messages.findIndex((m) => m.id === confirmDeleteId) + 1
     : null
 
+  const summarizationProgress = useMemo(() => {
+    if (!character) return null
+    const resolvedMemory = character.memory ?? memoryDefaults.mode
+    if (resolvedMemory === 'never') return null
+
+    const includeOOC = character.includeOOC !== false
+    const unsummarized = getUnsummarizedMessages(messages, { includeOOC })
+
+    if (resolvedMemory === 'messages') {
+      const threshold = Number(character.messagesThreshold ?? memoryDefaults.messagesThreshold)
+      const remaining = threshold - unsummarized.length
+      if (remaining <= 0) return null
+      return { mode: 'messages', remaining, threshold, current: unsummarized.length }
+    }
+
+    if (resolvedMemory === 'contextWindow') {
+      const threshold = Number(
+        character.contextWindowThreshold ?? memoryDefaults.contextWindowThreshold,
+      )
+      const tokenCount = unsummarized.reduce(
+        (total, message) => total + estimateTokens(message?.content || ''),
+        0,
+      )
+      const remaining = threshold - tokenCount
+      if (remaining <= 0) return null
+      return { mode: 'contextWindow', remaining, threshold, current: tokenCount }
+    }
+
+    return null
+  }, [character, messages, memoryDefaults])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -2184,6 +2232,18 @@ function ChatView() {
                 {hordeEta && <> · {hordeEta}</>}
               </span>
             )}
+          </div>
+        )}
+        {summarizationProgress && (
+          <div className="px-3 py-1 text-center">
+            <span className="text-xs text-tertiary">
+              {summarizationProgress.mode === 'messages'
+                ? t('summarizationProgressMessages', { count: summarizationProgress.remaining })
+                : t('summarizationProgressTokens', {
+                    current: summarizationProgress.current,
+                    threshold: summarizationProgress.threshold,
+                  })}
+            </span>
           </div>
         )}
         <ChatInputArea

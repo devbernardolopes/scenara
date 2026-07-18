@@ -61,5 +61,8 @@
   "summaryCancelButton": "Sì, annulla riepilogo",
   "summaryCancelHint": "Se la richiesta termina mentre questa finestra è aperta, il pulsante di conferma verrà disabilitato automaticamente.",
   "summaryCancelDone": "La richiesta di riepilogo è già stata completata.",
-  "summaryCancelDoneHint": "Puoi chiudere questa finestra — la richiesta è terminata da sola."
+  "summaryCancelDoneHint": "Puoi chiudere questa finestra — la richiesta è terminata da sola.",
+  "summarizationProgressMessages_one": "Prossimo riepilogo tra {{count}} messaggio",
+  "summarizationProgressMessages_other": "Prossimo riepilogo tra {{count}} messaggi",
+  "summarizationProgressTokens": "Memoria {{current}} / {{threshold}} token"
 }

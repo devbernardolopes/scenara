@@ -61,5 +61,8 @@
   "summaryCancelButton": "Ja, Zusammenfassung abbrechen",
   "summaryCancelHint": "Wenn die Anfrage abgeschlossen wird, während dieser Dialog geöffnet ist, wird der Bestätigungsbutton automatisch deaktiviert.",
   "summaryCancelDone": "Die Zusammenfassungsanfrage ist bereits abgeschlossen.",
-  "summaryCancelDoneHint": "Du kannst diesen Dialog schließen — die Anfrage wurde von selbst beendet."
+  "summaryCancelDoneHint": "Du kannst diesen Dialog schließen — die Anfrage wurde von selbst beendet.",
+  "summarizationProgressMessages_one": "Nächste Zusammenfassung in {{count}} Nachricht",
+  "summarizationProgressMessages_other": "Nächste Zusammenfassung in {{count}} Nachrichten",
+  "summarizationProgressTokens": "Speicher {{current}} / {{threshold}} Token"
 }

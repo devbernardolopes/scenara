@@ -61,5 +61,8 @@
   "summaryCancelButton": "Sí, cancelar resumen",
   "summaryCancelHint": "Si la solicitud termina mientras este diálogo está abierto, el botón de confirmación se desactivará automáticamente.",
   "summaryCancelDone": "La solicitud de resumen ya ha finalizado.",
-  "summaryCancelDoneHint": "Puedes cerrar este diálogo — la solicitud terminó por sí sola."
+  "summaryCancelDoneHint": "Puedes cerrar este diálogo — la solicitud terminó por sí sola.",
+  "summarizationProgressMessages_one": "Próximo resumen en {{count}} mensaje",
+  "summarizationProgressMessages_other": "Próximo resumen en {{count}} mensajes",
+  "summarizationProgressTokens": "Memoria {{current}} / {{threshold}} tokens"
 }

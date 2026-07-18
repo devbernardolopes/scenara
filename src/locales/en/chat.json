@@ -161,5 +161,8 @@
   },
   "memoryDeleteTitle": "Delete memory entry",
   "memoryDeleteConfirm": "Delete this memory entry? This cannot be undone.",
-  "retryingInterrupted": "Retrying interrupted message…"
+  "retryingInterrupted": "Retrying interrupted message…",
+  "summarizationProgressMessages_one": "Next summary in {{count}} message",
+  "summarizationProgressMessages_other": "Next summary in {{count}} messages",
+  "summarizationProgressTokens": "Memory {{current}} / {{threshold}} tokens"
 }

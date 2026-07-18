@@ -61,5 +61,8 @@
   "summaryCancelButton": "Oui, annuler le résumé",
   "summaryCancelHint": "Si la requête se termine pendant que cette fenêtre est ouverte, le bouton de confirmation sera désactivé automatiquement.",
   "summaryCancelDone": "La requête de résumé est déjà terminée.",
-  "summaryCancelDoneHint": "Vous pouvez fermer cette fenêtre — la requête s'est terminée d'elle-même."
+  "summaryCancelDoneHint": "Vous pouvez fermer cette fenêtre — la requête s'est terminée d'elle-même.",
+  "summarizationProgressMessages_one": "Prochain résumé dans {{count}} message",
+  "summarizationProgressMessages_other": "Prochain résumé dans {{count}} messages",
+  "summarizationProgressTokens": "Mémoire {{current}} / {{threshold}} tokens"
 }

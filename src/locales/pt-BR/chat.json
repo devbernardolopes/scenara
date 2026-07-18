@@ -158,5 +158,8 @@
   },
   "memoryDeleteTitle": "Excluir entrada de memória",
   "memoryDeleteConfirm": "Excluir esta entrada de memória? Não pode ser desfeito.",
-  "retryingInterrupted": "Tentando novamente mensagem interrompida…"
+  "retryingInterrupted": "Tentando novamente mensagem interrompida…",
+  "summarizationProgressMessages_one": "Próximo resumo em {{count}} mensagem",
+  "summarizationProgressMessages_other": "Próximo resumo em {{count}} mensagens",
+  "summarizationProgressTokens": "Memória {{current}} / {{threshold}} tokens"
 }
