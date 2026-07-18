@@ -72,6 +72,10 @@ export function getMessagesForApiRequest(messages, { includeOOC = true, keepMess
 
 const CODE_BLOCK_RE = /(```[\s\S]*?```|~~~[\s\S]*?~~~)/g
 
+function hasCodeBlocks(text) {
+  return typeof text === 'string' && CODE_BLOCK_RE.test(text)
+}
+
 function stripCodeBlocks(text) {
   if (!text) return text
   return text.replace(CODE_BLOCK_RE, '').trim()
@@ -81,10 +85,21 @@ export function removeCodeBlocksFromMessages(messages, keepCodeBlocks) {
   if (!Array.isArray(messages) || keepCodeBlocks === 'always') return messages
 
   const keepCount = keepCodeBlocks === 'never' ? 0 : Number(keepCodeBlocks)
-  const stripFromIndex = messages.length - keepCount
+
+  // Only messages that actually contain code blocks and are user/assistant
+  // roles consume the "keep" budget. Slots without code blocks don't move
+  // the counter, so the cap targets recent code-bearing messages.
+  let seenCodeBlocks = 0
+  const stripFlags = messages.map((msg) => {
+    if (msg.role !== 'user' && msg.role !== 'assistant') return false
+    if (!hasCodeBlocks(msg.content)) return false
+    const shouldKeep = seenCodeBlocks < keepCount
+    seenCodeBlocks += 1
+    return !shouldKeep
+  })
 
   return messages.map((msg, i) => {
-    if (i >= stripFromIndex || (msg.role !== 'user' && msg.role !== 'assistant')) return msg
+    if (!stripFlags[i]) return msg
     return { ...msg, content: stripCodeBlocks(msg.content) }
   })
 }

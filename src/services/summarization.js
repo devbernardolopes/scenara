@@ -12,6 +12,7 @@ import {
   getThreadQueuedCount,
   getThreadInflightCount,
 } from './apiQueue'
+import { removeCodeBlocksFromMessages } from './chatApi'
 
 const DEFAULT_SYSTEM_INSTRUCTION = 'You are a memory generator for conversational AI.'
 
@@ -66,6 +67,9 @@ export async function buildSummarizationPayload({
   currentPersona,
   memoryText,
 }) {
+  const keepCodeBlocks = await getSetting('prompting.keepCodeBlocks')
+  const processedMessages = removeCodeBlocksFromMessages(messages, keepCodeBlocks)
+
   const charName = character?.name || ''
   let personaName = ''
   let personaDescription = currentPersona?.description || ''
@@ -83,7 +87,7 @@ export async function buildSummarizationPayload({
 
   let transcript = replaceVarsIn(
     buildTranscript({
-      messages,
+      messages: processedMessages,
       personaName,
       currentPersonaName,
       includeOOCOverride,
