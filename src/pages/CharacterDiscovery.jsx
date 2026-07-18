@@ -143,13 +143,13 @@ function CharacterNameCell({ name, characterCardMarquee }) {
   }, [name, characterCardMarquee])
 
   if (!characterCardMarquee) {
-    return <span className="font-semibold text-on-image truncate">{name}</span>
+    return <span className="block font-semibold text-on-image truncate">{name}</span>
   }
 
   return (
     <span
       ref={wrapperRef}
-      className={`font-semibold text-on-image marquee-wrapper ${overflows ? 'marquee-animate' : ''}`}
+      className={`block font-semibold text-on-image marquee-wrapper ${overflows ? 'marquee-animate' : ''}`}
     >
       <span className="marquee-text">{name}</span>
     </span>
@@ -528,12 +528,14 @@ function CharacterDiscovery() {
                         characterCardMarquee={characterCardMarquee}
                       />
                       {char.tagline?.trim() && (
-                        <MarqueeText
-                          className="text-xs text-on-image-muted"
-                          marquee={characterCardMarquee}
-                        >
-                          {char.tagline}
-                        </MarqueeText>
+                        <div className="block">
+                          <MarqueeText
+                            className="text-xs text-on-image-muted"
+                            marquee={characterCardMarquee}
+                          >
+                            {char.tagline}
+                          </MarqueeText>
+                        </div>
                       )}
                       {displayTags.length > 0 && <TagRow tags={displayTags} />}
                       {(chatCount > 0 || has1st || hasMem || hasDir) && (
