@@ -20,6 +20,8 @@ function PersonaManagementModal() {
 
   const config = {
     entityKey: 'persona',
+    createLabelKey: 'persona.createPersona',
+    importLabelKey: 'persona.importPersona',
     changeEvent: 'personas-changed',
     showImage: true,
     squaredImage: true,

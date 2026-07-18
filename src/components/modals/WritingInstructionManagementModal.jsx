@@ -22,6 +22,8 @@ function WritingInstructionManagementModal() {
 
   const config = {
     entityKey: 'writingInstruction',
+    createLabelKey: 'writingInstruction.createWritingInstruction',
+    importLabelKey: 'writingInstruction.importWritingInstruction',
     changeEvent: 'writingInstructions-changed',
     showImage: false,
     icon: FileText,
