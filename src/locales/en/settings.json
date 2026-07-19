@@ -846,6 +846,14 @@
       "label": "Messages to Keep",
       "desc": "How many of the most recent messages from the last summarization are still passed to API requests until the next summarization."
     },
+    "messageRollover": {
+      "label": "Message Rollover",
+      "desc": "After summarization, progressively push out kept messages as new messages are sent. Static keeps all kept messages until the next summarization.",
+      "options": {
+        "rollover": "Rollover",
+        "static": "Static"
+      }
+    },
     "memorySlots": {
       "label": "Memory Slots",
       "desc": "How many memory entries (slots) per memory level the chat will have."

@@ -48,6 +48,11 @@ const PERSONA_MESSAGE_ROLE_OPTIONS = [
   { value: 'assistant', labelKey: 'personaInjectionMessageRoleOptions.assistant' },
 ]
 
+const MESSAGE_ROLLOVER_OPTIONS = [
+  { value: 'rollover', labelKey: 'messageRolloverOptions.rollover' },
+  { value: 'static', labelKey: 'messageRolloverOptions.static' },
+]
+
 // Maps each Overrides form field to its counterpart in Settings > Defaults.
 // Settings > Defaults contains more settings than the Overrides section, so only
 // the fields with a matching key are reset (copied from the global defaults).
@@ -58,6 +63,7 @@ const OVERRIDE_DEFAULTS_MAP = [
   ['messagesThreshold', 'defaultMessagesThreshold'],
   ['contextWindowThreshold', 'defaultContextWindowThreshold'],
   ['messagesToKeep', 'defaultMessagesToKeep'],
+  ['messageRollover', 'defaultMessageRollover'],
   ['memorySlots', 'defaultMemorySlots'],
   ['addCharacterPrompt', 'defaultAddCharacterPrompt'],
   ['firstMessage', 'defaultFirstMessage'],
@@ -305,6 +311,16 @@ function OverridesSection({ form, onChange, characterId }) {
           <span className="text-sm text-text font-medium w-14 text-right">
             {form.messagesToKeep}
           </span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <label className="text-sm text-secondary shrink-0">{t('messageRollover')}</label>
+          <ButtonGroup
+            options={MESSAGE_ROLLOVER_OPTIONS}
+            value={form.messageRollover}
+            onChange={(v) => onChange('messageRollover', v)}
+            disabled={form.memory === 'never' || form.messagesToKeep === 0}
+          />
         </div>
 
         <div className="flex items-center gap-3">

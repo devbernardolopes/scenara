@@ -832,6 +832,24 @@ export const SETTINGS = [
     dependsOn: { key: 'defaultMemory', value: 'never', not: true },
   },
   {
+    key: 'defaultMessageRollover',
+    category: 'defaults',
+    type: 'buttonOrder',
+    default: 'rollover',
+    props: {
+      buttons: [
+        { value: 'rollover', labelKey: 'settings:defaults.messageRollover.options.rollover' },
+        { value: 'static', labelKey: 'settings:defaults.messageRollover.options.static' },
+      ],
+    },
+    labelKey: 'settings:defaults.messageRollover.label',
+    descKey: 'settings:defaults.messageRollover.desc',
+    dependsOn: [
+      { key: 'defaultMemory', value: 'never', not: true },
+      { key: 'defaultMessagesToKeep', value: 0, not: true },
+    ],
+  },
+  {
     key: 'defaultMemorySlots',
     category: 'defaults',
     type: 'slider',

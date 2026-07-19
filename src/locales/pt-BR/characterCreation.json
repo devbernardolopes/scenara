@@ -73,6 +73,11 @@
   "messagesThreshold": "Limite de Mensagens",
   "contextWindowThreshold": "Limite da Janela de Contexto",
   "messagesToKeep": "Mensagens a Manter",
+  "messageRollover": "Rolar Mensagens",
+  "messageRolloverOptions": {
+    "rollover": "Rolar",
+    "static": "Estático"
+  },
   "memorySlots": "Slots de Memória",
   "addCharacterPrompt": "Adicionar Prompt do Personagem",
   "messagesToKeepDesc": "Quantas das mensagens mais recentes que fizeram parte da última solicitação de resumo ainda serão passadas para as requisições de API até o próximo evento de resumo.",

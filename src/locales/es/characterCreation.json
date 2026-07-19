@@ -20,6 +20,11 @@
   "confirmDeleteInitialMessageTitle": "Eliminar Mensaje Inicial",
   "noInitialMessages": "Aún no hay mensajes iniciales. Añade uno para saludar al usuario cuando comience un nuevo chat.",
   "messagesToKeep": "Mensajes a Mantener",
+  "messageRollover": "Rotación de Mensajes",
+  "messageRolloverOptions": {
+    "rollover": "Rotar",
+    "static": "Estático"
+  },
   "memorySlots": "Slots de Memória",
   "addCharacterPrompt": "Añadir Prompt del Personaje",
   "messagesToKeepDesc": "Quantas das mensagens mais recentes que fizerem parte da última solicitação de resumo ainda serão passadas para as requisições de API de um chat até o próximo evento de resumo.",

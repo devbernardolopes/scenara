@@ -360,7 +360,7 @@ export async function triggerSummarization({
     params: profile.params,
     apiDurationMs,
   })
-  await updateThread(thread.id, { lastSummarizationAt: timestamp })
+  await updateThread(thread.id, { lastSummarizationAt: timestamp, keptConsumedCount: 0 })
 
   return cleanedSummary
 }

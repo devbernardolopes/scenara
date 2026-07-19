@@ -631,6 +631,14 @@
       "label": "Mensajes a Mantener",
       "desc": "Cuántas de las mensajes más recientes que formen parte de la última solicitud de resumen aún se pasarán a las solicitudes de API de un chat hasta el próximo evento de resumen."
     },
+    "messageRollover": {
+      "label": "Rotación de Mensajes",
+      "desc": "Después de la resumen, empuje progresivamente los mensajes mantidos a medida que se envían nuevos mensajes. Estático mantiene todos los mensajes hasta la próxima resumen.",
+      "options": {
+        "rollover": "Rotar",
+        "static": "Estático"
+      }
+    },
     "memorySlots": {
       "label": "Slots de Memória",
       "desc": "Cuántas entradas de memoria (slots) tendrá el chat por nivel de memoria."

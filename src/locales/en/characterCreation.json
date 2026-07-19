@@ -77,6 +77,11 @@
   "messagesThreshold": "Messages Threshold",
   "contextWindowThreshold": "Context Window Threshold",
   "messagesToKeep": "Messages to Keep",
+  "messageRollover": "Message Rollover",
+  "messageRolloverOptions": {
+    "rollover": "Rollover",
+    "static": "Static"
+  },
   "memorySlots": "Memory Slots",
   "addCharacterPrompt": "Add Character Prompt",
   "messagesToKeepDesc": "How many of the most recent messages that were part of the last summarization request in a chat will still be passed to the API requests of a chat until the next summarization event.",

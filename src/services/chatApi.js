@@ -49,7 +49,10 @@ export function replacePersonaTemplate(
     .replace(/{{description_default}}/gi, descDefault)
 }
 
-export function getMessagesForApiRequest(messages, { includeOOC = true, keepMessages = 0 } = {}) {
+export function getMessagesForApiRequest(
+  messages,
+  { includeOOC = true, keepMessages = 0, keptConsumedCount = 0 } = {},
+) {
   if (!Array.isArray(messages)) return []
 
   const eligible = messages.filter(
@@ -75,6 +78,11 @@ export function getMessagesForApiRequest(messages, { includeOOC = true, keepMess
     )
     const kept = block.slice(-keepMessages)
     kept.forEach((m) => keptIds.add(m.id))
+
+    if (keptConsumedCount > 0) {
+      const rolledOut = kept.slice(0, Math.min(keptConsumedCount, kept.length))
+      rolledOut.forEach((m) => keptIds.delete(m.id))
+    }
   }
 
   return eligible.filter((m) => !m.summarizedAt || keptIds.has(m.id))
@@ -621,7 +629,21 @@ export async function buildChatRequestPayload({
       )
     : messages
 
-  const apiMessages = getMessagesForApiRequest(effectiveMessages, { includeOOC, keepMessages })
+  let effectiveKeptConsumedCount = 0
+  if (!beforeDate && keepMessages > 0) {
+    const rollover =
+      character?.messageRollover ?? (await getSetting('defaultMessageRollover')) ?? 'rollover'
+    if (rollover === 'rollover') {
+      const latestThread = await getThread(threadId)
+      effectiveKeptConsumedCount = Number(latestThread?.keptConsumedCount) || 0
+    }
+  }
+
+  const apiMessages = getMessagesForApiRequest(effectiveMessages, {
+    includeOOC,
+    keepMessages,
+    keptConsumedCount: effectiveKeptConsumedCount,
+  })
 
   const keepCodeBlocks = await getSetting('prompting.keepCodeBlocks')
   let processedMessages = removeCodeBlocksFromMessages(apiMessages, keepCodeBlocks)

@@ -834,6 +834,14 @@
       "label": "Mensagens a Manter",
       "desc": "Quantas das mensagens mais recentes da última sumarização ainda serão passadas para as requisições de API."
     },
+    "messageRollover": {
+      "label": "Rolar Mensagens",
+      "desc": "Após a sumarização, empurre progressivamente as mensagens mantidas à medida que novas mensagens são enviadas. Estático mantém todas as mensagens até a próxima sumarização.",
+      "options": {
+        "rollover": "Rolar",
+        "static": "Estático"
+      }
+    },
     "memorySlots": {
       "label": "Slots de Memória",
       "desc": "Quantas entradas de memória (slots) por nível de memória o chat terá."

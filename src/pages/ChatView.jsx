@@ -1346,6 +1346,23 @@ function ChatView() {
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages(dedupeMessages(currentMsgs))
         }
+
+        const thr = await getThread(threadId)
+        if (thr?.lastSummarizationAt) {
+          const chr = thr?.characterId ? await getCharacter(thr.characterId) : null
+          const rollover =
+            chr?.messageRollover ?? (await getSetting('defaultMessageRollover')) ?? 'rollover'
+          if (rollover === 'rollover') {
+            const kept = Number(
+              chr?.messagesToKeep ?? (await getSetting('defaultMessagesToKeep')) ?? 0,
+            )
+            if (kept > 0) {
+              await updateThread(threadId, {
+                keptConsumedCount: (Number(thr.keptConsumedCount) || 0) + 1,
+              })
+            }
+          }
+        }
       }
 
       const isFirstMessage = currentMsgs.filter(isRealMessage).length === 0
@@ -1842,6 +1859,22 @@ function ChatView() {
       return next
     })
     await deleteMessage(id)
+
+    if (msg?.createdAt) {
+      const thr = await getThread(threadId)
+      if (thr?.lastSummarizationAt && msg.createdAt > thr.lastSummarizationAt) {
+        const chr = thr?.characterId ? await getCharacter(thr.characterId) : null
+        const rollover =
+          chr?.messageRollover ?? (await getSetting('defaultMessageRollover')) ?? 'rollover'
+        if (rollover === 'rollover') {
+          const current = Number(thr.keptConsumedCount) || 0
+          if (current > 0) {
+            await updateThread(threadId, { keptConsumedCount: current - 1 })
+          }
+        }
+      }
+    }
+
     const msgs = await getMessagesByThread(threadId)
     setMessages(dedupeMessages(msgs))
     showToast(t('messageDeleted'), { type: 'success' })
@@ -1857,12 +1890,29 @@ function ChatView() {
       variant: 'danger',
     })
     if (!ok) return
+    const delMsg = messages.find((m) => m.id === id)
     await deleteMessage(id)
     setActiveSlotIndices((prev) => {
       const next = { ...prev }
       delete next[id]
       return next
     })
+
+    if (delMsg?.createdAt) {
+      const thr = await getThread(threadId)
+      if (thr?.lastSummarizationAt && delMsg.createdAt > thr.lastSummarizationAt) {
+        const chr = thr?.characterId ? await getCharacter(thr.characterId) : null
+        const rollover =
+          chr?.messageRollover ?? (await getSetting('defaultMessageRollover')) ?? 'rollover'
+        if (rollover === 'rollover') {
+          const current = Number(thr.keptConsumedCount) || 0
+          if (current > 0) {
+            await updateThread(threadId, { keptConsumedCount: current - 1 })
+          }
+        }
+      }
+    }
+
     setMessages(dedupeMessages(await getMessagesByThread(threadId)))
     showToast(t('messageDeleted'), { type: 'success' })
   }
@@ -1877,12 +1927,38 @@ function ChatView() {
     if (!ok) return
     const idx = messages.findIndex((m) => m.id === id)
     const deletedIds = idx === -1 ? new Set() : new Set(messages.slice(idx).map((m) => m.id))
+
+    const thr = await getThread(threadId)
+    let postSummDeletedCount = 0
+    if (thr?.lastSummarizationAt && idx !== -1) {
+      postSummDeletedCount = messages
+        .slice(idx)
+        .filter(
+          (m) =>
+            !m.isSummaryMarker && !m.isAutoTitleMarker && m.createdAt > thr.lastSummarizationAt,
+        ).length
+    }
+
     await deleteMessagesFrom(id)
     setActiveSlotIndices((prev) => {
       const next = { ...prev }
       deletedIds.forEach((d) => delete next[d])
       return next
     })
+
+    if (postSummDeletedCount > 0 && thr) {
+      const chr = thr?.characterId ? await getCharacter(thr.characterId) : null
+      const rollover =
+        chr?.messageRollover ?? (await getSetting('defaultMessageRollover')) ?? 'rollover'
+      if (rollover === 'rollover') {
+        const current = Number(thr.keptConsumedCount) || 0
+        const restored = Math.min(postSummDeletedCount, current)
+        if (restored > 0) {
+          await updateThread(threadId, { keptConsumedCount: current - restored })
+        }
+      }
+    }
+
     setMessages(dedupeMessages(await getMessagesByThread(threadId)))
     showToast(t('messageDeleted'), { type: 'success' })
   }
