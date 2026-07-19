@@ -7,6 +7,7 @@ import { isExternalImageUrl } from '../lib/image'
 import { useConfirm } from '../lib/confirm'
 import {
   getAllCharacters,
+  getCharacter,
   deleteCharacterWithThreads,
   duplicateCharacter,
   exportCharacter,
@@ -352,8 +353,9 @@ function CharacterDiscovery() {
     if (src) openModal('imageViewer', { src, modalSize: 'fullscreen' })
   }
 
-  function handleEditCharacter(character) {
-    openModal('characterCreate', { character })
+  async function handleEditCharacter(character) {
+    const fresh = await getCharacter(character.id)
+    openModal('characterCreate', { character: fresh || character })
   }
 
   async function createAndNavigateThread(character, persona, selectedScenario) {
