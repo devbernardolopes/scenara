@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
+import PromptBankButton from '../../shared/PromptBankButton'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { setUIState } from '../../../services/uiState'
 
@@ -150,6 +151,11 @@ function Group({ group, form, onChange, characterId, directorEnabled }) {
             defaultExpanded={false}
             open={systemOpen}
             onOpenChange={handleSystemOpenChange}
+            headerExtra={
+              <PromptBankButton
+                onSelect={(content) => onChange(group.systemInstructionsKey, content)}
+              />
+            }
           >
             <AutoResizeTextarea
               className={`${inputClass} resize-none mt-2`}
@@ -171,6 +177,9 @@ function Group({ group, form, onChange, characterId, directorEnabled }) {
           defaultExpanded={false}
           open={open}
           onOpenChange={handleOpenChange}
+          headerExtra={
+            <PromptBankButton onSelect={(content) => onChange(group.instructionsKey, content)} />
+          }
         >
           <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}

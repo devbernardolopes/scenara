@@ -24,7 +24,8 @@
     "characterNameWithId": "{{name}}",
     "localInference": "Inferencia local",
     "pin": "Fijar",
-    "unpin": "Quitar fijado"
+    "unpin": "Quitar fijado",
+    "promptBank": "Prompt Bank"
   },
   "topbar": {
     "toggleSidebar": "Alternar barra lateral",
@@ -136,6 +137,17 @@
       "exported": "{{name}} exported",
       "exportedMultiple": "{{count}} lorebooks exported",
       "imported": "{{count}} lorebooks imported"
+    },
+    "promptBank": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} prompts deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} prompts duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} prompts exported",
+      "imported": "{{count}} prompts imported"
     }
   },
   "ok": "OK",

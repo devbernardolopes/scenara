@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
+import PromptBankButton from '../../shared/PromptBankButton'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { getSetting } from '../../../services/settings'
 import { useConfirm } from '../../../lib/confirm'
@@ -198,6 +199,11 @@ function OverridesSection({ form, onChange, characterId }) {
           }
           storageKey={characterId ? `charSection.autoTitleSystem.${characterId}` : undefined}
           defaultExpanded={false}
+          headerExtra={
+            <PromptBankButton
+              onSelect={(content) => onChange('autoTitleSystemInstructions', content)}
+            />
+          }
         >
           <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}
@@ -218,6 +224,11 @@ function OverridesSection({ form, onChange, characterId }) {
           }
           storageKey={characterId ? `charSection.autoTitleUser.${characterId}` : undefined}
           defaultExpanded={false}
+          headerExtra={
+            <PromptBankButton
+              onSelect={(content) => onChange('autoTitleUserInstructions', content)}
+            />
+          }
         >
           <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}
@@ -330,6 +341,11 @@ function OverridesSection({ form, onChange, characterId }) {
           }
           storageKey={characterId ? `charSection.summarizationSystem.${characterId}` : undefined}
           defaultExpanded={false}
+          headerExtra={
+            <PromptBankButton
+              onSelect={(content) => onChange('summarizationSystemInstructions', content)}
+            />
+          }
         >
           <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}
@@ -352,6 +368,11 @@ function OverridesSection({ form, onChange, characterId }) {
           }
           storageKey={characterId ? `charSection.summarizationUser.${characterId}` : undefined}
           defaultExpanded={false}
+          headerExtra={
+            <PromptBankButton
+              onSelect={(content) => onChange('summarizationUserInstructions', content)}
+            />
+          }
         >
           <AutoResizeTextarea
             className={`${inputClass} resize-none mt-2`}

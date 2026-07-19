@@ -61,8 +61,9 @@ function SettingRow({ setting, onSave }) {
   }, [dependsOn]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (next) => {
-    setValue(next)
-    onSave(next)
+    const val = typeof next === 'string' || typeof next === 'number' ? next : next?.target?.value
+    setValue(val)
+    onSave(val)
   }
 
   const labelPath = setting.labelKey.replace('settings:', '')
@@ -103,6 +104,7 @@ function SettingRow({ setting, onSave }) {
             onChange={handleChange}
             disabled={disabled}
             storageKey={key}
+            promptBankEnabled={type === 'textarea'}
             {...extraProps}
             {...controlProps}
           />

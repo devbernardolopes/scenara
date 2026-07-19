@@ -306,4 +306,23 @@ db.version(22).stores({
   logs: '++id, type, threadId, createdAt, level',
 })
 
+db.version(23).stores({
+  threads:
+    '++id, title, characterId, personaId, updatedAt, isFavorite, isLocked, threadNumber, activeShortcutSetId, activeScenario',
+  characters: '++id, name, displayName, createdAt, updatedAt, characterNumber, *tags',
+  personas: '++id, name, title, createdAt, isDefault',
+  settings: '++id, key',
+  uiState: '++id, key',
+  messages: '++id, threadId, role, personaId, createdAt, summarizedAt',
+  writingInstructions: '++id, name, createdAt',
+  connectionProfiles: '++id, name, createdAt',
+  inChatShortcuts: '++id, name, createdAt, order',
+  lorebooks: '++id, name, createdAt, avatar',
+  promptHistory: '++id, threadId, createdAt, isOOC',
+  tags: '++id, &name, createdAt',
+  threadMemories: '++id, threadId, createdAt',
+  logs: '++id, type, threadId, createdAt, level',
+  promptBank: '++id, name, kind, createdAt',
+})
+
 export default db

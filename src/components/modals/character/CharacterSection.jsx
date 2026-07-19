@@ -4,6 +4,7 @@ import { useModal } from '../../../hooks/useModal'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import Label from '../../shared/Label'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
+import PromptBankButton from '../../shared/PromptBankButton'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { getAllWritingInstructions } from '../../../services/writingInstructions'
 import Avatar from '../../shared/Avatar'
@@ -159,6 +160,7 @@ function CharacterSection({ form, onChange, characterId }) {
         }
         storageKey={characterId ? `charSection.systemPrompt.${characterId}` : undefined}
         defaultExpanded={false}
+        headerExtra={<PromptBankButton onSelect={(content) => onChange('systemPrompt', content)} />}
       >
         <AutoResizeTextarea
           className={`${inputClass} resize-none mt-2`}
@@ -176,6 +178,7 @@ function CharacterSection({ form, onChange, characterId }) {
         }
         storageKey={characterId ? `charSection.prompt.${characterId}` : undefined}
         defaultExpanded={true}
+        headerExtra={<PromptBankButton onSelect={(content) => onChange('prompt', content)} />}
       >
         <AutoResizeTextarea
           className={`${inputClass} resize-none mt-2`}
@@ -195,6 +198,7 @@ function CharacterSection({ form, onChange, characterId }) {
         }
         storageKey={characterId ? `charSection.personality.${characterId}` : undefined}
         defaultExpanded={false}
+        headerExtra={<PromptBankButton onSelect={(content) => onChange('personality', content)} />}
       >
         <AutoResizeTextarea
           className={`${inputClass} resize-none mt-2`}
@@ -214,6 +218,9 @@ function CharacterSection({ form, onChange, characterId }) {
         }
         storageKey={characterId ? `charSection.globalContext.${characterId}` : undefined}
         defaultExpanded={false}
+        headerExtra={
+          <PromptBankButton onSelect={(content) => onChange('globalContext', content)} />
+        }
       >
         <AutoResizeTextarea
           className={`${inputClass} resize-none mt-2`}
@@ -242,6 +249,7 @@ function CharacterSection({ form, onChange, characterId }) {
         }
         storageKey={characterId ? `charSection.extraPrompt.${characterId}` : undefined}
         defaultExpanded={false}
+        headerExtra={<PromptBankButton onSelect={(content) => onChange('extraPrompt', content)} />}
       >
         <AutoResizeTextarea
           className={`${inputClass} resize-none mt-2`}
@@ -261,6 +269,9 @@ function CharacterSection({ form, onChange, characterId }) {
         }
         storageKey={characterId ? `charSection.postHistoryInstructions.${characterId}` : undefined}
         defaultExpanded={false}
+        headerExtra={
+          <PromptBankButton onSelect={(content) => onChange('postHistoryInstructions', content)} />
+        }
       >
         <AutoResizeTextarea
           className={`${inputClass} resize-none mt-2`}

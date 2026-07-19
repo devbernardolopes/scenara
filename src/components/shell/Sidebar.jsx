@@ -486,6 +486,11 @@ function Sidebar({ open, onClose }) {
               labelKey: 'sidebar.writingInstructions',
             },
             {
+              onClick: () => openModal('promptBankManagement'),
+              icon: FileText,
+              labelKey: 'sidebar.promptBank',
+            },
+            {
               onClick: () => openModal('profileManagement'),
               icon: SlidersHorizontal,
               labelKey: 'sidebar.connectionProfiles',

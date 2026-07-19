@@ -1,5 +1,6 @@
 import CollapsibleSection from '../../../shared/CollapsibleSection'
 import AutoResizeTextarea from '../../../shared/AutoResizeTextarea'
+import PromptBankButton from '../../../shared/PromptBankButton'
 import { estimateTokens } from '../../../../services/tokenEstimator'
 
 function computeSummary(value, mode) {
@@ -18,11 +19,11 @@ function computeSummary(value, mode) {
 function SettingTextarea({
   value,
   onChange,
-  rows = 6,
   placeholder,
   collapsible,
   summary,
   storageKey,
+  promptBankEnabled,
 }) {
   const content = (
     <AutoResizeTextarea
@@ -33,6 +34,8 @@ function SettingTextarea({
       extraHeight={8}
     />
   )
+
+  const headerExtra = promptBankEnabled ? <PromptBankButton onSelect={onChange} /> : null
 
   if (!collapsible) {
     return <div className="w-full max-w-lg">{content}</div>
@@ -46,6 +49,7 @@ function SettingTextarea({
         hasContent={!!value}
         storageKey={storageKey}
         defaultExpanded={true}
+        headerExtra={headerExtra}
       >
         {content}
       </CollapsibleSection>

@@ -11,6 +11,7 @@ import App from './App'
 import './lib/i18n'
 import './index.css'
 import { addLog } from './services/logs'
+import { seedBuiltInEntries } from './services/promptBank'
 
 import CharacterCreateModal from './components/modals/CharacterCreateModal'
 import PersonaEditorModal from './components/modals/PersonaEditorModal'
@@ -26,6 +27,9 @@ import InChatShortcutFormModal from './components/modals/InChatShortcutFormModal
 import LorebookManagementModal from './components/modals/LorebookManagementModal'
 import MakeShortcutModal from './components/modals/MakeShortcutModal'
 import CreateShortcutSetModal from './components/modals/CreateShortcutSetModal'
+import PromptBankManagementModal from './components/modals/PromptBankManagementModal'
+import PromptBankFormModal from './components/modals/PromptBankFormModal'
+import CreatePromptBankKindModal from './components/modals/CreatePromptBankKindModal'
 import ShowPromptModal from './components/modals/ShowPromptModal'
 import RequestDetailsModal from './components/modals/RequestDetailsModal'
 import DirectorDetailsModal from './components/modals/DirectorDetailsModal'
@@ -64,6 +68,9 @@ registerModal('inChatShortcutForm', InChatShortcutFormModal)
 registerModal('lorebookManagement', LorebookManagementModal)
 registerModal('makeShortcut', MakeShortcutModal)
 registerModal('createShortcutSet', CreateShortcutSetModal)
+registerModal('promptBankManagement', PromptBankManagementModal)
+registerModal('promptBankForm', PromptBankFormModal)
+registerModal('promptBankKind', CreatePromptBankKindModal)
 registerModal('showPrompt', ShowPromptModal)
 registerModal('requestDetails', RequestDetailsModal)
 registerModal('directorDetails', DirectorDetailsModal)
@@ -119,3 +126,5 @@ createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </StrictMode>,
 )
+
+seedBuiltInEntries()

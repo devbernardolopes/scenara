@@ -680,5 +680,55 @@
       "invalidFormat": "The file does not appear to be a valid lorebook export.",
       "fileError": "Failed to read the file."
     }
+  },
+  "promptBank": {
+    "title": "Prompt Bank",
+    "createEntry": "Create Prompt",
+    "importEntry": "Import",
+    "noEntries": "No prompts yet. Create one to start building your prompt bank.",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "confirmDelete": {
+      "title": "Delete Prompt",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} prompts?"
+    },
+    "form": {
+      "title": "Create Prompt",
+      "editTitle": "Edit Prompt",
+      "nameLabel": "Name",
+      "namePlaceholder": "Prompt name",
+      "kindLabel": "Kind",
+      "kindPlaceholder": "Category label",
+      "addKind": "Add Kind",
+      "createKindTitle": "Create Kind",
+      "createKindSave": "Create",
+      "contentLabel": "Content",
+      "contentPlaceholder": "Write your prompt content here…",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    },
+    "picker": {
+      "searchPlaceholder": "Search prompts…",
+      "empty": "No prompts found.",
+      "manage": "Manage Prompt Bank"
+    },
+    "import": {
+      "invalidFormat": "Invalid file format.",
+      "fileError": "Could not read file.",
+      "importSuccess": "Imported {{count}} prompt(s)"
+    }
   }
 }
