@@ -420,7 +420,7 @@ function CharacterDiscovery() {
     const promptUser = character.promptUser !== false
     const contentScenarios = (character.scenarios || []).filter((s) => s.content?.trim())
 
-    if (promptUser && contentScenarios.length >= 2) {
+    if (promptUser && contentScenarios.length >= 1) {
       openModal('scenarioSelector', {
         character,
         persona,

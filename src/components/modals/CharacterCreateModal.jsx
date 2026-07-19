@@ -390,7 +390,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       exampleMessages: (form.exampleMessages || []).some((m) => m.content?.trim()),
       tags: (form.tags || []).length > 0,
       lorebooks: (form.lorebookIds || []).length > 0,
-      scenarios: (form.scenarios || []).some((s) => s?.active),
+      scenarios: (form.scenarios || []).length > 0,
       postProcessing: ppEnabledDiff || ppOverrideDiff || ppRulesDiff,
       overrides: false,
       director:
