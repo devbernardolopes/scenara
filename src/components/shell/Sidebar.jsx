@@ -32,6 +32,7 @@ import {
   BookOpen,
   Tags,
   BrainCog,
+  DatabaseZap,
   Plus,
   Upload,
   Globe,
@@ -487,7 +488,7 @@ function Sidebar({ open, onClose }) {
             },
             {
               onClick: () => openModal('promptBankManagement'),
-              icon: ScrollText,
+              icon: DatabaseZap,
               labelKey: 'sidebar.promptBank',
             },
             {

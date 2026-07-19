@@ -44,6 +44,7 @@ export {
   BrainCog,
   Tags,
   Database,
+  DatabaseZap,
   Globe,
   FileUp,
   ArrowUpDown,
