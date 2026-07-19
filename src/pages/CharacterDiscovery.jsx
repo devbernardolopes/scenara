@@ -253,8 +253,8 @@ function CharacterDiscovery() {
     }
   }, [totalPages, currentPage])
 
-  async function loadCharacters() {
-    setLoading(true)
+  async function loadCharacters(isInitial = false) {
+    if (isInitial) setLoading(true)
     try {
       const [chars, counts, tags] = await Promise.all([
         getAllCharacters(),
@@ -265,7 +265,7 @@ function CharacterDiscovery() {
       setChatCounts(counts)
       setTagsMap(new Map(tags.map((t) => [t.id, t.name])))
     } finally {
-      setLoading(false)
+      if (isInitial) setLoading(false)
     }
   }
 
@@ -280,7 +280,7 @@ function CharacterDiscovery() {
   }
 
   useEffect(() => {
-    loadCharacters()
+    loadCharacters(true)
     getSetting('cardsPerPage').then((val) => setCardsPerPage(val || 10))
     getSetting('characterCardMarquee').then((val) => setCharacterCardMarquee(val !== false))
     getSetting('discoveryCardSize').then((val) => setCardSize(val || 'regular'))
