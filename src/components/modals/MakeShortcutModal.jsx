@@ -50,7 +50,7 @@ function countAllShortcuts(sets) {
 
 function MakeShortcutModal({ content = '' }) {
   const { t } = useTranslation('chat')
-  const { closeModal, setCloseGuard } = useModal()
+  const { openModal, closeModal, setCloseGuard } = useModal()
   const { promptSave } = useSaveConfirm()
 
   const [shortcutSets, setShortcutSets] = useState([])
@@ -171,12 +171,10 @@ function MakeShortcutModal({ content = '' }) {
     return () => setForm((prev) => ({ ...prev, [field]: !prev[field] }))
   }
 
-  async function handleCreateSet() {
-    const id = await createInChatShortcut({ name: 'Shortcuts', content: '' })
-    setSelectedSetId(id)
+  async function handleSetCreated(id) {
     const sets = await getAllInChatShortcuts()
     setShortcutSets(sets)
-    return id
+    if (id) setSelectedSetId(id)
   }
 
   if (loading) {
@@ -217,40 +215,40 @@ function MakeShortcutModal({ content = '' }) {
       <div className="space-y-4">
         <div>
           <Label>{t('makeShortcutModal.shortcutSet')}</Label>
-          {shortcutSets.length === 0 ? (
-            <div className="flex items-center gap-2 mt-1">
-              <p className="text-sm text-secondary">{t('makeShortcutModal.noSets')}</p>
+          <div className="flex flex-wrap items-center gap-1.5 mt-1">
+            {shortcutSets.map((set) => (
               <button
+                key={set.id}
                 type="button"
-                onClick={handleCreateSet}
-                className="min-h-[44px] min-w-[44px] px-3 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm flex items-center gap-1.5"
+                onClick={() => setSelectedSetId(set.id)}
+                className={`min-h-[44px] min-w-[44px] px-4 py-2 rounded-md text-sm font-medium border transition-colors ${
+                  selectedSetId === set.id
+                    ? 'bg-primary text-on-primary border-primary'
+                    : 'bg-surface text-secondary border-border hover:bg-surface-hover'
+                }`}
               >
-                <Plus className="w-4 h-4" />
-                {t('makeShortcutModal.createSet')}
+                {set.name}
               </button>
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-1.5 mt-1">
-              {shortcutSets.map((set) => (
-                <button
-                  key={set.id}
-                  type="button"
-                  onClick={() => setSelectedSetId(set.id)}
-                  className={`min-h-[44px] min-w-[44px] px-4 py-2 rounded-md text-sm font-medium border transition-colors ${
-                    selectedSetId === set.id
-                      ? 'bg-primary text-on-primary border-primary'
-                      : 'bg-surface text-secondary border-border hover:bg-surface-hover'
-                  }`}
-                >
-                  {set.name}
-                </button>
-              ))}
-            </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => openModal('createShortcutSet', { onCreated: handleSetCreated })}
+              aria-label={t('makeShortcutModal.addSet')}
+              title={t('makeShortcutModal.addSet')}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-sm font-medium border border-border text-secondary hover:bg-surface-hover transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
+          {shortcutSets.length === 0 && (
+            <p className="text-sm text-secondary mt-1">{t('makeShortcutModal.noSets')}</p>
           )}
         </div>
 
         <div>
-          <Label required>{t('makeShortcutModal.name')}</Label>
+          <Label required highlight={Boolean(form.name?.trim())}>
+            {t('makeShortcutModal.name')}
+          </Label>
           <input className={inputClass} value={form.name} onChange={update('name')} required />
         </div>
 

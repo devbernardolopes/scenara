@@ -115,7 +115,9 @@ function InChatShortcutFormModal({ inChatShortcut }) {
     >
       <div className="space-y-4">
         <div>
-          <Label required>{t('inChatShortcut.form.nameLabel')}</Label>
+          <Label required highlight={Boolean(form.name?.trim())}>
+            {t('inChatShortcut.form.nameLabel')}
+          </Label>
           <input
             className={inputClass}
             value={form.name}

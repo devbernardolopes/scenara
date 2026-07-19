@@ -166,7 +166,8 @@
   "makeShortcutModal": {
     "title": "Criar Atalho",
     "shortcutSet": "Conjunto de Atalhos",
-    "noSets": "Nenhum conjunto de atalhos. Crie um primeiro.",
+    "noSets": "Nenhum conjunto de atalhos ainda.",
+    "addSet": "Adicionar Conjunto de Atalhos",
     "createSet": "Criar Conjunto",
     "name": "Nome",
     "message": "Mensagem",
@@ -181,5 +182,13 @@
     "save": "Salvar",
     "saving": "Salvando…",
     "created": "Atalho criado"
+  },
+  "createShortcutSet": {
+    "title": "Criar Conjunto de Atalhos",
+    "nameLabel": "Nome",
+    "namePlaceholder": "Nome do conjunto de atalhos",
+    "save": "Criar",
+    "cancel": "Cancelar",
+    "saving": "Criando…"
   }
 }

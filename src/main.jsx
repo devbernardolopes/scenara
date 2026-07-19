@@ -25,6 +25,7 @@ import InChatShortcutManagementModal from './components/modals/InChatShortcutMan
 import InChatShortcutFormModal from './components/modals/InChatShortcutFormModal'
 import LorebookManagementModal from './components/modals/LorebookManagementModal'
 import MakeShortcutModal from './components/modals/MakeShortcutModal'
+import CreateShortcutSetModal from './components/modals/CreateShortcutSetModal'
 import ShowPromptModal from './components/modals/ShowPromptModal'
 import RequestDetailsModal from './components/modals/RequestDetailsModal'
 import DirectorDetailsModal from './components/modals/DirectorDetailsModal'
@@ -62,6 +63,7 @@ registerModal('inChatShortcutManagement', InChatShortcutManagementModal)
 registerModal('inChatShortcutForm', InChatShortcutFormModal)
 registerModal('lorebookManagement', LorebookManagementModal)
 registerModal('makeShortcut', MakeShortcutModal)
+registerModal('createShortcutSet', CreateShortcutSetModal)
 registerModal('showPrompt', ShowPromptModal)
 registerModal('requestDetails', RequestDetailsModal)
 registerModal('directorDetails', DirectorDetailsModal)

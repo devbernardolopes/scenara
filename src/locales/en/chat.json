@@ -169,7 +169,8 @@
   "makeShortcutModal": {
     "title": "Create Shortcut",
     "shortcutSet": "Shortcut Set",
-    "noSets": "No shortcut sets. Create one first.",
+    "noSets": "No shortcut sets yet.",
+    "addSet": "Add Shortcut Set",
     "createSet": "Create Set",
     "name": "Name",
     "message": "Message",
@@ -184,5 +185,13 @@
     "save": "Save",
     "saving": "Saving…",
     "created": "Shortcut created"
+  },
+  "createShortcutSet": {
+    "title": "Create Shortcut Set",
+    "nameLabel": "Name",
+    "namePlaceholder": "Shortcut set name",
+    "save": "Create",
+    "cancel": "Cancel",
+    "saving": "Creating…"
   }
 }
