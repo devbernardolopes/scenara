@@ -425,6 +425,13 @@ function CharacterDiscovery() {
   }
 
   async function handleDuplicate(character) {
+    const ok = await confirm({
+      title: t('discovery.confirmDuplicate.title'),
+      message: t('discovery.confirmDuplicate.message', { name: character.name }),
+      confirmLabel: t('discovery.confirmDuplicate.confirm'),
+      cancelLabel: t('cancel'),
+    })
+    if (!ok) return
     await duplicateCharacter(character.id)
   }
 

@@ -97,6 +97,11 @@
       "title": "Delete Character",
       "message": "Are you sure you want to delete {{name}}? All associated chats will be permanently deleted.",
       "confirm": "Delete"
+    },
+    "confirmDuplicate": {
+      "title": "Duplicate Character",
+      "message": "Are you sure you want to duplicate {{name}}?",
+      "confirm": "Duplicate"
     }
   },
   "loading": "Loading…",
