@@ -56,6 +56,12 @@ export async function exportDatabase(selection) {
     data.inChatShortcuts = [...filtered]
   }
 
+  if (selection.promptBankIds?.size > 0) {
+    const items = await db.promptBank.toArray()
+    const filtered = items.filter((i) => selection.promptBankIds.has(i.id))
+    data.promptBank = [...filtered]
+  }
+
   if (selection.settings) {
     data.settings = await db.settings.toArray()
   }
@@ -129,6 +135,7 @@ export async function importDatabase(data) {
     'tags',
     'threadMemories',
     'logs',
+    'promptBank',
   ]
 
   function addWithId(table, record) {
@@ -232,6 +239,12 @@ export async function importDatabase(data) {
       }
     }
 
+    if (Array.isArray(data.promptBank)) {
+      for (const item of data.promptBank) {
+        await addWithId(db.promptBank, item)
+      }
+    }
+
     if (data.discoveryView && typeof data.discoveryView === 'object') {
       await db.uiState.where('key').startsWith('discovery.').delete()
       if (data.discoveryView.sortBy != null) {
@@ -285,6 +298,7 @@ export async function resetDatabase() {
   await db.promptHistory.clear()
   await db.tags.clear()
   await db.threadMemories.clear()
+  await db.promptBank.clear()
 
   for (const setting of SETTINGS) {
     await db.settings.add({ key: setting.key, value: setting.default })

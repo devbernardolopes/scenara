@@ -25,6 +25,7 @@ function ExportDatabaseModal() {
   const [inChatShortcuts, setInChatShortcuts] = useState([])
   const [connectionProfiles, setConnectionProfiles] = useState([])
   const [logs, setLogs] = useState([])
+  const [promptBankEntries, setPromptBankEntries] = useState([])
 
   const [selectedCharacterIds, setSelectedCharacterIds] = useState(new Set())
   const [selectedPersonaIds, setSelectedPersonaIds] = useState(new Set())
@@ -33,13 +34,14 @@ function ExportDatabaseModal() {
   const [selectedInChatShortcutIds, setSelectedInChatShortcutIds] = useState(new Set())
   const [selectedConnectionProfileIds, setSelectedConnectionProfileIds] = useState(new Set())
   const [selectedLogIds, setSelectedLogIds] = useState(new Set())
+  const [selectedPromptBankIds, setSelectedPromptBankIds] = useState(new Set())
   const [selectedTags, setSelectedTags] = useState(true)
   const [selectedSettings, setSelectedSettings] = useState(true)
 
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      const [chars, pers, thrs, wi, ics, cp, logs] = await Promise.all([
+      const [chars, pers, thrs, wi, ics, cp, logs, pb] = await Promise.all([
         db.characters.toArray(),
         db.personas.toArray(),
         db.threads.toArray(),
@@ -47,6 +49,7 @@ function ExportDatabaseModal() {
         db.inChatShortcuts.toArray(),
         db.connectionProfiles.toArray(),
         db.logs.toArray(),
+        db.promptBank.toArray(),
       ])
 
       chars.sort((a, b) => (b.id || 0) - (a.id || 0))
@@ -63,6 +66,7 @@ function ExportDatabaseModal() {
       setInChatShortcuts(ics)
       setConnectionProfiles(cp)
       setLogs(logs)
+      setPromptBankEntries(pb)
 
       setSelectedCharacterIds(new Set(chars.map((c) => c.id)))
       setSelectedPersonaIds(new Set(pers.map((p) => p.id)))
@@ -71,6 +75,7 @@ function ExportDatabaseModal() {
       setSelectedInChatShortcutIds(new Set(ics.map((i) => i.id)))
       setSelectedConnectionProfileIds(new Set(cp.map((p) => p.id)))
       setSelectedLogIds(new Set(logs.map((l) => l.id)))
+      setSelectedPromptBankIds(new Set(pb.map((e) => e.id)))
     } finally {
       setLoading(false)
     }
@@ -114,6 +119,7 @@ function ExportDatabaseModal() {
         inChatShortcutIds: selectedInChatShortcutIds,
         connectionProfileIds: selectedConnectionProfileIds,
         logIds: selectedLogIds,
+        promptBankIds: selectedPromptBankIds,
         tags: selectedTags,
         settings: selectedSettings,
       })
@@ -152,6 +158,7 @@ function ExportDatabaseModal() {
   const allInChatShortcutIds = inChatShortcuts.map((i) => i.id)
   const allConnectionProfileIds = connectionProfiles.map((p) => p.id)
   const allLogIds = logs.map((l) => l.id)
+  const allPromptBankIds = promptBankEntries.map((e) => e.id)
 
   const charToggleAll = toggleAll(setSelectedCharacterIds, allCharacterIds)
   const persToggleAll = toggleAll(setSelectedPersonaIds, allPersonaIds)
@@ -160,6 +167,7 @@ function ExportDatabaseModal() {
   const icsToggleAll = toggleAll(setSelectedInChatShortcutIds, allInChatShortcutIds)
   const cpToggleAll = toggleAll(setSelectedConnectionProfileIds, allConnectionProfileIds)
   const logsToggleAll = toggleAll(setSelectedLogIds, allLogIds)
+  const pbToggleAll = toggleAll(setSelectedPromptBankIds, allPromptBankIds)
 
   const charToggle = toggleItem(setSelectedCharacterIds)
   const persToggle = toggleItem(setSelectedPersonaIds)
@@ -168,6 +176,7 @@ function ExportDatabaseModal() {
   const icsToggle = toggleItem(setSelectedInChatShortcutIds)
   const cpToggle = toggleItem(setSelectedConnectionProfileIds)
   const logsToggle = toggleItem(setSelectedLogIds)
+  const pbToggle = toggleItem(setSelectedPromptBankIds)
 
   function renderSectionHeader(label, count, selectedCount, allIds, toggleAllFn) {
     const allChecked = allIds.length > 0 && selectedCount === allIds.length
@@ -341,6 +350,36 @@ function ExportDatabaseModal() {
                   onChange={() => wiToggle(w.id)}
                   title={w.name}
                   id={w.id}
+                />
+              ))
+            )}
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          label={t('database.exportModal.promptBank')}
+          summary={`${promptBankEntries.length}`}
+          hasContent={selectedPromptBankIds.size > 0}
+          storageKey="export.promptBank"
+        >
+          {renderSectionHeader(
+            t('database.exportModal.promptBank'),
+            promptBankEntries.length,
+            selectedPromptBankIds.size,
+            allPromptBankIds,
+            pbToggleAll,
+          )}
+          <div className="space-y-1 max-h-64 overflow-y-auto">
+            {promptBankEntries.length === 0 ? (
+              <p className="text-xs text-tertiary py-2">{t('database.exportModal.noItems')}</p>
+            ) : (
+              promptBankEntries.map((e) => (
+                <ExportItemRow
+                  key={e.id}
+                  checked={selectedPromptBankIds.has(e.id)}
+                  onChange={() => pbToggle(e.id)}
+                  title={e.name}
+                  id={e.id}
                 />
               ))
             )}

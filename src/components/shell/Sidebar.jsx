@@ -487,7 +487,7 @@ function Sidebar({ open, onClose }) {
             },
             {
               onClick: () => openModal('promptBankManagement'),
-              icon: FileText,
+              icon: ScrollText,
               labelKey: 'sidebar.promptBank',
             },
             {
