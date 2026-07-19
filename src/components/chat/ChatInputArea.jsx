@@ -454,7 +454,10 @@ function ChatInputArea({
     return keys
   }, [chatOrder, visibility])
 
-  const { headerBtnRef, headerKeys, overflowKeys } = useOverflowButtons(allButtonKeys)
+  const { headerBtnRef, headerKeys, overflowKeys } = useOverflowButtons(allButtonKeys, {
+    gapPx: 2,
+    buttonWidthPx: 44,
+  })
 
   useEffect(() => {
     if (!overflowOpen) return
