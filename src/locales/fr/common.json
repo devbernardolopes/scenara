@@ -4,10 +4,22 @@
     "close": "Fermer la barre latérale",
     "discovery": "Découverte",
     "threads": "Discussions",
+    "newChat": "Nouvelle discussion",
     "personas": "Personas",
+    "writingInstructions": "Instructions d’écriture",
+    "connectionProfiles": "Profils de connexion",
+    "inChatShortcuts": "Raccourcis de discussion",
+    "lorebooks": "Lorebooks",
+    "promptBank": "Prompt Bank",
+    "tags": "Étiquettes",
+    "localInference": "Inférence locale",
+    "logs": "Journaux",
+    "database": "Base de données",
     "deleteThread": "Supprimer la discussion",
     "editCharacter": "Modifier le personnage",
     "duplicateThread": "Dupliquer la discussion",
+    "confirmDuplicateTitle": "Dupliquer la conversation",
+    "confirmDuplicateMessage": "Voulez-vous vraiment dupliquer cette conversation ?",
     "favorite": "Épingler",
     "unfavorite": "Désépingler",
     "lock": "Verrouiller la conversation",
@@ -15,17 +27,24 @@
     "confirmDeleteTitle": "Supprimer la Discussion",
     "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer cette discussion ? Cette action est irréversible.",
     "unknownCharacter": "Inconnu",
+    "selectThreads": "Sélectionner les conversations",
+    "selectAll": "Tout sélectionner",
+    "deselectAll": "Tout désélectionner",
+    "selectedCount": "{{count}} sélectionné(s)",
+    "deleteSelected": "Supprimer la sélection",
+    "confirmBatchDeleteTitle": "Supprimer les conversations",
+    "confirmBatchDeleteMessage": "Voulez-vous vraiment supprimer {{count}} conversations ? Cette action est irréversible.",
     "createCharacter": "Créer un personnage",
     "importCharacter": "Importer un personnage",
     "importFromUrl": "Depuis une URL",
     "importFromFile": "Depuis un fichier",
     "importUrlPrompt": "Entrez l'URL du personnage à importer :",
     "importUrlComingSoon": "L'importation par URL n'est pas encore implémentée",
+    "color": "Couleur",
+    "colorNone": "Aucune",
     "characterNameWithId": "{{name}}",
-    "localInference": "Inférence locale",
     "pin": "Épingler",
-    "unpin": "Désépingler",
-    "promptBank": "Prompt Bank"
+    "unpin": "Désépingler"
   },
   "topbar": {
     "toggleSidebar": "Basculer la barre latérale",
@@ -40,9 +59,18 @@
   "discovery": {
     "title": "Découverte",
     "subtitle": "Parcourez et sélectionnez des personnages pour démarrer une conversation.",
-    "characterCard": "Personnage {{index}}",
     "characterDesc": "Une brève description de ce personnage.",
     "createCharacter": "Créer un Personnage",
+    "startChat": "Démarrer la discussion",
+    "noCharacters": "Aucun personnage pour le moment. Créez-en un pour commencer !",
+    "loading": "Chargement…",
+    "actions": {
+      "delete": "Supprimer le personnage",
+      "favorite": "Ajouter le personnage aux favoris",
+      "duplicate": "Dupliquer le personnage",
+      "export": "Exporter le personnage",
+      "selectPersona": "Sélectionner une persona"
+    },
     "search": {
       "placeholder": "Rechercher des personnages...",
       "noResults": "Aucun personnage ne correspond à votre recherche."
@@ -51,6 +79,7 @@
       "label": "Trier par",
       "createdAt": "Création",
       "updatedAt": "Mise à jour",
+      "lastUsed": "Dernière utilisation",
       "chatCount": "Discussions",
       "name": "Nom"
     },
@@ -58,15 +87,55 @@
       "asc": "Croissant",
       "desc": "Décroissant"
     },
+    "filter": {
+      "title": "Filtres & Tri",
+      "active": "Actif"
+    },
     "chatCount": "{{count}} discussion",
     "chatCount_other": "{{count}} discussions",
-    "filter": {
-      "title": "Filtres & Tri"
+    "confirmDelete": {
+      "title": "Supprimer le personnage",
+      "message": "Voulez-vous vraiment supprimer {{name}} ? Toutes les discussions associées seront définitivement supprimées.",
+      "confirm": "Supprimer"
+    },
+    "confirmDuplicate": {
+      "title": "Dupliquer le personnage",
+      "message": "Voulez-vous vraiment dupliquer {{name}} ?",
+      "confirm": "Dupliquer"
     }
   },
   "loading": "Chargement…",
+  "saving": "Enregistrement…",
   "save": "Save",
   "cancel": "Cancel",
+  "confirm": "Confirmer",
+  "confirmDefaultMessage": "Êtes-vous sûr ?",
+  "ok": "OK",
+  "close": "Fermer",
+  "dismissModelBar": "Masquer la barre de modèle de discussion",
+  "topP": "Top P : {{value}}",
+  "eta": "ETA : {{value}}",
+  "moveUp": "Monter",
+  "moveDown": "Descendre",
+  "list": {
+    "actions": {
+      "edit": "Edit",
+      "setDefault": "Set as default",
+      "duplicate": "Duplicate",
+      "export": "Export",
+      "delete": "Delete"
+    }
+  },
+  "uploadImage": "Téléverser une image",
+  "downloadImage": "Télécharger une image",
+  "tokenCount": "{{count}} jetons",
+  "pagination": {
+    "firstPage": "Première page",
+    "previousPage": "Page précédente",
+    "nextPage": "Page suivante",
+    "lastPage": "Dernière page",
+    "page": "Page {{page}}"
+  },
   "toast": {
     "dismiss": "Ignorer",
     "paused": "En pause",
@@ -108,13 +177,16 @@
       "exportedMultiple": "{{count}} instructions d'écriture exportées",
       "imported": "{{count}} instructions d'écriture importées"
     },
-    "export": {
-      "failed": "Échec de l'exportation",
-      "invalidItem": "Élément introuvable"
-    },
-    "import": {
-      "invalidFormat": "Format de fichier invalide",
-      "fileError": "Échec de la lecture du fichier"
+    "connectionProfile": {
+      "created": "{{name}} créé",
+      "updated": "{{name}} mis à jour",
+      "deleted": "{{name}} supprimé",
+      "deletedMultiple": "{{count}} profils de connexion supprimés",
+      "duplicated": "{{name}} dupliqué",
+      "duplicatedMultiple": "{{count}} profils de connexion dupliqués",
+      "exported": "{{name}} exporté",
+      "exportedMultiple": "{{count}} profils de connexion exportés",
+      "imported": "{{count}} profils de connexion importés"
     },
     "inChatShortcut": {
       "created": "{{name}} created",
@@ -148,9 +220,37 @@
       "exported": "{{name}} exported",
       "exportedMultiple": "{{count}} prompts exported",
       "imported": "{{count}} prompts imported"
-    }
+    },
+    "export": {
+      "failed": "Échec de l'exportation",
+      "invalidItem": "Élément introuvable"
+    },
+    "import": {
+      "invalidFormat": "Format de fichier invalide",
+      "fileError": "Échec de la lecture du fichier"
+    },
+    "chatProfileRequired": "Assignez un profil de discussion dans Paramètres > API pour commencer à discuter."
   },
-  "ok": "OK",
+  "personaPicker": {
+    "title": "Démarrer avec une persona",
+    "changeTitle": "Changer de persona",
+    "empty": "Aucune persona pour le moment",
+    "default": "Par défaut"
+  },
+  "profilePicker": {
+    "title": "Sélectionner un profil",
+    "none": "Aucun (désactivé)",
+    "empty": "Aucun profil pour le moment. Créez-en un dans Profils de connexion."
+  },
+  "saveDialog": {
+    "title": "Modifications non enregistrées",
+    "message": "Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?",
+    "nameRequired": "Un nom est requis pour enregistrer. Ajoutez un nom ou abandonnez vos modifications.",
+    "importMessage": "Ce personnage a été importé mais pas encore enregistré. Enregistrez-le ou abandonnez pour perdre les données importées.",
+    "save": "Enregistrer",
+    "discard": "Abandonner",
+    "cancel": "Annuler"
+  },
   "tags": {
     "title": "Étiquettes",
     "add": "Ajouter",
@@ -186,14 +286,5 @@
   },
   "localInference": {
     "placeholder": "Les paramètres d'inférence locale seront disponibles ici."
-  },
-  "list": {
-    "actions": {
-      "edit": "Edit",
-      "setDefault": "Set as default",
-      "duplicate": "Duplicate",
-      "export": "Export",
-      "delete": "Delete"
-    }
   }
 }

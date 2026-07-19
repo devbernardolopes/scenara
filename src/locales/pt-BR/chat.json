@@ -102,6 +102,9 @@
   "totalTokens": "Total de Tokens",
   "model": "Modelo",
   "parameters": "Parâmetros",
+  "statusBar": {
+    "editProfile": "Editar perfil de conexão"
+  },
   "oocLabel": "OOC",
   "autoTitleMarker": "TÍTULO AUTOMÁTICO",
   "summarizationMarker": "Resumo",

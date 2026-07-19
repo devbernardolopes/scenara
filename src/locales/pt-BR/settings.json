@@ -291,6 +291,10 @@
       "label": "Mostrar Status",
       "desc": "Mostrar a barra de status acima da entrada com o nome do modelo ativo."
     },
+    "statusBarRefresh": {
+      "label": "Botão de Atualizar na Barra de Status",
+      "desc": "Mostrar um botão para atualizar o perfil de conexão na barra de status."
+    },
     "regenerationConfirmation": {
       "label": "Confirmação de Regeneração",
       "desc": "Mostrar diálogo de confirmação antes de regenerar uma mensagem."
@@ -405,7 +409,8 @@
       "confirmDelete": {
         "title": "Excluir Perfil",
         "message": "Tem certeza que deseja excluir \"{{name}}\"?",
-        "messageMultiple": "Tem certeza que deseja excluir {{count}} perfis de conexão?"
+        "messageMultiple": "Tem certeza que deseja excluir {{count}} perfis de conexão?",
+        "assignedTo": "Este perfil está atualmente atribuído a:"
       },
       "form": {
         "title": "Criar Perfil",
@@ -431,6 +436,11 @@
         "hordeMethod": "Método AI Horde",
         "hordeMethodNative": "Nativo",
         "hordeMethodOpenAI": "Compatível com OpenAI",
+        "lmStudioMethod": "Método de Conexão",
+        "lmStudioMethodNative": "Nativo",
+        "lmStudioMethodOpenAI": "Compatível com OpenAI",
+        "lmStudioMethodAnthropic": "Compatível com Anthropic",
+        "comingSoon": "Em breve",
         "baseUrl": "URL Base",
         "baseUrlPlaceholder": "Deixe vazio para o padrão"
       },
@@ -744,6 +754,8 @@
       "displayNamePlaceholder": "Para sua referência (não mostrado no chat)",
       "avatarLabel": "Avatar",
       "avatarPlaceholder": "URL, emoji ou upload de imagem",
+      "avatarImageData": "Dados da imagem ({{size}})",
+      "avatarClear": "Limpar avatar",
       "uploadFile": "Enviar imagem",
       "descriptionLabel": "Descrição",
       "descriptionPlaceholder": "Uma breve biografia para esta persona…",
@@ -877,7 +889,9 @@
     "systemAvatar": {
       "label": "Avatar SYSTEM",
       "desc": "Avatar padrão para mensagens do sistema.",
-      "placeholder": "URL, emoji ou upload de imagem"
+      "placeholder": "URL, emoji ou upload de imagem",
+      "imageData": "Dados da imagem ({{size}})",
+      "clear": "Limpar avatar"
     },
     "systemAvatarScale": {
       "label": "Escala do Avatar SYSTEM",

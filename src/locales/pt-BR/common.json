@@ -94,11 +94,19 @@
     "chatCount": "{{count}} chat",
     "chatCount_other": "{{count}} chats",
     "confirmDelete": {
-      "title": "Excluir Personagem",
-      "message": "Tem certeza que deseja excluir {{name}}? Todos os chats associados serão permanentemente deletados.",
-      "confirm": "Excluir"
+      "title": "Delete Character",
+      "message": "Are you sure you want to delete {{name}}? All associated chats will be permanently deleted.",
+      "confirm": "Delete"
+    },
+    "confirmDuplicate": {
+      "title": "Duplicar Personagem",
+      "message": "Tem certeza que deseja duplicar {{name}}?",
+      "confirm": "Duplicar"
     }
   },
+  "dismissModelBar": "Dispensar barra de modelo do chat",
+  "topP": "Top P: {{value}}",
+  "eta": "ETA: {{value}}",
   "loading": "Carregando…",
   "saving": "Salvando…",
   "save": "Salvar",
@@ -181,37 +189,37 @@
     },
     "chatProfileRequired": "Atribua um perfil de Chat em Configurações > API para começar a conversar.",
     "inChatShortcut": {
-      "created": "{{name}} created",
-      "updated": "{{name}} updated",
-      "deleted": "{{name}} deleted",
-      "deletedMultiple": "{{count}} in-chat shortcuts deleted",
-      "duplicated": "{{name}} duplicated",
-      "duplicatedMultiple": "{{count}} in-chat shortcuts duplicated",
-      "exported": "{{name}} exported",
-      "exportedMultiple": "{{count}} in-chat shortcuts exported",
-      "imported": "{{count}} in-chat shortcuts imported"
+      "created": "{{name}} criado",
+      "updated": "{{name}} atualizado",
+      "deleted": "{{name}} excluído",
+      "deletedMultiple": "{{count}} atalhos no chat excluídos",
+      "duplicated": "{{name}} duplicado",
+      "duplicatedMultiple": "{{count}} atalhos no chat duplicados",
+      "exported": "{{name}} exportado",
+      "exportedMultiple": "{{count}} atalhos no chat exportados",
+      "imported": "{{count}} atalhos no chat importados"
     },
     "lorebook": {
-      "created": "{{name}} created",
-      "updated": "{{name}} updated",
-      "deleted": "{{name}} deleted",
-      "deletedMultiple": "{{count}} lorebooks deleted",
-      "duplicated": "{{name}} duplicated",
-      "duplicatedMultiple": "{{count}} lorebooks duplicated",
-      "exported": "{{name}} exported",
-      "exportedMultiple": "{{count}} lorebooks exported",
-      "imported": "{{count}} lorebooks imported"
+      "created": "{{name}} criado",
+      "updated": "{{name}} atualizado",
+      "deleted": "{{name}} excluído",
+      "deletedMultiple": "{{count}} lorebooks excluídos",
+      "duplicated": "{{name}} duplicado",
+      "duplicatedMultiple": "{{count}} lorebooks duplicados",
+      "exported": "{{name}} exportado",
+      "exportedMultiple": "{{count}} lorebooks exportados",
+      "imported": "{{count}} lorebooks importados"
     },
     "promptBank": {
-      "created": "{{name}} created",
-      "updated": "{{name}} updated",
-      "deleted": "{{name}} deleted",
-      "deletedMultiple": "{{count}} prompts deleted",
-      "duplicated": "{{name}} duplicated",
-      "duplicatedMultiple": "{{count}} prompts duplicated",
-      "exported": "{{name}} exported",
-      "exportedMultiple": "{{count}} prompts exported",
-      "imported": "{{count}} prompts imported"
+      "created": "{{name}} criado",
+      "updated": "{{name}} atualizado",
+      "deleted": "{{name}} excluído",
+      "deletedMultiple": "{{count}} prompts excluídos",
+      "duplicated": "{{name}} duplicado",
+      "duplicatedMultiple": "{{count}} prompts duplicados",
+      "exported": "{{name}} exportado",
+      "exportedMultiple": "{{count}} prompts exportados",
+      "imported": "{{count}} prompts importados"
     }
   },
   "personaPicker": {
@@ -272,11 +280,11 @@
   },
   "list": {
     "actions": {
-      "edit": "Edit",
-      "setDefault": "Set as default",
-      "duplicate": "Duplicate",
-      "export": "Export",
-      "delete": "Delete"
+      "edit": "Editar",
+      "setDefault": "Definir como padrão",
+      "duplicate": "Duplicar",
+      "export": "Exportar",
+      "delete": "Excluir"
     }
   }
 }

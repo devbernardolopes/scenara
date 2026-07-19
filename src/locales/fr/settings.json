@@ -12,6 +12,7 @@
     "api": "API",
     "prompting": "Invites",
     "persona": "Persona",
+    "defaults": "Défauts",
     "tts": "TTS",
     "advanced": "Avancé",
     "database": "Database",
@@ -43,6 +44,12 @@
     "resetOverrideConfirmMessage": "This will reset the character's rules to match the ones currently set in Settings. This cannot be undone."
   },
   "groups": {
+    "autoTitle": "Auto-Title",
+    "summarization": "Summarization",
+    "ooc": "OOC",
+    "director": "Director",
+    "aiContinue": "AI Continue",
+    "prefixes": "Prefixes",
     "assistantButtons": "Assistant/System Message Bubbles Buttons",
     "userButtons": "User Message Bubbles Buttons",
     "apiRequestSectionHeaders": "API Request Section Headers",
@@ -51,13 +58,7 @@
     "localInference": "Inférence locale",
     "localInferenceAdvanced": "Avancé",
     "interface": "Interface",
-    "chat": "Chat",
-    "summarization": "Summarization",
-    "ooc": "OOC",
-    "director": "Director",
-    "aiContinue": "AI Continue",
-    "prefixes": "Prefixes",
-    "autoTitle": "Auto-Title"
+    "chat": "Chat"
   },
   "appearance": {
     "theme": {
@@ -104,6 +105,14 @@
       "label": "Toast Duration",
       "desc": "How long toast messages stay visible (in seconds)."
     },
+    "sidebarTogglePosition": {
+      "label": "Position du bouton de la barre latérale",
+      "desc": "Où le bouton de bascule de la barre latérale apparaît sur les petits écrans."
+    },
+    "sidebarNavLayout": {
+      "label": "Disposition de navigation de la barre latérale",
+      "desc": "Comment les boutons de navigation de la barre latérale (Personas, Instructions d’écriture, etc.) sont affichés."
+    },
     "showAssistantDelete": {
       "label": "Assistant/System – Delete",
       "desc": "Show the delete button on assistant and system message bubbles."
@@ -132,6 +141,22 @@
       "label": "Assistant/System – Prompt",
       "desc": "Show the prompt button on assistant and system message bubbles."
     },
+    "showAssistantRequestDetails": {
+      "label": "Assistant/System – Détails de la requête",
+      "desc": "Affiche le bouton qui ouvre la charge utile de requête et les détails de réponse sur les bulles de message assistant et système."
+    },
+    "showAssistantDeleteAll": {
+      "label": "Assistant/System – Tout supprimer",
+      "desc": "Affiche le bouton qui supprime chaque emplacement d’une bulle de message multi-emplacements."
+    },
+    "showAssistantDeleteFromHere": {
+      "label": "Assistant/System – Supprimer à partir d’ici",
+      "desc": "Affiche le bouton qui supprime ce message et tous ceux en dessous."
+    },
+    "showAssistantDirectorDetails": {
+      "label": "Assistant/System – Détails du réalisateur",
+      "desc": "Affiche le bouton qui ouvre les détails de l’examen du réalisateur sur les bulles assistant et système."
+    },
     "showUserDelete": {
       "label": "User – Delete",
       "desc": "Show the delete button on user message bubbles."
@@ -147,6 +172,61 @@
     "showUserFork": {
       "label": "User – Fork",
       "desc": "Show the fork button on user message bubbles."
+    },
+    "showUserDeleteAll": {
+      "label": "Utilisateur – Tout supprimer",
+      "desc": "Affiche le bouton qui supprime chaque emplacement d’une bulle de message multi-emplacements."
+    },
+    "showUserDeleteFromHere": {
+      "label": "Utilisateur – Supprimer à partir d’ici",
+      "desc": "Affiche le bouton qui supprime ce message et tous ceux en dessous."
+    },
+    "showUserMakeShortcut": {
+      "label": "Utilisateur – Créer un raccourci",
+      "desc": "Affiche le bouton de création de raccourci sur les bulles de message utilisateur."
+    },
+    "characterCardMarquee": {
+      "label": "Défilement de la carte de personnage",
+      "desc": "Fait défiler les noms de personnages lorsqu’ils débordent de la carte. Désactivez pour tronquer avec des points de suspension."
+    },
+    "threadCardMarquee": {
+      "label": "Défilement de la carte de conversation",
+      "desc": "Fait défiler les titres de conversation lorsqu’ils débordent de la carte. Désactivez pour tronquer avec des points de suspension."
+    },
+    "showChatModel": {
+      "label": "Afficher le modèle de discussion",
+      "desc": "Affiche une barre d’état avec le modèle de discussion actif en bas de la vue principale."
+    },
+    "chatTitleMarquee": {
+      "label": "Défilement du titre de discussion",
+      "desc": "Fait défiler le titre de discussion lorsqu’il déborde de l’en-tête. Désactivez pour tronquer avec des points de suspension."
+    },
+    "unreadBadges": {
+      "label": "Badges de Messages Non Lus",
+      "desc": "Afficher le nombre de messages non lus sur les cartes de discussion et l'onglet du navigateur."
+    },
+    "unreadSound": {
+      "label": "Son de Notification",
+      "desc": "Jouer un son lorsqu'un nouveau message arrive pendant votre absence.",
+      "testPlay": "Tester le son de notification",
+      "testStop": "Arrêter la lecture de test"
+    },
+    "chatFontFamily": {
+      "label": "Police de la discussion",
+      "desc": "Police utilisée pour le contenu des messages de discussion."
+    },
+    "chatFontFamilyOptions": {
+      "system": "Par défaut du système",
+      "inter": "Inter",
+      "atkinson": "Atkinson Hyperlegible",
+      "roboto": "Roboto",
+      "georgia": "Georgia",
+      "courier": "Courier New",
+      "trebuchet": "Trebuchet MS"
+    },
+    "chatFontSize": {
+      "label": "Taille de police de la discussion",
+      "desc": "Taille de police du contenu des messages de discussion."
     },
     "assistantButtonOrder": {
       "label": "Assistant/System button order",
@@ -196,15 +276,48 @@
       "label": "User Chat Button Order",
       "desc": "Arrange the user chat buttons shown in the chat input area using the arrow buttons."
     },
-    "unreadBadges": {
-      "label": "Badges de Messages Non Lus",
-      "desc": "Afficher le nombre de messages non lus sur les cartes de discussion et l'onglet du navigateur."
+    "chatFontSizeOptions": {
+      "xs": "Plus petite",
+      "sm": "Petite",
+      "base": "Régulière",
+      "lg": "Grande",
+      "xl": "Très grande"
     },
-    "unreadSound": {
-      "label": "Son de Notification",
-      "desc": "Jouer un son lorsqu'un nouveau message arrive pendant votre absence.",
-      "testPlay": "Tester le son de notification",
-      "testStop": "Arrêter la lecture de test"
+    "highlightDeleteButtons": {
+      "label": "Mettre en évidence les boutons de suppression",
+      "desc": "Affiche les boutons de suppression avec un arrière-plan rouge distinct pour les souligner."
+    },
+    "showStatus": {
+      "label": "Afficher la barre d’état",
+      "desc": "Affiche la barre d’état au-dessus du champ de saisie avec le nom du modèle actif."
+    },
+    "statusBarRefresh": {
+      "label": "Actualisation de la barre d’état",
+      "desc": "Fréquence d’actualisation de l’ETA Horde, en secondes."
+    },
+    "regenerationConfirmation": {
+      "label": "Confirmation de régénération",
+      "desc": "Affiche une boîte de dialogue de confirmation avant de régénérer un message."
+    },
+    "cancellationConfirmation": {
+      "label": "Confirmation d’annulation",
+      "desc": "Affiche une boîte de dialogue de confirmation avant d’annuler une requête API en cours."
+    },
+    "autoTitleMarker": {
+      "label": "Marqueur de titre auto",
+      "desc": "Affiche un séparateur intitulé « TITRE AUTO » dans la discussion après la génération d’un titre."
+    },
+    "summarizationMarker": {
+      "label": "Marqueur de résumé",
+      "desc": "Affiche un séparateur intitulé « Résumé » dans la discussion après la génération d’un résumé."
+    },
+    "trimAutoTitle": {
+      "label": "Rogner le titre auto",
+      "desc": "Supprime les retours à la ligne et les guillemets encadrants des titres générés automatiquement."
+    },
+    "renderMarkdown": {
+      "label": "Rendre le Markdown",
+      "desc": "Rend la mise en forme Markdown dans les messages de discussion et les titres de conversation."
     }
   },
   "themeOptions": {
@@ -238,21 +351,148 @@
     "keyLabelLabel": "Label (optional)",
     "keyLabelPlaceholder": "e.g. Work, Home",
     "useTrialKey": "Use trial key",
-    "deleteKeyConfirm": {
-      "title": "Delete API Key",
-      "message": "Are you sure you want to delete this key?"
-    },
     "addKeyDialogTitle": "Add API Key",
     "editKeyDialogTitle": "Edit API Key",
     "model": {
       "label": "Model",
       "placeholder": "Type a model name"
     },
+    "selectModel": "Sélectionner un modèle",
     "modelSearchPlaceholder": "Search models…",
+    "modelFilterSection": "Filtres et tri",
+    "modelFilterActive": "Actif",
+    "modelSortBy": "Trier par",
+    "modelSort": {
+      "name": "Nom",
+      "count": "Workers",
+      "queued": "En file",
+      "eta": "ETA",
+      "performance": "Tok/s"
+    },
+    "modelOrder": {
+      "asc": "Croissant",
+      "desc": "Décroissant"
+    },
     "noModels": "No models available",
     "refreshModels": "Refresh models",
     "fetchingModels": "Fetching models…",
     "cooldown": "Wait {{seconds}}s before refreshing again",
+    "profileAssignment": {
+      "title": "Attribution de profil",
+      "clearAll": "Tout effacer",
+      "apiKeys": "Clés API",
+      "chat": "Discussion",
+      "autoTitle": "Titre auto",
+      "summarization": "Résumé",
+      "ooc": "HORS-PERS",
+      "director": "Réalisateur",
+      "interface": "Interface",
+      "none": "Non attribué"
+    },
+    "requestCooldown": {
+      "label": "Temporisation des requêtes API",
+      "desc": "Temps d’attente minimum (en secondes) entre les requêtes API aux fournisseurs."
+    },
+    "requestTimeout": {
+      "label": "Délai API",
+      "desc": "Temps d’inactivité maximum (en secondes) entre les jetons avant l’annulation d’une requête bloquée."
+    },
+    "profile": {
+      "createProfile": "Créer un profil",
+      "noProfiles": "Aucun profil de connexion pour le moment. Créez-en un pour regrouper un fournisseur, une clé, un modèle et des paramètres.",
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "duplicate": "Dupliquer",
+        "export": "Exporter"
+      },
+      "confirmDelete": {
+        "title": "Supprimer le profil",
+        "message": "Voulez-vous vraiment supprimer « {{name}} » ?",
+        "messageMultiple": "Voulez-vous vraiment supprimer {{count}} profils de connexion ?",
+        "assignedTo": "Ce profil est actuellement attribué à :"
+      },
+      "form": {
+        "title": "Créer un profil",
+        "editTitle": "Modifier le profil",
+        "name": "Nom du profil",
+        "namePlaceholder": "ex. Groq rapide, OpenRouter créatif",
+        "provider": "Fournisseur",
+        "selectProvider": "Sélectionner un fournisseur…",
+        "apiKey": "Clé API",
+        "noKeys": "Aucune clé configurée pour ce fournisseur. Ajoutez-en une dans la section Clés API ci-dessous.",
+        "selectKey": "Sélectionner une clé…",
+        "noApiKey": "Aucune clé API",
+        "model": "Modèle",
+        "parameters": "Paramètres",
+        "resetParams": "Réinitialiser",
+        "resetParamsConfirm": {
+          "title": "Réinitialiser les paramètres ?",
+          "message": "Cela restaurera tous les paramètres à leurs valeurs par défaut pour ce fournisseur."
+        },
+        "reasoning": "Raisonnement",
+        "reasoningEffort": "Effort de raisonnement",
+        "includeReasoning": "Inclure le raisonnement",
+        "hordeMethod": "Méthode AI Horde",
+        "hordeMethodNative": "Native",
+        "hordeMethodOpenAI": "Compatible OpenAI",
+        "lmStudioMethod": "Méthode de connexion",
+        "lmStudioMethodNative": "Native",
+        "lmStudioMethodOpenAI": "Compatible OpenAI",
+        "lmStudioMethodAnthropic": "Compatible Anthropic",
+        "comingSoon": "Bientôt disponible",
+        "baseUrl": "URL de base",
+        "baseUrlPlaceholder": "Laisser vide pour la valeur par défaut"
+      },
+      "add": "Ajouter",
+      "maxStopItems": "Limite atteinte",
+      "addStopItem": "Tapez et appuyez sur Entrée",
+      "importProfile": "Importer",
+      "import": {
+        "invalidFormat": "Le fichier ne semble pas être un export de profil de connexion valide.",
+        "fileError": "Impossible de lire le fichier."
+      },
+      "batch": {
+        "selected": "{{count}} sélectionné(s)",
+        "delete": "Supprimer ({{count}})",
+        "duplicate": "Dupliquer ({{count}})",
+        "export": "Exporter ({{count}})",
+        "clear": "Effacer"
+      }
+    },
+    "noKeyWarning": {
+      "title": "Aucune clé API",
+      "message": "Ce profil ne pourra être attribué à aucun type de requête de discussion tant qu’une clé API n’est pas fournie."
+    },
+    "deleteKeyConfirm": {
+      "title": "Delete API Key",
+      "message": "Are you sure you want to delete this key?",
+      "profileWarning": "Cette clé est utilisée par {{count}} profil(s) de connexion. Sa suppression cassera ces profils."
+    },
+    "chatProfile": {
+      "label": "Profil de discussion",
+      "desc": "Profil utilisé pour les requêtes de discussion."
+    },
+    "autoTitleProfile": {
+      "label": "Profil de titre auto",
+      "desc": "Profil utilisé pour les requêtes de titre auto."
+    },
+    "summarizationProfile": {
+      "label": "Profil de résumé",
+      "desc": "Profil utilisé pour les requêtes de résumé."
+    },
+    "oocProfile": {
+      "label": "Profil HORS-PERS",
+      "desc": "Profil utilisé pour les requêtes hors-personnage."
+    },
+    "directorProfile": {
+      "label": "Profil du réalisateur",
+      "desc": "Profil utilisé pour les requêtes du réalisateur."
+    },
+    "interfaceProfile": {
+      "label": "Profil d’interface",
+      "desc": "Profil utilisé pour les requêtes d’interface."
+    },
     "testConnection": "Test Connection",
     "serverUrl": {
       "label": "Server URL",
@@ -387,29 +627,6 @@
       "label": "USER Role Prefix in OOC",
       "desc": "Prefix for user messages in out-of-character mode."
     },
-    "writingInjectionTiming": {
-      "label": "Writing Instructions Injection Timing",
-      "desc": "When writing instructions are injected into the prompt."
-    },
-    "writingInjectionTimingOptions": {
-      "always": "Always"
-    },
-    "writingPlacement": {
-      "label": "Writing Instructions Placement",
-      "desc": "Where writing instructions are placed in the prompt."
-    },
-    "writingPlacementOptions": {
-      "endOfSystemPrompt": "End of SYSTEM Prompt",
-      "endOfMessages": "End of Messages"
-    },
-    "writingMessageRole": {
-      "label": "Writing Instructions Message Role",
-      "desc": "Role used for the writing instructions message when placed at the end of messages."
-    },
-    "writingMessageRoleOptions": {
-      "system": "SYSTEM",
-      "assistant": "ASSISTANT"
-    },
     "firstMessageRole": {
       "label": "FIRST MESSAGE Prompt Role",
       "desc": "Role assigned to the first message prompt."
@@ -454,14 +671,31 @@
       },
       "writingInstruction": {
         "label": "Writing Instruction"
-      },
-      "keepCodeBlocks": {
-        "label": "Keep Code Blocks",
-        "desc": "Strip fenced code blocks (``` and ~~~) from message content before sending to the API. Options control how many recent messages keep their code blocks intact.",
-        "always": "Always",
-        "never": "Never"
       }
-    }
+    },
+    "prefixAssistantRole": {
+      "label": "Préfixer le rôle ASSISTANT",
+      "desc": "Préfixe les messages ASSISTANT avec le nom du personnage actuel pour les appels API de discussion régulière."
+    },
+    "prefixUserRole": {
+      "label": "Préfixer le rôle USER",
+      "desc": "Préfixe les messages USER avec le nom de la persona active pour les appels API de discussion régulière."
+    },
+    "trimMessages": {
+      "label": "Rogner les retours à la ligne",
+      "desc": "Supprime les retours à la ligne initiaux et finaux de tous les messages."
+    },
+    "trimWhitespaces": {
+      "label": "Rogner les espaces",
+      "desc": "Supprime les espaces initiaux et finaux des messages USER après envoi."
+    },
+    "keepCodeBlocks": {
+      "label": "Conserver les blocs de code",
+      "desc": "Retire les blocs de code délimités (``` et ~~~) du contenu du message avant l’envoi à l’API.",
+      "always": "Toujours",
+      "never": "Jamais"
+    },
+    "toggleInputPlaceholder": "Saisir une valeur"
   },
   "toastPositionOptions": {
     "top-right": "Top Right",
@@ -470,6 +704,20 @@
     "bottom-right": "Bottom Right",
     "bottom-left": "Bottom Left",
     "bottom-center": "Bottom Center"
+  },
+  "sidebarTogglePositionOptions": {
+    "bottom-left": "En bas à gauche",
+    "bottom-right": "En bas à droite",
+    "bottom-center": "En bas au centre",
+    "top-left": "En haut à gauche",
+    "top-right": "En haut à droite",
+    "top-center": "En haut au centre",
+    "left-center": "Au centre à gauche",
+    "right-center": "Au centre à droite"
+  },
+  "sidebarNavLayoutOptions": {
+    "vertical": "Vertical (libellés visibles)",
+    "compact": "Compact (icônes uniquement)"
   },
   "persona": {
     "title": "Personas",
@@ -506,6 +754,8 @@
       "displayNamePlaceholder": "Pour votre référence (non affiché dans le chat)",
       "avatarLabel": "Avatar",
       "avatarPlaceholder": "URL, emoji ou téléchargez une image",
+      "avatarImageData": "Données d’image ({{size}})",
+      "avatarClear": "Effacer l’avatar",
       "uploadFile": "Télécharger une image",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Une courte bio pour cette persona…",
@@ -524,6 +774,186 @@
       "importSuccess": "{{count}} persona(s) importée(s)"
     }
   },
+  "writingInstruction": {
+    "title": "Instructions d’écriture",
+    "createWritingInstruction": "Créer une instruction d’écriture",
+    "importWritingInstruction": "Importer",
+    "noWritingInstructions": "Aucune instruction d’écriture pour le moment.",
+    "actions": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "duplicate": "Dupliquer",
+      "export": "Exporter"
+    },
+    "batch": {
+      "selected": "{{count}} sélectionné(s)",
+      "delete": "Supprimer ({{count}})",
+      "duplicate": "Dupliquer ({{count}})",
+      "export": "Exporter ({{count}})",
+      "clear": "Effacer"
+    },
+    "confirmDelete": {
+      "title": "Supprimer l’instruction d’écriture",
+      "message": "Voulez-vous vraiment supprimer « {{name}} » ?",
+      "messageMultiple": "Voulez-vous vraiment supprimer {{count}} instructions d’écriture ?",
+      "linkedCharacters": "Cette instruction d’écriture est utilisée par {{count}} personnage :",
+      "linkedCharacters_other": "Cette instruction d’écriture est utilisée par {{count}} personnages :"
+    },
+    "form": {
+      "title": "Créer une instruction d’écriture",
+      "editTitle": "Modifier l’instruction d’écriture",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Nom de l’instruction",
+      "contentLabel": "Contenu",
+      "contentPlaceholder": "Écrivez le contenu de votre instruction ici…",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "cancel": "Annuler"
+    },
+    "import": {
+      "invalidFormat": "Format de fichier invalide.",
+      "fileError": "Impossible de lire le fichier.",
+      "importSuccess": "{{count}} instruction(s) d’écriture importée(s)"
+    }
+  },
+  "defaults": {
+    "autoTitle": {
+      "label": "Titre auto",
+      "desc": "État par défaut du bouton de titre auto lors de la création d’un nouveau personnage."
+    },
+    "autoTitleThreshold": {
+      "label": "Seuil de titre auto",
+      "desc": "Seuil par défaut pour le titre auto."
+    },
+    "memory": {
+      "label": "Mémoire",
+      "desc": "Contrôle la gestion de la mémoire (résumé) lors de la création d’un nouveau personnage."
+    },
+    "memoryOptions": {
+      "never": "Jamais",
+      "messages": "Messages",
+      "contextWindow": "Fenêtre de contexte"
+    },
+    "messagesThreshold": {
+      "label": "Seuil de messages",
+      "desc": "Nombre de messages avant l’exécution du résumé."
+    },
+    "contextWindowThreshold": {
+      "label": "Seuil de fenêtre de contexte",
+      "desc": "Seuil de jetons pour l’approche de la fenêtre de contexte."
+    },
+    "messagesToKeep": {
+      "label": "Messages à conserver",
+      "desc": "Combien des messages les plus récents du dernier résumé sont encore transmis aux requêtes API jusqu’au prochain résumé."
+    },
+    "messageRollover": {
+      "label": "Roulement des messages",
+      "desc": "Après le résumé, expulse progressivement les messages conservés à mesure que de nouveaux sont envoyés. Statique conserve tous les messages jusqu’au prochain résumé.",
+      "options": {
+        "rollover": "Roulement",
+        "static": "Statique"
+      }
+    },
+    "memorySlots": {
+      "label": "Emplacements de mémoire",
+      "desc": "Nombre d’entrées de mémoire (emplacements) par niveau de mémoire que la discussion aura."
+    },
+    "addCharacterPrompt": {
+      "label": "Ajouter un prompt de personnage",
+      "desc": "État par défaut pour préfixer le prompt du personnage au transcript envoyé à l’API de résumé lors de la création d’un nouveau personnage."
+    },
+    "firstMessage": {
+      "label": "Premier message",
+      "desc": "État par défaut du bouton du premier message."
+    },
+    "userPersonaPrefix": {
+      "label": "Préfixe de persona utilisateur",
+      "desc": "État par défaut du bouton de préfixe de persona utilisateur."
+    },
+    "includeOOC": {
+      "label": "Inclure HORS-PERS",
+      "desc": "État par défaut du bouton d’inclusion HORS-PERS."
+    },
+    "removeMarkdownImages": {
+      "label": "Supprimer la syntaxe d’image Markdown",
+      "desc": "Retire la syntaxe d’image Markdown (![]()) du contenu du message avant l’envoi à l’API."
+    },
+    "unloadMessagesThreshold": {
+      "label": "Seuil de déchargement des messages",
+      "desc": "Nombre maximum de messages récents conservés dans la vue de discussion. Les plus anciens sont déchargés de la vue mais conservés. 0 = illimité."
+    },
+    "postProcessing": {
+      "label": "Post-traitement",
+      "desc": "État par défaut du bouton de post-traitement."
+    },
+    "systemAvatar": {
+      "label": "Avatar SYSTEM",
+      "desc": "Avatar par défaut pour les messages système.",
+      "placeholder": "URL, emoji ou téléversement d’image",
+      "imageData": "Données d’image ({{size}})",
+      "clear": "Effacer l’avatar"
+    },
+    "systemAvatarScale": {
+      "label": "Échelle de l’avatar SYSTEM",
+      "desc": "Échelle d’avatar SYSTEM par défaut pour les nouveaux personnages."
+    },
+    "characterAvatarScale": {
+      "label": "Échelle de l’avatar du personnage",
+      "desc": "Échelle d’avatar du personnage par défaut pour les nouveaux personnages."
+    },
+    "userPersonaAvatarScale": {
+      "label": "Échelle de l’avatar de persona utilisateur",
+      "desc": "Échelle d’avatar de persona utilisateur par défaut pour les nouveaux personnages."
+    },
+    "writingInjectionTiming": {
+      "label": "Moment d’injection des instructions d’écriture",
+      "desc": "Quand les instructions d’écriture sont injectées dans le prompt."
+    },
+    "writingInjectionTimingOptions": {
+      "always": "Toujours",
+      "never": "Jamais"
+    },
+    "writingPlacement": {
+      "label": "Placement des instructions d’écriture",
+      "desc": "Où les instructions d’écriture sont placées dans le prompt."
+    },
+    "writingPlacementOptions": {
+      "endOfSystemPrompt": "Fin du prompt SYSTEM",
+      "endOfMessages": "Fin des messages"
+    },
+    "writingMessageRole": {
+      "label": "Rôle de message des instructions d’écriture",
+      "desc": "Rôle utilisé pour le message d’instructions d’écriture lorsqu’il est placé en fin de messages."
+    },
+    "writingMessageRoleOptions": {
+      "system": "SYSTEM",
+      "assistant": "ASSISTANT"
+    },
+    "personaInjectionTiming": {
+      "label": "Moment d’injection de la persona",
+      "desc": "Quand le contexte de persona est injecté dans le prompt."
+    },
+    "personaInjectionTimingOptions": {
+      "always": "Toujours",
+      "never": "Jamais"
+    },
+    "personaInjectionPlacement": {
+      "label": "Placement de la persona",
+      "desc": "Où le contexte de persona est injecté dans le prompt."
+    },
+    "personaInjectionPlacementOptions": {
+      "endOfSystemPrompt": "Fin du prompt SYSTEM",
+      "endOfMessages": "Fin des messages"
+    },
+    "personaInjectionMessageRole": {
+      "label": "Rôle de message de la persona",
+      "desc": "Rôle utilisé pour le message d’injection de persona lorsqu’il est placé en fin de messages."
+    },
+    "personaInjectionMessageRoleOptions": {
+      "system": "SYSTEM",
+      "assistant": "ASSISTANT"
+    }
+  },
   "database": {
     "export": "Export Database",
     "import": "Import Database",
@@ -538,6 +968,11 @@
     "resetConfirmTitle": "Reset Database",
     "resetConfirmMessage": "This will permanently delete all your data, including characters, chats, personas, settings, API keys, and writing instructions. The application will be restored to its original state. This action cannot be undone.",
     "resetSuccess": "Database has been reset to its default state",
+    "resetSettings": "Réinitialiser les paramètres",
+    "resetSettingsDesc": "Rétablit tous les paramètres, sauf les clés API, à leurs valeurs par défaut d’origine.",
+    "resetSettingsConfirmTitle": "Réinitialiser les paramètres",
+    "resetSettingsConfirmMessage": "Tous les paramètres, à l’exception des clés API déjà ajoutées, seront rétablis aux valeurs par défaut du système. Aucun personnage, persona, fil, instruction d’écriture, étiquette ou autre donnée ne sera supprimé. Cette action est irréversible.",
+    "resetSettingsSuccess": "Les paramètres ont été réinitialisés à leurs valeurs par défaut",
     "exportNotImplemented": "Export is not yet implemented",
     "importNotImplemented": "Import is not yet implemented",
     "exportModal": {
@@ -548,6 +983,7 @@
       "writingInstructions": "Writing Instructions",
       "inChatShortcuts": "In-Chat Shortcuts",
       "connectionProfiles": "Connection Profiles",
+      "logs": "Journaux",
       "lorebooks": "Lorebooks",
       "lorebooksDisabled": "Not yet implemented",
       "tags": "Tags",
@@ -588,12 +1024,25 @@
   "inChatShortcut": {
     "title": "Raccourcis dans le Chat",
     "createShortcut": "Créer un Ensemble de Raccourcis",
+    "create": "Create Shortcut Set",
+    "importLabel": "Import",
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid in-chat shortcut export.",
+      "fileError": "Failed to read the file."
+    },
     "noShortcuts": "Aucun ensemble de raccourcis pour l'instant.",
     "actions": {
       "edit": "Modifier",
       "delete": "Supprimer",
       "duplicate": "Dupliquer",
       "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
     },
     "confirmDelete": {
       "title": "Supprimer l'Ensemble de Raccourcis",
@@ -605,38 +1054,24 @@
       "editTitle": "Modifier l'Ensemble de Raccourcis",
       "nameLabel": "Nom",
       "namePlaceholder": "Nom de l'ensemble de raccourcis",
+      "order": "Ordre",
+      "orderAsc": "Croissant",
+      "orderDesc": "Décroissant",
       "contentLabel": "Contenu",
       "contentPlaceholder": "@name=\n@message=\n@insertionType=\n@autoSend=\n@clearAfterSend=",
       "save": "Enregistrer",
       "saving": "Enregistrement…",
       "cancel": "Annuler"
-    },
-    "create": "Create Shortcut Set",
-    "batch": {
-      "selected": "{{count}} selected",
-      "delete": "Delete ({{count}})",
-      "duplicate": "Duplicate ({{count}})",
-      "export": "Export ({{count}})",
-      "clear": "Clear"
-    },
-    "importLabel": "Import",
-    "import": {
-      "invalidFormat": "The file does not appear to be a valid in-chat shortcut export.",
-      "fileError": "Failed to read the file."
     }
-  },
-  "versionLabel": "Version",
-  "languageOptions": {
-    "en": "English",
-    "pt-BR": "Português (Brasil)",
-    "fr": "Français",
-    "it": "Italiano",
-    "de": "Deutsch",
-    "es": "Español"
   },
   "lorebook": {
     "title": "Lorebooks",
     "create": "Create Lorebook",
+    "importLabel": "Import",
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid lorebook export.",
+      "fileError": "Failed to read the file."
+    },
     "noItems": "No lorebooks yet.",
     "comingSoon": "Creating and editing lorebooks is coming soon. You can still import, reorder, duplicate, and delete existing lorebooks.",
     "actions": {
@@ -656,11 +1091,6 @@
       "title": "Delete Lorebook",
       "message": "Are you sure you want to delete \"{{name}}\"?",
       "messageMultiple": "Are you sure you want to delete {{count}} lorebooks?"
-    },
-    "importLabel": "Import",
-    "import": {
-      "invalidFormat": "The file does not appear to be a valid lorebook export.",
-      "fileError": "Failed to read the file."
     }
   },
   "promptBank": {
@@ -712,5 +1142,14 @@
       "fileError": "Could not read file.",
       "importSuccess": "Imported {{count}} prompt(s)"
     }
+  },
+  "versionLabel": "Version",
+  "languageOptions": {
+    "en": "English",
+    "pt-BR": "Português (Brasil)",
+    "fr": "Français",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "es": "Español"
   }
 }

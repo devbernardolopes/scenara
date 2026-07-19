@@ -4,10 +4,22 @@
     "close": "Seitenleiste schließen",
     "discovery": "Entdecken",
     "threads": "Unterhaltungen",
+    "newChat": "Neuer Chat",
     "personas": "Personas",
+    "writingInstructions": "Schreibanweisungen",
+    "connectionProfiles": "Verbindungsprofile",
+    "inChatShortcuts": "Chat-Verknüpfungen",
+    "lorebooks": "Lorebooks",
+    "promptBank": "Prompt Bank",
+    "tags": "Tags",
+    "localInference": "Lokale Inferenz",
+    "logs": "Protokolle",
+    "database": "Datenbank",
     "deleteThread": "Unterhaltung löschen",
     "editCharacter": "Charakter bearbeiten",
     "duplicateThread": "Unterhaltung duplizieren",
+    "confirmDuplicateTitle": "Unterhaltung duplizieren",
+    "confirmDuplicateMessage": "Möchtest du diese Unterhaltung wirklich duplizieren?",
     "favorite": "Anheften",
     "unfavorite": "Lösen",
     "lock": "Unterhaltung sperren",
@@ -15,17 +27,24 @@
     "confirmDeleteTitle": "Unterhaltung löschen",
     "confirmDeleteMessage": "Bist du sicher, dass du diese Unterhaltung löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
     "unknownCharacter": "Unbekannt",
+    "selectThreads": "Unterhaltungen auswählen",
+    "selectAll": "Alle auswählen",
+    "deselectAll": "Auswahl aufheben",
+    "selectedCount": "{{count}} ausgewählt",
+    "deleteSelected": "Ausgewählte löschen",
+    "confirmBatchDeleteTitle": "Unterhaltungen löschen",
+    "confirmBatchDeleteMessage": "Möchtest du wirklich {{count}} Unterhaltungen löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
     "createCharacter": "Charakter erstellen",
     "importCharacter": "Charakter importieren",
     "importFromUrl": "Von URL",
     "importFromFile": "Aus Datei",
     "importUrlPrompt": "Gib die Charakter-URL zum Importieren ein:",
     "importUrlComingSoon": "URL-Import ist noch nicht implementiert",
+    "color": "Farbe",
+    "colorNone": "Keine",
     "characterNameWithId": "{{name}}",
-    "localInference": "Lokale Inferenz",
     "pin": "Anheften",
-    "unpin": "Lösen",
-    "promptBank": "Prompt Bank"
+    "unpin": "Lösen"
   },
   "topbar": {
     "toggleSidebar": "Seitenleiste umschalten",
@@ -40,9 +59,18 @@
   "discovery": {
     "title": "Entdecken",
     "subtitle": "Durchstöbern Sie Charaktere und starten Sie einen neuen Chat.",
-    "characterCard": "Charakter {{index}}",
     "characterDesc": "Eine kurze Beschreibung dieses Charakters.",
     "createCharacter": "Charakter erstellen",
+    "startChat": "Chat starten",
+    "noCharacters": "Noch keine Charaktere. Erstelle einen, um loszulegen!",
+    "loading": "Wird geladen…",
+    "actions": {
+      "delete": "Charakter löschen",
+      "favorite": "Charakter favorisieren",
+      "duplicate": "Charakter duplizieren",
+      "export": "Charakter exportieren",
+      "selectPersona": "Persona auswählen"
+    },
     "search": {
       "placeholder": "Charaktere suchen...",
       "noResults": "Keine Charaktere entsprechen Ihrer Suche."
@@ -51,6 +79,7 @@
       "label": "Sortieren nach",
       "createdAt": "Erstellt",
       "updatedAt": "Aktualisiert",
+      "lastUsed": "Zuletzt verwendet",
       "chatCount": "Chats",
       "name": "Name"
     },
@@ -58,15 +87,55 @@
       "asc": "Aufsteigend",
       "desc": "Absteigend"
     },
+    "filter": {
+      "title": "Filter & Sortierung",
+      "active": "Aktiv"
+    },
     "chatCount": "{{count}} Chat",
     "chatCount_other": "{{count}} Chats",
-    "filter": {
-      "title": "Filter & Sortierung"
+    "confirmDelete": {
+      "title": "Charakter löschen",
+      "message": "Möchtest du {{name}} wirklich löschen? Alle zugehörigen Chats werden dauerhaft gelöscht.",
+      "confirm": "Löschen"
+    },
+    "confirmDuplicate": {
+      "title": "Charakter duplizieren",
+      "message": "Möchtest du {{name}} wirklich duplizieren?",
+      "confirm": "Duplizieren"
     }
   },
   "loading": "Laden…",
+  "saving": "Wird gespeichert…",
   "save": "Save",
   "cancel": "Cancel",
+  "confirm": "Bestätigen",
+  "confirmDefaultMessage": "Bist du sicher?",
+  "ok": "OK",
+  "close": "Schließen",
+  "dismissModelBar": "Chat-Modellleiste ausblenden",
+  "topP": "Top P: {{value}}",
+  "eta": "ETA: {{value}}",
+  "moveUp": "Nach oben",
+  "moveDown": "Nach unten",
+  "list": {
+    "actions": {
+      "edit": "Edit",
+      "setDefault": "Set as default",
+      "duplicate": "Duplicate",
+      "export": "Export",
+      "delete": "Delete"
+    }
+  },
+  "uploadImage": "Bild hochladen",
+  "downloadImage": "Bild herunterladen",
+  "tokenCount": "{{count}} Token",
+  "pagination": {
+    "firstPage": "Erste Seite",
+    "previousPage": "Vorherige Seite",
+    "nextPage": "Nächste Seite",
+    "lastPage": "Letzte Seite",
+    "page": "Seite {{page}}"
+  },
   "toast": {
     "dismiss": "Verwerfen",
     "paused": "Pausiert",
@@ -108,13 +177,16 @@
       "exportedMultiple": "{{count}} Schreibanweisungen exportiert",
       "imported": "{{count}} Schreibanweisungen importiert"
     },
-    "export": {
-      "failed": "Export fehlgeschlagen",
-      "invalidItem": "Element nicht gefunden"
-    },
-    "import": {
-      "invalidFormat": "Ungültiges Dateiformat",
-      "fileError": "Fehler beim Lesen der Datei"
+    "connectionProfile": {
+      "created": "{{name}} erstellt",
+      "updated": "{{name}} aktualisiert",
+      "deleted": "{{name}} gelöscht",
+      "deletedMultiple": "{{count}} Verbindungsprofile gelöscht",
+      "duplicated": "{{name}} dupliziert",
+      "duplicatedMultiple": "{{count}} Verbindungsprofile dupliziert",
+      "exported": "{{name}} exportiert",
+      "exportedMultiple": "{{count}} Verbindungsprofile exportiert",
+      "imported": "{{count}} Verbindungsprofile importiert"
     },
     "inChatShortcut": {
       "created": "{{name}} created",
@@ -148,9 +220,37 @@
       "exported": "{{name}} exported",
       "exportedMultiple": "{{count}} prompts exported",
       "imported": "{{count}} prompts imported"
-    }
+    },
+    "export": {
+      "failed": "Export fehlgeschlagen",
+      "invalidItem": "Element nicht gefunden"
+    },
+    "import": {
+      "invalidFormat": "Ungültiges Dateiformat",
+      "fileError": "Fehler beim Lesen der Datei"
+    },
+    "chatProfileRequired": "Weise in Einstellungen > API ein Chat-Profil zu, um zu chatten."
   },
-  "ok": "OK",
+  "personaPicker": {
+    "title": "Mit Persona starten",
+    "changeTitle": "Persona ändern",
+    "empty": "Noch keine Personas",
+    "default": "Standard"
+  },
+  "profilePicker": {
+    "title": "Profil auswählen",
+    "none": "Keines (deaktiviert)",
+    "empty": "Noch keine Profile. Erstelle eines in Verbindungsprofile."
+  },
+  "saveDialog": {
+    "title": "Nicht gespeicherte Änderungen",
+    "message": "Du hast nicht gespeicherte Änderungen. Was möchtest du tun?",
+    "nameRequired": "Zum Speichern ist ein Name erforderlich. Füge einen Namen hinzu oder verwirf deine Änderungen.",
+    "importMessage": "Dieser Charakter wurde importiert, aber noch nicht gespeichert. Speichere ihn oder verwirf ihn, um die importierten Daten zu verlieren.",
+    "save": "Speichern",
+    "discard": "Verwerfen",
+    "cancel": "Abbrechen"
+  },
   "tags": {
     "title": "Tags",
     "add": "Hinzufügen",
@@ -186,14 +286,5 @@
   },
   "localInference": {
     "placeholder": "Lokale Inferenzeinstellungen werden hier verfügbar sein."
-  },
-  "list": {
-    "actions": {
-      "edit": "Edit",
-      "setDefault": "Set as default",
-      "duplicate": "Duplicate",
-      "export": "Export",
-      "delete": "Delete"
-    }
   }
 }

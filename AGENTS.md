@@ -169,12 +169,13 @@ Spacing, typography, and radius use Tailwind's built-in classes (`p-4`, `text-sm
 
 All UI strings live in `src/locales/{lang}/{namespace}.json`. Each language has the same set of namespaces:
 
-| Namespace           | Scope                                                   |
-| ------------------- | ------------------------------------------------------- |
-| `common`            | Sidebar, TopBar, Discovery, modals, shared labels       |
-| `settings`          | Settings modal, categories, setting labels/descriptions |
-| `chat`              | Chat view, message UI                                   |
-| `characterCreation` | Character and persona creation forms                    |
+| Namespace           | Scope                                                                |
+| ------------------- | -------------------------------------------------------------------- |
+| `common`            | Sidebar, TopBar, Discovery, modals, shared labels                    |
+| `settings`          | Settings modal, categories, setting labels/descriptions              |
+| `chat`              | Chat view, message UI                                                |
+| `characterCreation` | Character and persona creation forms                                 |
+| `logs`              | Logs viewer (UI only — technical terms like Toast/API stay verbatim) |
 
 **Usage in components:**
 
@@ -192,6 +193,16 @@ The namespace prefix (`:`) syntax references other namespaces from any component
 ```js
 t('settings:appearance.theme.label')
 ```
+
+### Locale sync tooling
+
+To keep every language's key set in lock-step with the `en` reference (the source of truth), the sync generators live outside the shipped source tree in `.opencode/scripts/`:
+
+- `locale-merge.mjs` — merge engine. For each language/namespace it walks `en`, keeps existing target translations, fills missing keys from a per-language dictionary, and falls back to the English value otherwise (guaranteeing key parity with no empty strings). Orphan keys not in `en` are dropped.
+- `locales-{de,fr,it,es}.mjs` (+ `-settings.mjs`) — translation dictionaries of missing keys, exported as `{lang}All`.
+- `run-de.mjs` / `run-de-fr.mjs` / `run-it-es.mjs` — runners that invoke `syncLang(lang, dict)` and print fallback counts.
+
+Run from the repo root: `node .opencode/scripts/run-de-fr.mjs && node .opencode/scripts/run-it-es.mjs`. After adding new `en` keys, add their translations to the relevant dictionary, then re-run. The `logs` namespace for `de/es/fr/it` lives directly in `src/locales/{lang}/logs.json` (no longer falls back to English).
 
 ## Settings System
 
