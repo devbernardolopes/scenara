@@ -4,7 +4,7 @@ import { useConfirm } from '../../../lib/confirm'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
-import { Plus, Trash2, Edit3, Zap, Square, Copy } from '../../../lib/icons'
+import { Plus, Trash2, BrainCog, Zap, Square, Copy, X } from '../../../lib/icons'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
@@ -145,6 +145,11 @@ function ScenarioSection({ form, onChange }) {
     setExpandedId(clone.id)
   }
 
+  function handleClear(scenario, e) {
+    e.stopPropagation()
+    handleContentChange(scenario.id, '')
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -204,25 +209,36 @@ function ScenarioSection({ form, onChange }) {
               open={expandedId === scenario.id}
               onOpenChange={(isOpen) => setExpandedId(isOpen ? scenario.id : null)}
               headerExtra={
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={!!scenario.active}
-                  aria-label={t('scenarioActive')}
-                  title={t('scenarioActive')}
-                  disabled={!scenario.content?.trim()}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleActiveChange(scenario.id, !scenario.active)
-                  }}
-                  className={`min-h-[28px] min-w-[28px] flex items-center justify-center rounded-md border transition-colors ${
-                    scenario.active
-                      ? 'bg-primary text-on-primary border-primary'
-                      : 'bg-surface text-tertiary border-border hover:bg-surface-hover'
-                  } disabled:opacity-40 disabled:cursor-not-allowed`}
-                >
-                  {scenario.active ? <Zap className="w-4 h-4" /> : <Square className="w-4 h-4" />}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => handleDelete(scenario, e)}
+                    className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded-md bg-delete text-on-delete hover:bg-delete-hover transition-colors"
+                    aria-label={t('deleteScenario')}
+                    title={t('deleteScenario')}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={!!scenario.active}
+                    aria-label={t('scenarioActive')}
+                    title={t('scenarioActive')}
+                    disabled={!scenario.content?.trim()}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleActiveChange(scenario.id, !scenario.active)
+                    }}
+                    className={`min-h-[28px] min-w-[28px] flex items-center justify-center rounded-md border transition-colors ${
+                      scenario.active
+                        ? 'bg-primary text-on-primary border-primary'
+                        : 'bg-surface text-tertiary border-border hover:bg-surface-hover'
+                    } disabled:opacity-40 disabled:cursor-not-allowed`}
+                  >
+                    {scenario.active ? <Zap className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                  </button>
+                </>
               }
               summary={
                 scenario.content ? (
@@ -255,12 +271,13 @@ function ScenarioSection({ form, onChange }) {
                 <div className="absolute top-2 right-2 flex flex-col gap-2">
                   <button
                     type="button"
-                    onClick={(e) => handleDelete(scenario, e)}
-                    className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-delete text-on-delete hover:bg-delete-hover transition-colors"
-                    aria-label={t('deleteScenario')}
-                    title={t('deleteScenario')}
+                    onClick={(e) => handleClear(scenario, e)}
+                    disabled={!scenario.content?.trim()}
+                    className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-surface text-secondary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label={t('clearScenario')}
+                    title={t('clearScenario')}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <X className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
@@ -269,7 +286,7 @@ function ScenarioSection({ form, onChange }) {
                     aria-label={t('generateScenario')}
                     title={t('generateScenario')}
                   >
-                    <Edit3 className="w-4 h-4" />
+                    <BrainCog className="w-4 h-4" />
                   </button>
                   <button
                     type="button"

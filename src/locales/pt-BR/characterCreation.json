@@ -147,6 +147,7 @@
   "scenarioNamePlaceholder": "Nome do cenário (opcional)",
   "scenarioPlaceholder": "Escreva um cenário para ambientar a conversa…",
   "deleteScenario": "Excluir",
+  "clearScenario": "Limpar",
   "generateScenario": "Gerar",
   "confirmDeleteScenario": "Tem certeza que deseja excluir este cenário?",
   "confirmDeleteScenarioTitle": "Excluir Cenário",

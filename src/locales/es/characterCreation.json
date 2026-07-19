@@ -34,6 +34,7 @@
   "scenarioNamePlaceholder": "Nombre del escenario (opcional)",
   "scenarioPlaceholder": "Escribe un escenario para ambientar la conversación…",
   "deleteScenario": "Eliminar",
+  "clearScenario": "Limpiar",
   "generateScenario": "Generar",
   "confirmDeleteScenario": "¿Estás seguro de que deseas eliminar este escenario?",
   "confirmDeleteScenarioTitle": "Eliminar Escenario",
