@@ -200,6 +200,7 @@ function CharacterDiscovery() {
   const [chatCounts, setChatCounts] = useState(new Map())
   const [tagsMap, setTagsMap] = useState(new Map())
   const [cardSize, setCardSize] = useState('regular')
+  const suppressNextReloadRef = useRef(false)
 
   const filteredCharacters = useMemo(() => {
     const q = searchQuery.toLowerCase().trim()
@@ -297,6 +298,13 @@ function CharacterDiscovery() {
   }
 
   useEffect(() => {
+    function onCharactersChanged() {
+      if (suppressNextReloadRef.current) {
+        suppressNextReloadRef.current = false
+        return
+      }
+      loadCharacters()
+    }
     loadCharacters(true)
     getSetting('cardsPerPage').then((val) => setCardsPerPage(val || 10))
     getSetting('characterCardMarquee').then((val) => setCharacterCardMarquee(val !== false))
@@ -304,11 +312,11 @@ function CharacterDiscovery() {
     getUIState('discovery.sortBy').then((val) => val && setSortBy(val))
     getUIState('discovery.sortOrder').then((val) => val && setSortOrder(val))
     getUIState('discovery.searchQuery').then((val) => val && setSearchQuery(val))
-    window.addEventListener('characters-changed', loadCharacters)
+    window.addEventListener('characters-changed', onCharactersChanged)
     window.addEventListener('threads-changed', loadChatCounts)
     window.addEventListener('tags-changed', loadTagsMap)
     return () => {
-      window.removeEventListener('characters-changed', loadCharacters)
+      window.removeEventListener('characters-changed', onCharactersChanged)
       window.removeEventListener('threads-changed', loadChatCounts)
       window.removeEventListener('tags-changed', loadTagsMap)
     }
@@ -434,8 +442,14 @@ function CharacterDiscovery() {
       variant: 'danger',
     })
     if (!ok) return
+    suppressNextReloadRef.current = true
     await deleteCharacterWithThreads(character.id)
-    await loadCharacters()
+    setCharacters((prev) => prev.filter((c) => c.id !== character.id))
+    setChatCounts((prev) => {
+      const next = new Map(prev)
+      next.delete(character.id)
+      return next
+    })
   }
 
   function handleFavorite(_character) {
