@@ -126,6 +126,20 @@ const VIS_KEY = {
     makeShortcut: 'showUserMakeShortcut',
     visible: 'showUserVisible',
   },
+  assistant: {
+    delete: 'showAssistantDelete',
+    deleteAll: 'showAssistantDeleteAll',
+    deleteFromHere: 'showAssistantDeleteFromHere',
+    edit: 'showAssistantEdit',
+    copy: 'showAssistantCopy',
+    fork: 'showAssistantFork',
+    regenerate: 'showAssistantRegenerate',
+    speak: 'showAssistantSpeak',
+    prompt: 'showAssistantPrompt',
+    requestDetails: 'showAssistantRequestDetails',
+    directorDetails: 'showAssistantDirectorDetails',
+    visible: 'showAssistantVisible',
+  },
 }
 
 const AVATAR_SIZE_MAP = { '1x': 'sm', '2x': 'md', '3x': 'lg', '4x': '2xl' }
