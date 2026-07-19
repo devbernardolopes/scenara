@@ -1,21 +1,10 @@
-import { PROVIDERS, getBaseUrl } from './apiProviders'
+import { PROVIDERS, getBaseUrl, getDefaultBaseUrl } from './apiProviders'
 import { getSetting } from './settings'
 import { getThread } from './threads'
 import { getWritingInstruction } from './writingInstructions'
 import { buildInjectedMemory } from './threadMemories'
 import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
 import { getPersona } from './personas'
-
-const BASE_URLS = {
-  groq: 'https://api.groq.com/openai/v1',
-  cerebras: 'https://api.cerebras.ai/v1',
-  openrouter: 'https://openrouter.ai/api/v1',
-  'ai-horde': 'https://oai.aihorde.net/v1',
-}
-
-export function getChatBaseUrl(providerId) {
-  return BASE_URLS[providerId] || null
-}
 
 function extractErrorDetail(errBody) {
   if (!errBody) return ''
@@ -753,13 +742,16 @@ export async function sendChatCompletion({
   threadId = null,
   kind = null,
 }) {
-  let baseUrl = getChatBaseUrl(profile.providerId)
+  let baseUrl = profile.baseUrl || null
   if (!baseUrl) {
     const rawUrl = await getBaseUrl(profile.providerId)
     if (rawUrl) {
       const stripped = rawUrl.replace(/\/+$/, '')
       baseUrl = stripped.endsWith('/v1') ? stripped : `${stripped}/v1`
     }
+  }
+  if (!baseUrl) {
+    baseUrl = getDefaultBaseUrl(profile.providerId)
   }
   if (!baseUrl) throw new Error(`No base URL for provider "${profile.providerId}"`)
 

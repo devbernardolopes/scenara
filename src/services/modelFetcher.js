@@ -1,4 +1,4 @@
-import { getActiveKey, getBaseUrl } from './apiProviders'
+import { getActiveKey, getBaseUrl, getDefaultBaseUrl } from './apiProviders'
 
 const COOLDOWN_MS = 5000
 let _lastFetchTime = 0
@@ -20,11 +20,11 @@ export function resetCooldown() {
 }
 
 const STRATEGIES = {
-  groq: { type: 'openai', baseUrl: 'https://api.groq.com/openai', needsKey: true },
-  cerebras: { type: 'openai', baseUrl: 'https://api.cerebras.ai', needsKey: true },
-  openrouter: { type: 'openai', baseUrl: 'https://openrouter.ai/api', needsKey: true },
+  groq: { type: 'openai', needsKey: true },
+  cerebras: { type: 'openai', needsKey: true },
+  openrouter: { type: 'openai', needsKey: true },
   'ai-horde': { type: 'horde', needsKey: false },
-  'lm-studio': { type: 'openai', baseUrl: null, needsKey: false },
+  'lm-studio': { type: 'openai', needsKey: false },
 }
 
 async function fetchOpenAIModels(baseUrl, apiKey, signal, modelsPath) {
@@ -105,7 +105,10 @@ async function fetchHordeModels(signal) {
   return { models, meta }
 }
 
-export async function fetchModels(providerId, { signal, hordeMethod: _hordeMethod } = {}) {
+export async function fetchModels(
+  providerId,
+  { signal, hordeMethod: _hordeMethod, baseUrl: profileBaseUrl } = {},
+) {
   if (providerId === 'ai-horde') {
     const result = await fetchHordeModels(signal)
     startCooldown()
@@ -122,7 +125,17 @@ export async function fetchModels(providerId, { signal, hordeMethod: _hordeMetho
       }
       apiKey = keyEntry.value
     }
-    const result = await fetchOpenRouterModels(strategy.baseUrl, apiKey, signal)
+    let baseUrl = profileBaseUrl || null
+    if (!baseUrl) {
+      const rawUrl = await getBaseUrl(providerId)
+      if (rawUrl) baseUrl = rawUrl.replace(/\/v1\/?$/, '')
+    }
+    if (!baseUrl) {
+      const def = getDefaultBaseUrl(providerId)
+      baseUrl = def ? def.replace(/\/v1\/?$/, '') : null
+    }
+    if (!baseUrl) throw new Error(`No base URL configured for ${providerId}`)
+    const result = await fetchOpenRouterModels(baseUrl, apiKey, signal)
     startCooldown()
     return result
   }
@@ -141,10 +154,14 @@ export async function fetchModels(providerId, { signal, hordeMethod: _hordeMetho
 
   let models
   if (strategy.type === 'openai') {
-    let baseUrl = strategy.baseUrl
+    let baseUrl = profileBaseUrl || null
     if (!baseUrl) {
       const rawUrl = await getBaseUrl(providerId)
       if (rawUrl) baseUrl = rawUrl.replace(/\/v1\/?$/, '')
+    }
+    if (!baseUrl) {
+      const def = getDefaultBaseUrl(providerId)
+      baseUrl = def ? def.replace(/\/v1\/?$/, '') : null
     }
     if (!baseUrl) throw new Error(`No base URL configured for ${providerId}`)
     models = await fetchOpenAIModels(baseUrl, apiKey, signal)

@@ -430,7 +430,9 @@
         "includeReasoning": "Incluir Raciocínio",
         "hordeMethod": "Método AI Horde",
         "hordeMethodNative": "Nativo",
-        "hordeMethodOpenAI": "Compatível com OpenAI"
+        "hordeMethodOpenAI": "Compatível com OpenAI",
+        "baseUrl": "URL Base",
+        "baseUrlPlaceholder": "Deixe vazio para o padrão"
       },
       "add": "Adicionar",
       "maxStopItems": "Limite atingido",

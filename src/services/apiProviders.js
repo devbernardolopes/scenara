@@ -7,6 +7,7 @@ export const PROVIDERS = [
     descKey: 'settings:api.providers.groq.desc',
     needsKey: true,
     needsUrl: false,
+    defaultBaseUrl: 'https://api.groq.com/openai/v1',
     hasModelEndpoint: true,
     supportsAnonymous: false,
     trialKey: 'gsk_placeholder_trial_groq_key',
@@ -58,6 +59,7 @@ export const PROVIDERS = [
     descKey: 'settings:api.providers.cerebras.desc',
     needsKey: true,
     needsUrl: false,
+    defaultBaseUrl: 'https://api.cerebras.ai/v1',
     hasModelEndpoint: true,
     hasModelReasoning: true,
     supportsAnonymous: false,
@@ -110,6 +112,7 @@ export const PROVIDERS = [
     descKey: 'settings:api.providers.openrouter.desc',
     needsKey: true,
     needsUrl: false,
+    defaultBaseUrl: 'https://openrouter.ai/api/v1',
     hasModelEndpoint: true,
     supportsAnonymous: false,
     trialKey: 'sk-or-placeholder-trial-openrouter-key',
@@ -161,6 +164,7 @@ export const PROVIDERS = [
     descKey: 'settings:api.providers.aiHorde.desc',
     needsKey: true,
     needsUrl: false,
+    defaultBaseUrl: 'https://oai.aihorde.net/v1',
     hasModelEndpoint: true,
     supportsAnonymous: false,
     supportsHordeMethods: true,
@@ -213,6 +217,7 @@ export const PROVIDERS = [
     descKey: 'settings:api.providers.lmStudio.desc',
     needsKey: false,
     needsUrl: true,
+    defaultBaseUrl: null,
     hasModelEndpoint: true,
     supportsLmStudioMethods: true,
     supportsAnonymous: false,
@@ -282,6 +287,10 @@ export async function getModel(providerId) {
 
 export async function setModel(providerId, model) {
   await setSetting(pKey(providerId, 'model'), model)
+}
+
+export function getDefaultBaseUrl(providerId) {
+  return PROVIDERS.find((p) => p.id === providerId)?.defaultBaseUrl || null
 }
 
 export async function getBaseUrl(providerId) {

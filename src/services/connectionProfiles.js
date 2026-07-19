@@ -78,6 +78,7 @@ export async function createProfile(data) {
     keyId: data.keyId || null,
     model: data.model || null,
     params: data.params || {},
+    baseUrl: data.baseUrl || null,
     createdAt: now,
     updatedAt: now,
   })
@@ -127,6 +128,7 @@ export async function duplicateProfile(id) {
     keyId: original.keyId,
     model: original.model,
     params: { ...original.params },
+    baseUrl: original.baseUrl || null,
     createdAt: now,
     updatedAt: now,
   })
@@ -182,6 +184,7 @@ export async function exportProfile(id) {
     keyId: profile.keyId || null,
     model: profile.model || null,
     params: profile.params || {},
+    baseUrl: profile.baseUrl || null,
   }
 }
 
@@ -210,6 +213,7 @@ export async function importProfiles(items) {
       keyId: item.keyId || null,
       model: item.model || null,
       params: item.params || {},
+      baseUrl: item.baseUrl || null,
       createdAt: now,
       updatedAt: now,
     })
@@ -261,6 +265,7 @@ export async function getEffectiveProfileFor(requestKind) {
     key,
     model: profile.model,
     params: { ...profile.params },
+    baseUrl: profile.baseUrl || null,
   }
 }
 

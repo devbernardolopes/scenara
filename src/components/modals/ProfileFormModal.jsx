@@ -9,6 +9,7 @@ import Label from '../shared/Label'
 import {
   PROVIDERS,
   getKeys,
+  getDefaultBaseUrl,
   getCachedModels,
   setCachedModels as persistCachedModels,
   getCachedModelMeta,
@@ -120,6 +121,7 @@ function ProfileFormModal({ profile }) {
     keyId: profile?.keyId || null,
     model: profile?.model || '',
     params: profile?.params ? { ...profile.params } : {},
+    baseUrl: profile?.baseUrl || getDefaultBaseUrl(profile?.providerId) || '',
   })
 
   const [form, setForm] = useState({ ...initialRef.current })
@@ -275,6 +277,7 @@ function ProfileFormModal({ profile }) {
         keyId: form.keyId || null,
         model: form.model || null,
         params: { ...form.params },
+        baseUrl: form.baseUrl || null,
       }
       if (editing) {
         await updateProfile(profile.id, data)
@@ -308,6 +311,7 @@ function ProfileFormModal({ profile }) {
       const result = await fetchModels(form.providerId, {
         signal: abortRef.current.signal,
         hordeMethod,
+        baseUrl: form.baseUrl || null,
       })
       const { models, meta, names, supportedParams } = result
       await persistCachedModels(form.providerId, models, hordeMethod)
@@ -437,6 +441,7 @@ function ProfileFormModal({ profile }) {
                 keyId,
                 model: '',
                 params: {},
+                baseUrl: getDefaultBaseUrl(nextProvider) || '',
               }))
             }}
             className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm"
@@ -453,6 +458,19 @@ function ProfileFormModal({ profile }) {
             })}
           </select>
         </div>
+
+        {selectedProvider && (
+          <div>
+            <Label>{t('api.profile.form.baseUrl')}</Label>
+            <input
+              type="url"
+              value={form.baseUrl}
+              onChange={(e) => setForm((prev) => ({ ...prev, baseUrl: e.target.value }))}
+              placeholder={t('api.profile.form.baseUrlPlaceholder')}
+              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+            />
+          </div>
+        )}
 
         {selectedProvider && selectedProvider.needsKey && (
           <div>

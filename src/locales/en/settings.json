@@ -440,7 +440,9 @@
         "lmStudioMethodNative": "Native",
         "lmStudioMethodOpenAI": "OpenAI-Compatible",
         "lmStudioMethodAnthropic": "Anthropic-Compatible",
-        "comingSoon": "Coming soon"
+        "comingSoon": "Coming soon",
+        "baseUrl": "Base URL",
+        "baseUrlPlaceholder": "Leave empty for default"
       },
       "add": "Add",
       "maxStopItems": "Limit reached",
