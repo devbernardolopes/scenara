@@ -108,6 +108,7 @@ export async function updateCharacter(id, data) {
 
 export async function updateCharacterLastSection(id, section) {
   await db.characters.update(id, { lastSection: section })
+  window.dispatchEvent(new CustomEvent('characters-changed'))
 }
 
 export async function deleteCharacter(id) {
