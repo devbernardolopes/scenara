@@ -127,7 +127,7 @@ function PromptBankPicker({ open, onClose, onSelect, anchorRef }) {
   const content = (
     <div
       ref={ref}
-      className="w-[280px] max-h-80 flex flex-col bg-surface border border-border rounded-lg shadow-surface-lg z-50"
+      className="w-[280px] max-h-80 flex flex-col bg-surface border border-border rounded-lg shadow-surface-lg z-[60]"
     >
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
         <Search className="w-3.5 h-3.5 text-tertiary shrink-0" />
