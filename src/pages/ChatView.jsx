@@ -2289,7 +2289,8 @@ function ChatView() {
         {' '}
         {/* Wrap input for better control */}
         {showStatus && chatModelName && (
-          <div className="px-3 py-1.5 text-center">
+          // <div className="px-3 py-1.5 text-center">
+          <div className="px-3 text-center">
             {chatProfile ? (
               <button
                 type="button"

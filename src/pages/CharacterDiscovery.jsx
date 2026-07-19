@@ -685,7 +685,7 @@ function CharacterDiscovery() {
       </div>
       {!isUnlimited && sortedCharacters.length > 0 ? (
         // <div className="shrink-0 px-4 md:px-8 pb-4 md:pb-8 pt-4 bg-surface border-t border-border">
-        <div className="shrink-0 px-4 md:px-8 pb-4 md:pb-8 bg-surface border-t border-border">
+        <div className="shrink-0 px-4 md:px-8 pb-4 bg-surface border-t border-border">
           <ModelStatusBar embedded />
           <Pagination
             currentPage={safePage}
