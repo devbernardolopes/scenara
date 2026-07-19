@@ -61,7 +61,10 @@ function SettingRow({ setting, onSave }) {
   }, [dependsOn]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (next) => {
-    const val = typeof next === 'string' || typeof next === 'number' ? next : next?.target?.value
+    const val =
+      typeof next === 'string' || typeof next === 'number' || typeof next === 'boolean'
+        ? next
+        : next?.target?.value
     setValue(val)
     onSave(val)
   }
