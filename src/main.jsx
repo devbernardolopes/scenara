@@ -25,6 +25,8 @@ import ProfileFormModal from './components/modals/ProfileFormModal'
 import InChatShortcutManagementModal from './components/modals/InChatShortcutManagementModal'
 import InChatShortcutFormModal from './components/modals/InChatShortcutFormModal'
 import LorebookManagementModal from './components/modals/LorebookManagementModal'
+import LorebookFormModal from './components/modals/LorebookFormModal'
+import LorebookEntryFormModal from './components/modals/LorebookEntryFormModal'
 import MakeShortcutModal from './components/modals/MakeShortcutModal'
 import CreateShortcutSetModal from './components/modals/CreateShortcutSetModal'
 import PromptBankManagementModal from './components/modals/PromptBankManagementModal'
@@ -66,6 +68,8 @@ registerModal('profileForm', ProfileFormModal)
 registerModal('inChatShortcutManagement', InChatShortcutManagementModal)
 registerModal('inChatShortcutForm', InChatShortcutFormModal)
 registerModal('lorebookManagement', LorebookManagementModal)
+registerModal('lorebookForm', LorebookFormModal)
+registerModal('lorebookEntryForm', LorebookEntryFormModal)
 registerModal('makeShortcut', MakeShortcutModal)
 registerModal('createShortcutSet', CreateShortcutSetModal)
 registerModal('promptBankManagement', PromptBankManagementModal)

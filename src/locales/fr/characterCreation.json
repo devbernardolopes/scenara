@@ -214,5 +214,10 @@
   "tagsSectionPlaceholder": "Tapez un nom de tag ou collez des tags séparés par des virgules…",
   "tagsSectionNoTags": "Aucun tag attribué pour le moment.",
   "tagsSectionBrowseTags": "Parcourir Tous les Tags",
-  "tagsSectionBrowseActive": "Actif"
+  "tagsSectionBrowseActive": "Actif",
+  "lorebooksSectionNoLorebooks": "No lorebooks linked yet.",
+  "lorebooksSectionNoLorebooksBrowse": "No lorebooks available to link.",
+  "lorebooksSectionBrowseLorebooks": "Browse All Lorebooks",
+  "lorebooksSectionRemove": "Remove {{name}}",
+  "lorebooksSectionSearchPlaceholder": "Search lorebooks…"
 }

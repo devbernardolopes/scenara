@@ -215,5 +215,10 @@
   "tagsSectionPlaceholder": "Type a tag name or paste comma-separated tags…",
   "tagsSectionNoTags": "No tags assigned yet.",
   "tagsSectionBrowseTags": "Browse All Tags",
-  "tagsSectionBrowseActive": "Active"
+  "tagsSectionBrowseActive": "Active",
+  "lorebooksSectionNoLorebooks": "No lorebooks linked yet.",
+  "lorebooksSectionNoLorebooksBrowse": "No lorebooks available to link.",
+  "lorebooksSectionBrowseLorebooks": "Browse All Lorebooks",
+  "lorebooksSectionRemove": "Remove {{name}}",
+  "lorebooksSectionSearchPlaceholder": "Search lorebooks…"
 }

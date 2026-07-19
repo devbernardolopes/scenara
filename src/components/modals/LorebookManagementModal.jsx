@@ -23,11 +23,17 @@ function LorebookManagementModal() {
     changeEvent: 'lorebooks-changed',
     showImage: true,
     squaredImage: true,
-    canCreate: false,
-    comingSoonNoteKey: 'lorebook.comingSoon',
-    formModal: null,
+    canCreate: true,
+    formModal: 'lorebookForm',
     formProp: 'lorebook',
     getTitle: (l) => l.name,
+    getSubtitle: (l) => l.description || null,
+    getBadges: (l) =>
+      l.isGlobal ? (
+        <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-primary-subtle text-primary">
+          {t('lorebook.globalBadge')}
+        </span>
+      ) : null,
     getImageSrc: (l) => l.avatar,
     confirmDelete: async (l) => {
       const ok = await confirm({

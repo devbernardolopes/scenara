@@ -24,6 +24,7 @@ import ExampleMessagesSection from './character/ExampleMessagesSection'
 import DirectorSection from './character/DirectorSection'
 import TagsSection from './character/TagsSection'
 import ScenarioSection from './character/ScenarioSection'
+import LorebooksSection from './character/LorebooksSection'
 
 const INITIAL_FORM = {
   name: '',
@@ -83,6 +84,7 @@ const INITIAL_FORM = {
   personaInjectionPlacement: 'endOfSystemPrompt',
   personaInjectionMessageRole: 'system',
   tags: [],
+  lorebookIds: [],
   lastSection: null,
 }
 
@@ -198,7 +200,7 @@ const SECTION_COMPONENTS = {
   exampleMessages: ExampleMessagesSection,
   scenarios: ScenarioSection,
   director: DirectorSection,
-  lorebooks: PlaceholderSection,
+  lorebooks: LorebooksSection,
   tags: TagsSection,
   '3d': PlaceholderSection,
   sfx: PlaceholderSection,
@@ -387,6 +389,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       initialMessages: (form.initialMessages || []).some((m) => m.content?.trim()),
       exampleMessages: (form.exampleMessages || []).some((m) => m.content?.trim()),
       tags: (form.tags || []).length > 0,
+      lorebooks: (form.lorebookIds || []).length > 0,
       scenarios: (form.scenarios || []).some((s) => s?.active),
       postProcessing: ppEnabledDiff || ppOverrideDiff || ppRulesDiff,
       overrides: false,

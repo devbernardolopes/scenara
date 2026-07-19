@@ -2,6 +2,8 @@ import db from '../db'
 import { getSetting, setSetting } from './settings'
 import { showToast } from '../lib/toast'
 import i18n from '../lib/i18n'
+import { createEntry, deleteEntriesForLorebook, getEntriesForLorebook } from './lorebookEntries'
+import { mapLorebookFromST, mapLorebookToST } from './lorebookImportExport'
 
 const ORDER_KEY = 'lorebookOrder'
 
@@ -58,14 +60,17 @@ export async function getLorebook(id) {
   return db.lorebooks.get(id)
 }
 
-// Entry management is deferred. createLorebook/updateLorebook are stubbed to
-// persist only the container (name + avatar) so the management UI is functional
-// while lore entry editing is implemented separately.
 export async function createLorebook(data) {
   const now = new Date()
   const id = await db.lorebooks.add({
     name: data.name,
     avatar: data.avatar || '',
+    description: data.description || '',
+    scanDepth: data.scanDepth ?? null,
+    tokenBudget: data.tokenBudget ?? null,
+    recursiveScanning: Boolean(data.recursiveScanning),
+    isGlobal: Boolean(data.isGlobal),
+    sourceMeta: data.sourceMeta ?? null,
     createdAt: now,
     updatedAt: now,
   })
@@ -87,7 +92,9 @@ export async function updateLorebook(id, data) {
 export async function deleteLorebook(id) {
   const item = await db.lorebooks.get(id)
   await db.lorebooks.delete(id)
+  await deleteEntriesForLorebook(id)
   await removeFromOrder(id)
+  await detachLorebookFromCharacters(id)
   window.dispatchEvent(
     new CustomEvent('lorebooks-changed', {
       detail: { action: 'delete', entityName: item?.name || 'Unknown' },
@@ -97,7 +104,9 @@ export async function deleteLorebook(id) {
 
 export async function deleteLorebooks(ids) {
   await db.lorebooks.bulkDelete(ids)
+  await db.lorebookEntries.where('lorebookId').anyOf(ids).delete()
   await removeManyFromOrder(ids)
+  await Promise.all(ids.map((id) => detachLorebookFromCharacters(id)))
   window.dispatchEvent(
     new CustomEvent('lorebooks-changed', { detail: { action: 'delete', count: ids.length } }),
   )
@@ -110,9 +119,21 @@ export async function duplicateLorebook(id) {
   const newId = await db.lorebooks.add({
     name: `${original.name} (copy)`,
     avatar: original.avatar,
+    description: original.description || '',
+    scanDepth: original.scanDepth ?? null,
+    tokenBudget: original.tokenBudget ?? null,
+    recursiveScanning: Boolean(original.recursiveScanning),
+    isGlobal: Boolean(original.isGlobal),
+    sourceMeta: original.sourceMeta ?? null,
     createdAt: now,
     updatedAt: now,
   })
+
+  const entries = await getEntriesForLorebook(id)
+  for (const entry of entries) {
+    await createEntry(newId, { ...entry })
+  }
+
   const order = await getOrderIds()
   const idx = order.indexOf(id)
   if (idx === -1) order.push(newId)
@@ -138,8 +159,10 @@ export async function exportLorebook(id) {
     showToast(i18n.t('common:toast.export.invalidItem'), { type: 'error' })
     throw new Error('Lorebook not found')
   }
+  const entries = await getEntriesForLorebook(id)
+  const st = mapLorebookToST(l, entries)
   showToast(i18n.t('common:toast.lorebook.exported', { name: l.name }), { type: 'success' })
-  return { name: l.name, avatar: l.avatar }
+  return st
 }
 
 export async function exportLorebooks(ids) {
@@ -156,20 +179,17 @@ export async function exportLorebooks(ids) {
 export async function importLorebooks(items) {
   const added = []
   for (const item of items) {
-    if (!item || !item.name || !item.name.trim()) continue
-    const now = new Date()
-    const id = await db.lorebooks.add({
-      name: item.name.trim(),
-      avatar: item.avatar || '',
-      createdAt: now,
-      updatedAt: now,
-    })
+    const mapped = mapLorebookFromST(item)
+    if (!mapped) continue
+    const { lorebook, entries } = mapped
+    if (!lorebook.name || !lorebook.name.trim()) continue
+    const id = await createLorebook(lorebook)
+    for (const entry of entries) {
+      await createEntry(id, entry)
+    }
     added.push(id)
   }
   if (added.length > 0) {
-    const order = await getOrderIds()
-    order.push(...added)
-    await setSetting(ORDER_KEY, order)
     window.dispatchEvent(
       new CustomEvent('lorebooks-changed', {
         detail: { action: 'import', count: added.length },
@@ -177,4 +197,15 @@ export async function importLorebooks(items) {
     )
   }
   return added
+}
+
+async function detachLorebookFromCharacters(lorebookId) {
+  const chars = await db.characters.where('lorebookIds').equals(lorebookId).toArray()
+  await Promise.all(
+    chars.map((c) =>
+      db.characters.update(c.id, {
+        lorebookIds: (c.lorebookIds || []).filter((lid) => lid !== lorebookId),
+      }),
+    ),
+  )
 }
