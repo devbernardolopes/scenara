@@ -1201,7 +1201,10 @@
         "characterFilterExclude": "Exclude",
         "characterFilterNames": "Character Names",
         "characterFilterNamesLabel": "Character Names",
-        "characterFilterNamesPlaceholder": "Type a character name and press Enter…"
+        "characterFilterNamesPlaceholder": "Type a character name and press Enter…",
+        "save": "Save",
+        "saving": "Saving…",
+        "cancel": "Cancel"
       }
     }
   },

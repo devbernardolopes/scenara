@@ -1144,6 +1144,9 @@
       "form": {
         "title": "Create Entry",
         "editTitle": "Edit Entry",
+        "save": "Save",
+        "saving": "Saving…",
+        "cancel": "Cancel",
         "name": "Name",
         "nameLabel": "Name",
         "namePlaceholder": "Entry name",

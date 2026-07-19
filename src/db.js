@@ -266,6 +266,7 @@ db.version(24).stores({
   lorebooks: '++id, name, createdAt, avatar, isGlobal',
   lorebookEntries: '++id, lorebookId, order, enabled, createdAt, updatedAt',
   promptHistory: '++id, threadId, createdAt, isOOC',
+  promptBank: '++id, name, kind, createdAt',
   tags: '++id, &name, createdAt',
   threadMemories: '++id, threadId, createdAt',
   logs: '++id, type, threadId, createdAt, level',
