@@ -156,6 +156,7 @@ All visual properties are defined as CSS custom properties in `src/styles/tokens
 | Success / Warning / Error | `text-success`, `bg-warning` etc. |
 | Accent                    | `text-accent`, `bg-accent`        |
 | Theme-aware shadows       | `shadow-surface-sm/md/lg`         |
+| Toggle off-state          | `bg-toggle-off`                   |
 
 Spacing, typography, and radius use Tailwind's built-in classes (`p-4`, `text-sm`, `rounded-lg`). Do not create custom tokens for these.
 
@@ -286,7 +287,7 @@ Transient UI state (collapse/expand, scroll positions) lives in the `uiState` De
 </CollapsibleSection>
 ```
 
-- Label highlights in `text-primary` when `hasContent` is true
+- Label highlights in `text-highlight` when `hasContent` is true
 - Summary shows computed metrics (tokens, words, characters) or custom text
 - Collapse state persisted per-instance via `storageKey` → `uiState` table
 - All touch targets are `min-h-[44px]`
