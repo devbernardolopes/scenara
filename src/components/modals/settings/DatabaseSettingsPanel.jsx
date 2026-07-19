@@ -173,7 +173,6 @@ function DatabaseSettingsPanel() {
         onClick={handleImport}
         disabled={isImporting}
       />
-      <hr className="border-border" />
       <div>
         <label className="block text-sm font-medium text-text mb-2">{t('database.fromUrl')}</label>
         <div className="flex gap-2">

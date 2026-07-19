@@ -110,8 +110,8 @@ const DEFAULTS_MAP = {
   'prompting.writingPlacement': 'writingPlacement',
   'prompting.writingMessageRole': 'writingMessageRole',
   'prompting.personaInjectionTiming': 'personaInjectionTiming',
-  personaInjectionPlacement: 'personaInjectionPlacement',
-  personaInjectionMessageRole: 'personaInjectionMessageRole',
+  'prompting.personaInjectionPlacement': 'personaInjectionPlacement',
+  'prompting.personaInjectionMessageRole': 'personaInjectionMessageRole',
 }
 
 const OVERRIDE_FIELDS = [

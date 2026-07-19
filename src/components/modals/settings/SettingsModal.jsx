@@ -22,19 +22,8 @@ function SettingsModal() {
     'modal.settings.category',
     CATEGORIES[0]?.id,
   )
-  const [search] = usePersistedState('modal.settings.search', '')
 
-  const filtered = SETTINGS.filter((s) => {
-    const matchesCategory = search ? true : s.category === activeCategory
-    if (!matchesCategory) return false
-    if (!search) return true
-    const label = t(s.labelKey).toLowerCase()
-    const desc = s.descKey ? t(s.descKey).toLowerCase() : ''
-    const q = search.toLowerCase()
-    return label.includes(q) || desc.includes(q)
-  })
-
-  const noResults = search && filtered.length === 0
+  const filtered = SETTINGS.filter((s) => s.category === activeCategory)
 
   function groupedSettings(settings) {
     const settingsByGroup = new Map()
@@ -96,10 +85,15 @@ function SettingsModal() {
       )
     }
     const groupDef = node.def
+    const totalItems =
+      node.items.length + node.children.reduce((sum, c) => sum + (c.items?.length || 0), 0)
+    const summary =
+      totalItems > 0 ? `${totalItems} ${totalItems === 1 ? 'setting' : 'settings'}` : ''
     return (
       <CollapsibleSection
         key={node.key}
         label={groupDef ? t(groupDef.labelKey.replace('settings:', '')) : node.key}
+        summary={summary}
         storageKey={`settings.group.${node.key}`}
         defaultExpanded={groupDef?.defaultExpanded ?? true}
       >
@@ -147,38 +141,32 @@ function SettingsModal() {
       </div>
 
       <div className="px-6 pt-4 pb-2 shrink-0 space-y-2">
-        {!search && (
-          <select
-            value={activeCategory}
-            onChange={(e) => setActiveCategory(e.target.value)}
-            className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text text-sm md:hidden"
-          >
-            {CATEGORIES.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {t(cat.labelKey.replace('settings:', ''))}
-              </option>
-            ))}
-          </select>
-        )}
+        <select
+          value={activeCategory}
+          onChange={(e) => setActiveCategory(e.target.value)}
+          className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text text-sm md:hidden"
+        >
+          {CATEGORIES.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {t(cat.labelKey.replace('settings:', ''))}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="flex flex-1 min-h-0">
-        {!search && (
-          <SettingsSidebar
-            categories={CATEGORIES}
-            active={activeCategory}
-            onSelect={setActiveCategory}
-          />
-        )}
+        <SettingsSidebar
+          categories={CATEGORIES}
+          active={activeCategory}
+          onSelect={setActiveCategory}
+        />
 
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          {noResults ? (
-            <p className="text-secondary text-sm">{t('noResults')}</p>
-          ) : !search && activeCategory === 'api' ? (
+          {activeCategory === 'api' ? (
             <ApiSettingsPanel />
-          ) : !search && activeCategory === 'database' ? (
+          ) : activeCategory === 'database' ? (
             <DatabaseSettingsPanel />
-          ) : !search && activeCategory === 'postProcessing' ? (
+          ) : activeCategory === 'postProcessing' ? (
             <PostProcessingRulesPanel />
           ) : (
             <div className="space-y-8">

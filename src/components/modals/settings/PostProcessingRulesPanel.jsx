@@ -7,6 +7,7 @@ import {
   setPostProcessingRules,
 } from '../../../services/settings'
 import PostProcessingRuleEditor from '../../shared/PostProcessingRuleEditor'
+import SettingToggle from './controls/SettingToggle'
 
 function PostProcessingRulesPanel() {
   const { t } = useTranslation('settings')
@@ -40,27 +41,13 @@ function PostProcessingRulesPanel() {
 
   return (
     <div className="space-y-6">
-      <label className="flex items-center justify-between gap-3 min-h-[44px] cursor-pointer">
+      <div className="flex items-center justify-between gap-3 min-h-[44px]">
         <div>
           <span className="text-sm text-text">{t('postProcessing.enable.label')}</span>
           <p className="text-xs text-secondary">{t('postProcessing.enable.desc')}</p>
         </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={!!enabled}
-          onClick={() => handleToggle(!enabled)}
-          className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ${
-            enabled ? 'bg-primary' : 'bg-gray-300'
-          }`}
-        >
-          <span
-            className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition-transform duration-200 ${
-              enabled ? 'translate-x-5' : 'translate-x-0'
-            }`}
-          />
-        </button>
-      </label>
+        <SettingToggle value={enabled} onChange={handleToggle} />
+      </div>
       <div className={enabled ? '' : 'opacity-40 pointer-events-none'}>
         <PostProcessingRuleEditor rules={rules} onChange={handleChange} />
       </div>

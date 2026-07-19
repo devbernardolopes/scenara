@@ -6,7 +6,7 @@ function SettingToggle({ value, onChange }) {
         aria-checked={!!value}
         onClick={() => onChange(!value)}
         className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ${
-          value ? 'bg-primary' : 'bg-gray-300'
+          value ? 'bg-primary' : 'bg-toggle-off'
         }`}
       >
         <span

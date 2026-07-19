@@ -11,6 +11,8 @@ import ProfilePicker from '../../shared/ProfilePicker'
 import ProviderIcon from '../../shared/ProviderIcon'
 import { Edit3 } from '../../../lib/icons'
 
+// UI labels for profile assignment rows (distinct from connectionProfiles.REQUEST_KINDS
+// which is a string array used for DB lookups).
 const REQUEST_KINDS = [
   { id: 'chat', labelKey: 'settings:api.profileAssignment.chat' },
   { id: 'autoTitle', labelKey: 'settings:api.profileAssignment.autoTitle' },
@@ -187,7 +189,7 @@ function ApiSettingsPanel() {
           <button
             type="button"
             onClick={handleClearAll}
-            className="min-h-[44px] px-3 text-sm border border-border rounded-md bg-surface text-secondary hover:bg-surface-hover whitespace-nowrap"
+            className="min-h-[44px] px-3 text-sm border border-border rounded-md text-text hover:bg-surface-hover whitespace-nowrap"
           >
             {t('api.profileAssignment.clearAll')}
           </button>
@@ -221,7 +223,7 @@ function ApiSettingsPanel() {
         </div>
       </div>
 
-      <div className="pt-6">
+      <div className="border-t border-border pt-6">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-text">{t('api.requestTimeout.label')}</h3>

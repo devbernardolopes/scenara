@@ -730,9 +730,7 @@ export const SETTINGS = [
     group: 'chat',
     type: 'slider',
     default: 30,
-    min: 5,
-    max: 60,
-    step: 1,
+    props: { min: 5, max: 60, step: 1 },
     labelKey: 'settings:appearance.statusBarRefresh.label',
     descKey: 'settings:appearance.statusBarRefresh.desc',
     dependsOn: [{ key: 'showStatus', value: true }],
@@ -974,6 +972,8 @@ export const SETTINGS = [
     labelKey: 'settings:defaults.userPersonaAvatarScale.label',
     descKey: 'settings:defaults.userPersonaAvatarScale.desc',
   },
+  // Profile assignment slots — not rendered as setting rows; exist only to
+  // declare defaults for getSetting() lookups.
   {
     key: 'requestKind.chat.profileId',
     category: 'api',
@@ -1324,7 +1324,7 @@ export const SETTINGS = [
     },
   },
   {
-    key: 'personaInjectionPlacement',
+    key: 'prompting.personaInjectionPlacement',
     category: 'defaults',
     type: 'select',
     default: 'endOfSystemPrompt',
@@ -1338,13 +1338,13 @@ export const SETTINGS = [
     },
   },
   {
-    key: 'personaInjectionMessageRole',
+    key: 'prompting.personaInjectionMessageRole',
     category: 'defaults',
     type: 'select',
     default: 'system',
     options: ['system', 'assistant'],
     dependsOn: [
-      { key: 'personaInjectionPlacement', value: 'endOfMessages' },
+      { key: 'prompting.personaInjectionPlacement', value: 'endOfMessages' },
       { key: 'prompting.personaInjectionTiming', value: 'always' },
     ],
     labelKey: 'settings:defaults.personaInjectionMessageRole.label',
@@ -1559,4 +1559,23 @@ export async function setSetting(key, value) {
   }
   SETTING_EFFECTS[key]?.(value)
   window.dispatchEvent(new CustomEvent('settings-changed', { detail: { key, value } }))
+}
+
+const SETTINGS_KEY_MIGRATIONS = [
+  { old: 'personaInjectionPlacement', fixed: 'prompting.personaInjectionPlacement' },
+  { old: 'personaInjectionMessageRole', fixed: 'prompting.personaInjectionMessageRole' },
+]
+
+export async function migrateSettingsKeys() {
+  for (const { old, fixed } of SETTINGS_KEY_MIGRATIONS) {
+    const existing = await db.settings.where('key').equals(old).first()
+    if (existing) {
+      const alreadyHasFixed = await db.settings.where('key').equals(fixed).first()
+      if (!alreadyHasFixed) {
+        await db.settings.update(existing.id, { key: fixed })
+      } else {
+        await db.settings.delete(existing.id)
+      }
+    }
+  }
 }

@@ -47,6 +47,8 @@
 
   --color-accent-subtle: color-mix(in srgb, var(--color-accent) 12%, transparent);
 
+  --color-toggle-off: color-mix(in srgb, var(--color-text-secondary) 35%, var(--color-surface));
+
   --color-code-bg: rgba(0, 0, 0, 0.05);
 
   --color-pill-count-bg: #dbeafe;
@@ -1232,6 +1234,11 @@ main {
 }
 .text-on-image-muted {
   color: var(--color-on-image-muted);
+}
+
+/* Toggle switch */
+.bg-toggle-off {
+  background-color: var(--color-toggle-off);
 }
 
 /* Delete highlight toggle — when class is absent, delete buttons blend into neutral */
