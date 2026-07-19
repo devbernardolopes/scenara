@@ -157,6 +157,10 @@
       "label": "Assistant/System – Détails du réalisateur",
       "desc": "Affiche le bouton qui ouvre les détails de l’examen du réalisateur sur les bulles assistant et système."
     },
+    "showAssistantVisible": {
+      "label": "Assistant/System – Visible",
+      "desc": "Affiche le bascule qui contrôle si cet emplacement de message est envoyé à l’IA dans les requêtes API."
+    },
     "showUserDelete": {
       "label": "User – Delete",
       "desc": "Show the delete button on user message bubbles."
@@ -184,6 +188,10 @@
     "showUserMakeShortcut": {
       "label": "Utilisateur – Créer un raccourci",
       "desc": "Affiche le bouton de création de raccourci sur les bulles de message utilisateur."
+    },
+    "showUserVisible": {
+      "label": "Utilisateur – Visible",
+      "desc": "Affiche le bascule qui contrôle si cet emplacement de message est envoyé à l’IA dans les requêtes API."
     },
     "characterCardMarquee": {
       "label": "Défilement de la carte de personnage",
@@ -1136,6 +1144,9 @@
       "form": {
         "title": "Create Entry",
         "editTitle": "Edit Entry",
+        "save": "Save",
+        "saving": "Saving…",
+        "cancel": "Cancel",
         "name": "Name",
         "nameLabel": "Name",
         "namePlaceholder": "Entry name",
@@ -1192,10 +1203,7 @@
         "characterFilterExclude": "Exclude",
         "characterFilterNames": "Character Names",
         "characterFilterNamesLabel": "Character Names",
-        "characterFilterNamesPlaceholder": "Type a character name and press Enter…",
-        "save": "Save",
-        "saving": "Saving…",
-        "cancel": "Cancel"
+        "characterFilterNamesPlaceholder": "Type a character name and press Enter…"
       }
     }
   },

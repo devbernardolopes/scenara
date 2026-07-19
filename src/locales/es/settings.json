@@ -157,6 +157,10 @@
       "label": "Asistente/System – Detalles del director",
       "desc": "Muestra el botón que abre los detalles de revisión del director en las burbujas del asistente y del sistema."
     },
+    "showAssistantVisible": {
+      "label": "Asistente/System – Visible",
+      "desc": "Muestra el interruptor que controla si esta ranura de mensaje se envía a la IA en las solicitudes de API."
+    },
     "showUserDelete": {
       "label": "User – Delete",
       "desc": "Show the delete button on user message bubbles."
@@ -184,6 +188,10 @@
     "showUserMakeShortcut": {
       "label": "Usuario – Crear atajo",
       "desc": "Muestra el botón de crear atajo en las burbujas de mensaje del usuario."
+    },
+    "showUserVisible": {
+      "label": "Usuario – Visible",
+      "desc": "Muestra el interruptor que controla si esta ranura de mensaje se envía a la IA en las solicitudes de API."
     },
     "characterCardMarquee": {
       "label": "Desplazamiento de la tarjeta de personaje",
@@ -1136,6 +1144,9 @@
       "form": {
         "title": "Create Entry",
         "editTitle": "Edit Entry",
+        "save": "Save",
+        "saving": "Saving…",
+        "cancel": "Cancel",
         "name": "Name",
         "nameLabel": "Name",
         "namePlaceholder": "Entry name",
@@ -1192,10 +1203,7 @@
         "characterFilterExclude": "Exclude",
         "characterFilterNames": "Character Names",
         "characterFilterNamesLabel": "Character Names",
-        "characterFilterNamesPlaceholder": "Type a character name and press Enter…",
-        "save": "Save",
-        "saving": "Saving…",
-        "cancel": "Cancel"
+        "characterFilterNamesPlaceholder": "Type a character name and press Enter…"
       }
     }
   },

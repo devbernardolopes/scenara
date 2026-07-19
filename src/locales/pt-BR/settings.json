@@ -318,6 +318,14 @@
     "renderMarkdown": {
       "label": "Renderizar Markdown",
       "desc": "Renderizar formatação Markdown nas mensagens e títulos."
+    },
+    "showAssistantVisible": {
+      "label": "Assistente/Sistema – Visível",
+      "desc": "Mostra o botão que controla se esta ranhura de mensagem é enviada à IA nas requisições da API."
+    },
+    "showUserVisible": {
+      "label": "Usuário – Visível",
+      "desc": "Mostra o botão que controla se esta ranhura de mensagem é enviada à IA nas requisições da API."
     }
   },
   "themeOptions": {

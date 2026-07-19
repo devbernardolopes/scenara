@@ -5,6 +5,18 @@ import { getWritingInstruction } from './writingInstructions'
 import { buildInjectedMemory } from './threadMemories'
 import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
 import { getPersona } from './personas'
+import { parseBundleEntries } from './chatGeneration'
+
+// A message is hidden for payload purposes when its currently-active slot
+// entry carries `hidden: true`. Visibility is stored per-slot (each entry in
+// `bundleMessages`), but only the active slot's flag affects API requests.
+export function isMessageHidden(message) {
+  const entries = parseBundleEntries(message?.bundleMessages)
+  if (!entries) return false
+  const idx = message?.activeSlotIndex ?? 0
+  const entry = entries[idx] ?? entries[0]
+  return entry?.hidden === true
+}
 
 function extractErrorDetail(errBody) {
   if (!errBody) return ''
@@ -57,7 +69,10 @@ export function getMessagesForApiRequest(
 
   const eligible = messages.filter(
     (message) =>
-      !message?.isSummaryMarker && !message?.isAutoTitleMarker && (includeOOC || !message?.isOOC),
+      !message?.isSummaryMarker &&
+      !message?.isAutoTitleMarker &&
+      !isMessageHidden(message) &&
+      (includeOOC || !message?.isOOC),
   )
   if (keepMessages <= 0) {
     return eligible.filter((message) => !message?.summarizedAt)
@@ -307,6 +322,7 @@ export async function buildMessagesPayload({
   } else {
     for (const msg of messages) {
       if (msg.isSummaryMarker || msg.isAutoTitleMarker) continue
+      if (isMessageHidden(msg)) continue
       let content = msg.role === 'user' ? msg.content : replaceVarsIn(msg.content)
       if (!msg.isOOC) {
         if (msg.role === 'assistant' && assistantPrefix) {
@@ -426,6 +442,7 @@ export function buildTranscript({
 
   for (const msg of messages) {
     if (msg.isSummaryMarker || msg.isAutoTitleMarker) continue
+    if (isMessageHidden(msg)) continue
     if (msg.isOOC && !includeOOCOverride) continue
 
     let prefix = ''

@@ -157,6 +157,10 @@
       "label": "Assistant/System – Director Details",
       "desc": "Show the button that opens the Director review details on assistant and system message bubbles."
     },
+    "showAssistantVisible": {
+      "label": "Assistent/System – Sichtbar",
+      "desc": "Zeige den Umschalter, der steuert, ob dieser Nachrichten-Slot in API-Anfragen an die KI gesendet wird."
+    },
     "showUserDelete": {
       "label": "User – Delete",
       "desc": "Show the delete button on user message bubbles."
@@ -184,6 +188,10 @@
     "showUserMakeShortcut": {
       "label": "User – Make Shortcut",
       "desc": "Show the make shortcut button on user message bubbles."
+    },
+    "showUserVisible": {
+      "label": "Benutzer – Sichtbar",
+      "desc": "Zeige den Umschalter, der steuert, ob dieser Nachrichten-Slot in API-Anfragen an die KI gesendet wird."
     },
     "characterCardMarquee": {
       "label": "Character Card Marquee",
@@ -1136,6 +1144,9 @@
       "form": {
         "title": "Create Entry",
         "editTitle": "Edit Entry",
+        "save": "Save",
+        "saving": "Saving…",
+        "cancel": "Cancel",
         "name": "Name",
         "nameLabel": "Name",
         "namePlaceholder": "Entry name",
@@ -1192,10 +1203,7 @@
         "characterFilterExclude": "Exclude",
         "characterFilterNames": "Character Names",
         "characterFilterNamesLabel": "Character Names",
-        "characterFilterNamesPlaceholder": "Type a character name and press Enter…",
-        "save": "Save",
-        "saving": "Saving…",
-        "cancel": "Cancel"
+        "characterFilterNamesPlaceholder": "Type a character name and press Enter…"
       }
     }
   },

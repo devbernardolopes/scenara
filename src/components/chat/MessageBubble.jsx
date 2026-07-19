@@ -24,6 +24,9 @@ import {
   ChevronsDown,
   Theater,
   Zap,
+  Eye,
+  EyeOff,
+  Check,
 } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
@@ -41,6 +44,7 @@ const VISIBILITY_KEYS = [
   'showAssistantPrompt',
   'showAssistantRequestDetails',
   'showAssistantDirectorDetails',
+  'showAssistantVisible',
   'showUserDelete',
   'showUserDeleteAll',
   'showUserDeleteFromHere',
@@ -48,6 +52,7 @@ const VISIBILITY_KEYS = [
   'showUserCopy',
   'showUserFork',
   'showUserMakeShortcut',
+  'showUserVisible',
 ]
 
 const ORDER_KEYS = ['assistantButtonOrder', 'userButtonOrder']
@@ -63,6 +68,7 @@ const DEFAULT_ASSISTANT_ORDER = [
   'prompt',
   'requestDetails',
   'directorDetails',
+  'visible',
 ]
 const DEFAULT_USER_ORDER = [
   'delete',
@@ -72,6 +78,7 @@ const DEFAULT_USER_ORDER = [
   'copy',
   'fork',
   'makeShortcut',
+  'visible',
 ]
 
 const BUTTON_DEFS = {
@@ -87,6 +94,7 @@ const BUTTON_DEFS = {
   prompt: { icon: Terminal, placement: 'overflow', labelKey: 'showPrompt' },
   requestDetails: { icon: FileText, placement: 'header', labelKey: 'requestDetails' },
   directorDetails: { icon: Theater, placement: 'header', labelKey: 'directorDetails' },
+  visible: { icon: Eye, placement: 'header', labelKey: 'visible', toggle: true },
 }
 
 function DeleteAllIcon({ className = '' }) {
@@ -116,19 +124,7 @@ const VIS_KEY = {
     copy: 'showUserCopy',
     fork: 'showUserFork',
     makeShortcut: 'showUserMakeShortcut',
-  },
-  assistant: {
-    delete: 'showAssistantDelete',
-    deleteAll: 'showAssistantDeleteAll',
-    deleteFromHere: 'showAssistantDeleteFromHere',
-    edit: 'showAssistantEdit',
-    copy: 'showAssistantCopy',
-    fork: 'showAssistantFork',
-    regenerate: 'showAssistantRegenerate',
-    speak: 'showAssistantSpeak',
-    prompt: 'showAssistantPrompt',
-    requestDetails: 'showAssistantRequestDetails',
-    directorDetails: 'showAssistantDirectorDetails',
+    visible: 'showUserVisible',
   },
 }
 
@@ -203,6 +199,7 @@ function MessageBubble({
   character,
   collapsedCodeBlocks,
   onToggleCodeBlock,
+  onToggleVisible,
 }) {
   function renderContent(text) {
     return text
@@ -369,11 +366,16 @@ function MessageBubble({
   })
 
   const contentSlotCount = bundleMessages
-    ? bundleMessages.filter((c) => (c || '').trim()).length
+    ? bundleMessages.filter((c) => (c?.content || '').trim()).length
     : 1
+
+  const activeEntry = bundleMessages?.[bundleIndex ?? 0] ?? bundleMessages?.[0]
+  const isSlotHidden = activeEntry?.hidden === true
+  const isSlotError = activeEntry?.isError === true
 
   function isButtonDisabled(key) {
     if (streaming) return true
+    if (key === 'visible' && isSlotError) return true
     if (requestFailed) return !['delete', 'regenerate', 'deleteAll', 'deleteFromHere'].includes(key)
     if (key === 'deleteAll' && contentSlotCount <= 1) return true
     if (key === 'regenerate' && generating) return true
@@ -587,6 +589,8 @@ function MessageBubble({
         return handleShowRequestDetails
       case 'directorDetails':
         return handleShowDirectorDetails
+      case 'visible':
+        return () => onToggleVisible?.(message.id, bundleIndex ?? 0, !isSlotHidden)
       default:
         return () => {}
     }
@@ -632,14 +636,16 @@ function MessageBubble({
               : isSystem
                 ? 'bg-surface-secondary text-secondary text-sm italic'
                 : 'bg-surface-secondary text-text'
-        }`}
+        } ${isSlotHidden ? 'border-dotted opacity-60' : ''}`}
         style={{
           willChange: isMobile && hasMultipleSlots ? 'transform' : undefined,
           ...(isUser ? userBgStyle : {}),
           ...(!isUser && isOOC
             ? { borderLeftColor: 'var(--color-ooc)', borderLeftWidth: '3px' }
             : {}),
+          ...(isSlotHidden && !isUser && !isOOC ? { borderStyle: 'dotted' } : {}),
           ...(editing && editWidth ? { minWidth: editWidth } : {}),
+          ...(isSlotHidden && !isUser && !isOOC ? { borderStyle: 'dotted' } : {}),
         }}
       >
         {/* Header */}
@@ -745,25 +751,42 @@ function MessageBubble({
                     const isDelete =
                       key === 'delete' || key === 'deleteAll' || key === 'deleteFromHere'
                     const disabled = isButtonDisabled(key)
+                    const isToggled = key === 'visible' && !isSlotHidden
+                    const baseColor = isUser
+                      ? userMutedClass
+                        ? `${userHoverBg} ${userMutedClass}`
+                        : userHoverBg
+                      : isOOC
+                        ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
+                        : 'hover:bg-black/10 text-tertiary hover:text-text'
+                    const toggleColor = isToggled
+                      ? 'bg-primary text-on-primary hover:bg-primary-hover ring-1 ring-primary-hover shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)]'
+                      : ''
                     return (
                       <button
                         key={key}
                         type="button"
                         onClick={getButtonHandler(key)}
                         disabled={disabled}
-                        className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
-                          isUser
-                            ? userMutedClass
-                              ? `${userHoverBg} ${userMutedClass}`
-                              : userHoverBg
-                            : isOOC
-                              ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
-                              : 'hover:bg-black/10 text-tertiary hover:text-text'
-                        } ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
-                        style={isUser && !isDelete && userMutedStyle ? userMutedStyle : undefined}
+                        className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${baseColor} ${toggleColor} ${
+                          disabled ? 'opacity-30 pointer-events-none' : ''
+                        }`}
+                        style={
+                          isUser && !isDelete && !isToggled && userMutedStyle
+                            ? userMutedStyle
+                            : undefined
+                        }
                         title={t(def.labelKey)}
                       >
-                        <Icon className="w-3.5 h-3.5" />
+                        {key === 'visible' ? (
+                          isToggled ? (
+                            <Eye className="w-3.5 h-3.5" />
+                          ) : (
+                            <EyeOff className="w-3.5 h-3.5" />
+                          )
+                        ) : (
+                          <Icon className="w-3.5 h-3.5" />
+                        )}
                       </button>
                     )
                   })}
@@ -798,25 +821,52 @@ function MessageBubble({
                             const Icon = def.icon
                             const isDelete =
                               key === 'delete' || key === 'deleteAll' || key === 'deleteFromHere'
+                            const isToggle = key === 'visible'
+                            const isToggled = isToggle && !isSlotHidden
                             return (
                               <button
                                 key={key}
                                 type="button"
                                 onClick={() => {
-                                  getButtonHandler(key)()
-                                  setOverflowOpen(false)
+                                  if (!isToggle) {
+                                    getButtonHandler(key)()
+                                    setOverflowOpen(false)
+                                  } else {
+                                    getButtonHandler(key)()
+                                  }
                                 }}
                                 disabled={
                                   (key === 'prompt' && !promptData) || isButtonDisabled(key)
                                 }
-                                className={`w-full flex items-center gap-2 px-3 py-2 text-sm min-h-[44px] disabled:opacity-30 disabled:pointer-events-none ${
+                                className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm min-h-[44px] disabled:opacity-30 disabled:pointer-events-none ${
                                   isDelete
                                     ? 'text-error hover:bg-surface-hover'
                                     : 'text-text hover:bg-surface-hover'
                                 }`}
                               >
-                                <Icon className="w-4 h-4" />
-                                <span>{t(def.labelKey)}</span>
+                                <span className="flex items-center gap-2">
+                                  {isToggle ? (
+                                    isToggled ? (
+                                      <Eye className="w-4 h-4" />
+                                    ) : (
+                                      <EyeOff className="w-4 h-4" />
+                                    )
+                                  ) : (
+                                    <Icon className="w-4 h-4" />
+                                  )}
+                                  <span>{t(def.labelKey)}</span>
+                                </span>
+                                {isToggle && (
+                                  <div
+                                    className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
+                                      isToggled
+                                        ? 'bg-primary text-on-primary'
+                                        : 'bg-surface-secondary border border-border'
+                                    }`}
+                                  >
+                                    {isToggled && <Check className="w-3 h-3" />}
+                                  </div>
+                                )}
                               </button>
                             )
                           })}

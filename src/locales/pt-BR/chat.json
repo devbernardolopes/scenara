@@ -191,5 +191,7 @@
     "save": "Criar",
     "cancel": "Cancelar",
     "saving": "Criando…"
-  }
+  },
+  "visible": "Visível",
+  "hidden": "Oculto"
 }

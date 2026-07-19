@@ -46,6 +46,8 @@
   "showPrompt": "Afficher le prompt",
   "requestDetails": "Détails de la requête",
   "directorDetails": "Détails du réalisateur",
+  "visible": "Visible",
+  "hidden": "Hidden",
   "requestDetailsModal": {
     "title": "Détails de la requête",
     "request": "Charge utile de la requête",

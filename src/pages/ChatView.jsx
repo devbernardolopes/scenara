@@ -977,7 +977,13 @@ function ChatView() {
   ) {
     currentMsgs = withoutFailedMessages(currentMsgs)
 
-    const assistantMsgId = await createAssistantMessage(threadId, '', null, isOOC)
+    const assistantMsgId = await createAssistantMessage(
+      threadId,
+      '',
+      null,
+      isOOC,
+      isOOC && character?.includeOOC === false,
+    )
     setStreamingMessageId(threadId, assistantMsgId)
     setStreamingStartTime(assistantMsgId, Date.now())
     if (Number(currentThreadIdRef.current) === Number(threadId)) {
@@ -1365,7 +1371,14 @@ function ChatView() {
         let userText = trimMsgs ? trimLeadingTrailingNewlines(text) : text
         const trimWs = await getSetting('prompting.trimWhitespaces')
         if (trimWs) userText = trimWhitespace(userText)
-        await createMessage(threadId, 'user', userText, personaId, isOOC)
+        await createMessage(
+          threadId,
+          'user',
+          userText,
+          personaId,
+          isOOC,
+          isOOC && character?.includeOOC === false,
+        )
         currentMsgs = await getMessagesByThread(threadId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages(dedupeMessages(currentMsgs))
@@ -1498,6 +1511,23 @@ function ChatView() {
         setShowScrollButton(false)
       }
     })
+  }
+
+  async function handleToggleVisible(messageId, slotIndex, hidden) {
+    const msg = messagesRef.current.find((m) => m.id === messageId)
+    if (!msg) return
+    const entries = parseBundleEntries(msg.bundleMessages)
+    if (!entries || slotIndex < 0 || slotIndex >= entries.length) return
+    const idx = Math.min(slotIndex, entries.length - 1)
+    const entry = { ...entries[idx] }
+    if (entry.isError) return
+    entry.hidden = !!hidden
+    entries[idx] = entry
+    const nextBundleJson = JSON.stringify(entries)
+    await updateMessage(messageId, { bundleMessages: nextBundleJson })
+    setMessages((prev) =>
+      prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: nextBundleJson } : m)),
+    )
   }
 
   async function handleRegenerate(messageId, skipConfirmation = false) {
@@ -1676,6 +1706,7 @@ function ChatView() {
         if (finalEntries[slotIndex]) {
           finalEntries[slotIndex].isError = true
           finalEntries[slotIndex].error = null
+          finalEntries[slotIndex].hidden = true
         }
         await updateMessage(messageId, {
           bundleMessages: JSON.stringify(finalEntries),
@@ -1694,6 +1725,7 @@ function ChatView() {
           finalEntries[slotIndex].isError = true
           finalEntries[slotIndex].error = result.error || null
           finalEntries[slotIndex].content = result.error || finalEntries[slotIndex].content || ''
+          finalEntries[slotIndex].hidden = true
         }
         await updateMessage(messageId, {
           bundleMessages: JSON.stringify(finalEntries),
@@ -2230,7 +2262,7 @@ function ChatView() {
                 }
 
                 const entries = parseBundleEntries(msg.bundleMessages)
-                const bundleMessages = entries ? entries.map((e) => e.content) : null
+                const bundleMessages = entries
                 const trackIdx = msg.activeSlotIndex ?? activeSlotIndices[msg.id]
                 const bundleIndex =
                   trackIdx != null && bundleMessages
@@ -2291,6 +2323,7 @@ function ChatView() {
                       isUnread={msg.isUnread || false}
                       character={character}
                       onToggleCodeBlock={handleToggleCodeBlock}
+                      onToggleVisible={handleToggleVisible}
                     />
                   </div>
                 )

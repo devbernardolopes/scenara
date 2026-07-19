@@ -15,13 +15,22 @@ export async function getMessagesByThread(threadId) {
   return db.messages.where('threadId').equals(Number(threadId)).sortBy('createdAt')
 }
 
-export async function createMessage(threadId, role, content, personaId, isOOC = false) {
+export async function createMessage(
+  threadId,
+  role,
+  content,
+  personaId,
+  isOOC = false,
+  isHidden = false,
+) {
   const id = await db.messages.add({
     threadId: Number(threadId),
     role,
     content,
     personaId: personaId || null,
     isOOC: !!isOOC,
+    bundleMessages: JSON.stringify([{ content, hidden: !!isHidden }]),
+    activeSlotIndex: 0,
     createdAt: new Date(),
     summarizedAt: null,
   })
@@ -39,13 +48,21 @@ export async function createMessage(threadId, role, content, personaId, isOOC = 
   return id
 }
 
-export async function createAssistantMessage(threadId, content, createdAt, isOOC = false) {
+export async function createAssistantMessage(
+  threadId,
+  content,
+  createdAt,
+  isOOC = false,
+  isHidden = false,
+) {
   const id = await db.messages.add({
     threadId: Number(threadId),
     role: 'assistant',
     content,
     personaId: null,
     isOOC: !!isOOC,
+    bundleMessages: JSON.stringify([{ content, hidden: !!isHidden }]),
+    activeSlotIndex: 0,
     createdAt: createdAt || new Date(),
     summarizedAt: null,
   })

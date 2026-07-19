@@ -1,7 +1,13 @@
 import db from '../db'
 import { getMessagesByThread, updateMessage, deleteMessage } from './messages'
 import { updateThread } from './threads'
-import { buildTranscript, replaceVars, replacePersonaTemplate, sendChatCompletion } from './chatApi'
+import {
+  buildTranscript,
+  replaceVars,
+  replacePersonaTemplate,
+  sendChatCompletion,
+  isMessageHidden,
+} from './chatApi'
 import {
   createThreadMemory,
   buildInjectedMemory,
@@ -28,6 +34,7 @@ export function getUnsummarizedMessages(messages, { includeOOC = true } = {}) {
       !message?.isSummaryMarker &&
       !message?.isAutoTitleMarker &&
       !message?.summarizedAt &&
+      !isMessageHidden(message) &&
       (includeOOC || !message?.isOOC),
   )
 }
@@ -264,6 +271,7 @@ export async function buildCurrentSummarizationPayload(threadId, entry) {
   const windowMessages = allMessages.filter((m) => {
     if (m.isSummaryMarker || m.isAutoTitleMarker) return false
     if (m.summarizedAt == null) return false
+    if (isMessageHidden(m)) return false
     const t = new Date(m.createdAt).getTime()
     return t > lowerBound && t < upperBound
   })

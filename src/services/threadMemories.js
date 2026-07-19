@@ -1,6 +1,6 @@
 import db from '../db'
 import { getSetting } from './settings'
-import { replaceVars } from './chatApi'
+import { replaceVars, isMessageHidden } from './chatApi'
 import { getMessagesByThread, updateMessage, deleteMessage } from './messages'
 import { updateThread } from './threads'
 
@@ -191,6 +191,7 @@ export async function deleteMemoryAndRevert(threadMemoryId, threadId) {
   const messagesToRevert = allMessages.filter((m) => {
     if (!m.summarizedAt) return false
     if (m.isSummaryMarker || m.isAutoTitleMarker) return false
+    if (isMessageHidden(m)) return false
     const msgTime = new Date(m.createdAt).getTime()
     return msgTime > lowerBound && msgTime < upperBound
   })

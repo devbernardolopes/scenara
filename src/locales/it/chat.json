@@ -46,6 +46,8 @@
   "showPrompt": "Mostra prompt",
   "requestDetails": "Dettagli richiesta",
   "directorDetails": "Dettagli regista",
+  "visible": "Visible",
+  "hidden": "Hidden",
   "requestDetailsModal": {
     "title": "Dettagli richiesta",
     "request": "Payload della richiesta",

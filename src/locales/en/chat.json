@@ -46,6 +46,8 @@
   "showPrompt": "Show prompt",
   "requestDetails": "Request details",
   "directorDetails": "Director Details",
+  "visible": "Visible",
+  "hidden": "Hidden",
   "requestDetailsModal": {
     "title": "Request Details",
     "request": "Request Payload",

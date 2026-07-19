@@ -157,6 +157,10 @@
       "label": "Assistant/System – Director Details",
       "desc": "Show the button that opens the Director review details on assistant and system message bubbles."
     },
+    "showAssistantVisible": {
+      "label": "Assistant/System – Visible",
+      "desc": "Show the toggle that controls whether this message slot is sent to the AI in API requests."
+    },
     "showUserDelete": {
       "label": "User – Delete",
       "desc": "Show the delete button on user message bubbles."
@@ -184,6 +188,10 @@
     "showUserMakeShortcut": {
       "label": "User – Make Shortcut",
       "desc": "Show the make shortcut button on user message bubbles."
+    },
+    "showUserVisible": {
+      "label": "User – Visible",
+      "desc": "Show the toggle that controls whether this message slot is sent to the AI in API requests."
     },
     "characterCardMarquee": {
       "label": "Character Card Marquee",

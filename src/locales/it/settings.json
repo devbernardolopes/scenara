@@ -157,6 +157,10 @@
       "label": "Assistente/System – Dettagli regista",
       "desc": "Mostra il pulsante che apre i dettagli della revisione del regista nelle bolle assistente e di sistema."
     },
+    "showAssistantVisible": {
+      "label": "Assistente/System – Visibile",
+      "desc": "Mostra l’interruttore che controlla se questo slot di messaggio viene inviato all’IA nelle richieste API."
+    },
     "showUserDelete": {
       "label": "User – Delete",
       "desc": "Show the delete button on user message bubbles."
@@ -184,6 +188,10 @@
     "showUserMakeShortcut": {
       "label": "Utente – Crea scorciatoia",
       "desc": "Mostra il pulsante per creare scorciatoie nelle bolle di messaggio utente."
+    },
+    "showUserVisible": {
+      "label": "Utente – Visibile",
+      "desc": "Mostra l’interruttore che controlla se questo slot di messaggio viene inviato all’IA nelle richieste API."
     },
     "characterCardMarquee": {
       "label": "Scorrimento scheda personaggio",
@@ -1136,6 +1144,9 @@
       "form": {
         "title": "Create Entry",
         "editTitle": "Edit Entry",
+        "save": "Save",
+        "saving": "Saving…",
+        "cancel": "Cancel",
         "name": "Name",
         "nameLabel": "Name",
         "namePlaceholder": "Entry name",
@@ -1192,10 +1203,7 @@
         "characterFilterExclude": "Exclude",
         "characterFilterNames": "Character Names",
         "characterFilterNamesLabel": "Character Names",
-        "characterFilterNamesPlaceholder": "Type a character name and press Enter…",
-        "save": "Save",
-        "saving": "Saving…",
-        "cancel": "Cancel"
+        "characterFilterNamesPlaceholder": "Type a character name and press Enter…"
       }
     }
   },

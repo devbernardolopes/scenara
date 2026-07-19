@@ -46,6 +46,8 @@
   "showPrompt": "Mostrar prompt",
   "requestDetails": "Detalles de la solicitud",
   "directorDetails": "Detalles del director",
+  "visible": "Visible",
+  "hidden": "Hidden",
   "requestDetailsModal": {
     "title": "Detalles de la solicitud",
     "request": "Carga útil de la solicitud",

@@ -46,6 +46,8 @@
   "showPrompt": "Prompt anzeigen",
   "requestDetails": "Anfragedetails",
   "directorDetails": "Regisseur-Details",
+  "visible": "Visible",
+  "hidden": "Hidden",
   "requestDetailsModal": {
     "title": "Anfragedetails",
     "request": "Anfrage-Payload",
