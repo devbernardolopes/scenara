@@ -1112,9 +1112,33 @@ function ChatView() {
     } catch (err) {
       throttledToken.cancel()
       if (err.name === 'AbortError') {
-        await deleteMessage(assistantMsgId)
+        const dbMsg = await db.messages.get(Number(assistantMsgId))
+        const partial = dbMsg?.content || ''
+        const keptEntry = {
+          content: partial,
+          promptData: null,
+          responseData: null,
+          apiDurationMs: null,
+          createdAt: dbMsg?.createdAt || new Date().toISOString(),
+        }
+        await updateMessage(assistantMsgId, {
+          content: partial,
+          bundleMessages: JSON.stringify([keptEntry]),
+          activeSlotIndex: 0,
+        })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          setMessages((prev) => prev.filter((m) => m.id !== assistantMsgId))
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantMsgId
+                ? {
+                    ...m,
+                    content: partial,
+                    bundleMessages: JSON.stringify([keptEntry]),
+                    activeSlotIndex: 0,
+                  }
+                : m,
+            ),
+          )
         }
         throw err
       }
@@ -1579,17 +1603,16 @@ function ChatView() {
       }
 
       const streamSlotIntoBubble = (full) => {
-        if (regenEntries[slotIndex]) regenEntries[slotIndex].content = full
+        const entries = regenEntries.map((e, i) => (i === slotIndex ? { ...e, content: full } : e))
+        const bundleJson = JSON.stringify(entries)
         updateMessage(messageId, {
           content: full,
-          bundleMessages: JSON.stringify(regenEntries),
+          bundleMessages: bundleJson,
         })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages((prev) =>
             prev.map((m) =>
-              m.id === messageId
-                ? { ...m, content: full, bundleMessages: JSON.stringify(regenEntries) }
-                : m,
+              m.id === messageId ? { ...m, content: full, bundleMessages: bundleJson } : m,
             ),
           )
         }
@@ -1728,26 +1751,35 @@ function ChatView() {
       if (throttledToken) throttledToken.cancel()
       if (err.name === 'AbortError') {
         outcome = 'aborted'
-        if (regenEntries) {
-          regenEntries.pop()
-          const cleanedBundle = JSON.stringify(regenEntries)
-          await updateMessage(messageId, {
-            bundleMessages: cleanedBundle,
-            activeSlotIndex: regenEntries.length - 1,
-          })
-          if (Number(currentThreadIdRef.current) === Number(threadId)) {
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === messageId
-                  ? {
-                      ...m,
-                      bundleMessages: cleanedBundle,
-                      activeSlotIndex: regenEntries.length - 1,
-                    }
-                  : m,
-              ),
-            )
-          }
+        // Keep the streamed slot (with its partial content) instead of discarding it.
+        // Read the latest bundle from the DB so we don't lose streamed content that
+        // arrived after the local `regenEntries` snapshot was taken.
+        const dbMsg = await db.messages.get(Number(messageId))
+        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
+        if (finalEntries?.[slotIndex]) {
+          finalEntries[slotIndex].isError = false
+          finalEntries[slotIndex].error = null
+          finalEntries[slotIndex].promptData = finalEntries[slotIndex].promptData || null
+        }
+        const keptBundle = JSON.stringify(finalEntries)
+        await updateMessage(messageId, {
+          bundleMessages: keptBundle,
+          content: finalEntries?.[slotIndex]?.content ?? '',
+          activeSlotIndex: slotIndex,
+        })
+        if (Number(currentThreadIdRef.current) === Number(threadId)) {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === messageId
+                ? {
+                    ...m,
+                    bundleMessages: keptBundle,
+                    content: finalEntries?.[slotIndex]?.content ?? '',
+                    activeSlotIndex: slotIndex,
+                  }
+                : m,
+            ),
+          )
         }
       } else {
         const dbMsg = await db.messages.get(Number(messageId))
