@@ -44,9 +44,9 @@ function PromptBankPicker({ open, onClose, onSelect, anchorRef }) {
   useEffect(() => {
     if (!open) return
     function handleMousedown(e) {
-      if (ref.current && !ref.current.contains(e.target)) {
-        onCloseRef.current()
-      }
+      if (ref.current && ref.current.contains(e.target)) return
+      if (anchorRef && anchorRef.current && anchorRef.current.contains(e.target)) return
+      onCloseRef.current()
     }
     document.addEventListener('mousedown', handleMousedown)
     return () => document.removeEventListener('mousedown', handleMousedown)
@@ -81,7 +81,8 @@ function PromptBankPicker({ open, onClose, onSelect, anchorRef }) {
       setCoords({ left, top, above })
     }
     compute()
-    function handleScroll() {
+    function handleScroll(e) {
+      if (ref.current && ref.current.contains(e.target)) return
       onCloseRef.current()
     }
     window.addEventListener('scroll', handleScroll, true)
