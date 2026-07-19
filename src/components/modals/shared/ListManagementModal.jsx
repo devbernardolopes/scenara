@@ -6,6 +6,7 @@ import { showToast } from '../../../lib/toast'
 import { downloadJson } from '../../../lib/download'
 import CloseButton from '../../shared/CloseButton'
 import ListEntryCard from '../../shared/ListEntryCard'
+import { SortableList, SortableItem } from '../../shared/SortableList'
 import { Plus, Upload } from '../../../lib/icons'
 
 /**
@@ -168,20 +169,6 @@ function ListManagementModal({ config }) {
     }
   }
 
-  async function handleMoveUp(index) {
-    if (index === 0) return
-    const next = items.map((it) => it.id)
-    ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
-    await config.service.updateOrder(next)
-  }
-
-  async function handleMoveDown(index) {
-    if (index === items.length - 1) return
-    const next = items.map((it) => it.id)
-    ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
-    await config.service.updateOrder(next)
-  }
-
   const multi = selectedIds.size > 0
 
   return (
@@ -233,32 +220,42 @@ function ListManagementModal({ config }) {
           ) : (
             <>
               <div className="space-y-3">
-                {items.map((item, index) => (
-                  <ListEntryCard
-                    key={item.id}
-                    item={item}
-                    title={config.getTitle(item)}
-                    subtitle={config.getSubtitle ? config.getSubtitle(item) : null}
-                    badges={config.getBadges ? config.getBadges(item) : null}
-                    imageSrc={config.showImage ? config.getImageSrc(item) : null}
-                    icon={config.showImage ? null : config.icon}
-                    tile={config.getTile ? config.getTile(item) : null}
-                    selected={selectedIds.has(item.id)}
-                    onToggleSelect={toggleSelect}
-                    onEdit={startEdit}
-                    showSetDefault={config.showSetDefault}
-                    isDefault={config.isDefault ? config.isDefault(item) : false}
-                    onSetDefault={config.onSetDefault}
-                    onDuplicate={handleDuplicate}
-                    onExport={handleExportSingle}
-                    onDelete={handleDelete}
-                    onMoveUp={() => handleMoveUp(index)}
-                    onMoveDown={() => handleMoveDown(index)}
-                    isFirst={index === 0}
-                    isLast={index === items.length - 1}
-                    disableDelete={config.disableDelete ? config.disableDelete(item, items) : false}
-                  />
-                ))}
+                <SortableList
+                  items={items}
+                  getId={(i) => i.id}
+                  onReorder={(ids) => config.service.updateOrder(ids)}
+                >
+                  {(item) => (
+                    <SortableItem id={item.id} key={item.id}>
+                      {(sortable) => (
+                        <ListEntryCard
+                          item={item}
+                          title={config.getTitle(item)}
+                          subtitle={config.getSubtitle ? config.getSubtitle(item) : null}
+                          badges={config.getBadges ? config.getBadges(item) : null}
+                          imageSrc={config.showImage ? config.getImageSrc(item) : null}
+                          icon={config.showImage ? null : config.icon}
+                          tile={config.getTile ? config.getTile(item) : null}
+                          selected={selectedIds.has(item.id)}
+                          onToggleSelect={toggleSelect}
+                          onEdit={startEdit}
+                          showSetDefault={config.showSetDefault}
+                          isDefault={config.isDefault ? config.isDefault(item) : false}
+                          onSetDefault={config.onSetDefault}
+                          onDuplicate={handleDuplicate}
+                          onExport={handleExportSingle}
+                          onDelete={handleDelete}
+                          disableDelete={
+                            config.disableDelete ? config.disableDelete(item, items) : false
+                          }
+                          setNodeRef={sortable.setNodeRef}
+                          style={sortable.style}
+                          dragHandleProps={sortable.dragHandleProps}
+                        />
+                      )}
+                    </SortableItem>
+                  )}
+                </SortableList>
               </div>
 
               {multi && (

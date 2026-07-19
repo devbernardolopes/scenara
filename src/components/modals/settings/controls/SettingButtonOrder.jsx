@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { ChevronUp, ChevronDown } from '../../../../lib/icons'
+import { GripVertical } from '../../../../lib/icons'
+import { SortableList, SortableItem } from '../../../shared/SortableList'
 
 function SettingButtonOrder({ value = [], onChange, disabled, buttons = [] }) {
   const { t } = useTranslation('settings')
@@ -12,50 +13,41 @@ function SettingButtonOrder({ value = [], onChange, disabled, buttons = [] }) {
     return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib)
   })
 
-  function moveUp(index) {
-    if (index === 0) return
-    const next = [...ordered.map((b) => b.key)]
-    ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
-    onChange(next)
-  }
-
-  function moveDown(index) {
-    if (index === ordered.length - 1) return
-    const next = [...ordered.map((b) => b.key)]
-    ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
-    onChange(next)
-  }
-
   return (
     <div className="space-y-1">
-      {ordered.map((btn, index) => (
-        <div
-          key={btn.key}
-          className="flex items-center gap-1 min-h-[44px] px-2 rounded-md bg-surface-secondary border border-border"
-        >
-          <span className="flex-1 text-sm text-text min-w-0 truncate">
-            {t(btn.labelKey.replace('settings:', ''))}
-          </span>
-          <button
-            type="button"
-            onClick={() => moveUp(index)}
-            disabled={disabled || index === 0}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-surface-hover text-tertiary hover:text-text disabled:opacity-30 disabled:pointer-events-none"
-            aria-label={t('moveUp', { ns: 'common' })}
-          >
-            <ChevronUp className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => moveDown(index)}
-            disabled={disabled || index === ordered.length - 1}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-surface-hover text-tertiary hover:text-text disabled:opacity-30 disabled:pointer-events-none"
-            aria-label={t('moveDown', { ns: 'common' })}
-          >
-            <ChevronDown className="w-4 h-4" />
-          </button>
-        </div>
-      ))}
+      <SortableList items={ordered} getId={(btn) => btn.key} onReorder={(ids) => onChange(ids)}>
+        {(btn) => (
+          <SortableItem id={btn.key} key={btn.key}>
+            {(sortable) => (
+              <div
+                ref={sortable.setNodeRef}
+                style={sortable.style}
+                className="flex items-center gap-1 min-h-[44px] px-2 rounded-md bg-surface-secondary border border-border"
+              >
+                {disabled ? (
+                  <span className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary opacity-30 shrink-0">
+                    <GripVertical className="w-4 h-4" />
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    {...sortable.dragHandleProps.attributes}
+                    {...sortable.dragHandleProps.listeners}
+                    onClick={(e) => e.stopPropagation()}
+                    className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text cursor-grab active:cursor-grabbing touch-none shrink-0"
+                    aria-label={t('common:list.actions.reorder')}
+                  >
+                    <GripVertical className="w-4 h-4" />
+                  </button>
+                )}
+                <span className="flex-1 text-sm text-text min-w-0 truncate">
+                  {t(btn.labelKey.replace('settings:', ''))}
+                </span>
+              </div>
+            )}
+          </SortableItem>
+        )}
+      </SortableList>
     </div>
   )
 }

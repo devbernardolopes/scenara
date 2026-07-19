@@ -117,6 +117,16 @@
   "close": "Fechar",
   "moveUp": "Mover para cima",
   "moveDown": "Mover para baixo",
+  "list": {
+    "actions": {
+      "edit": "Editar",
+      "setDefault": "Definir como padrão",
+      "duplicate": "Duplicar",
+      "export": "Exportar",
+      "delete": "Excluir",
+      "reorder": "Arrastar para reordenar"
+    }
+  },
   "uploadImage": "Enviar imagem",
   "downloadImage": "Baixar imagem",
   "tokenCount": "{{count}} tokens",

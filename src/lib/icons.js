@@ -56,6 +56,7 @@ export {
   Play,
   Terminal,
   Volume2,
+  GripVertical,
   CornerDownLeft,
   Reply,
   Forward,

@@ -19,17 +19,10 @@ import {
 import { PROVIDERS } from '../../../services/apiProviders'
 import { getSetting } from '../../../services/settings'
 import IconButton from '../../shared/IconButton'
+import DragHandle from '../../shared/DragHandle'
 import ProviderIcon from '../../shared/ProviderIcon'
-import {
-  Plus,
-  Copy,
-  Trash2,
-  Edit3,
-  ChevronUp,
-  ChevronDown,
-  Download,
-  Upload,
-} from '../../../lib/icons'
+import { SortableList, SortableItem } from '../../shared/SortableList'
+import { Plus, Copy, Trash2, Edit3, Download, Upload } from '../../../lib/icons'
 
 function ProfileSettingsPanel() {
   const { t } = useTranslation('settings')
@@ -181,20 +174,6 @@ function ProfileSettingsPanel() {
     }
   }
 
-  async function handleMoveUp(index) {
-    if (index === 0) return
-    const next = profiles.map((p) => p.id)
-    ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
-    await updateConnectionProfileOrder(next)
-  }
-
-  async function handleMoveDown(index) {
-    if (index === profiles.length - 1) return
-    const next = profiles.map((p) => p.id)
-    ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
-    await updateConnectionProfileOrder(next)
-  }
-
   const multi = selectedIds.size > 0
 
   if (loading) {
@@ -236,82 +215,87 @@ function ProfileSettingsPanel() {
       ) : (
         <>
           <div className="space-y-3">
-            {profiles.map((p, index) => {
-              const provider = PROVIDERS.find((pr) => pr.id === p.providerId)
-              const selected = selectedIds.has(p.id)
-              return (
-                <div
-                  key={p.id}
-                  className={`border rounded-lg p-3 bg-surface transition-shadow cursor-pointer hover:shadow-surface-sm ${
-                    selected ? 'border-primary ring-1 ring-primary' : 'border-border'
-                  }`}
-                  onClick={() => startEdit(p)}
-                >
-                  <div className="flex items-start gap-3">
-                    <label
-                      className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selected}
-                        onChange={() => toggleSelect(p.id)}
-                        className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-                      />
-                    </label>
-                    <div className="flex items-center justify-center size-[44px] shrink-0 rounded-md bg-primary-subtle">
-                      <ProviderIcon providerId={p.providerId} size={24} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium text-text truncate">{p.name}</span>
+            <SortableList
+              items={profiles}
+              getId={(p) => p.id}
+              onReorder={(ids) => updateConnectionProfileOrder(ids)}
+            >
+              {(p) => (
+                <SortableItem id={p.id} key={p.id}>
+                  {(sortable) => {
+                    const provider = PROVIDERS.find((pr) => pr.id === p.providerId)
+                    const selected = selectedIds.has(p.id)
+                    return (
+                      <div
+                        ref={sortable.setNodeRef}
+                        style={sortable.style}
+                        className={`border rounded-lg p-3 bg-surface transition-shadow cursor-pointer hover:shadow-surface-sm ${
+                          selected ? 'border-primary ring-1 ring-primary' : 'border-border'
+                        }`}
+                        onClick={() => startEdit(p)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <label
+                            className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selected}
+                              onChange={() => toggleSelect(p.id)}
+                              className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                            />
+                          </label>
+                          <div className="flex items-center justify-center size-[44px] shrink-0 rounded-md bg-primary-subtle">
+                            <ProviderIcon providerId={p.providerId} size={24} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium text-text truncate">{p.name}</span>
+                            </div>
+                            <p className="text-xs text-secondary mt-0.5">
+                              {provider
+                                ? t(provider.nameKey.replace('settings:', ''))
+                                : p.providerId}
+                              {p.model ? ` · ${p.model}` : ''}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 mt-1 -ml-1">
+                          <IconButton
+                            icon={Edit3}
+                            label={t('api.profile.actions.edit')}
+                            onClick={() => startEdit(p)}
+                          />
+                          <IconButton
+                            icon={Copy}
+                            label={t('api.profile.actions.duplicate')}
+                            onClick={() => handleDuplicate(p)}
+                          />
+                          <IconButton
+                            icon={Download}
+                            label={t('api.profile.actions.export')}
+                            onClick={() => handleExportSingle(p)}
+                          />
+                          <IconButton
+                            icon={Trash2}
+                            label={t('api.profile.actions.delete')}
+                            onClick={() => handleDelete(p)}
+                            className="bg-delete text-on-delete hover:bg-delete-hover"
+                          />
+                          <div className="ml-auto flex items-center gap-1">
+                            <DragHandle
+                              {...sortable.dragHandleProps}
+                              label={t('common:list.actions.reorder')}
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-xs text-secondary mt-0.5">
-                        {provider ? t(provider.nameKey.replace('settings:', '')) : p.providerId}
-                        {p.model ? ` · ${p.model}` : ''}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 mt-1 -ml-1">
-                    <IconButton
-                      icon={Edit3}
-                      label={t('api.profile.actions.edit')}
-                      onClick={() => startEdit(p)}
-                    />
-                    <IconButton
-                      icon={Copy}
-                      label={t('api.profile.actions.duplicate')}
-                      onClick={() => handleDuplicate(p)}
-                    />
-                    <IconButton
-                      icon={Download}
-                      label={t('api.profile.actions.export')}
-                      onClick={() => handleExportSingle(p)}
-                    />
-                    <IconButton
-                      icon={Trash2}
-                      label={t('api.profile.actions.delete')}
-                      onClick={() => handleDelete(p)}
-                      className="bg-delete text-on-delete hover:bg-delete-hover"
-                    />
-                    <div className="ml-auto flex items-center gap-1">
-                      <IconButton
-                        icon={ChevronUp}
-                        label={t('moveUp', { ns: 'common' })}
-                        onClick={() => handleMoveUp(index)}
-                        disabled={index === 0}
-                      />
-                      <IconButton
-                        icon={ChevronDown}
-                        label={t('moveDown', { ns: 'common' })}
-                        onClick={() => handleMoveDown(index)}
-                        disabled={index === profiles.length - 1}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+                    )
+                  }}
+                </SortableItem>
+              )}
+            </SortableList>
           </div>
 
           {multi && (

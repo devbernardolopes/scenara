@@ -3,7 +3,8 @@ import { useModal } from '../../hooks/useModal'
 import { useOnlineStatus } from '../../hooks/useOnlineStatus'
 import { isExternalImageUrl } from '../../lib/image'
 import IconButton from './IconButton'
-import { Edit3, Star, Copy, Download, Trash2, ChevronUp, ChevronDown } from '../../lib/icons'
+import DragHandle from './DragHandle'
+import { Edit3, Star, Copy, Download, Trash2 } from '../../lib/icons'
 
 function ListEntryCard({
   item,
@@ -22,11 +23,10 @@ function ListEntryCard({
   onDuplicate,
   onExport,
   onDelete,
-  onMoveUp,
-  onMoveDown,
-  isFirst,
-  isLast,
   disableDelete,
+  setNodeRef,
+  style,
+  dragHandleProps,
 }) {
   const { t } = useTranslation('settings')
   const { openModal } = useModal()
@@ -34,6 +34,8 @@ function ListEntryCard({
 
   return (
     <div
+      ref={setNodeRef}
+      style={style}
       className={`border rounded-lg p-3 bg-surface transition-shadow cursor-pointer ${
         selected ? 'border-primary ring-1 ring-primary' : 'border-border'
       }`}
@@ -117,18 +119,7 @@ function ListEntryCard({
           className="bg-delete text-on-delete hover:bg-delete-hover"
         />
         <div className="ml-auto flex items-center gap-1">
-          <IconButton
-            icon={ChevronUp}
-            label={t('moveUp', { ns: 'common' })}
-            onClick={onMoveUp}
-            disabled={isFirst}
-          />
-          <IconButton
-            icon={ChevronDown}
-            label={t('moveDown', { ns: 'common' })}
-            onClick={onMoveDown}
-            disabled={isLast}
-          />
+          <DragHandle {...dragHandleProps} label={t('common:list.actions.reorder')} />
         </div>
       </div>
     </div>

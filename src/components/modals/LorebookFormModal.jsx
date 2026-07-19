@@ -8,7 +8,9 @@ import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import Label from '../shared/Label'
 import Avatar from '../shared/Avatar'
-import { Plus, X, ChevronUp, ChevronDown, Edit3 } from '../../lib/icons'
+import { Plus, X, Edit3 } from '../../lib/icons'
+import DragHandle from '../shared/DragHandle'
+import { SortableList, SortableItem } from '../shared/SortableList'
 import { estimateTokens } from '../../services/tokenEstimator'
 import { createLorebook, updateLorebook } from '../../services/lorebooks'
 import {
@@ -179,18 +181,6 @@ function LorebookFormModal({ lorebook }) {
       await deleteEntry(entry.id)
     }
     setEntries((prev) => prev.filter((e) => e !== entry))
-  }
-
-  async function handleMoveEntry(index, dir) {
-    const next = entries.map((e) => ({ ...e }))
-    const target = index + dir
-    if (target < 0 || target >= next.length) return
-    ;[next[index], next[target]] = [next[target], next[index]]
-    setEntries(next)
-    await updateEntryOrder(
-      lorebookId,
-      next.map((e) => e.id),
-    )
   }
 
   const addEntryRef = useRef(addEntry)
@@ -381,66 +371,63 @@ function LorebookFormModal({ lorebook }) {
             <p className="text-sm text-tertiary text-center py-4">{t('lorebook.form.noEntries')}</p>
           ) : (
             <div className="space-y-2">
-              {entries.map((entry, idx) => (
-                <div
-                  key={entry.id ?? `${entry.name}-${idx}`}
-                  className="flex items-center gap-2 border border-border rounded-md p-2 bg-surface"
-                >
-                  <button
-                    type="button"
-                    onClick={() => openEntryRef.current(entry)}
-                    className="flex-1 min-w-0 text-left"
-                  >
-                    <div className="font-medium text-text text-sm truncate">
-                      {entry.name || entry.keys?.[0] || t('lorebook.form.untitledEntry')}
-                    </div>
-                    {entry.keys?.length > 0 && (
-                      <div className="text-xs text-secondary truncate">{entry.keys.join(', ')}</div>
+              <SortableList
+                items={entries}
+                getId={(e) => e.id}
+                onReorder={(ids) => updateEntryOrder(lorebookId, ids)}
+              >
+                {(entry, idx) => (
+                  <SortableItem id={entry.id} key={entry.id ?? `${entry.name}-${idx}`}>
+                    {(sortable) => (
+                      <div
+                        ref={sortable.setNodeRef}
+                        style={sortable.style}
+                        className="flex items-center gap-2 border border-border rounded-md p-2 bg-surface"
+                      >
+                        <DragHandle
+                          {...sortable.dragHandleProps}
+                          label={t('common:list.actions.reorder')}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => openEntryRef.current(entry)}
+                          className="flex-1 min-w-0 text-left"
+                        >
+                          <div className="font-medium text-text text-sm truncate">
+                            {entry.name || entry.keys?.[0] || t('lorebook.form.untitledEntry')}
+                          </div>
+                          {entry.keys?.length > 0 && (
+                            <div className="text-xs text-secondary truncate">
+                              {entry.keys.join(', ')}
+                            </div>
+                          )}
+                        </button>
+                        {!entry.enabled && (
+                          <span className="shrink-0 text-[10px] uppercase px-1.5 py-0.5 rounded bg-warning text-on-warning">
+                            {t('lorebook.form.disabled')}
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => openEntryRef.current(entry)}
+                          className="min-h-[36px] min-w-[36px] flex items-center justify-center text-secondary hover:text-text rounded-md hover:bg-surface-hover"
+                          aria-label={t('lorebook.form.editEntry')}
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteEntry(entry)}
+                          className="min-h-[36px] min-w-[36px] flex items-center justify-center text-on-delete bg-delete hover:bg-delete-hover rounded-md"
+                          aria-label={t('lorebook.form.deleteEntry')}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     )}
-                  </button>
-                  {!entry.enabled && (
-                    <span className="shrink-0 text-[10px] uppercase px-1.5 py-0.5 rounded bg-warning text-on-warning">
-                      {t('lorebook.form.disabled')}
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => openEntryRef.current(entry)}
-                    className="min-h-[36px] min-w-[36px] flex items-center justify-center text-secondary hover:text-text rounded-md hover:bg-surface-hover"
-                    aria-label={t('lorebook.form.editEntry')}
-                  >
-                    <Edit3 className="w-4 h-4" />
-                  </button>
-                  <div className="flex items-center">
-                    <button
-                      type="button"
-                      onClick={() => handleMoveEntry(idx, -1)}
-                      disabled={idx === 0}
-                      className="min-h-[36px] min-w-[32px] flex items-center justify-center text-secondary hover:text-text rounded-md hover:bg-surface-hover disabled:opacity-30"
-                      aria-label={t('lorebook.form.moveUp')}
-                    >
-                      <ChevronUp className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleMoveEntry(idx, 1)}
-                      disabled={idx === entries.length - 1}
-                      className="min-h-[36px] min-w-[32px] flex items-center justify-center text-secondary hover:text-text rounded-md hover:bg-surface-hover disabled:opacity-30"
-                      aria-label={t('lorebook.form.moveDown')}
-                    >
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteEntry(entry)}
-                    className="min-h-[36px] min-w-[36px] flex items-center justify-center text-on-delete bg-delete hover:bg-delete-hover rounded-md"
-                    aria-label={t('lorebook.form.deleteEntry')}
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
+                  </SortableItem>
+                )}
+              </SortableList>
             </div>
           )}
 
