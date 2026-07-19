@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { TransformWrapper, TransformComponent, useControls } from 'react-zoom-pan-pinch'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
@@ -8,8 +8,10 @@ import { Download, X } from '../../lib/icons'
 
 function ImageViewerInner({ src, alt, imgRef, onZoomRef }) {
   const { centerView } = useControls()
-  onZoomRef.current = (scale, animationTime, animationType) =>
-    centerView(scale, animationTime, animationType)
+  useEffect(() => {
+    onZoomRef.current = (scale, animationTime, animationType) =>
+      centerView(scale, animationTime, animationType)
+  })
 
   return (
     <TransformComponent

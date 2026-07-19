@@ -357,10 +357,6 @@ function CharacterDiscovery() {
     setUIState('discovery.searchQuery', val)
   }, [])
 
-  function handleImageClick(src) {
-    if (src) openModal('imageViewer', { src, modalSize: 'fullscreen' })
-  }
-
   async function handleEditCharacter(character) {
     const fresh = await getCharacter(character.id)
     openModal('characterCreate', { character: fresh || character })

@@ -16,8 +16,10 @@ function PersonaPicker({ open, onClose, onSelect, anchorRef, titleKey = 'persona
   const onCloseRef = useRef(onClose)
   const onSelectRef = useRef(onSelect)
 
-  onCloseRef.current = onClose
-  onSelectRef.current = onSelect
+  useEffect(() => {
+    onCloseRef.current = onClose
+    onSelectRef.current = onSelect
+  })
 
   useEffect(() => {
     if (open) {

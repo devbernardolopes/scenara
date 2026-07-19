@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
@@ -60,25 +60,27 @@ function PersonaFormModal({ persona }) {
   const { promptSave } = useSaveConfirm()
   const editing = Boolean(persona)
 
-  const initialRef = useRef({
-    name: persona?.name || '',
-    title: persona?.title || '',
-    avatar: persona?.avatar || '',
-    description: persona?.description || '',
-    color: persona?.color || '',
-    colorSlot: persona?.colorSlot ?? (persona?.color ? findColorSlot(persona.color, 'light') : -1),
-    isDefault: Boolean(persona?.isDefault),
-  })
+  const initial = useMemo(
+    () => ({
+      name: persona?.name || '',
+      title: persona?.title || '',
+      avatar: persona?.avatar || '',
+      description: persona?.description || '',
+      color: persona?.color || '',
+      colorSlot:
+        persona?.colorSlot ?? (persona?.color ? findColorSlot(persona.color, 'light') : -1),
+      isDefault: Boolean(persona?.isDefault),
+    }),
+    [],
+  )
 
-  const [form, setForm] = useState({ ...initialRef.current })
+  const [form, setForm] = useState({ ...initial })
   const [saving, setSaving] = useState(false)
   const [isLastDefault, setIsLastDefault] = useState(false)
   const fileRef = useRef(null)
   const savePendingRef = useRef(false)
 
-  const isDirty = Object.keys(initialRef.current).some(
-    (key) => form[key] !== initialRef.current[key],
-  )
+  const isDirty = Object.keys(initial).some((key) => form[key] !== initial[key])
 
   useEffect(() => {
     if (editing) {
@@ -91,7 +93,9 @@ function PersonaFormModal({ persona }) {
   }, [editing, persona])
 
   const handleCloseRef = useRef()
-  handleCloseRef.current = handleCloseAttempt
+  useEffect(() => {
+    handleCloseRef.current = handleCloseAttempt
+  })
 
   useEffect(() => {
     if (isDirty) {

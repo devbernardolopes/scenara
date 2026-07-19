@@ -212,8 +212,10 @@ function CharacterCreateModal({ character: existing, initialData }) {
   const isImport = Boolean(initialData)
   const characterId = existing?.id || null
 
-  const initialRef = useRef(isImport ? buildInitialForm(initialData) : buildInitialForm(existing))
-  const [form, setForm] = useState(initialRef.current)
+  const [initial, setInitial] = useState(() =>
+    isImport ? buildInitialForm(initialData) : buildInitialForm(existing),
+  )
+  const [form, setForm] = useState(initial)
   const [saving, setSaving] = useState(false)
   const [activeSection, setActiveSection] = useState(form.lastSection || 'character')
   const savePendingRef = useRef(false)
@@ -331,7 +333,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       })
       if (Object.keys(patches).length === 0) return
       const merged = { ...form, ...patches }
-      initialRef.current = merged
+      setInitial(merged)
       setForm(merged)
     })
   }, [isEditing]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -358,10 +360,10 @@ function CharacterCreateModal({ character: existing, initialData }) {
 
   const isDirty =
     isImport ||
-    Object.keys(initialRef.current).some((key) => {
+    Object.keys(initial).some((key) => {
       if (key === 'lastSection') return false
       const val = form[key]
-      const init = initialRef.current[key]
+      const init = initial[key]
       if (Array.isArray(val)) return JSON.stringify(val) !== JSON.stringify(init)
       return val !== init
     })
@@ -406,7 +408,9 @@ function CharacterCreateModal({ character: existing, initialData }) {
   }, [form, overrideDefaults, ppGlobals])
 
   const handleCloseRef = useRef()
-  handleCloseRef.current = handleCloseAttempt
+  useEffect(() => {
+    handleCloseRef.current = handleCloseAttempt
+  })
 
   useEffect(() => {
     if (isDirty && activeModal === 'characterCreate') {

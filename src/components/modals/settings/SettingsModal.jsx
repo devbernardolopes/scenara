@@ -5,7 +5,7 @@ import { CATEGORIES, GROUPS, SETTINGS, setSetting } from '../../../services/sett
 import { useConfirm } from '../../../lib/confirm'
 import { RefreshCw } from '../../../lib/icons'
 import SettingsSidebar from './SettingsSidebar'
-import SettingsSearch from './SettingsSearch'
+
 import SettingRow from './SettingRow'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import ApiSettingsPanel from './ApiSettingsPanel'
@@ -22,7 +22,7 @@ function SettingsModal() {
     'modal.settings.category',
     CATEGORIES[0]?.id,
   )
-  const [search, setSearch] = usePersistedState('modal.settings.search', '')
+  const [search] = usePersistedState('modal.settings.search', '')
 
   const filtered = SETTINGS.filter((s) => {
     const matchesCategory = search ? true : s.category === activeCategory

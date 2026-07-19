@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
@@ -22,21 +22,24 @@ function WritingInstructionFormModal({ writingInstruction }) {
   const { promptSave } = useSaveConfirm()
   const editing = Boolean(writingInstruction)
 
-  const initialRef = useRef({
-    name: writingInstruction?.name || '',
-    content: writingInstruction?.content || '',
-  })
+  const initial = useMemo(
+    () => ({
+      name: writingInstruction?.name || '',
+      content: writingInstruction?.content || '',
+    }),
+    [],
+  )
 
-  const [form, setForm] = useState({ ...initialRef.current })
+  const [form, setForm] = useState({ ...initial })
   const [saving, setSaving] = useState(false)
   const savePendingRef = useRef(false)
 
-  const isDirty = Object.keys(initialRef.current).some(
-    (key) => form[key] !== initialRef.current[key],
-  )
+  const isDirty = Object.keys(initial).some((key) => form[key] !== initial[key])
 
   const handleCloseRef = useRef()
-  handleCloseRef.current = handleCloseAttempt
+  useEffect(() => {
+    handleCloseRef.current = handleCloseAttempt
+  })
 
   useEffect(() => {
     if (isDirty) {

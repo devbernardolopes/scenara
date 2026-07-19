@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
@@ -17,22 +17,25 @@ function InChatShortcutFormModal({ inChatShortcut }) {
   const { promptSave } = useSaveConfirm()
   const editing = Boolean(inChatShortcut)
 
-  const initialRef = useRef({
-    name: inChatShortcut?.name || '',
-    content: inChatShortcut?.content || '',
-    order: inChatShortcut?.order || 'asc',
-  })
+  const initial = useMemo(
+    () => ({
+      name: inChatShortcut?.name || '',
+      content: inChatShortcut?.content || '',
+      order: inChatShortcut?.order || 'asc',
+    }),
+    [],
+  )
 
-  const [form, setForm] = useState({ ...initialRef.current })
+  const [form, setForm] = useState({ ...initial })
   const [saving, setSaving] = useState(false)
   const savePendingRef = useRef(false)
 
-  const isDirty = Object.keys(initialRef.current).some(
-    (key) => form[key] !== initialRef.current[key],
-  )
+  const isDirty = Object.keys(initial).some((key) => form[key] !== initial[key])
 
   const handleCloseRef = useRef()
-  handleCloseRef.current = handleCloseAttempt
+  useEffect(() => {
+    handleCloseRef.current = handleCloseAttempt
+  })
 
   useEffect(() => {
     if (isDirty) {

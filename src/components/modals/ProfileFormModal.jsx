@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
@@ -115,16 +115,19 @@ function ProfileFormModal({ profile }) {
   const { confirm } = useConfirm()
   const editing = Boolean(profile)
 
-  const initialRef = useRef({
-    name: profile?.name || '',
-    providerId: profile?.providerId || '',
-    keyId: profile?.keyId || null,
-    model: profile?.model || '',
-    params: profile?.params ? { ...profile.params } : {},
-    baseUrl: profile?.baseUrl || getDefaultBaseUrl(profile?.providerId) || '',
-  })
+  const initial = useMemo(
+    () => ({
+      name: profile?.name || '',
+      providerId: profile?.providerId || '',
+      keyId: profile?.keyId || null,
+      model: profile?.model || '',
+      params: profile?.params ? { ...profile.params } : {},
+      baseUrl: profile?.baseUrl || getDefaultBaseUrl(profile?.providerId) || '',
+    }),
+    [],
+  )
 
-  const [form, setForm] = useState({ ...initialRef.current })
+  const [form, setForm] = useState({ ...initial })
   const [saving, setSaving] = useState(false)
   const [keys, setKeys] = useState([])
   const [cachedModels, setCachedModels] = useState([])
@@ -178,10 +181,9 @@ function ProfileFormModal({ profile }) {
     }
   }, [isCerebras, form.model])
 
-  const isDirty = Object.keys(initialRef.current).some((key) => {
-    if (key === 'params')
-      return JSON.stringify(form.params) !== JSON.stringify(initialRef.current.params)
-    return form[key] !== initialRef.current[key]
+  const isDirty = Object.keys(initial).some((key) => {
+    if (key === 'params') return JSON.stringify(form.params) !== JSON.stringify(initial.params)
+    return form[key] !== initial[key]
   })
 
   useEffect(() => {
@@ -239,7 +241,9 @@ function ProfileFormModal({ profile }) {
   }, [form.providerId, hordeMethod])
 
   const handleCloseRef = useRef()
-  handleCloseRef.current = handleCloseAttempt
+  useEffect(() => {
+    handleCloseRef.current = handleCloseAttempt
+  })
 
   useEffect(() => {
     if (isDirty) {

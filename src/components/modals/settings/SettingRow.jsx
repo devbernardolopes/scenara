@@ -75,6 +75,7 @@ function SettingRow({ setting, onSave }) {
   const descPath = setting.descKey?.replace('settings:', '')
   const Control = CONTROL_MAP[setting.type]
   const Trailing = TRAILING_MAP[setting.key]
+  /* eslint-disable no-unused-vars -- destructured to exclude from controlProps */
   const {
     key,
     category,
@@ -85,6 +86,7 @@ function SettingRow({ setting, onSave }) {
     props: extraProps,
     ...controlProps
   } = setting
+  /* eslint-enable no-unused-vars */
 
   if (!Control) return null
 
