@@ -8,7 +8,7 @@ import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import Label from '../shared/Label'
 import Avatar from '../shared/Avatar'
-import { Plus, X, ChevronUp, ChevronDown, Pencil } from '../../lib/icons'
+import { Plus, X, ChevronUp, ChevronDown, Edit3 } from '../../lib/icons'
 import { estimateTokens } from '../../services/tokenEstimator'
 import { createLorebook, updateLorebook } from '../../services/lorebooks'
 import {
@@ -409,7 +409,7 @@ function LorebookFormModal({ lorebook }) {
                     className="min-h-[36px] min-w-[36px] flex items-center justify-center text-secondary hover:text-text rounded-md hover:bg-surface-hover"
                     aria-label={t('lorebook.form.editEntry')}
                   >
-                    <Pencil className="w-4 h-4" />
+                    <Edit3 className="w-4 h-4" />
                   </button>
                   <div className="flex items-center">
                     <button
