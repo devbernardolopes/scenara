@@ -261,9 +261,25 @@ function CharacterDiscovery() {
         getCharacterChatCounts(),
         getAllTags(),
       ])
-      setCharacters(chars)
-      setChatCounts(counts)
-      setTagsMap(new Map(tags.map((t) => [t.id, t.name])))
+      setCharacters((prev) => {
+        if (
+          prev.length === chars.length &&
+          prev.every((c, i) => c.id === chars[i].id && c.updatedAt === chars[i].updatedAt)
+        )
+          return prev
+        return chars
+      })
+      setChatCounts((prev) => {
+        if (prev.size === counts.size && [...prev.entries()].every(([k, v]) => counts.get(k) === v))
+          return prev
+        return counts
+      })
+      setTagsMap((prev) => {
+        const next = new Map(tags.map((t) => [t.id, t.name]))
+        if (prev.size === next.size && [...prev.entries()].every(([k, v]) => next.get(k) === v))
+          return prev
+        return next
+      })
     } finally {
       if (isInitial) setLoading(false)
     }

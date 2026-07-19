@@ -232,12 +232,6 @@ function CharacterCreateModal({ character: existing, initialData }) {
   }, [])
 
   useEffect(() => {
-    return () => {
-      window.dispatchEvent(new CustomEvent('characters-changed'))
-    }
-  }, [])
-
-  useEffect(() => {
     const keys = Object.keys(DEFAULTS_MAP)
     Promise.all(keys.map((k) => getSetting(k))).then((values) => {
       const defaults = {}
