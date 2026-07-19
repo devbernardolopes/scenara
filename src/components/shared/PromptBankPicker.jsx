@@ -127,7 +127,7 @@ function PromptBankPicker({ open, onClose, onSelect, anchorRef }) {
   const content = (
     <div
       ref={ref}
-      className="w-[280px] max-h-80 flex flex-col bg-surface border border-border rounded-lg shadow-surface-lg z-[60]"
+      className="w-[280px] max-h-80 flex flex-col bg-surface border border-border rounded-lg shadow-surface-lg"
     >
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
         <Search className="w-3.5 h-3.5 text-tertiary shrink-0" />
@@ -184,7 +184,11 @@ function PromptBankPicker({ open, onClose, onSelect, anchorRef }) {
   )
 
   if (!anchorRef) {
-    return <div className="absolute bottom-full mb-2 right-0">{content}</div>
+    return (
+      <div className="relative" style={{ zIndex: 60 }}>
+        <div className="absolute bottom-full mb-2 right-0">{content}</div>
+      </div>
+    )
   }
 
   if (!coords) return null
@@ -196,6 +200,7 @@ function PromptBankPicker({ open, onClose, onSelect, anchorRef }) {
         left: coords.left,
         top: coords.top,
         width: PANEL_WIDTH,
+        zIndex: 60,
         ...(coords.above ? { transform: 'translateY(-100%)' } : {}),
       }}
     >
