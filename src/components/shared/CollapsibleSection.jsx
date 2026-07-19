@@ -63,9 +63,9 @@ function CollapsibleSection({
           >
             {label}
           </span>
+          {summary && <span className="text-xs text-tertiary">{summary}</span>}
         </button>
         <span className="flex items-center gap-2">
-          {summary && <span className="text-xs text-tertiary">{summary}</span>}
           {headerExtra}
           <button
             type="button"
