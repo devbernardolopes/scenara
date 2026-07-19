@@ -834,7 +834,7 @@ export const SETTINGS = [
   {
     key: 'defaultMessageRollover',
     category: 'defaults',
-    type: 'buttonOrder',
+    type: 'buttonGroup',
     default: 'rollover',
     props: {
       buttons: [

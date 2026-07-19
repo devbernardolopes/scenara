@@ -7,6 +7,7 @@ import SettingSlider from './controls/SettingSlider'
 import SettingInput from './controls/SettingInput'
 import SettingTextarea from './controls/SettingTextarea'
 import SettingButtonOrder from './controls/SettingButtonOrder'
+import SettingButtonGroup from './controls/SettingButtonGroup'
 import SettingAvatarPicker from './controls/SettingAvatarPicker'
 import SettingOocDelimiters from './controls/SettingOocDelimiters'
 import SettingToggleInput from './controls/SettingToggleInput'
@@ -19,6 +20,7 @@ const CONTROL_MAP = {
   text: SettingInput,
   textarea: SettingTextarea,
   buttonOrder: SettingButtonOrder,
+  buttonGroup: SettingButtonGroup,
   avatar: SettingAvatarPicker,
   oocDelimiters: SettingOocDelimiters,
   toggleInput: SettingToggleInput,
