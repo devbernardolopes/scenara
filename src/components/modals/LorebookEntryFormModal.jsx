@@ -149,6 +149,8 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
     return a !== b
   })
 
+  const contentTokenCount = useMemo(() => estimateTokens(form.content), [form.content])
+
   const handleCloseRef = useRef()
   useEffect(() => {
     handleCloseRef.current = handleCloseAttempt
@@ -289,9 +291,7 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
 
         <CollapsibleSection
           label={t('lorebook.entry.form.content')}
-          summary={
-            form.content ? t('common:tokenCount', { count: estimateTokens(form.content) }) : null
-          }
+          summary={form.content ? t('common:tokenCount', { count: contentTokenCount }) : null}
           storageKey="lorebookEntryContent"
           defaultExpanded={true}
         >
