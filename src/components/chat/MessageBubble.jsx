@@ -833,7 +833,9 @@ function MessageBubble({
         {/* Content */}
         <div
           onDoubleClick={
-            streaming || requestFailed || !message.content?.trim() ? undefined : handleStartEdit
+            editing || streaming || requestFailed || !message.content?.trim()
+              ? undefined
+              : handleStartEdit
           }
           className={editing ? '' : 'px-3 py-2'}
         >
