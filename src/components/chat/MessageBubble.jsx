@@ -773,9 +773,7 @@ function MessageBubble({
                       : isOOC
                         ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
                         : 'hover:bg-black/10 text-tertiary hover:text-text'
-                    const toggleColor = isToggled
-                      ? 'bg-primary text-on-primary hover:bg-primary-hover ring-1 ring-primary-hover shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)]'
-                      : ''
+                    const toggleColor = isToggled ? 'text-primary' : ''
                     return (
                       <button
                         key={key}
@@ -785,11 +783,7 @@ function MessageBubble({
                         className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${baseColor} ${toggleColor} ${
                           disabled ? 'opacity-30 pointer-events-none' : ''
                         }`}
-                        style={
-                          isUser && !isDelete && !isToggled && userMutedStyle
-                            ? userMutedStyle
-                            : undefined
-                        }
+                        style={isUser && !isDelete && userMutedStyle ? userMutedStyle : undefined}
                         title={t(def.labelKey)}
                       >
                         {key === 'visible' ? (
