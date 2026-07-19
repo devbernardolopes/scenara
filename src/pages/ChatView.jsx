@@ -1995,10 +1995,8 @@ function ChatView() {
               <Avatar
                 src={character.avatar}
                 size="sm"
-                className="flex-shrink-0"
-                onClick={() =>
-                  openModal('imageViewer', { src: character.avatar, modalSize: 'fullscreen' })
-                }
+                className="flex-shrink-0 cursor-pointer"
+                onClick={() => openModal('characterCreate', { character })}
               />
             )}
             <div className="flex items-center gap-2 min-w-0">
