@@ -397,7 +397,9 @@ function ChatInputArea({
   const hasShortcutsSet = allShortcutsSets.length > 0
   const parsedShortcuts = useMemo(() => {
     if (!shortcutsSet?.content) return null
-    return parseShortcuts(shortcutsSet.content)
+    const parsed = parseShortcuts(shortcutsSet.content)
+    if (parsed && shortcutsSet.order === 'desc') return [...parsed].reverse()
+    return parsed
   }, [shortcutsSet])
 
   const handleSetChange = useCallback(

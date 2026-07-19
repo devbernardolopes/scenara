@@ -74,6 +74,7 @@ export async function createInChatShortcut(data) {
   const id = await db.inChatShortcuts.add({
     name: data.name,
     content: data.content || '',
+    order: data.order || 'asc',
     createdAt: now,
     updatedAt: now,
   })

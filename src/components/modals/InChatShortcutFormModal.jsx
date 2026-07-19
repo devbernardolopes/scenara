@@ -20,6 +20,7 @@ function InChatShortcutFormModal({ inChatShortcut }) {
   const initialRef = useRef({
     name: inChatShortcut?.name || '',
     content: inChatShortcut?.content || '',
+    order: inChatShortcut?.order || 'asc',
   })
 
   const [form, setForm] = useState({ ...initialRef.current })
@@ -60,11 +61,13 @@ function InChatShortcutFormModal({ inChatShortcut }) {
         await updateInChatShortcut(inChatShortcut.id, {
           name: form.name.trim(),
           content: form.content.trim(),
+          order: form.order || 'asc',
         })
       } else {
         await createInChatShortcut({
           name: form.name.trim(),
           content: form.content.trim(),
+          order: form.order || 'asc',
         })
       }
     } finally {
@@ -126,6 +129,26 @@ function InChatShortcutFormModal({ inChatShortcut }) {
             required
             // autoFocus
           />
+        </div>
+
+        <div>
+          <Label highlight={Boolean(form.order)}>{t('inChatShortcut.form.order')}</Label>
+          <div className="flex flex-wrap gap-1.5 mt-1">
+            {['asc', 'desc'].map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => setForm((prev) => ({ ...prev, order: opt }))}
+                className={`min-h-[44px] min-w-[44px] px-4 py-2 rounded-md text-sm font-medium border transition-colors ${
+                  (form.order || 'asc') === opt
+                    ? 'bg-primary text-on-primary border-primary'
+                    : 'bg-surface text-secondary border-border hover:bg-surface-hover'
+                }`}
+              >
+                {t(`inChatShortcut.form.order${opt === 'asc' ? 'Asc' : 'Desc'}`)}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div>

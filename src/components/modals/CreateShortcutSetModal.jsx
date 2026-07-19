@@ -31,7 +31,7 @@ function CreateShortcutSetModal({ onCreated }) {
     if (!name.trim() || saving) return
     setSaving(true)
     try {
-      const id = await createInChatShortcut({ name: name.trim(), content: '' })
+      const id = await createInChatShortcut({ name: name.trim(), content: '', order: 'asc' })
       if (typeof onCreated === 'function') onCreated(id)
     } finally {
       setSaving(false)

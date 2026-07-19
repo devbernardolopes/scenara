@@ -109,7 +109,7 @@ function MakeShortcutModal({ content = '' }) {
     if (!form.name.trim() || !form.message.trim() || saving) return
     let setId = selectedSetId
     if (!setId) {
-      const id = await createInChatShortcut({ name: 'Shortcuts', content: '' })
+      const id = await createInChatShortcut({ name: 'Shortcuts', content: '', order: 'asc' })
       setSelectedSetId(id)
       const sets = await getAllInChatShortcuts()
       setShortcutSets(sets)
