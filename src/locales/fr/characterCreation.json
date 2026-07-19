@@ -31,6 +31,7 @@
   "scenarioSelector": {
     "title": "Choisir un scénario",
     "startWithScenario": "Commencer avec ce scénario",
+    "startWithNoScenario": "Commencer sans scénario",
     "cancel": "Annuler",
     "noContent": "Ce scénario n'a pas de contenu.",
     "previousScenario": "Scénario précédent",

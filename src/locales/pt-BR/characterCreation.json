@@ -166,6 +166,7 @@
   "scenarioSelector": {
     "title": "Escolher um cenário",
     "startWithScenario": "Começar com este cenário",
+    "startWithNoScenario": "Começar sem cenário",
     "cancel": "Cancelar",
     "noContent": "Este cenário não tem conteúdo.",
     "previousScenario": "Cenário anterior",

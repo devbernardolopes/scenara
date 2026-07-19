@@ -7,7 +7,7 @@ import { getSetting } from '../../services/settings'
 import { getPersona } from '../../services/personas'
 import { ChevronLeft, ChevronRight } from '../../lib/icons'
 
-function ScenarioSelectorModal({ character, persona, scenarios, onSelect }) {
+function ScenarioSelectorModal({ character, persona, scenarios, onSelect, onCancel }) {
   const { t } = useTranslation('characterCreation')
   const { closeModal } = useModal()
 
@@ -29,6 +29,11 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect }) {
     }
   }, [persona?.name])
 
+  function handleStartWithout() {
+    onSelect(null)
+    closeModal()
+  }
+
   const scenario = scenarios[currentIndex]
   const charName = character?.name || ''
 
@@ -49,7 +54,7 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect }) {
   }
 
   function handleCancel() {
-    onSelect(null)
+    onCancel?.()
     closeModal()
   }
 
@@ -70,6 +75,13 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect }) {
             className="min-h-[44px] px-4 py-2 rounded-md text-sm font-medium border border-border bg-surface text-text hover:bg-surface-hover transition-colors"
           >
             {t('scenarioSelector.cancel')}
+          </button>
+          <button
+            type="button"
+            onClick={handleStartWithout}
+            className="min-h-[44px] px-4 py-2 rounded-md text-sm font-medium border border-warning text-warning hover:bg-surface-hover transition-colors"
+          >
+            {t('scenarioSelector.startWithNoScenario')}
           </button>
           <button
             type="button"

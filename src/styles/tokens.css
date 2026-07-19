@@ -852,6 +852,9 @@
 .bg-error {
   background-color: var(--color-error);
 }
+.border-warning {
+  border-color: var(--color-warning);
+}
 .bg-error-subtle {
   background-color: color-mix(in srgb, var(--color-error) 12%, transparent);
 }

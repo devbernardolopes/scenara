@@ -366,7 +366,12 @@ function CharacterDiscovery() {
     openModal('characterCreate', { character: fresh || character })
   }
 
-  async function createAndNavigateThread(character, persona, selectedScenario) {
+  async function createAndNavigateThread(
+    character,
+    persona,
+    selectedScenario,
+    { noScenario = false } = {},
+  ) {
     const personaId = persona?.id || (await getSetting('defaultPersonaId'))
     const initialMessages = character.initialMessages?.length ? character.initialMessages : null
 
@@ -378,7 +383,7 @@ function CharacterDiscovery() {
     })
 
     let scenarioToUse = selectedScenario
-    if (!scenarioToUse) {
+    if (!scenarioToUse && !noScenario) {
       const activeScenarioIndex = character.scenarios?.findIndex(
         (s) => s?.active && s?.content?.trim(),
       )
@@ -386,7 +391,7 @@ function CharacterDiscovery() {
         const active = character.scenarios[activeScenarioIndex]
         scenarioToUse = { ...active, scenarioNumber: activeScenarioIndex + 1 }
       }
-    } else {
+    } else if (scenarioToUse) {
       const selectedIdx = character.scenarios?.findIndex((s) => s.id === scenarioToUse.id)
       scenarioToUse = { ...scenarioToUse, scenarioNumber: (selectedIdx ?? 0) + 1 }
     }
@@ -424,8 +429,14 @@ function CharacterDiscovery() {
         character,
         persona,
         scenarios: contentScenarios,
-        onSelect: (selectedScenario) =>
-          createAndNavigateThread(character, persona, selectedScenario),
+        onSelect: (selectedScenario) => {
+          if (selectedScenario === null) {
+            createAndNavigateThread(character, persona, null, { noScenario: true })
+          } else {
+            createAndNavigateThread(character, persona, selectedScenario)
+          }
+        },
+        onCancel: () => {},
       })
       return
     }

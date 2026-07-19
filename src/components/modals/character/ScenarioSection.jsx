@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useConfirm } from '../../../lib/confirm'
 import CollapsibleSection from '../../shared/CollapsibleSection'
@@ -58,10 +59,14 @@ function AddButton({ onClick, label }) {
   )
 }
 
-function ScenarioSection({ form, onChange, characterId }) {
+function ScenarioSection({ form, onChange }) {
   const { t } = useTranslation('characterCreation')
   const { confirm } = useConfirm()
   const scenarios = form.scenarios || []
+  const [expandedId, setExpandedId] = useState(() => {
+    const firstEmpty = scenarios.find((s) => !s.content)
+    return firstEmpty?.id || null
+  })
 
   function handleAdd() {
     const next = {
@@ -71,6 +76,7 @@ function ScenarioSection({ form, onChange, characterId }) {
       active: scenarios.length === 0,
     }
     onChange('scenarios', [...scenarios, next])
+    setExpandedId(next.id)
   }
 
   function handleContentChange(id, content) {
@@ -132,12 +138,11 @@ function ScenarioSection({ form, onChange, characterId }) {
     const clone = {
       ...scenario,
       id: crypto.randomUUID(),
+      name: scenario.name ? `${scenario.name} (Copy)` : '',
       active: !hasActive ? true : false,
     }
-    const idx = scenarios.findIndex((s) => s.id === scenario.id)
-    const next = [...scenarios]
-    next.splice(idx + 1, 0, clone)
-    onChange('scenarios', next)
+    onChange('scenarios', [...scenarios, clone])
+    setExpandedId(clone.id)
   }
 
   return (
@@ -187,6 +192,8 @@ function ScenarioSection({ form, onChange, characterId }) {
         />
       </div>
 
+      <AddButton onClick={handleAdd} label={t('addScenario')} />
+
       {scenarios.length === 0 ? (
         <p className="text-sm text-tertiary text-center py-8">{t('noScenarios')}</p>
       ) : (
@@ -194,6 +201,8 @@ function ScenarioSection({ form, onChange, characterId }) {
           <div key={scenario.id} className="border border-border rounded-md">
             <CollapsibleSection
               label={scenario.name?.trim() || `${t('scenarioLabel')} #${idx + 1}`}
+              open={expandedId === scenario.id}
+              onOpenChange={(isOpen) => setExpandedId(isOpen ? scenario.id : null)}
               headerExtra={
                 <button
                   type="button"
@@ -226,10 +235,6 @@ function ScenarioSection({ form, onChange, characterId }) {
                 ) : null
               }
               hasContent={!!scenario.content}
-              storageKey={
-                characterId ? `charSection.scenario.${characterId}.${scenario.id}` : undefined
-              }
-              defaultExpanded={!scenario.content}
             >
               <input
                 type="text"
@@ -290,8 +295,6 @@ function ScenarioSection({ form, onChange, characterId }) {
           </div>
         ))
       )}
-
-      <AddButton onClick={handleAdd} label={t('addScenario')} />
     </div>
   )
 }
