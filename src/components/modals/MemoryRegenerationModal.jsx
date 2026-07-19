@@ -149,7 +149,6 @@ function MemoryRegenerationModal({ threadId, entry }) {
     {
       idx: 0,
       role: 'system',
-      label: t('memoryRegeneration.systemPromptLabel'),
       value: systemContent,
       onChange: handleSystemChange,
       tokens: systemTokens,
@@ -157,7 +156,6 @@ function MemoryRegenerationModal({ threadId, entry }) {
     {
       idx: 1,
       role: 'user',
-      label: t('memoryRegeneration.userPromptLabel'),
       value: userContent,
       onChange: handleUserChange,
       tokens: userTokens,
@@ -225,7 +223,6 @@ function MemoryRegenerationModal({ threadId, entry }) {
                   <span className="text-xs font-medium text-secondary shrink-0 uppercase">
                     {section.role}
                   </span>
-                  <span className="text-sm font-medium text-text">{section.label}</span>
                   <span className="text-xs text-tertiary shrink-0">
                     {t('tokens', { count: section.tokens })}
                   </span>

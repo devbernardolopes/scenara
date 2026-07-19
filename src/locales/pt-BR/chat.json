@@ -141,8 +141,6 @@
   "memoryEmpty": "Nenhuma memória",
   "memoryRegeneration": {
     "title": "Regeneração de Entrada de Memória",
-    "systemPromptLabel": "Prompt SYSTEM de Resumo",
-    "userPromptLabel": "Prompt USER de Resumo",
     "regenerate": "Regenerar",
     "discardTitle": "Descartar alterações?",
     "discardMessage": "Você tem alterações não salvas no prompt de resumo. Tem certeza que deseja fechar sem regenerar?",

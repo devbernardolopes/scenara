@@ -144,8 +144,6 @@
   "memoryEmpty": "No memories",
   "memoryRegeneration": {
     "title": "Memory Entry Regeneration",
-    "systemPromptLabel": "SYSTEM Summarization Prompt",
-    "userPromptLabel": "USER Summarization Prompt",
     "regenerate": "Regenerate",
     "discardTitle": "Discard changes?",
     "discardMessage": "You have unsaved changes to the summarization prompt. Are you sure you want to close without regenerating?",
