@@ -120,7 +120,9 @@ function WritingInstructionFormModal({ writingInstruction }) {
     >
       <div className="space-y-4">
         <div>
-          <Label required>{t('writingInstruction.form.nameLabel')}</Label>
+          <Label required highlight={Boolean(form.name.trim())}>
+            {t('writingInstruction.form.nameLabel')}
+          </Label>
           <input
             className={inputClass}
             value={form.name}
