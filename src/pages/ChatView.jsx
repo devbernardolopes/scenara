@@ -1658,6 +1658,10 @@ function ChatView() {
           bundleMessages: JSON.stringify(finalEntries),
           promptData: null,
         })
+        if (Number(currentThreadIdRef.current) === Number(threadId)) {
+          const msgs = await getMessagesByThread(threadId)
+          setMessages(dedupeMessages(msgs))
+        }
       }
 
       if (result.status === 'error') {
@@ -1779,6 +1783,7 @@ function ChatView() {
         setStreamingMsgId(null)
       }
       generatingRef.current = false
+      generatingFetchIdRef.current += 1
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setGenerating(false)
       }
