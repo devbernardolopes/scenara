@@ -106,6 +106,10 @@ export async function updateCharacter(id, data) {
   throw new Error('Character not found')
 }
 
+export async function updateCharacterLastSection(id, section) {
+  await db.characters.update(id, { lastSection: section })
+}
+
 export async function deleteCharacter(id) {
   const character = await db.characters.get(id)
   await db.characters.delete(id)

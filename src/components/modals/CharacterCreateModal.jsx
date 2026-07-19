@@ -2,7 +2,11 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
-import { createCharacter, updateCharacter } from '../../services/characters'
+import {
+  createCharacter,
+  updateCharacter,
+  updateCharacterLastSection,
+} from '../../services/characters'
 import { getSetting, getPostProcessingRules } from '../../services/settings'
 import { getAllTags, createTag } from '../../services/tags'
 import { estimateTokens } from '../../services/tokenEstimator'
@@ -352,6 +356,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
   const isDirty =
     isImport ||
     Object.keys(initialRef.current).some((key) => {
+      if (key === 'lastSection') return false
       const val = form[key]
       const init = initialRef.current[key]
       if (Array.isArray(val)) return JSON.stringify(val) !== JSON.stringify(init)
@@ -424,7 +429,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
     setActiveSection(section)
     handleChange('lastSection', section)
     if (characterId && section !== existing?.lastSection) {
-      updateCharacter(characterId, { lastSection: section })
+      updateCharacterLastSection(characterId, section)
     }
   }
 
