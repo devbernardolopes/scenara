@@ -231,6 +231,15 @@ Settings are code-split: `SettingsModal` uses `React.lazy()` and is bundled sepa
 - **No state management library.** Use React built-ins (`useState`, `useContext`) + Dexie for persistence. Revisit only if genuinely needed.
 - **Imports:** Use relative imports within `src/`. No barrel files (`index.js`) — import directly from the file.
 - **No JSX in `lib/` or `services/`.** Keep non-UI modules free of React.
+- **Form modal initial values.** Don't use `useRef` to hold initial form state for `isDirty` comparison — React 19 lint rules flag `ref.current` reads during render. Use `useMemo(() => ..., [])` when the initial value is static, or `useState(() => ...)` when it needs to be updated later (e.g. loading defaults for an existing record).
+- **Modal close-guard callback ref.** Don't assign `ref.current = fn` during render body. Wrap in a `useEffect(() => { ref.current = fn })` so the ref stays fresh without violating React's render-phase rules:
+
+  ```jsx
+  const handleCloseRef = useRef()
+  useEffect(() => {
+    handleCloseRef.current = handleCloseAttempt
+  })
+  ```
 
 ## Constraints
 
