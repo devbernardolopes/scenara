@@ -62,6 +62,15 @@ export async function exportDatabase(selection) {
     data.promptBank = [...filtered]
   }
 
+  if (selection.lorebookIds?.size > 0) {
+    const allLorebooks = await db.lorebooks.toArray()
+    const filtered = allLorebooks.filter((l) => selection.lorebookIds.has(l.id))
+    data.lorebooks = [...filtered]
+
+    const allEntries = await db.lorebookEntries.toArray()
+    data.lorebookEntries = allEntries.filter((e) => selection.lorebookIds.has(e.lorebookId))
+  }
+
   if (selection.settings) {
     data.settings = await db.settings.toArray()
   }
@@ -136,6 +145,8 @@ export async function importDatabase(data) {
     'threadMemories',
     'logs',
     'promptBank',
+    'lorebooks',
+    'lorebookEntries',
   ]
 
   function addWithId(table, record) {
@@ -165,6 +176,12 @@ export async function importDatabase(data) {
     if (Array.isArray(data.personas)) {
       for (const persona of data.personas) {
         await addWithId(db.personas, persona)
+      }
+    }
+
+    if (Array.isArray(data.lorebooks)) {
+      for (const lorebook of data.lorebooks) {
+        await addWithId(db.lorebooks, lorebook)
       }
     }
 
@@ -245,6 +262,12 @@ export async function importDatabase(data) {
       }
     }
 
+    if (Array.isArray(data.lorebookEntries)) {
+      for (const entry of data.lorebookEntries) {
+        await addWithId(db.lorebookEntries, entry)
+      }
+    }
+
     if (data.discoveryView && typeof data.discoveryView === 'object') {
       await db.uiState.where('key').startsWith('discovery.').delete()
       if (data.discoveryView.sortBy != null) {
@@ -299,6 +322,8 @@ export async function resetDatabase() {
   await db.tags.clear()
   await db.threadMemories.clear()
   await db.promptBank.clear()
+  await db.lorebooks.clear()
+  await db.lorebookEntries.clear()
 
   for (const setting of SETTINGS) {
     await db.settings.add({ key: setting.key, value: setting.default })

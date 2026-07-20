@@ -26,6 +26,7 @@ function ExportDatabaseModal() {
   const [connectionProfiles, setConnectionProfiles] = useState([])
   const [logs, setLogs] = useState([])
   const [promptBankEntries, setPromptBankEntries] = useState([])
+  const [lorebooks, setLorebooks] = useState([])
 
   const [selectedCharacterIds, setSelectedCharacterIds] = useState(new Set())
   const [selectedPersonaIds, setSelectedPersonaIds] = useState(new Set())
@@ -35,13 +36,14 @@ function ExportDatabaseModal() {
   const [selectedConnectionProfileIds, setSelectedConnectionProfileIds] = useState(new Set())
   const [selectedLogIds, setSelectedLogIds] = useState(new Set())
   const [selectedPromptBankIds, setSelectedPromptBankIds] = useState(new Set())
+  const [selectedLorebookIds, setSelectedLorebookIds] = useState(new Set())
   const [selectedTags, setSelectedTags] = useState(true)
   const [selectedSettings, setSelectedSettings] = useState(true)
 
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      const [chars, pers, thrs, wi, ics, cp, logs, pb] = await Promise.all([
+      const [chars, pers, thrs, wi, ics, cp, logs, pb, lbs] = await Promise.all([
         db.characters.toArray(),
         db.personas.toArray(),
         db.threads.toArray(),
@@ -50,6 +52,7 @@ function ExportDatabaseModal() {
         db.connectionProfiles.toArray(),
         db.logs.toArray(),
         db.promptBank.toArray(),
+        db.lorebooks.toArray(),
       ])
 
       chars.sort((a, b) => (b.id || 0) - (a.id || 0))
@@ -67,6 +70,7 @@ function ExportDatabaseModal() {
       setConnectionProfiles(cp)
       setLogs(logs)
       setPromptBankEntries(pb)
+      setLorebooks(lbs)
 
       setSelectedCharacterIds(new Set(chars.map((c) => c.id)))
       setSelectedPersonaIds(new Set(pers.map((p) => p.id)))
@@ -76,6 +80,7 @@ function ExportDatabaseModal() {
       setSelectedConnectionProfileIds(new Set(cp.map((p) => p.id)))
       setSelectedLogIds(new Set(logs.map((l) => l.id)))
       setSelectedPromptBankIds(new Set(pb.map((e) => e.id)))
+      setSelectedLorebookIds(new Set(lbs.map((l) => l.id)))
     } finally {
       setLoading(false)
     }
@@ -120,6 +125,7 @@ function ExportDatabaseModal() {
         connectionProfileIds: selectedConnectionProfileIds,
         logIds: selectedLogIds,
         promptBankIds: selectedPromptBankIds,
+        lorebookIds: selectedLorebookIds,
         tags: selectedTags,
         settings: selectedSettings,
       })
@@ -159,6 +165,7 @@ function ExportDatabaseModal() {
   const allConnectionProfileIds = connectionProfiles.map((p) => p.id)
   const allLogIds = logs.map((l) => l.id)
   const allPromptBankIds = promptBankEntries.map((e) => e.id)
+  const allLorebookIds = lorebooks.map((l) => l.id)
 
   const charToggleAll = toggleAll(setSelectedCharacterIds, allCharacterIds)
   const persToggleAll = toggleAll(setSelectedPersonaIds, allPersonaIds)
@@ -168,6 +175,7 @@ function ExportDatabaseModal() {
   const cpToggleAll = toggleAll(setSelectedConnectionProfileIds, allConnectionProfileIds)
   const logsToggleAll = toggleAll(setSelectedLogIds, allLogIds)
   const pbToggleAll = toggleAll(setSelectedPromptBankIds, allPromptBankIds)
+  const lbsToggleAll = toggleAll(setSelectedLorebookIds, allLorebookIds)
 
   const charToggle = toggleItem(setSelectedCharacterIds)
   const persToggle = toggleItem(setSelectedPersonaIds)
@@ -177,6 +185,7 @@ function ExportDatabaseModal() {
   const cpToggle = toggleItem(setSelectedConnectionProfileIds)
   const logsToggle = toggleItem(setSelectedLogIds)
   const pbToggle = toggleItem(setSelectedPromptBankIds)
+  const lbsToggle = toggleItem(setSelectedLorebookIds)
 
   function renderSectionHeader(label, count, selectedCount, allIds, toggleAllFn) {
     const allChecked = allIds.length > 0 && selectedCount === allIds.length
@@ -478,14 +487,33 @@ function ExportDatabaseModal() {
 
         <CollapsibleSection
           label={t('database.exportModal.lorebooks')}
-          summary="0"
-          hasContent={false}
+          summary={`${lorebooks.length}`}
+          hasContent={selectedLorebookIds.size > 0}
           storageKey="export.lorebooks"
-          defaultExpanded={false}
         >
-          <p className="text-xs text-tertiary py-2">
-            {t('database.exportModal.lorebooksDisabled')}
-          </p>
+          {renderSectionHeader(
+            t('database.exportModal.lorebooks'),
+            lorebooks.length,
+            selectedLorebookIds.size,
+            allLorebookIds,
+            lbsToggleAll,
+          )}
+          <div className="space-y-1 max-h-64 overflow-y-auto">
+            {lorebooks.length === 0 ? (
+              <p className="text-xs text-tertiary py-2">{t('database.exportModal.noItems')}</p>
+            ) : (
+              lorebooks.map((l) => (
+                <ExportItemRow
+                  key={l.id}
+                  checked={selectedLorebookIds.has(l.id)}
+                  onChange={() => lbsToggle(l.id)}
+                  avatar={l.avatar}
+                  title={l.name}
+                  id={l.id}
+                />
+              ))
+            )}
+          </div>
         </CollapsibleSection>
 
         <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
