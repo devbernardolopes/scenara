@@ -1051,6 +1051,7 @@ function ChatView() {
           isError: true,
           error: null,
           createdAt: new Date().toISOString(),
+          hidden: isOOC && character?.includeOOC === false,
         }
         await updateMessage(assistantMsgId, {
           content: '',
@@ -1068,6 +1069,7 @@ function ChatView() {
           isError: true,
           error: result.error || null,
           createdAt: new Date().toISOString(),
+          hidden: isOOC && character?.includeOOC === false,
         }
         await updateMessage(assistantMsgId, {
           content: result.error || '',
@@ -1091,6 +1093,7 @@ function ChatView() {
           responseData: result.responseData || null,
           apiDurationMs: result.apiDurationMs ?? null,
           createdAt: new Date().toISOString(),
+          hidden: isOOC && character?.includeOOC === false,
         }
         const successBundleJson = JSON.stringify([successEntry])
         await updateMessage(assistantMsgId, {
@@ -1127,6 +1130,7 @@ function ChatView() {
           responseData: null,
           apiDurationMs: null,
           createdAt: dbMsg?.createdAt || new Date().toISOString(),
+          hidden: isOOC && character?.includeOOC === false,
         }
         await updateMessage(assistantMsgId, {
           content: partial,
@@ -1156,6 +1160,7 @@ function ChatView() {
         isError: true,
         error: err.message || null,
         createdAt: new Date().toISOString(),
+        hidden: isOOC && character?.includeOOC === false,
       }
       await updateMessage(assistantMsgId, {
         content: err.message || '',
@@ -1602,7 +1607,12 @@ function ChatView() {
       }
 
       slotIndex = regenEntries.length
-      regenEntries.push({ content: '', promptData: null, createdAt: new Date().toISOString() })
+      regenEntries.push({
+        content: '',
+        promptData: null,
+        createdAt: new Date().toISOString(),
+        hidden: isOOCRegen && character?.includeOOC === false,
+      })
       setStreamingSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
       setStreamingSlotIndex(threadId, slotIndex)
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
@@ -1885,6 +1895,7 @@ function ChatView() {
       apiDurationMs: null,
       origin: 'edit',
       createdAt: new Date().toISOString(),
+      hidden: msg.isOOC && character?.includeOOC === false,
     })
     await updateMessage(id, {
       bundleMessages: JSON.stringify(entries),
