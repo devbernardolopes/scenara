@@ -997,6 +997,9 @@ function ChatView() {
           role: 'assistant',
           content: '',
           isOOC,
+          bundleMessages: JSON.stringify([
+            { content: '', hidden: isOOC && character?.includeOOC === false },
+          ]),
           createdAt: new Date(),
         },
       ])
