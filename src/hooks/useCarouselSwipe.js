@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 
 const ANIMATION_MS = 200
 const STALE_TIMEOUT_MS = ANIMATION_MS * 3
+const INTENT_THRESHOLD = 5
+const VERTICAL_ABANDON_THRESHOLD = 20
 
 export function useCarouselSwipe(
   trackRef,
@@ -64,15 +66,17 @@ export function useCarouselSwipe(
       if (!startRef.current || e.touches.length > 1) return
       const dx = e.touches[0].clientX - startRef.current.x
       const dy = e.touches[0].clientY - startRef.current.y
+      const absDx = Math.abs(dx)
+      const absDy = Math.abs(dy)
 
-      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10) {
+      if (absDy > absDx && absDy > VERTICAL_ABANDON_THRESHOLD) {
         startRef.current = null
         el.style.transition = 'none'
         el.style.transform = 'translateX(-100%)'
         return
       }
 
-      if (Math.abs(dx) > threshold) {
+      if (absDx > INTENT_THRESHOLD && absDx > absDy) {
         e.preventDefault()
         el.style.transition = 'none'
         el.style.transform = `translateX(calc(-100% + ${dx}px))`
@@ -85,15 +89,18 @@ export function useCarouselSwipe(
       const dy = e.changedTouches[0].clientY - startRef.current.y
       startRef.current = null
 
+      const currentTransform = el.style.transform
+      const snapTarget = 'translateX(-100%)'
+
       if (Math.abs(dx) <= Math.abs(dy) || Math.abs(dx) <= threshold) {
-        if (el.style.transform && el.style.transform !== 'none') {
+        if (currentTransform && currentTransform !== 'none' && currentTransform !== snapTarget) {
           el.style.transition = `transform ${ANIMATION_MS}ms ease-out`
-          el.style.transform = 'translateX(-100%)'
+          el.style.transform = snapTarget
           const onEnd = () => {
             el.removeEventListener('transitionend', onEnd)
             activeListeners.current = activeListeners.current.filter((l) => l.fn !== onEnd)
             el.style.transition = 'none'
-            el.style.transform = 'translateX(-100%)'
+            el.style.transform = snapTarget
           }
           el.addEventListener('transitionend', onEnd)
           activeListeners.current.push({ type: 'transitionend', fn: onEnd })
@@ -115,7 +122,7 @@ export function useCarouselSwipe(
         activeListeners.current = activeListeners.current.filter((l) => l.fn !== onSnap)
 
         el.style.transition = 'none'
-        el.style.transform = 'translateX(-100%)'
+        el.style.transform = snapTarget
         callback?.()
         isAnimating.current = false
         animStartRef.current = null

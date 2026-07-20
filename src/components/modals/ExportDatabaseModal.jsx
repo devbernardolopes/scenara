@@ -24,7 +24,6 @@ function ExportDatabaseModal() {
   const [writingInstructions, setWritingInstructions] = useState([])
   const [inChatShortcuts, setInChatShortcuts] = useState([])
   const [connectionProfiles, setConnectionProfiles] = useState([])
-  const [logs, setLogs] = useState([])
   const [promptBankEntries, setPromptBankEntries] = useState([])
   const [lorebooks, setLorebooks] = useState([])
 
@@ -34,7 +33,7 @@ function ExportDatabaseModal() {
   const [selectedWritingInstructionIds, setSelectedWritingInstructionIds] = useState(new Set())
   const [selectedInChatShortcutIds, setSelectedInChatShortcutIds] = useState(new Set())
   const [selectedConnectionProfileIds, setSelectedConnectionProfileIds] = useState(new Set())
-  const [selectedLogIds, setSelectedLogIds] = useState(new Set())
+  const [selectedLogs, setSelectedLogs] = useState(false)
   const [selectedPromptBankIds, setSelectedPromptBankIds] = useState(new Set())
   const [selectedLorebookIds, setSelectedLorebookIds] = useState(new Set())
   const [selectedTags, setSelectedTags] = useState(true)
@@ -43,14 +42,13 @@ function ExportDatabaseModal() {
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      const [chars, pers, thrs, wi, ics, cp, logs, pb, lbs] = await Promise.all([
+      const [chars, pers, thrs, wi, ics, cp, pb, lbs] = await Promise.all([
         db.characters.toArray(),
         db.personas.toArray(),
         db.threads.toArray(),
         db.writingInstructions.toArray(),
         db.inChatShortcuts.toArray(),
         db.connectionProfiles.toArray(),
-        db.logs.toArray(),
         db.promptBank.toArray(),
         db.lorebooks.toArray(),
       ])
@@ -68,7 +66,6 @@ function ExportDatabaseModal() {
       setWritingInstructions(wi)
       setInChatShortcuts(ics)
       setConnectionProfiles(cp)
-      setLogs(logs)
       setPromptBankEntries(pb)
       setLorebooks(lbs)
 
@@ -78,7 +75,6 @@ function ExportDatabaseModal() {
       setSelectedWritingInstructionIds(new Set(wi.map((w) => w.id)))
       setSelectedInChatShortcutIds(new Set(ics.map((i) => i.id)))
       setSelectedConnectionProfileIds(new Set(cp.map((p) => p.id)))
-      setSelectedLogIds(new Set(logs.map((l) => l.id)))
       setSelectedPromptBankIds(new Set(pb.map((e) => e.id)))
       setSelectedLorebookIds(new Set(lbs.map((l) => l.id)))
     } finally {
@@ -123,7 +119,7 @@ function ExportDatabaseModal() {
         writingInstructionIds: selectedWritingInstructionIds,
         inChatShortcutIds: selectedInChatShortcutIds,
         connectionProfileIds: selectedConnectionProfileIds,
-        logIds: selectedLogIds,
+        logs: selectedLogs,
         promptBankIds: selectedPromptBankIds,
         lorebookIds: selectedLorebookIds,
         tags: selectedTags,
@@ -163,7 +159,6 @@ function ExportDatabaseModal() {
   const allWritingInstructionIds = writingInstructions.map((w) => w.id)
   const allInChatShortcutIds = inChatShortcuts.map((i) => i.id)
   const allConnectionProfileIds = connectionProfiles.map((p) => p.id)
-  const allLogIds = logs.map((l) => l.id)
   const allPromptBankIds = promptBankEntries.map((e) => e.id)
   const allLorebookIds = lorebooks.map((l) => l.id)
 
@@ -173,7 +168,6 @@ function ExportDatabaseModal() {
   const wiToggleAll = toggleAll(setSelectedWritingInstructionIds, allWritingInstructionIds)
   const icsToggleAll = toggleAll(setSelectedInChatShortcutIds, allInChatShortcutIds)
   const cpToggleAll = toggleAll(setSelectedConnectionProfileIds, allConnectionProfileIds)
-  const logsToggleAll = toggleAll(setSelectedLogIds, allLogIds)
   const pbToggleAll = toggleAll(setSelectedPromptBankIds, allPromptBankIds)
   const lbsToggleAll = toggleAll(setSelectedLorebookIds, allLorebookIds)
 
@@ -183,7 +177,6 @@ function ExportDatabaseModal() {
   const wiToggle = toggleItem(setSelectedWritingInstructionIds)
   const icsToggle = toggleItem(setSelectedInChatShortcutIds)
   const cpToggle = toggleItem(setSelectedConnectionProfileIds)
-  const logsToggle = toggleItem(setSelectedLogIds)
   const pbToggle = toggleItem(setSelectedPromptBankIds)
   const lbsToggle = toggleItem(setSelectedLorebookIds)
 
@@ -455,35 +448,22 @@ function ExportDatabaseModal() {
           </div>
         </CollapsibleSection>
 
-        <CollapsibleSection
-          label={t('database.exportModal.logs')}
-          summary={`${logs.length}`}
-          hasContent={selectedLogIds.size > 0}
-          storageKey="export.logs"
-        >
-          {renderSectionHeader(
-            t('database.exportModal.logs'),
-            logs.length,
-            selectedLogIds.size,
-            allLogIds,
-            logsToggleAll,
-          )}
-          <div className="space-y-1 max-h-64 overflow-y-auto">
-            {logs.length === 0 ? (
-              <p className="text-xs text-tertiary py-2">{t('database.exportModal.noItems')}</p>
-            ) : (
-              logs.map((l) => (
-                <ExportItemRow
-                  key={l.id}
-                  checked={selectedLogIds.has(l.id)}
-                  onChange={() => logsToggle(l.id)}
-                  title={l.type}
-                  id={l.id}
-                />
-              ))
-            )}
+        <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
+          <label className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer">
+            <input
+              type="checkbox"
+              checked={selectedLogs}
+              onChange={(e) => setSelectedLogs(e.target.checked)}
+              className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+            />
+          </label>
+          <div className="flex-1 min-w-0">
+            <span className="text-sm font-medium text-text">{t('database.exportModal.logs')}</span>
+            <span className="text-xs text-tertiary ml-2">
+              {t('database.exportModal.logsDescription')}
+            </span>
           </div>
-        </CollapsibleSection>
+        </div>
 
         <CollapsibleSection
           label={t('database.exportModal.lorebooks')}

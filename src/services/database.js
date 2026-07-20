@@ -44,10 +44,8 @@ export async function exportDatabase(selection) {
     data.connectionProfiles = [...filtered]
   }
 
-  if (selection.logIds?.size > 0) {
-    const allLogs = await db.logs.toArray()
-    const filtered = allLogs.filter((l) => selection.logIds.has(l.id))
-    data.logs = [...filtered]
+  if (selection.logs) {
+    data.logs = await db.logs.toArray()
   }
 
   if (selection.inChatShortcutIds?.size > 0) {

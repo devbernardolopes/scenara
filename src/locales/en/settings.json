@@ -997,6 +997,7 @@
       "inChatShortcuts": "In-Chat Shortcuts",
       "connectionProfiles": "Connection Profiles",
       "logs": "Logs",
+      "logsDescription": "All logs",
       "lorebooks": "Lorebooks",
       "lorebooksDisabled": "Not yet implemented",
       "tags": "Tags",
