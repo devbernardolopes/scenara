@@ -162,6 +162,7 @@
   "memoryDeleteTitle": "Eliminar entrada de memoria",
   "memoryDeleteConfirm": "¿Eliminar esta entrada de memoria? No se puede deshacer.",
   "retryingInterrupted": "Reintentando mensaje interrumpido…",
+  "cancelled": "Cancelado",
   "summarizationProgressMessages_one": "Próximo resumen en {{count}} mensaje",
   "summarizationProgressMessages_other": "Próximo resumen en {{count}} mensajes",
   "summarizationProgressTokens": "Memoria {{current}} / {{threshold}} tokens",

@@ -162,6 +162,7 @@
   "memoryDeleteTitle": "Supprimer l’entrée de mémoire",
   "memoryDeleteConfirm": "Supprimer cette entrée de mémoire ? Cela est irréversible.",
   "retryingInterrupted": "Nouvelle tentative du message interrompu…",
+  "cancelled": "Annulé",
   "summarizationProgressMessages_one": "Prochain résumé dans {{count}} message",
   "summarizationProgressMessages_other": "Prochain résumé dans {{count}} messages",
   "summarizationProgressTokens": "Mémoire {{current}} / {{threshold}} tokens",

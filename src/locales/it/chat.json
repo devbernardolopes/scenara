@@ -162,6 +162,7 @@
   "memoryDeleteTitle": "Elimina voce di memoria",
   "memoryDeleteConfirm": "Eliminare questa voce di memoria? Non può essere annullato.",
   "retryingInterrupted": "Nuovo tentativo del messaggio interrotto…",
+  "cancelled": "Annullato",
   "summarizationProgressMessages_one": "Prossimo riepilogo tra {{count}} messaggio",
   "summarizationProgressMessages_other": "Prossimo riepilogo tra {{count}} messaggi",
   "summarizationProgressTokens": "Memoria {{current}} / {{threshold}} token",

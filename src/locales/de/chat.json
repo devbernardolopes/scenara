@@ -162,6 +162,7 @@
   "memoryDeleteTitle": "Erinnerungseintrag löschen",
   "memoryDeleteConfirm": "Diesen Erinnerungseintrag löschen? Das kann nicht rückgängig gemacht werden.",
   "retryingInterrupted": "Unterbrochene Nachricht wird erneut versucht…",
+  "cancelled": "Abgebrochen",
   "summarizationProgressMessages_one": "Nächste Zusammenfassung in {{count}} Nachricht",
   "summarizationProgressMessages_other": "Nächste Zusammenfassung in {{count}} Nachrichten",
   "summarizationProgressTokens": "Speicher {{current}} / {{threshold}} Token",

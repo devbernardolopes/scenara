@@ -1153,6 +1153,7 @@ function ChatView() {
       if (err.name === 'AbortError') {
         const dbMsg = await db.messages.get(Number(assistantMsgId))
         const partial = dbMsg?.content || ''
+        const cancelledText = partial ? `${partial}\n\n${t('cancelled')}` : t('cancelled')
         const keptEntry = {
           content: partial,
           promptData: null,
@@ -1160,6 +1161,9 @@ function ChatView() {
           apiDurationMs: null,
           createdAt: dbMsg?.createdAt || new Date().toISOString(),
           hidden: isOOC && character?.includeOOC === false,
+          isError: true,
+          isCancelled: true,
+          error: cancelledText,
         }
         await updateMessage(assistantMsgId, {
           content: partial,
@@ -1823,18 +1827,23 @@ function ChatView() {
       if (err.name === 'AbortError') {
         outcome = 'aborted'
         // Keep the streamed slot (with its partial content) instead of discarding it.
-        // Read the latest bundle from the DB so we don't lose streamed content that
+        // Read the latest message from the DB so we don't lose streamed content that
         // arrived after the local `regenEntries` snapshot was taken.
+        const dbMsg = await db.messages.get(Number(messageId))
+        const partial = dbMsg?.content || ''
+        const cancelledText = partial ? `${partial}\n\n${t('cancelled')}` : t('cancelled')
         const finalEntries = regenEntries.map((e) => ({ ...e }))
         if (finalEntries?.[slotIndex]) {
-          finalEntries[slotIndex].isError = false
-          finalEntries[slotIndex].error = null
+          finalEntries[slotIndex].content = partial
+          finalEntries[slotIndex].isError = true
+          finalEntries[slotIndex].isCancelled = true
+          finalEntries[slotIndex].error = cancelledText
           finalEntries[slotIndex].promptData = finalEntries[slotIndex].promptData || null
         }
         const keptBundle = JSON.stringify(finalEntries)
         await updateMessage(messageId, {
           bundleMessages: keptBundle,
-          content: finalEntries?.[slotIndex]?.content ?? '',
+          content: partial,
           activeSlotIndex: slotIndex,
         })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {

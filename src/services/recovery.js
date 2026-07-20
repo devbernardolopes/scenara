@@ -15,7 +15,8 @@ export function detectOrphanedMessages(messages) {
     lastMsg.role === 'assistant' &&
     lastMsg.content === '' &&
     !lastMsg.bundleMessages &&
-    lastMsg.apiDurationMs == null
+    lastMsg.apiDurationMs == null &&
+    !lastMsg.isCancelled
   ) {
     return { type: 'send', messageId: lastMsg.id, isOOC: !!lastMsg.isOOC }
   }
@@ -29,7 +30,12 @@ export function detectOrphanedMessages(messages) {
 
     const activeIdx = msg.activeSlotIndex ?? entries.length - 1
     const activeEntry = entries[activeIdx]
-    if (activeEntry && activeEntry.content === '' && !activeEntry.isError) {
+    if (
+      activeEntry &&
+      activeEntry.content === '' &&
+      !activeEntry.isError &&
+      !activeEntry.isCancelled
+    ) {
       return { type: 'regenerate', messageId: msg.id }
     }
   }

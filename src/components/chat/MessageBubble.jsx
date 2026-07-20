@@ -395,6 +395,7 @@ function MessageBubble({
   const activeEntry = bundleMessages?.[bundleIndex ?? 0] ?? bundleMessages?.[0]
   const isSlotHidden = activeEntry?.hidden === true
   const isSlotError = activeEntry?.isError === true
+  const isSlotCancelled = activeEntry?.isCancelled === true
 
   function isButtonDisabled(key) {
     if (streaming) return true
@@ -933,7 +934,9 @@ function MessageBubble({
             />
           ) : requestFailed ? (
             <div className="bg-error-subtle rounded p-3 text-sm max-w-full overflow-hidden">
-              <p className="font-bold text-error">Error:</p>
+              <p className="font-bold text-error">
+                {isSlotCancelled ? t('cancelled') + ':' : 'Error:'}
+              </p>
               <pre className="mt-1 text-error text-xs overflow-x-auto max-w-full whitespace-pre-wrap break-words">
                 {errorText || '(No content)'}
               </pre>
