@@ -51,8 +51,11 @@ export async function updateLorebookOrder(order) {
   window.dispatchEvent(new CustomEvent('lorebooks-changed'))
 }
 
-export async function getAllLorebooks() {
-  const all = await db.lorebooks.orderBy('createdAt').toArray()
+export async function getAllLorebooks({ isGlobal } = {}) {
+  let all = await db.lorebooks.orderBy('createdAt').toArray()
+  if (typeof isGlobal === 'boolean') {
+    all = all.filter((l) => l.isGlobal === isGlobal)
+  }
   return applyOrder(all)
 }
 

@@ -6,6 +6,7 @@ import { buildInjectedMemory } from './threadMemories'
 import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
 import { getPersona } from './personas'
 import { parseBundleEntries } from './chatGeneration'
+import { getActiveLoreBlocks } from './lorebookActivation'
 
 // A message is hidden for payload purposes when its currently-active slot
 // entry carries `hidden: true`. Visibility is stored per-slot (each entry in
@@ -224,6 +225,13 @@ export async function buildMessagesPayload({
   personaMap,
   lastSummarizationAt = null,
   activeScenario = null,
+  loreBlocks = {
+    beforeChar: '',
+    afterChar: '',
+    beforePrompt: '',
+    afterPrompt: '',
+    atDepth: new Map(),
+  },
 }) {
   const writingMessageRole =
     character?.writingMessageRole || settings.writingMessageRole || 'system'
@@ -264,6 +272,10 @@ export async function buildMessagesPayload({
     systemParts.push(systemPrompt)
   }
 
+  if (loreBlocks.beforeChar) {
+    systemParts.push(loreBlocks.beforeChar)
+  }
+
   const promptBlock = buildCharacterPromptBlock(character, {
     isFirstMessage,
     lastSummarizationAt,
@@ -272,6 +284,10 @@ export async function buildMessagesPayload({
   })
   if (promptBlock) {
     systemParts.push(promptBlock)
+  }
+
+  if (loreBlocks.afterChar) {
+    systemParts.push(loreBlocks.afterChar)
   }
 
   const extraPrompt = replaceVarsIn(character?.extraPrompt)
@@ -306,6 +322,10 @@ export async function buildMessagesPayload({
   const postHistoryInstructions = replaceVarsWithDesc(character?.postHistoryInstructions)
 
   if (isFirstMessage) {
+    if (loreBlocks.beforePrompt) {
+      result.push({ role: 'user', content: loreBlocks.beforePrompt })
+      entryTypes.push('loreBeforePrompt')
+    }
     const firstMessageContent = replaceVarsIn(settings.firstMessagePrompt)
     const firstMessageRole = settings.firstMessageRole || 'system'
     if (firstMessageContent) {
@@ -318,6 +338,10 @@ export async function buildMessagesPayload({
         result.push({ role: firstMessageRole, content: firstMessageContent })
       }
       entryTypes.push('firstMessage')
+    }
+    if (loreBlocks.afterPrompt) {
+      result.push({ role: 'user', content: loreBlocks.afterPrompt })
+      entryTypes.push('loreAfterPrompt')
     }
   } else {
     for (const msg of messages) {
@@ -353,6 +377,17 @@ export async function buildMessagesPayload({
     }
   }
 
+  if (!isFirstMessage && loreBlocks.atDepth instanceof Map && loreBlocks.atDepth.size > 0) {
+    const depths = [...loreBlocks.atDepth.keys()].sort((a, b) => b - a)
+    for (const depth of depths) {
+      const text = loreBlocks.atDepth.get(depth)
+      if (!text) continue
+      const insertIdx = Math.max(1, result.length - depth)
+      result.splice(insertIdx, 0, { role: 'system', content: text })
+      entryTypes.splice(insertIdx, 0, 'loreAtDepth')
+    }
+  }
+
   const writingEndOfMessages =
     writingInstruction?.content &&
     writingTiming === 'always' &&
@@ -375,9 +410,19 @@ export async function buildMessagesPayload({
     entryTypes.push('persona')
   }
 
-  if (!isFirstMessage && postHistoryInstructions) {
-    result.push({ role: 'user', content: postHistoryInstructions })
-    entryTypes.push('postHistory')
+  if (!isFirstMessage) {
+    if (loreBlocks.beforePrompt) {
+      result.push({ role: 'user', content: loreBlocks.beforePrompt })
+      entryTypes.push('loreBeforePrompt')
+    }
+    if (postHistoryInstructions) {
+      result.push({ role: 'user', content: postHistoryInstructions })
+      entryTypes.push('postHistory')
+    }
+    if (loreBlocks.afterPrompt) {
+      result.push({ role: 'user', content: loreBlocks.afterPrompt })
+      entryTypes.push('loreAfterPrompt')
+    }
   }
 
   if (memoryText) {
@@ -501,6 +546,13 @@ export async function buildOOCMessagesPayload({
   lastSummarizationAt = null,
   activeScenario = null,
   isFirstMessage = false,
+  loreBlocks = {
+    beforeChar: '',
+    afterChar: '',
+    beforePrompt: '',
+    afterPrompt: '',
+    atDepth: new Map(),
+  },
 }) {
   const charName = character?.name || ''
   const personaName = chatPersona?.name || ''
@@ -545,6 +597,10 @@ export async function buildOOCMessagesPayload({
     )
   }
 
+  if (loreBlocks.beforeChar) {
+    systemParts.push(loreBlocks.beforeChar)
+  }
+
   const promptBlock = buildCharacterPromptBlock(character, {
     isFirstMessage,
     lastSummarizationAt,
@@ -560,6 +616,21 @@ export async function buildOOCMessagesPayload({
     }
   }
 
+  const oocAfterChar = [loreBlocks.afterChar]
+  if (loreBlocks.atDepth instanceof Map) {
+    for (const text of loreBlocks.atDepth.values()) {
+      if (text) oocAfterChar.push(text)
+    }
+  }
+  const oocAfterCharJoined = oocAfterChar.filter(Boolean).join('\n\n')
+  if (oocAfterCharJoined) {
+    systemParts.push(oocAfterCharJoined)
+  }
+
+  if (loreBlocks.beforePrompt) {
+    systemParts.push(loreBlocks.beforePrompt)
+  }
+
   if (transcriptWithVars && !systemHasTranscript) {
     const messagesHeader = oocSettings.messagesHeader
     if (messagesHeader) {
@@ -567,6 +638,10 @@ export async function buildOOCMessagesPayload({
     } else {
       systemParts.push(transcriptWithVars)
     }
+  }
+
+  if (loreBlocks.afterPrompt) {
+    systemParts.push(loreBlocks.afterPrompt)
   }
 
   const result = [{ role: 'system', content: systemParts.join('\n\n') }]
@@ -611,12 +686,16 @@ export function buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, p
   }
   const numbers = [null]
   if (isFirstMessage) {
-    if (payload.length > 1) numbers.push(null)
+    while (numbers.length < payload.length) {
+      numbers.push(null)
+    }
   } else {
     for (const msg of apiMessages) {
       numbers.push(numMap.get(msg.id) || null)
     }
-    if (payload.length > numbers.length) numbers.push(null)
+    while (numbers.length < payload.length) {
+      numbers.push(null)
+    }
   }
   return numbers
 }
@@ -672,6 +751,11 @@ export async function buildChatRequestPayload({
   const latestThread = await getThread(threadId)
   const memoryText = await buildInjectedMemory(character, latestThread, { beforeDate })
 
+  const loreBlocks = await getActiveLoreBlocks({
+    character,
+    messages: processedMessages,
+  })
+
   let payload
   let entryTypes = null
 
@@ -707,6 +791,7 @@ export async function buildChatRequestPayload({
       lastSummarizationAt: latestThread?.lastSummarizationAt || null,
       activeScenario: latestThread?.activeScenario || null,
       isFirstMessage,
+      loreBlocks,
       oocSettings: {
         oocSystemInstructions,
         oocUserInstructions,
@@ -759,6 +844,7 @@ export async function buildChatRequestPayload({
       personaMap,
       lastSummarizationAt: latestThread?.lastSummarizationAt || null,
       activeScenario: latestThread?.activeScenario || null,
+      loreBlocks,
     })
     payload = chatResult.payload
     entryTypes = chatResult.entryTypes
