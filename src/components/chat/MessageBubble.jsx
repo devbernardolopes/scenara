@@ -1020,7 +1020,8 @@ function MessageBubble({
                   </div>
                 ) : (
                   renderSlideContent(displayContent, displayContentForRender, plainSegments, {
-                    streaming: streaming && (!bundleMessages || bundleIndex === streamingSlotIndex),
+                    streaming:
+                      streaming && (!hasMultipleSlots || bundleIndex === streamingSlotIndex),
                   })
                 )}
               </div>
@@ -1076,7 +1077,7 @@ function MessageBubble({
               </div>
             ) : (
               renderSlideContent(displayContent, displayContentForRender, plainSegments, {
-                streaming: streaming && (!bundleMessages || bundleIndex === streamingSlotIndex),
+                streaming: streaming && (!hasMultipleSlots || bundleIndex === streamingSlotIndex),
               })
             )}
           </div>

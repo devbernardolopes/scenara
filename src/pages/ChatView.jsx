@@ -1743,8 +1743,7 @@ function ChatView() {
       }
 
       if (result.status === 'empty') {
-        const dbMsg = await db.messages.get(Number(messageId))
-        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
+        const finalEntries = regenEntries.map((e) => ({ ...e }))
         if (finalEntries[slotIndex]) {
           finalEntries[slotIndex].isError = true
           finalEntries[slotIndex].error = null
@@ -1761,8 +1760,7 @@ function ChatView() {
       }
 
       if (result.status === 'error') {
-        const dbMsg = await db.messages.get(Number(messageId))
-        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
+        const finalEntries = regenEntries.map((e) => ({ ...e }))
         if (finalEntries[slotIndex]) {
           finalEntries[slotIndex].isError = true
           finalEntries[slotIndex].error = result.error || null
@@ -1784,8 +1782,7 @@ function ChatView() {
       }
 
       if (result.status === 'success') {
-        const dbMsg = await db.messages.get(Number(messageId))
-        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
+        const finalEntries = regenEntries.map((e) => ({ ...e }))
         if (finalEntries[slotIndex]) {
           finalEntries[slotIndex].content = result.content
           finalEntries[slotIndex].promptData = result.promptData
@@ -1828,8 +1825,7 @@ function ChatView() {
         // Keep the streamed slot (with its partial content) instead of discarding it.
         // Read the latest bundle from the DB so we don't lose streamed content that
         // arrived after the local `regenEntries` snapshot was taken.
-        const dbMsg = await db.messages.get(Number(messageId))
-        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
+        const finalEntries = regenEntries.map((e) => ({ ...e }))
         if (finalEntries?.[slotIndex]) {
           finalEntries[slotIndex].isError = false
           finalEntries[slotIndex].error = null
@@ -1856,8 +1852,7 @@ function ChatView() {
           )
         }
       } else {
-        const dbMsg = await db.messages.get(Number(messageId))
-        const finalEntries = parseBundleEntries(dbMsg?.bundleMessages) || regenEntries
+        const finalEntries = regenEntries.map((e) => ({ ...e }))
         if (finalEntries?.[slotIndex]) {
           finalEntries[slotIndex].isError = true
           finalEntries[slotIndex].error = err.message || null
