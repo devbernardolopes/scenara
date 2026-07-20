@@ -244,8 +244,7 @@ function ChatInputArea({
         requestAnimationFrame(() => {
           const el = textareaRef.current
           if (!el) return
-          if (el.value) autoResize(el)
-          else resetTextareaHeight()
+          resetTextareaHeight()
         })
       }
     }
