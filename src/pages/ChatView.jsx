@@ -173,6 +173,7 @@ function ChatView() {
   const loadEarlierSuppressUntilRef = useRef(0)
   const scrollClearedRef = useRef(false)
   const generatingFetchIdRef = useRef(0)
+  const streamingMsgIdRef = useRef(null)
   const messagesRef = useRef(null)
   const failedIdsRef = useRef(new Set())
   const [thread, setThread] = useState(null)
@@ -625,10 +626,30 @@ function ChatView() {
   }, [threadId])
 
   useEffect(() => {
+    streamingMsgIdRef.current = streamingMsgId
+  }, [streamingMsgId])
+
+  useEffect(() => {
     function handleMessagesChanged(e) {
       if (Number(e.detail?.threadId) !== Number(threadId)) return
-      if (generatingRef.current) return
-      getMessagesByThread(threadId).then((msgs) => setMessages(dedupeMessages(msgs)))
+      getMessagesByThread(threadId).then((msgs) => {
+        const fresh = dedupeMessages(msgs)
+        if (!generatingRef.current) {
+          setMessages(fresh)
+          return
+        }
+        setMessages((prev) => {
+          const prevMap = new Map(prev.map((m) => [m.id, m]))
+          return fresh.map((m) => {
+            const prevMsg = prevMap.get(m.id)
+            if (!prevMsg) return m
+            if (prevMsg.id === streamingMsgIdRef.current) {
+              return { ...m, content: prevMsg.content }
+            }
+            return m
+          })
+        })
+      })
     }
     window.addEventListener('messages-changed', handleMessagesChanged)
     return () => window.removeEventListener('messages-changed', handleMessagesChanged)
