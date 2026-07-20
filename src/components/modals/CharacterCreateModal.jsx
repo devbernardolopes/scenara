@@ -26,6 +26,7 @@ import TagsSection from './character/TagsSection'
 import ScenarioSection from './character/ScenarioSection'
 import LorebooksSection from './character/LorebooksSection'
 import FullDataSection from './character/FullDataSection'
+import { buildFullDataMarkdown } from './character/fullDataMarkdown'
 
 const INITIAL_FORM = {
   name: '',
@@ -398,6 +399,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       director:
         form.directorEnabled &&
         DIRECTOR_GROUP_FIELDS.some((g) => form[g.enabledKey] && form[g.instructionsKey]?.trim()),
+      fullData: buildFullDataMarkdown(form, '').trim().length > 0,
     }
     if (overrideDefaults) {
       highlights.overrides = OVERRIDE_FIELDS.some((key) => {
