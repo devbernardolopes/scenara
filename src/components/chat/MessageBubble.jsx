@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect, useLayoutEffect, useMemo, memo } from 'react'
+import { useState, useRef, useEffect, useMemo, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
-import { useCarouselSwipe } from '../../hooks/useCarouselSwipe'
+import { useSwipe } from '../../hooks/useSwipe'
 import { useIsMobile } from '../../hooks/useIsMobile'
 import { useOverflowButtons } from '../../hooks/useOverflowButtons'
 import { showToast } from '../../lib/toast'
@@ -217,8 +217,8 @@ function MessageBubble({
   onToggleVisible,
   personaName,
 }) {
-  function renderContent(text, origin) {
-    if (origin === 'initial') {
+  function renderContent(text) {
+    if (currentOrigin === 'initial') {
       return replaceVars(text, {
         charName: character?.name,
         personaName,
@@ -237,7 +237,6 @@ function MessageBubble({
   const overflowRef = useRef(null)
   const overflowBtnRef = useRef(null)
   const bubbleRef = useRef(null)
-  const trackRef = useRef(null)
   const [overflowMenuStyle, setOverflowMenuStyle] = useState(null)
   const [visibility, setVisibility] = useState(
     Object.fromEntries(VISIBILITY_KEYS.map((k) => [k, true])),
@@ -359,7 +358,7 @@ function MessageBubble({
 
   const isUser = role === 'user'
   const isSystem = role === 'system'
-  const displayContent = renderContent(message.content, currentOrigin)
+  const displayContent = renderContent(message.content)
 
   const displayContentForRender = useMemo(() => {
     if (renderMarkdown && activeRules.length) return injectRuleTags(displayContent, activeRules)
@@ -372,63 +371,9 @@ function MessageBubble({
     return null
   }, [displayContent, renderMarkdown, activeRules])
 
-  function renderSlideContent(
-    content,
-    forRender,
-    segments,
-    { streaming: slideStreaming = false } = {},
-  ) {
-    return (
-      <div
-        className="text-sm markdown-body w-full overflow-hidden"
-        style={{
-          fontFamily: CHAT_FONTS[chatFontFamily],
-          fontSize: CHAT_FONT_SIZES[chatFontSize],
-        }}
-      >
-        {renderMarkdown ? (
-          <CodeBlocksMarkdown
-            content={forRender}
-            activeRules={activeRules}
-            collapsedCodeBlocks={collapsedCodeBlocks}
-            onToggleCodeBlock={onToggleCodeBlock}
-            messageId={message.id}
-          />
-        ) : segments ? (
-          <p className="mb-2 last:mb-0 whitespace-pre-wrap">
-            {segments.map((seg, idx) =>
-              seg.type === 'styled' ? (
-                <span
-                  key={idx}
-                  style={{
-                    color: activeRules[seg.ruleIndex].color,
-                    fontSize: `${activeRules[seg.ruleIndex].fontSizePercent}%`,
-                  }}
-                >
-                  {seg.content}
-                </span>
-              ) : (
-                <span key={idx}>{seg.content}</span>
-              ),
-            )}
-          </p>
-        ) : (
-          <p className="mb-2 last:mb-0 whitespace-pre-wrap">{content}</p>
-        )}
-        {slideStreaming && (
-          <RefreshCw className="inline-block w-4 h-4 text-primary animate-spin ml-0.5 align-text-bottom" />
-        )}
-      </div>
-    )
-  }
-
   const isMobile = useIsMobile()
   const hasMultipleSlots = bundleMessages?.length > 1
-  const isCarousel = isMobile && hasMultipleSlots && !streaming && !editing
-
-  useCarouselSwipe(trackRef, {
-    enabled: isCarousel,
-    threshold: 50,
+  useSwipe(bubbleRef, {
     onSwipeLeft: () => {
       if (!hasMultipleSlots) return
       const newIdx = (bundleIndex + 1) % bundleMessages.length
@@ -439,45 +384,9 @@ function MessageBubble({
       const newIdx = (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
       onBundleNavigate?.(message.id, newIdx)
     },
+    enabled: isMobile && hasMultipleSlots && !streaming,
+    threshold: 50,
   })
-
-  useLayoutEffect(() => {
-    if (!trackRef.current || !isCarousel) return
-    trackRef.current.style.transition = 'none'
-    trackRef.current.style.transform = 'translateX(-100%)'
-  }, [bundleIndex, isCarousel])
-
-  const prevIdx = isCarousel
-    ? (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
-    : -1
-  const nextIdx = isCarousel ? (bundleIndex + 1) % bundleMessages.length : -1
-
-  const prevDisplayContent = isCarousel
-    ? renderContent(bundleMessages[prevIdx]?.content || '', bundleMessages[prevIdx]?.origin || null)
-    : ''
-  const nextDisplayContent = isCarousel
-    ? renderContent(bundleMessages[nextIdx]?.content || '', bundleMessages[nextIdx]?.origin || null)
-    : ''
-
-  const prevDisplayContentForRender = useMemo(() => {
-    if (!isCarousel || renderMarkdown || !activeRules.length) return prevDisplayContent
-    return injectRuleTags(prevDisplayContent, activeRules)
-  }, [prevDisplayContent, renderMarkdown, activeRules, isCarousel])
-
-  const nextDisplayContentForRender = useMemo(() => {
-    if (!isCarousel || renderMarkdown || !activeRules.length) return nextDisplayContent
-    return injectRuleTags(nextDisplayContent, activeRules)
-  }, [nextDisplayContent, renderMarkdown, activeRules, isCarousel])
-
-  const prevPlainSegments = useMemo(() => {
-    if (!isCarousel || renderMarkdown || !activeRules.length) return null
-    return applyRulesToPlainText(prevDisplayContent, activeRules)
-  }, [prevDisplayContent, renderMarkdown, activeRules, isCarousel])
-
-  const nextPlainSegments = useMemo(() => {
-    if (!isCarousel || renderMarkdown || !activeRules.length) return null
-    return applyRulesToPlainText(nextDisplayContent, activeRules)
-  }, [nextDisplayContent, renderMarkdown, activeRules, isCarousel])
 
   const contentSlotCount = bundleMessages
     ? bundleMessages.filter((c) => (c?.content || '').trim()).length
@@ -752,7 +661,7 @@ function MessageBubble({
                 : 'bg-surface-secondary text-text'
         } ${isSlotHidden ? 'border-dotted opacity-60' : ''}`}
         style={{
-          willChange: !isCarousel && isMobile && hasMultipleSlots ? 'transform' : undefined,
+          willChange: isMobile && hasMultipleSlots ? 'transform' : undefined,
           ...(isUser ? userBgStyle : {}),
           ...(!isUser && isOOC
             ? { borderLeftColor: 'var(--color-ooc)', borderLeftWidth: '3px' }
@@ -989,99 +898,89 @@ function MessageBubble({
         })()}
 
         {/* Content */}
-        {isCarousel ? (
-          <div className="overflow-hidden">
-            <div
-              ref={trackRef}
-              className="flex"
-              style={{ width: '300%', willChange: 'transform', touchAction: 'pan-y' }}
-            >
-              <div className="w-1/3 shrink-0 px-3 py-2">
-                {renderSlideContent(
-                  prevDisplayContent,
-                  prevDisplayContentForRender,
-                  prevPlainSegments,
-                )}
-              </div>
-              <div
-                className="w-1/3 shrink-0 px-3 py-2"
-                onDoubleClick={
-                  streaming || requestFailed || !message.content?.trim()
-                    ? undefined
-                    : handleStartEdit
-                }
-              >
-                {requestFailed ? (
-                  <div className="bg-error-subtle rounded p-3 text-sm max-w-full overflow-hidden">
-                    <p className="font-bold text-error">Error:</p>
-                    <pre className="mt-1 text-error text-xs overflow-x-auto max-w-full whitespace-pre-wrap break-words">
-                      {errorText || '(No content)'}
-                    </pre>
-                  </div>
-                ) : (
-                  renderSlideContent(displayContent, displayContentForRender, plainSegments, {
-                    streaming:
-                      streaming && (!hasMultipleSlots || bundleIndex === streamingSlotIndex),
-                  })
-                )}
-              </div>
-              <div className="w-1/3 shrink-0 px-3 py-2">
-                {renderSlideContent(
-                  nextDisplayContent,
-                  nextDisplayContentForRender,
-                  nextPlainSegments,
-                )}
-              </div>
+        <div
+          onDoubleClick={
+            editing || streaming || requestFailed || !message.content?.trim()
+              ? undefined
+              : handleStartEdit
+          }
+          className={editing ? '' : 'px-3 py-2'}
+        >
+          {editing ? (
+            <AutoResizeTextarea
+              ref={editRef}
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+              onBlur={handleSaveEdit}
+              onKeyDown={handleEditKeyDown}
+              extraHeight={8}
+              className={`w-full resize-none rounded border whitespace-pre-wrap break-words px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+                isOOC
+                  ? 'bg-ooc-subtle text-text border-border focus:ring-ooc'
+                  : isUser
+                    ? `${userBgClass || 'bg-transparent'} border-white/20 focus:ring-white/40`
+                    : 'bg-surface text-text border-border focus:ring-primary/40'
+              }`}
+              style={{
+                ...(isOOC
+                  ? { borderLeftColor: 'var(--color-ooc)', borderLeftWidth: '3px' }
+                  : isUser
+                    ? userBgStyle
+                    : undefined),
+                fontFamily: CHAT_FONTS[chatFontFamily],
+                fontSize: CHAT_FONT_SIZES[chatFontSize],
+              }}
+            />
+          ) : requestFailed ? (
+            <div className="bg-error-subtle rounded p-3 text-sm max-w-full overflow-hidden">
+              <p className="font-bold text-error">Error:</p>
+              <pre className="mt-1 text-error text-xs overflow-x-auto max-w-full whitespace-pre-wrap break-words">
+                {errorText || '(No content)'}
+              </pre>
             </div>
-          </div>
-        ) : (
-          <div
-            onDoubleClick={
-              editing || streaming || requestFailed || !message.content?.trim()
-                ? undefined
-                : handleStartEdit
-            }
-            className={editing ? '' : 'px-3 py-2'}
-          >
-            {editing ? (
-              <AutoResizeTextarea
-                ref={editRef}
-                value={editedContent}
-                onChange={(e) => setEditedContent(e.target.value)}
-                onBlur={handleSaveEdit}
-                onKeyDown={handleEditKeyDown}
-                extraHeight={8}
-                className={`w-full resize-none rounded border whitespace-pre-wrap break-words px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
-                  isOOC
-                    ? 'bg-ooc-subtle text-text border-border focus:ring-ooc'
-                    : isUser
-                      ? `${userBgClass || 'bg-transparent'} border-white/20 focus:ring-white/40`
-                      : 'bg-surface text-text border-border focus:ring-primary/40'
-                }`}
-                style={{
-                  ...(isOOC
-                    ? { borderLeftColor: 'var(--color-ooc)', borderLeftWidth: '3px' }
-                    : isUser
-                      ? userBgStyle
-                      : undefined),
-                  fontFamily: CHAT_FONTS[chatFontFamily],
-                  fontSize: CHAT_FONT_SIZES[chatFontSize],
-                }}
-              />
-            ) : requestFailed ? (
-              <div className="bg-error-subtle rounded p-3 text-sm max-w-full overflow-hidden">
-                <p className="font-bold text-error">Error:</p>
-                <pre className="mt-1 text-error text-xs overflow-x-auto max-w-full whitespace-pre-wrap break-words">
-                  {errorText || '(No content)'}
-                </pre>
-              </div>
-            ) : (
-              renderSlideContent(displayContent, displayContentForRender, plainSegments, {
-                streaming: streaming && (!hasMultipleSlots || bundleIndex === streamingSlotIndex),
-              })
-            )}
-          </div>
-        )}
+          ) : (
+            <div
+              className="text-sm markdown-body w-full overflow-hidden"
+              style={{
+                fontFamily: CHAT_FONTS[chatFontFamily],
+                fontSize: CHAT_FONT_SIZES[chatFontSize],
+              }}
+            >
+              {renderMarkdown ? (
+                <CodeBlocksMarkdown
+                  content={displayContentForRender}
+                  activeRules={activeRules}
+                  collapsedCodeBlocks={collapsedCodeBlocks}
+                  onToggleCodeBlock={onToggleCodeBlock}
+                  messageId={message.id}
+                />
+              ) : plainSegments ? (
+                <p className="mb-2 last:mb-0 whitespace-pre-wrap">
+                  {plainSegments.map((seg, idx) =>
+                    seg.type === 'styled' ? (
+                      <span
+                        key={idx}
+                        style={{
+                          color: activeRules[seg.ruleIndex].color,
+                          fontSize: `${activeRules[seg.ruleIndex].fontSizePercent}%`,
+                        }}
+                      >
+                        {seg.content}
+                      </span>
+                    ) : (
+                      <span key={idx}>{seg.content}</span>
+                    ),
+                  )}
+                </p>
+              ) : (
+                <p className="mb-2 last:mb-0 whitespace-pre-wrap">{displayContent}</p>
+              )}
+              {streaming && (!bundleMessages || bundleIndex === streamingSlotIndex) && (
+                <RefreshCw className="inline-block w-4 h-4 text-primary animate-spin ml-0.5 align-text-bottom" />
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Footer */}
         <div
