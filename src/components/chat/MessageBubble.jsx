@@ -991,7 +991,11 @@ function MessageBubble({
         {/* Content */}
         {isCarousel ? (
           <div className="overflow-hidden">
-            <div ref={trackRef} className="flex" style={{ width: '300%', willChange: 'transform' }}>
+            <div
+              ref={trackRef}
+              className="flex"
+              style={{ width: '300%', willChange: 'transform', touchAction: 'pan-y' }}
+            >
               <div className="w-1/3 shrink-0 px-3 py-2">
                 {renderSlideContent(
                   prevDisplayContent,
