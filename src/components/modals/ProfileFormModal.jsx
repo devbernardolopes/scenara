@@ -108,6 +108,38 @@ const CEREBRAS_REASONING_MAP = {
   'gemma-4-31b': { options: ['none', 'low', 'medium', 'high'], default: 'none' },
 }
 
+function resolveParams(profile) {
+  const base = profile?.params ? { ...profile.params } : {}
+  const provider = profile?.providerId ? PROVIDERS.find((p) => p.id === profile.providerId) : null
+  const merged = { ...base }
+  if (provider) {
+    for (const def of provider.params || []) {
+      if (!(def.key in merged) && def.default !== undefined && def.default !== null) {
+        merged[def.key] = def.default
+      }
+    }
+    if (provider.supportsLmStudioMethods && !merged.lmStudioMethod) {
+      merged.lmStudioMethod = 'openai-compatible'
+    }
+    if (provider.hasModelReasoning && profile.model && CEREBRAS_REASONING_MAP[profile.model]) {
+      if (!('reasoning_effort' in merged)) {
+        merged.reasoning_effort = CEREBRAS_REASONING_MAP[profile.model].default
+      }
+    }
+  }
+  return merged
+}
+
+function sortParams(obj) {
+  if (!obj || typeof obj !== 'object') return obj
+  return Object.keys(obj)
+    .sort()
+    .reduce((acc, k) => {
+      acc[k] = obj[k]
+      return acc
+    }, {})
+}
+
 function ProfileFormModal({ profile }) {
   const { t } = useTranslation('settings')
   const { closeModal, setCloseGuard } = useModal()
@@ -121,7 +153,7 @@ function ProfileFormModal({ profile }) {
       providerId: profile?.providerId || '',
       keyId: profile?.keyId || null,
       model: profile?.model || '',
-      params: profile?.params ? { ...profile.params } : {},
+      params: resolveParams(profile),
       baseUrl: profile?.baseUrl || getDefaultBaseUrl(profile?.providerId) || '',
     }),
     [],
@@ -174,15 +206,19 @@ function ProfileFormModal({ profile }) {
 
   useEffect(() => {
     if (isCerebras && form.model && CEREBRAS_REASONING_MAP[form.model]) {
-      setForm((prev) => ({
-        ...prev,
-        params: { ...prev.params, reasoning_effort: CEREBRAS_REASONING_MAP[form.model].default },
-      }))
+      setForm((prev) => {
+        if ('reasoning_effort' in prev.params) return prev
+        return {
+          ...prev,
+          params: { ...prev.params, reasoning_effort: CEREBRAS_REASONING_MAP[form.model].default },
+        }
+      })
     }
   }, [isCerebras, form.model])
 
   const isDirty = Object.keys(initial).some((key) => {
-    if (key === 'params') return JSON.stringify(form.params) !== JSON.stringify(initial.params)
+    if (key === 'params')
+      return JSON.stringify(sortParams(form.params)) !== JSON.stringify(sortParams(initial.params))
     return form[key] !== initial[key]
   })
 
