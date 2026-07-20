@@ -2,6 +2,7 @@
   "title": "Logs",
   "detailsTitle": "Détails du journal",
   "search": "Rechercher dans les journaux…",
+  "filters": "Filtres",
   "filterType": "Tous les types",
   "filterLevel": "Tous les niveaux",
   "filterThread": "Toutes les discussions",

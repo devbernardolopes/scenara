@@ -8,9 +8,10 @@ import { getLogs, deleteLogs, clearLogs, exportLogs } from '../../services/logs'
 import { getAllThreads } from '../../services/threads'
 import { getUIState, setUIState } from '../../services/uiState'
 import CloseButton from '../shared/CloseButton'
-import { Search, Trash2, Download, ScrollText } from '../../lib/icons'
+import { Search, Trash2, Download, ScrollText, ChevronDown } from '../../lib/icons'
 
 const FILTERS_KEY = 'logsModal.filters'
+const FILTERS_COLLAPSED_KEY = 'logsModal.filtersCollapsed'
 
 const DEFAULT_FILTERS = {
   type: '',
@@ -44,6 +45,7 @@ function LogsModal() {
   const [threads, setThreads] = useState([])
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
+  const [filtersCollapsed, setFiltersCollapsed] = useState(true)
   const searchRef = useRef(null)
 
   useEffect(() => {
@@ -51,6 +53,9 @@ function LogsModal() {
       if (saved && typeof saved === 'object') {
         setFilters({ ...DEFAULT_FILTERS, ...saved })
       }
+    })
+    getUIState(FILTERS_COLLAPSED_KEY).then((saved) => {
+      if (saved !== null) setFiltersCollapsed(!!saved)
     })
   }, [])
 
@@ -66,6 +71,10 @@ function LogsModal() {
   useEffect(() => {
     setUIState(FILTERS_KEY, filters)
   }, [filters])
+
+  useEffect(() => {
+    setUIState(FILTERS_COLLAPSED_KEY, filtersCollapsed)
+  }, [filtersCollapsed])
 
   useEffect(() => {
     load()
@@ -154,6 +163,11 @@ function LogsModal() {
 
   const validSelectedCount = logs.filter((l) => selectedIds.has(l.id)).length
   const allChecked = logs.length > 0 && validSelectedCount === logs.length
+  const activeFilterCount = [filters.type, filters.level, filters.threadId].filter(Boolean).length
+
+  function toggleFilters() {
+    setFiltersCollapsed((prev) => !prev)
+  }
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
@@ -162,62 +176,82 @@ function LogsModal() {
         <CloseButton onClick={closeModal} />
       </div>
 
-      <div className="p-6 pt-4 space-y-3 border-b border-border shrink-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[160px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
-            <input
-              ref={searchRef}
-              value={filters.search}
-              onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-              placeholder={t('logs:search')}
-              className="w-full min-h-[44px] pl-10 pr-3 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+      <div className="p-6 pt-4 space-y-2 border-b border-border shrink-0">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
+          <input
+            ref={searchRef}
+            value={filters.search}
+            onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
+            placeholder={t('logs:search')}
+            className="w-full min-h-[44px] pl-10 pr-3 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={toggleFilters}
+          className="flex items-center gap-2 min-h-[44px] px-1 w-full text-left"
+        >
+          <ChevronDown
+            className={`w-4 h-4 text-tertiary transition-transform duration-200 ${filtersCollapsed ? '' : 'rotate-180'}`}
+          />
+          <span className="text-sm text-secondary">{t('logs:filters')}</span>
+          {activeFilterCount > 0 && (
+            <span className="text-[11px] leading-none px-1.5 py-0.5 rounded bg-primary-subtle text-primary font-medium">
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+        <div
+          className="overflow-hidden transition-all duration-200"
+          style={{ maxHeight: filtersCollapsed ? 0 : '200px' }}
+        >
+          <div className="flex flex-wrap items-center gap-2 pb-2">
+            <select
+              value={filters.type}
+              onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value }))}
+              className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="">{t('logs:filterType')}</option>
+              {TYPES.map((tp) => (
+                <option key={tp} value={tp}>
+                  {t(`logs:types.${tp}`)}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filters.level}
+              onChange={(e) => setFilters((f) => ({ ...f, level: e.target.value }))}
+              className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="">{t('logs:filterLevel')}</option>
+              {LEVELS.map((lv) => (
+                <option key={lv} value={lv}>
+                  {t(`logs:levels.${lv}`)}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filters.threadId}
+              onChange={(e) => setFilters((f) => ({ ...f, threadId: e.target.value }))}
+              className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="">{t('logs:filterThread')}</option>
+              {threads.map((thr) => (
+                <option key={thr.id} value={thr.id}>
+                  {thr.title || `#${thr.threadNumber}`}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filters.sort}
+              onChange={(e) => setFilters((f) => ({ ...f, sort: e.target.value }))}
+              className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="desc">{t('logs:sortNewest')}</option>
+              <option value="asc">{t('logs:sortOldest')}</option>
+            </select>
           </div>
-          <select
-            value={filters.type}
-            onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value }))}
-            className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="">{t('logs:filterType')}</option>
-            {TYPES.map((tp) => (
-              <option key={tp} value={tp}>
-                {t(`logs:types.${tp}`)}
-              </option>
-            ))}
-          </select>
-          <select
-            value={filters.level}
-            onChange={(e) => setFilters((f) => ({ ...f, level: e.target.value }))}
-            className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="">{t('logs:filterLevel')}</option>
-            {LEVELS.map((lv) => (
-              <option key={lv} value={lv}>
-                {t(`logs:levels.${lv}`)}
-              </option>
-            ))}
-          </select>
-          <select
-            value={filters.threadId}
-            onChange={(e) => setFilters((f) => ({ ...f, threadId: e.target.value }))}
-            className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="">{t('logs:filterThread')}</option>
-            {threads.map((thr) => (
-              <option key={thr.id} value={thr.id}>
-                {thr.title || `#${thr.threadNumber}`}
-              </option>
-            ))}
-          </select>
-          <select
-            value={filters.sort}
-            onChange={(e) => setFilters((f) => ({ ...f, sort: e.target.value }))}
-            className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="desc">{t('logs:sortNewest')}</option>
-            <option value="asc">{t('logs:sortOldest')}</option>
-          </select>
         </div>
       </div>
 

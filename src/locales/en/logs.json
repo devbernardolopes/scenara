@@ -2,6 +2,7 @@
   "title": "Logs",
   "detailsTitle": "Log Details",
   "search": "Search logs…",
+  "filters": "Filters",
   "filterType": "All types",
   "filterLevel": "All levels",
   "filterThread": "All threads",

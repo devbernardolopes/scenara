@@ -2,6 +2,7 @@
   "title": "Logs",
   "detailsTitle": "Protokolldetails",
   "search": "Logs durchsuchen…",
+  "filters": "Filter",
   "filterType": "Alle Typen",
   "filterLevel": "Alle Stufen",
   "filterThread": "Alle Threads",

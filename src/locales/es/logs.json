@@ -2,6 +2,7 @@
   "title": "Logs",
   "detailsTitle": "Detalles del registro",
   "search": "Buscar en los registros…",
+  "filters": "Filtros",
   "filterType": "Todos los tipos",
   "filterLevel": "Todos los niveles",
   "filterThread": "Todas las conversaciones",
