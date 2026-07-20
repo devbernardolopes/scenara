@@ -470,8 +470,13 @@ function ChatView() {
   }, [])
 
   useEffect(() => {
+    if (messages.length === 0) {
+      setShowScrollButton(false)
+      isAtBottomRef.current = true
+      return
+    }
     const el = scrollRef.current
-    if (!el || messages.length === 0 || scrollCommits.current <= 1) return
+    if (!el || scrollCommits.current <= 1) return
 
     if (messagesGrewRef.current) {
       el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
