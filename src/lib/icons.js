@@ -12,6 +12,7 @@ export {
   Trash2,
   Edit3,
   Heart,
+  Home,
   Copy,
   Layers,
   ChevronsDown,

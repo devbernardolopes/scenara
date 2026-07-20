@@ -109,6 +109,10 @@
       "label": "Position du bouton de la barre latérale",
       "desc": "Où le bouton de bascule de la barre latérale apparaît sur les petits écrans."
     },
+    "showHomeButton": {
+      "label": "Afficher le bouton Accueil",
+      "desc": "Affiche un bouton d'accueil flottant sur les petits écrans lorsqu'on n'est pas sur la Découverte."
+    },
     "sidebarNavLayout": {
       "label": "Disposition de navigation de la barre latérale",
       "desc": "Comment les boutons de navigation de la barre latérale (Personas, Instructions d’écriture, etc.) sont affichés."

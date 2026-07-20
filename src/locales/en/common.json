@@ -48,6 +48,7 @@
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",
+    "home": "Home",
     "settings": "Settings"
   },
   "editThreadTitle": {

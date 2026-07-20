@@ -109,6 +109,10 @@
       "label": "Sidebar Toggle Position",
       "desc": "Where the sidebar toggle button appears on small screens."
     },
+    "showHomeButton": {
+      "label": "Show Home Button",
+      "desc": "Show a floating Home button on small screens when not on the Discovery view."
+    },
     "sidebarNavLayout": {
       "label": "Sidebar Navigation Layout",
       "desc": "How sidebar navigation buttons (Personas, Writing Instructions, etc.) are displayed."

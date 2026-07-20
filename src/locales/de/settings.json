@@ -109,6 +109,10 @@
       "label": "Sidebar Toggle Position",
       "desc": "Where the sidebar toggle button appears on small screens."
     },
+    "showHomeButton": {
+      "label": "Startschaltfläche anzeigen",
+      "desc": "Zeigt auf kleinen Bildschirmen eine Schaltfläche „Start“ an, wenn man sich nicht in der Entdeckung befindet."
+    },
     "sidebarNavLayout": {
       "label": "Sidebar Navigation Layout",
       "desc": "How sidebar navigation buttons (Personas, Writing Instructions, etc.) are displayed."

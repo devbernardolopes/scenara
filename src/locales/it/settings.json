@@ -109,6 +109,10 @@
       "label": "Posizione interruttore barra laterale",
       "desc": "Dove appare il pulsante per attivare la barra laterale su schermi piccoli."
     },
+    "showHomeButton": {
+      "label": "Mostra pulsante Home",
+      "desc": "Mostra un pulsante Home fluttuante su schermi piccoli quando non ci si trova nella Scoperta."
+    },
     "sidebarNavLayout": {
       "label": "Layout navigazione barra laterale",
       "desc": "Come sono visualizzati i pulsanti di navigazione della barra laterale (Personas, Istruzioni di scrittura, ecc.)."

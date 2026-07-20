@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import SidebarToggle from './SidebarToggle'
+import HomeButton from './HomeButton'
 import ToastContainer from '../shared/ToastContainer'
 import ToastObserver from '../shared/ToastObserver'
 import { initInferenceWorker } from '../../lib/inferenceClient'
@@ -22,6 +23,7 @@ function ShellLayout() {
         </main>
       </div>
       <SidebarToggle open={sidebarOpen} onToggle={() => setSidebarOpen((prev) => !prev)} />
+      <HomeButton open={sidebarOpen} />
       <ToastContainer />
       <ToastObserver />
     </div>

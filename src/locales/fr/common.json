@@ -48,6 +48,7 @@
   },
   "topbar": {
     "toggleSidebar": "Basculer la barre latérale",
+    "home": "Accueil",
     "settings": "Paramètres"
   },
   "editThreadTitle": {

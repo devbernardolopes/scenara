@@ -48,6 +48,7 @@
   },
   "topbar": {
     "toggleSidebar": "Alternar barra lateral",
+    "home": "Página inicial",
     "settings": "Configurações"
   },
   "editThreadTitle": {
@@ -123,8 +124,7 @@
       "setDefault": "Definir como padrão",
       "duplicate": "Duplicar",
       "export": "Exportar",
-      "delete": "Excluir",
-      "reorder": "Arrastar para reordenar"
+      "delete": "Excluir"
     }
   },
   "uploadImage": "Enviar imagem",
@@ -288,14 +288,5 @@
   },
   "localInference": {
     "placeholder": "As configurações de inferência local estarão disponíveis aqui."
-  },
-  "list": {
-    "actions": {
-      "edit": "Editar",
-      "setDefault": "Definir como padrão",
-      "duplicate": "Duplicar",
-      "export": "Exportar",
-      "delete": "Excluir"
-    }
   }
 }

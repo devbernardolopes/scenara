@@ -278,6 +278,15 @@ export const SETTINGS = [
     },
   },
   {
+    key: 'showHomeButton',
+    category: 'appearance',
+    group: 'interface',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.showHomeButton.label',
+    descKey: 'settings:appearance.showHomeButton.desc',
+  },
+  {
     key: 'sidebarNavLayout',
     category: 'appearance',
     group: 'interface',

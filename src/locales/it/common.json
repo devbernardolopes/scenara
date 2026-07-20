@@ -48,6 +48,7 @@
   },
   "topbar": {
     "toggleSidebar": "Attiva/disattiva barra laterale",
+    "home": "Home",
     "settings": "Impostazioni"
   },
   "editThreadTitle": {

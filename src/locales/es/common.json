@@ -48,6 +48,7 @@
   },
   "topbar": {
     "toggleSidebar": "Alternar barra lateral",
+    "home": "Inicio",
     "settings": "Ajustes"
   },
   "editThreadTitle": {

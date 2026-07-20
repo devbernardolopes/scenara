@@ -109,6 +109,10 @@
       "label": "Posición del botón de la barra lateral",
       "desc": "Dónde aparece el botón de alternar la barra lateral en pantallas pequeñas."
     },
+    "showHomeButton": {
+      "label": "Mostrar botón Inicio",
+      "desc": "Muestra un botón flotante de Inicio en pantallas pequeñas cuando no estás en Descubrimiento."
+    },
     "sidebarNavLayout": {
       "label": "Diseño de navegación de la barra lateral",
       "desc": "Cómo se muestran los botones de navegación de la barra lateral (Personas, Instrucciones de escritura, etc.)."
