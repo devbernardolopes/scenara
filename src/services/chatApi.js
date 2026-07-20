@@ -726,7 +726,7 @@ export async function buildChatRequestPayload({
     : messages
 
   let effectiveKeptConsumedCount = 0
-  if (!beforeDate && keepMessages > 0) {
+  if (keepMessages > 0) {
     const rollover =
       character?.messageRollover ?? (await getSetting('defaultMessageRollover')) ?? 'rollover'
     if (rollover === 'rollover') {
