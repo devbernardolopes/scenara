@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect } from 'react'
 import { TransformWrapper, TransformComponent, useControls } from 'react-zoom-pan-pinch'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
@@ -8,43 +8,64 @@ import { Download, X } from '../../lib/icons'
 
 function ImageViewerInner({ src, alt, imgRef, onZoomRef }) {
   const { centerView, resetTransform } = useControls()
-  const lastTapRef = useRef(0)
-  const touchStartRef = useRef(null)
   useEffect(() => {
     onZoomRef.current = (scale, animationTime, animationType) =>
       centerView(scale, animationTime, animationType)
   })
 
-  const doReset = useCallback(() => {
-    resetTransform(200, 'easeOut')
-  }, [resetTransform])
+  // The zoom library attaches native listeners on its wrapper and calls
+  // stopPropagation, which prevents React's root-delegated synthetic events
+  // (onDoubleClick/onTouchEnd) on the <img> from ever firing. So we attach our
+  // own native listeners directly on the <img> element — they run during the
+  // bubble phase *before* the wrapper's listener. A double-tap (or double-click)
+  // resets the image to its original display size.
+  useEffect(() => {
+    const el = imgRef.current
+    if (!el) return
 
-  // Mobile: detect a double-tap (two quick taps without panning) and reset the
-  // image to its original display size. The library's built-in touch double-tap
-  // behaves inconsistently across devices, so we handle it explicitly.
-  const handleTouchStart = (e) => {
-    const t = e.changedTouches[0]
-    touchStartRef.current = { x: t.clientX, y: t.clientY }
-  }
+    let lastTap = 0
+    let touchStart = null
 
-  const handleTouchEnd = (e) => {
-    const start = touchStartRef.current
-    touchStartRef.current = null
-    const t = e.changedTouches[0]
-    const moved = start ? Math.hypot(t.clientX - start.x, t.clientY - start.y) : 0
-    if (moved > 10) {
-      lastTapRef.current = 0
-      return
-    }
-    const now = Date.now()
-    if (now - lastTapRef.current < 300) {
-      lastTapRef.current = 0
+    const doReset = () => resetTransform(200, 'easeOut')
+
+    const handleDblClick = (e) => {
       e.stopPropagation()
       doReset()
-    } else {
-      lastTapRef.current = now
     }
-  }
+
+    const handleTouchStart = (e) => {
+      const t = e.changedTouches[0]
+      touchStart = { x: t.clientX, y: t.clientY }
+    }
+
+    const handleTouchEnd = (e) => {
+      const start = touchStart
+      touchStart = null
+      const t = e.changedTouches[0]
+      const moved = start ? Math.hypot(t.clientX - start.x, t.clientY - start.y) : 0
+      if (moved > 10) {
+        lastTap = 0
+        return
+      }
+      const now = Date.now()
+      if (now - lastTap < 300) {
+        lastTap = 0
+        e.stopPropagation()
+        doReset()
+      } else {
+        lastTap = now
+      }
+    }
+
+    el.addEventListener('dblclick', handleDblClick)
+    el.addEventListener('touchstart', handleTouchStart, { passive: true })
+    el.addEventListener('touchend', handleTouchEnd, { passive: true })
+    return () => {
+      el.removeEventListener('dblclick', handleDblClick)
+      el.removeEventListener('touchstart', handleTouchStart)
+      el.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [imgRef, resetTransform])
 
   return (
     <TransformComponent
@@ -57,12 +78,6 @@ function ImageViewerInner({ src, alt, imgRef, onZoomRef }) {
         className="max-w-[90vw] max-h-[90vh] object-contain select-none"
         draggable={false}
         ref={imgRef}
-        onDoubleClick={(e) => {
-          e.stopPropagation()
-          doReset()
-        }}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
       />
     </TransformComponent>
   )
