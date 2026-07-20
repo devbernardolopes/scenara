@@ -2306,7 +2306,10 @@ function ChatView() {
                   trackIdx != null && bundleMessages
                     ? Math.min(trackIdx, bundleMessages.length - 1)
                     : bundleMessages && msg.content
-                      ? Math.max(0, bundleMessages.indexOf(msg.content))
+                      ? Math.max(
+                          0,
+                          bundleMessages.findIndex((e) => e?.content === msg.content),
+                        )
                       : 0
                 const collapsedCodeBlocks =
                   entries && bundleIndex >= 0 && bundleIndex < entries.length

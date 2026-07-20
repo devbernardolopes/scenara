@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 const ANIMATION_MS = 200
+const STALE_TIMEOUT_MS = ANIMATION_MS * 3
 
 export function useCarouselSwipe(
   trackRef,
@@ -8,6 +9,7 @@ export function useCarouselSwipe(
 ) {
   const startRef = useRef(null)
   const isAnimating = useRef(false)
+  const animStartRef = useRef(null)
   const onSwipeLeftRef = useRef(onSwipeLeft)
   const onSwipeRightRef = useRef(onSwipeRight)
   const activeListeners = useRef([])
@@ -16,6 +18,13 @@ export function useCarouselSwipe(
     onSwipeLeftRef.current = onSwipeLeft
     onSwipeRightRef.current = onSwipeRight
   })
+
+  useEffect(() => {
+    if (enabled) {
+      isAnimating.current = false
+      animStartRef.current = null
+    }
+  }, [enabled])
 
   useEffect(() => {
     const el = trackRef.current
@@ -33,10 +42,18 @@ export function useCarouselSwipe(
       el.style.transition = 'none'
       el.style.transform = ''
       isAnimating.current = false
+      animStartRef.current = null
     }
 
     function handleTouchStart(e) {
-      if (e.touches.length > 1 || isAnimating.current) return
+      if (e.touches.length > 1) return
+      if (isAnimating.current) {
+        if (animStartRef.current && Date.now() - animStartRef.current > STALE_TIMEOUT_MS) {
+          resetDragState()
+        } else {
+          return
+        }
+      }
       startRef.current = {
         x: e.touches[0].clientX,
         y: e.touches[0].clientY,
@@ -89,6 +106,7 @@ export function useCarouselSwipe(
       const callback = direction === 'left' ? onSwipeLeftRef.current : onSwipeRightRef.current
 
       isAnimating.current = true
+      animStartRef.current = Date.now()
       el.style.transition = `transform ${ANIMATION_MS}ms ease-out`
       el.style.transform = target
 
@@ -100,6 +118,7 @@ export function useCarouselSwipe(
         el.style.transform = 'translateX(-100%)'
         callback?.()
         isAnimating.current = false
+        animStartRef.current = null
       }
       el.addEventListener('transitionend', onSnap)
       activeListeners.current.push({ type: 'transitionend', fn: onSnap })
