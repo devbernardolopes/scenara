@@ -230,7 +230,8 @@
       "invalidFormat": "Format de fichier invalide",
       "fileError": "Échec de la lecture du fichier"
     },
-    "chatProfileRequired": "Assignez un profil de discussion dans Paramètres > API pour commencer à discuter."
+    "chatProfileRequired": "Assignez un profil de discussion dans Paramètres > API pour commencer à discuter.",
+    "copied": "Copié dans le presse-papiers"
   },
   "personaPicker": {
     "title": "Démarrer avec une persona",

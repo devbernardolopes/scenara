@@ -230,7 +230,8 @@
       "invalidFormat": "Ungültiges Dateiformat",
       "fileError": "Fehler beim Lesen der Datei"
     },
-    "chatProfileRequired": "Weise in Einstellungen > API ein Chat-Profil zu, um zu chatten."
+    "chatProfileRequired": "Weise in Einstellungen > API ein Chat-Profil zu, um zu chatten.",
+    "copied": "In die Zwischenablage kopiert"
   },
   "personaPicker": {
     "title": "Mit Persona starten",

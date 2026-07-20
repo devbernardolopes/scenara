@@ -198,6 +198,7 @@
       "fileError": "Falha ao ler o arquivo"
     },
     "chatProfileRequired": "Atribua um perfil de Chat em Configurações > API para começar a conversar.",
+    "copied": "Copiado para a área de transferência",
     "inChatShortcut": {
       "created": "{{name}} criado",
       "updated": "{{name}} atualizado",

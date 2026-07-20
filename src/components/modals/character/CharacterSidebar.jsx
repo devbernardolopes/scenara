@@ -12,6 +12,7 @@ const SECTIONS = [
   { id: 'tags', labelKey: 'sectionTags' },
   { id: '3d', labelKey: 'section3d' },
   { id: 'sfx', labelKey: 'sectionSfx' },
+  { id: 'fullData', labelKey: 'sectionFullData' },
 ]
 
 function CharacterSidebar({ active, onSelect, highlights }) {

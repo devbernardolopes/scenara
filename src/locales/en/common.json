@@ -230,7 +230,8 @@
       "invalidFormat": "Invalid file format",
       "fileError": "Failed to read file"
     },
-    "chatProfileRequired": "Assign a Chat profile in Settings > API to start chatting."
+    "chatProfileRequired": "Assign a Chat profile in Settings > API to start chatting.",
+    "copied": "Copied to clipboard"
   },
   "personaPicker": {
     "title": "Start with persona",

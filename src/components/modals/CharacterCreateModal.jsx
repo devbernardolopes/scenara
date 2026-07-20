@@ -25,6 +25,7 @@ import DirectorSection from './character/DirectorSection'
 import TagsSection from './character/TagsSection'
 import ScenarioSection from './character/ScenarioSection'
 import LorebooksSection from './character/LorebooksSection'
+import FullDataSection from './character/FullDataSection'
 
 const INITIAL_FORM = {
   name: '',
@@ -204,6 +205,7 @@ const SECTION_COMPONENTS = {
   tags: TagsSection,
   '3d': PlaceholderSection,
   sfx: PlaceholderSection,
+  fullData: FullDataSection,
 }
 
 function CharacterCreateModal({ character: existing, initialData }) {
@@ -518,6 +520,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
             { id: 'tags', labelKey: 'sectionTags' },
             { id: '3d', labelKey: 'section3d' },
             { id: 'sfx', labelKey: 'sectionSfx' },
+            { id: 'fullData', labelKey: 'sectionFullData' },
           ].map((sec) => (
             <option key={sec.id} value={sec.id}>
               {sectionHighlights[sec.id] ? `● ${t(sec.labelKey)}` : t(sec.labelKey)}

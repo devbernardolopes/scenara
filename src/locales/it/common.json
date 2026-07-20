@@ -230,7 +230,8 @@
       "invalidFormat": "Formato file non valido",
       "fileError": "Impossibile leggere il file"
     },
-    "chatProfileRequired": "Assegna un profilo di chat in Impostazioni > API per iniziare a chattare."
+    "chatProfileRequired": "Assegna un profilo di chat in Impostazioni > API per iniziare a chattare.",
+    "copied": "Copiato negli appunti"
   },
   "personaPicker": {
     "title": "Inizia con una persona",
