@@ -144,7 +144,7 @@ export async function triggerAutoTitle({
     userRolePrefixOoc: await getSetting('prompting.userRolePrefixOoc'),
   }
 
-  const transcript = buildTranscript({
+  const transcript = await buildTranscript({
     messages,
     personaName,
     currentPersonaName,

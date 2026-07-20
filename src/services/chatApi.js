@@ -62,6 +62,17 @@ export function replacePersonaTemplate(
     .replace(/{{description_default}}/gi, descDefault)
 }
 
+// Wraps OOC message content with the configured delimiters when the
+// "Use OOC Delimiters" setting is enabled and at least one delimiter value is
+// non-empty. Returns the content unchanged otherwise.
+function applyOOCDelimiters(content, delimiters) {
+  if (!delimiters?.enabled) return content
+  const left = delimiters.left || ''
+  const right = delimiters.right || ''
+  if (!left && !right) return content
+  return `${left}${content ?? ''}${right}`
+}
+
 export function getMessagesForApiRequest(
   messages,
   { includeOOC = true, keepMessages = 0, keptConsumedCount = 0 } = {},
@@ -266,6 +277,7 @@ export async function buildMessagesPayload({
 
   const userRolePrefixWithPersona = await getSetting('prompting.userRolePrefixWithPersona')
   const userPersonaPrefixOverride = character?.userPersonaPrefix === false ? false : true
+  const oocDelimiters = await getSetting('prompting.oocDelimiters')
 
   const systemPrompt = replaceVarsIn(character?.systemPrompt)
   if (systemPrompt) {
@@ -363,6 +375,8 @@ export async function buildMessagesPayload({
             content = userPrefix + content
           }
         }
+      } else if (msg.isOOC) {
+        content = applyOOCDelimiters(content, oocDelimiters)
       }
       result.push({ role: msg.role, content })
       entryTypes.push('chatMessage')
@@ -464,7 +478,7 @@ export function getActiveParams(profile) {
   return active
 }
 
-export function buildTranscript({
+export async function buildTranscript({
   messages,
   personaName,
   currentPersonaName,
@@ -482,6 +496,8 @@ export function buildTranscript({
     assistantRolePrefixOoc,
     userRolePrefixOoc,
   } = rolePrefixes
+
+  const oocDelimiters = await getSetting('prompting.oocDelimiters')
 
   const lines = []
 
@@ -527,7 +543,11 @@ export function buildTranscript({
 
     if (prefix && !/\s$/.test(prefix)) prefix += '\n'
 
-    lines.push(prefix + (msg.content || ''))
+    let content = msg.content || ''
+    if (msg.isOOC) {
+      content = applyOOCDelimiters(content, oocDelimiters)
+    }
+    lines.push(prefix + content)
   }
 
   return lines.join('\n\n')
@@ -570,7 +590,7 @@ export async function buildOOCMessagesPayload({
 
   let transcriptWithVars = ''
   if (messages.length > 0) {
-    const transcript = buildTranscript({
+    const transcript = await buildTranscript({
       messages,
       personaName,
       currentPersonaName,

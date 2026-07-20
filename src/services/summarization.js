@@ -108,7 +108,7 @@ export async function buildSummarizationPayload({
   const userPersonaPrefixOverride = character?.userPersonaPrefix !== false
 
   let transcript = replaceVarsIn(
-    buildTranscript({
+    await buildTranscript({
       messages: processedMessages,
       personaName,
       currentPersonaName,
