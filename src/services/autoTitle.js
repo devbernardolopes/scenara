@@ -11,7 +11,7 @@ import {
   buildDirectorMessages,
   getAutoTitleTemplateValues,
 } from './director'
-import { waitForCooldown } from './apiQueue'
+import { waitForCooldown, getThreadQueuedCount, getThreadInflightCount } from './apiQueue'
 import { showToast } from '../lib/toast'
 import { run, disposeModel } from '../lib/inferenceClient'
 import i18n from '../lib/i18n'
@@ -71,10 +71,19 @@ export function getCountedMessageCount(messages, includeOOC) {
   return counted.filter((m) => !m.isOOC).length
 }
 
+export function isAutoTitleActive(threadId) {
+  const tid = Number(threadId)
+  return (
+    getThreadQueuedCount(tid, { kinds: ['autoTitle'] }) > 0 ||
+    getThreadInflightCount(tid, { kinds: ['autoTitle'] }) > 0
+  )
+}
+
 export async function shouldAutoTitle(thread, character, messages) {
   if (!character?.autoTitle) return false
   if (thread?.titleEdited) return false
   if (thread?.autoTitleGenerated) return false
+  if (isAutoTitleActive(thread.id)) return false
 
   const threshold = character?.autoTitleThreshold ?? 3
   const includeOOC = character?.includeOOC !== false
