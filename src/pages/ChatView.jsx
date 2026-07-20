@@ -2360,6 +2360,7 @@ function ChatView() {
                       errorText={errorText}
                       isUnread={msg.isUnread || false}
                       character={character}
+                      personaName={personaMap?.[thread?.personaId]?.name || ''}
                       onToggleCodeBlock={handleToggleCodeBlock}
                       onToggleVisible={handleToggleVisible}
                     />

@@ -6,6 +6,7 @@ import { useIsMobile } from '../../hooks/useIsMobile'
 import { useOverflowButtons } from '../../hooks/useOverflowButtons'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
+import { replaceVars } from '../../services/chatApi'
 import { getStreamingStartTime } from '../../services/generatingState'
 import { injectRuleTags, applyRulesToPlainText, DEFAULT_PP_RULES } from '../../lib/postProcessing'
 import {
@@ -214,8 +215,16 @@ function MessageBubble({
   collapsedCodeBlocks,
   onToggleCodeBlock,
   onToggleVisible,
+  personaName,
 }) {
   function renderContent(text) {
+    if (currentOrigin === 'initial') {
+      return replaceVars(text, {
+        charName: character?.name,
+        personaName,
+        currentPersonaName: personaName,
+      })
+    }
     return text
   }
   const { t } = useTranslation('chat')
