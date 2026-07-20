@@ -975,7 +975,7 @@ function MessageBubble({
               ) : (
                 <p className="mb-2 last:mb-0 whitespace-pre-wrap">{displayContent}</p>
               )}
-              {streaming && (!bundleMessages || bundleIndex === streamingSlotIndex) && (
+              {streaming && (!hasMultipleSlots || bundleIndex === streamingSlotIndex) && (
                 <RefreshCw className="inline-block w-4 h-4 text-primary animate-spin ml-0.5 align-text-bottom" />
               )}
             </div>
