@@ -35,7 +35,7 @@ export function getUnsummarizedMessages(messages, { includeOOC = true } = {}) {
       !message?.isAutoTitleMarker &&
       !message?.summarizedAt &&
       !isMessageHidden(message) &&
-      (includeOOC || !message?.isOOC),
+      (includeOOC || !message?.isOOC || !isMessageHidden(message)),
   )
 }
 

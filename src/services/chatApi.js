@@ -73,7 +73,7 @@ export function getMessagesForApiRequest(
       !message?.isSummaryMarker &&
       !message?.isAutoTitleMarker &&
       !isMessageHidden(message) &&
-      (includeOOC || !message?.isOOC),
+      (includeOOC || !message?.isOOC || !isMessageHidden(message)),
   )
   if (keepMessages <= 0) {
     return eligible.filter((message) => !message?.summarizedAt)
@@ -488,7 +488,7 @@ export function buildTranscript({
   for (const msg of messages) {
     if (msg.isSummaryMarker || msg.isAutoTitleMarker) continue
     if (isMessageHidden(msg)) continue
-    if (msg.isOOC && !includeOOCOverride) continue
+    if (msg.isOOC && !includeOOCOverride && isMessageHidden(msg)) continue
 
     let prefix = ''
 

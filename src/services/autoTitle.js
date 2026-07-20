@@ -1,6 +1,12 @@
 import db from '../db'
 import { getEffectiveProfileFor } from './connectionProfiles'
-import { sendChatCompletion, replaceVars, buildTranscript, appendMemoryToPayload } from './chatApi'
+import {
+  sendChatCompletion,
+  replaceVars,
+  buildTranscript,
+  appendMemoryToPayload,
+  isMessageHidden,
+} from './chatApi'
 import { getSetting } from './settings'
 import { updateThread } from './threads'
 import { trimLeadingTrailingNewlines } from './messages'
@@ -68,7 +74,7 @@ function sanitizeAutoTitle(text) {
 export function getCountedMessageCount(messages, includeOOC) {
   const counted = messages.filter((m) => !m?.isSummaryMarker && !m?.isAutoTitleMarker)
   if (includeOOC) return counted.length
-  return counted.filter((m) => !m.isOOC).length
+  return counted.filter((m) => !m.isOOC || !isMessageHidden(m)).length
 }
 
 export function isAutoTitleActive(threadId) {
