@@ -34,6 +34,7 @@ import {
 } from '../services/connectionProfiles'
 import { getSetting } from '../services/settings'
 import { generateChatResponse, parseBundleEntries } from '../services/chatGeneration'
+import { isMessageHidden } from '../services/chatApi'
 import * as apiQueue from '../services/apiQueue'
 import {
   getGeneratingThreads,
@@ -1402,7 +1403,8 @@ function ChatView() {
         }
       }
 
-      const isFirstMessage = currentMsgs.filter(isRealMessage).length === 0
+      const isFirstMessage =
+        currentMsgs.filter((m) => isRealMessage(m) && !isMessageHidden(m)).length === 0
 
       if (text && !autoReply) return
 
@@ -1584,7 +1586,8 @@ function ChatView() {
       currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : chatPersona
 
       const isFirstMessage =
-        currentMsgs.filter(isRealMessage).length === 0 && character?.firstMessage
+        currentMsgs.filter((m) => isRealMessage(m) && !isMessageHidden(m)).length === 0 &&
+        character?.firstMessage
 
       regenEntries = parseBundleEntries(msg.bundleMessages)
       if (!regenEntries) {
