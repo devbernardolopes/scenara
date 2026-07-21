@@ -35,35 +35,39 @@ function RequestDetailsModal({ payload, responseData, responseContent }) {
     responseData != null ? formatForDisplay(responseData) : formatForDisplay(responseContent)
 
   const textareaClass =
-    'w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none'
+    'w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none cursor-default'
 
   return (
     <ModalShell title={t('requestDetailsModal.title')} onClose={closeModal}>
       <div className="space-y-3">
-        <CollapsibleSection
-          label={t('requestDetailsModal.request')}
-          storageKey="requestDetailsRequest"
-          defaultExpanded={true}
-        >
-          <AutoResizeTextarea
-            readOnly
-            value={requestText}
-            className={textareaClass}
-            extraHeight={8}
-          />
-        </CollapsibleSection>
-        <CollapsibleSection
-          label={t('requestDetailsModal.response')}
-          storageKey="requestDetailsResponse"
-          defaultExpanded={true}
-        >
-          <AutoResizeTextarea
-            readOnly
-            value={responseText}
-            className={textareaClass}
-            extraHeight={8}
-          />
-        </CollapsibleSection>
+        <div className="border border-border rounded-lg overflow-hidden">
+          <CollapsibleSection
+            label={t('requestDetailsModal.request')}
+            storageKey="requestDetailsRequest"
+            defaultExpanded={true}
+          >
+            <AutoResizeTextarea
+              readOnly
+              value={requestText}
+              className={textareaClass}
+              extraHeight={8}
+            />
+          </CollapsibleSection>
+        </div>
+        <div className="border border-border rounded-lg overflow-hidden">
+          <CollapsibleSection
+            label={t('requestDetailsModal.response')}
+            storageKey="requestDetailsResponse"
+            defaultExpanded={true}
+          >
+            <AutoResizeTextarea
+              readOnly
+              value={responseText}
+              className={textareaClass}
+              extraHeight={8}
+            />
+          </CollapsibleSection>
+        </div>
       </div>
     </ModalShell>
   )

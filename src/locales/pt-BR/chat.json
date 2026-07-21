@@ -48,7 +48,7 @@
   "directorDetails": "Detalhes do Diretor",
   "requestDetailsModal": {
     "title": "Detalhes da Requisição",
-    "request": "Payload da Requisição",
+    "request": "Payload",
     "response": "Resposta"
   },
   "directorDetailsModal": {

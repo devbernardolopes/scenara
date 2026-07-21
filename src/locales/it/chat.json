@@ -50,7 +50,7 @@
   "hidden": "Hidden",
   "requestDetailsModal": {
     "title": "Dettagli richiesta",
-    "request": "Payload della richiesta",
+    "request": "Payload",
     "response": "Risposta"
   },
   "directorDetailsModal": {

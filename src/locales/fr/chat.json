@@ -50,7 +50,7 @@
   "hidden": "Hidden",
   "requestDetailsModal": {
     "title": "Détails de la requête",
-    "request": "Charge utile de la requête",
+    "request": "Payload",
     "response": "Réponse"
   },
   "directorDetailsModal": {
