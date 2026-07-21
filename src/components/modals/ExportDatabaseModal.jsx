@@ -448,22 +448,69 @@ function ExportDatabaseModal() {
           </div>
         </CollapsibleSection>
 
-        <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
-          <label className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selectedLogs}
-              onChange={(e) => setSelectedLogs(e.target.checked)}
-              className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-            />
-          </label>
-          <div className="flex-1 min-w-0">
-            <span className="text-sm font-medium text-text">{t('database.exportModal.logs')}</span>
-            <span className="text-xs text-tertiary ml-2">
-              {t('database.exportModal.logsDescription')}
-            </span>
+        <CollapsibleSection
+          label={t('database.exportModal.extra')}
+          summary={`${[selectedTags, selectedSettings, selectedLogs].filter(Boolean).length}`}
+          hasContent={selectedTags || selectedSettings || selectedLogs}
+          storageKey="export.extra"
+        >
+          <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
+            <label className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={selectedTags}
+                onChange={(e) => setSelectedTags(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+              />
+            </label>
+            <div className="flex-1 min-w-0">
+              <span className="text-sm font-medium text-text">
+                {t('database.exportModal.tags')}
+              </span>
+              <span className="text-xs text-tertiary ml-2">
+                {t('database.exportModal.tagsDescription')}
+              </span>
+            </div>
           </div>
-        </div>
+
+          <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
+            <label className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={selectedSettings}
+                onChange={(e) => setSelectedSettings(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+              />
+            </label>
+            <div className="flex-1 min-w-0">
+              <span className="text-sm font-medium text-text">
+                {t('database.exportModal.settings')}
+              </span>
+              <span className="text-xs text-tertiary ml-2">
+                {t('database.exportModal.settingsDescription')}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
+            <label className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={selectedLogs}
+                onChange={(e) => setSelectedLogs(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+              />
+            </label>
+            <div className="flex-1 min-w-0">
+              <span className="text-sm font-medium text-text">
+                {t('database.exportModal.logs')}
+              </span>
+              <span className="text-xs text-tertiary ml-2">
+                {t('database.exportModal.logsDescription')}
+              </span>
+            </div>
+          </div>
+        </CollapsibleSection>
 
         <CollapsibleSection
           label={t('database.exportModal.lorebooks')}
@@ -495,42 +542,6 @@ function ExportDatabaseModal() {
             )}
           </div>
         </CollapsibleSection>
-
-        <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
-          <label className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selectedTags}
-              onChange={(e) => setSelectedTags(e.target.checked)}
-              className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-            />
-          </label>
-          <div className="flex-1 min-w-0">
-            <span className="text-sm font-medium text-text">{t('database.exportModal.tags')}</span>
-            <span className="text-xs text-tertiary ml-2">
-              {t('database.exportModal.tagsDescription')}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
-          <label className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selectedSettings}
-              onChange={(e) => setSelectedSettings(e.target.checked)}
-              className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-            />
-          </label>
-          <div className="flex-1 min-w-0">
-            <span className="text-sm font-medium text-text">
-              {t('database.exportModal.settings')}
-            </span>
-            <span className="text-xs text-tertiary ml-2">
-              {t('database.exportModal.settingsDescription')}
-            </span>
-          </div>
-        </div>
       </div>
     </ModalShell>
   )
