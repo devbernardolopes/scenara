@@ -1,4 +1,4 @@
-const API_URL = 'https://catbox.moe/user/api.php'
+const API_URL = '/api/catbox-proxy'
 
 const GIF_MAX_BYTES = 20 * 1024 * 1024
 const IMAGE_MAX_BYTES = 200 * 1024 * 1024
