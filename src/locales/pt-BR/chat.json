@@ -44,6 +44,7 @@
   "speak": "Falar",
   "stop": "Parar",
   "showPrompt": "Mostrar prompt",
+  "showMemoryEntryPrompt": "Mostrar prompt da entrada de memória",
   "requestDetails": "Detalhes da requisição",
   "directorDetails": "Detalhes do Diretor",
   "requestDetailsModal": {

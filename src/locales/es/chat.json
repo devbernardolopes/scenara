@@ -44,6 +44,7 @@
   "speak": "Hablar",
   "stop": "Detener",
   "showPrompt": "Mostrar prompt",
+  "showMemoryEntryPrompt": "Mostrar prompt de entrada de memoria",
   "requestDetails": "Detalles de la solicitud",
   "directorDetails": "Detalles del director",
   "visible": "Visible",

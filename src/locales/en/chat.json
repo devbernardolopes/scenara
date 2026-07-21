@@ -15,7 +15,7 @@
     "label": "In-chat shortcuts",
     "manage": "Manage shortcut sets"
   },
-  "memories": "Saved memories",
+  "memories": "Saved Memories",
   "stt": "Speech to text",
   "moreOptions": "More options",
   "personaSelector": "Select persona",
@@ -44,6 +44,7 @@
   "speak": "Speak",
   "stop": "Stop",
   "showPrompt": "Show prompt",
+  "showMemoryEntryPrompt": "Show Memory Entry Prompt",
   "requestDetails": "Request details",
   "directorDetails": "Director Details",
   "visible": "Visible",

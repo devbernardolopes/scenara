@@ -42,7 +42,15 @@ function MessagePills({ flags, onToggleExpand }) {
   )
 }
 
-function ShowPromptModal({ payload, model, params, msgNumbers, messageFlags, directorReviewed }) {
+function ShowPromptModal({
+  payload,
+  model,
+  params,
+  msgNumbers,
+  messageFlags,
+  directorReviewed,
+  modalTitle,
+}) {
   const { t } = useTranslation('chat')
   const { closeModal } = useModal()
   const [expandedIdx, setExpandedIdx] = useState(null)
@@ -57,7 +65,7 @@ function ShowPromptModal({ payload, model, params, msgNumbers, messageFlags, dir
   )
 
   return (
-    <ModalShell title={t('showPrompt')} onClose={closeModal}>
+    <ModalShell title={modalTitle || t('showPrompt')} onClose={closeModal}>
       <div className="space-y-6">
         <div className="space-y-1.5 p-4 bg-surface-secondary rounded-lg text-sm">
           <div className="flex items-center gap-2 text-text">

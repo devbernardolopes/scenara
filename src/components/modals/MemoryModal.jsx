@@ -14,8 +14,6 @@ import {
 } from '../../services/threadMemories'
 import { updateThread } from '../../services/threads'
 import { ChevronDown, Trash2, RefreshCw, Eye } from '../../lib/icons'
-import db from '../../db'
-import { replaceVars } from '../../services/chatApi'
 
 function MemoryModal({ threadId }) {
   const { t } = useTranslation(['chat', 'common'])
@@ -140,27 +138,12 @@ function MemoryModal({ threadId }) {
 
   async function handleShowPrompt(entry) {
     if (!entry?.payload) return
-    const thread = await db.threads.get(Number(threadId))
-    const character = thread ? await db.characters.get(thread.characterId) : null
-    const charName = character?.name || ''
-    let personaName = ''
-    if (thread?.personaId) {
-      const persona = await db.personas.get(thread.personaId)
-      personaName = persona?.name || ''
-    }
-    const transformedPayload = entry.payload.map((msg) => ({
-      ...msg,
-      content: replaceVars(msg.content || '', {
-        charName,
-        personaName,
-        currentPersonaName: personaName,
-      }),
-    }))
     openModal('showPrompt', {
-      payload: transformedPayload,
+      payload: entry.payload,
       model: entry.model,
       params: entry.params,
       msgNumbers: null,
+      modalTitle: t('showMemoryEntryPrompt'),
     })
   }
 
@@ -226,7 +209,7 @@ function MemoryModal({ threadId }) {
                       type="button"
                       onClick={() => handleShowPrompt(entry)}
                       className="p-2 rounded-md hover:bg-surface-hover text-tertiary"
-                      title={t('showPrompt')}
+                      title={t('showMemoryEntryPrompt')}
                     >
                       <Eye className="w-4 h-4" />
                     </button>

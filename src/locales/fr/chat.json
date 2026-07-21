@@ -44,6 +44,7 @@
   "speak": "Parler",
   "stop": "Arrêter",
   "showPrompt": "Afficher le prompt",
+  "showMemoryEntryPrompt": "Afficher le prompt de l'entrée mémoire",
   "requestDetails": "Détails de la requête",
   "directorDetails": "Détails du réalisateur",
   "visible": "Visible",
