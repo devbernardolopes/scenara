@@ -296,9 +296,7 @@ export async function buildCurrentSummarizationPayload(threadId, entry) {
     rolePrefixes,
     currentPersona: null,
     memoryText,
-    lastSummarizationAt: prevMarker
-      ? new Date(prevMarker.createdAt).toISOString()
-      : thread?.lastSummarizationAt || null,
+    lastSummarizationAt: prevMarker ? new Date(prevMarker.createdAt).toISOString() : null,
   })
 }
 
