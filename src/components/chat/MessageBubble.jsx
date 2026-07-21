@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo, memo } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSwipe } from '../../hooks/useSwipe'
@@ -236,6 +237,7 @@ function MessageBubble({
   const [overflowOpen, setOverflowOpen] = useState(false)
   const overflowRef = useRef(null)
   const overflowBtnRef = useRef(null)
+  const overflowPanelRef = useRef(null)
   const bubbleRef = useRef(null)
   const [overflowMenuStyle, setOverflowMenuStyle] = useState(null)
   const [visibility, setVisibility] = useState(
@@ -552,7 +554,12 @@ function MessageBubble({
   useEffect(() => {
     if (!overflowOpen) return
     function handleClick(e) {
-      if (overflowRef.current && !overflowRef.current.contains(e.target)) {
+      if (
+        overflowRef.current &&
+        !overflowRef.current.contains(e.target) &&
+        overflowPanelRef.current &&
+        !overflowPanelRef.current.contains(e.target)
+      ) {
         setOverflowOpen(false)
         setOverflowMenuStyle(null)
       }
@@ -571,6 +578,16 @@ function MessageBubble({
     }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
+  }, [overflowOpen])
+
+  useEffect(() => {
+    if (!overflowOpen) return
+    function handleScroll() {
+      setOverflowOpen(false)
+      setOverflowMenuStyle(null)
+    }
+    window.addEventListener('scroll', handleScroll, { capture: true, passive: true })
+    return () => window.removeEventListener('scroll', handleScroll, { capture: true })
   }, [overflowOpen])
 
   function handleOverflowClick() {
@@ -828,68 +845,71 @@ function MessageBubble({
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </button>
-                      {overflowOpen && (
-                        <div
-                          style={overflowMenuStyle}
-                          className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
-                        >
-                          {overflowKeys.map((key) => {
-                            const def = BUTTON_DEFS[key]
-                            if (!def) return null
-                            const Icon = def.icon
-                            const isDelete =
-                              key === 'delete' || key === 'deleteAll' || key === 'deleteFromHere'
-                            const isToggle = key === 'visible'
-                            const isToggled = isToggle && !isSlotHidden
-                            return (
-                              <button
-                                key={key}
-                                type="button"
-                                onClick={() => {
-                                  if (!isToggle) {
-                                    getButtonHandler(key)()
-                                    setOverflowOpen(false)
-                                  } else {
-                                    getButtonHandler(key)()
+                      {overflowOpen &&
+                        createPortal(
+                          <div
+                            ref={overflowPanelRef}
+                            style={overflowMenuStyle}
+                            className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
+                          >
+                            {overflowKeys.map((key) => {
+                              const def = BUTTON_DEFS[key]
+                              if (!def) return null
+                              const Icon = def.icon
+                              const isDelete =
+                                key === 'delete' || key === 'deleteAll' || key === 'deleteFromHere'
+                              const isToggle = key === 'visible'
+                              const isToggled = isToggle && !isSlotHidden
+                              return (
+                                <button
+                                  key={key}
+                                  type="button"
+                                  onClick={() => {
+                                    if (!isToggle) {
+                                      getButtonHandler(key)()
+                                      setOverflowOpen(false)
+                                    } else {
+                                      getButtonHandler(key)()
+                                    }
+                                  }}
+                                  disabled={
+                                    (key === 'prompt' && !promptData) || isButtonDisabled(key)
                                   }
-                                }}
-                                disabled={
-                                  (key === 'prompt' && !promptData) || isButtonDisabled(key)
-                                }
-                                className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm min-h-[44px] disabled:opacity-30 disabled:pointer-events-none ${
-                                  isDelete
-                                    ? 'text-error hover:bg-surface-hover'
-                                    : 'text-text hover:bg-surface-hover'
-                                }`}
-                              >
-                                <span className="flex items-center gap-2">
-                                  {isToggle ? (
-                                    isToggled ? (
-                                      <Eye className="w-4 h-4" />
+                                  className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm min-h-[44px] disabled:opacity-30 disabled:pointer-events-none ${
+                                    isDelete
+                                      ? 'text-error hover:bg-surface-hover'
+                                      : 'text-text hover:bg-surface-hover'
+                                  }`}
+                                >
+                                  <span className="flex items-center gap-2">
+                                    {isToggle ? (
+                                      isToggled ? (
+                                        <Eye className="w-4 h-4" />
+                                      ) : (
+                                        <EyeOff className="w-4 h-4" />
+                                      )
                                     ) : (
-                                      <EyeOff className="w-4 h-4" />
-                                    )
-                                  ) : (
-                                    <Icon className="w-4 h-4" />
+                                      <Icon className="w-4 h-4" />
+                                    )}
+                                    <span>{t(def.labelKey)}</span>
+                                  </span>
+                                  {isToggle && (
+                                    <div
+                                      className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
+                                        isToggled
+                                          ? 'bg-primary text-on-primary'
+                                          : 'bg-surface-secondary border border-border'
+                                      }`}
+                                    >
+                                      {isToggled && <Check className="w-3 h-3" />}
+                                    </div>
                                   )}
-                                  <span>{t(def.labelKey)}</span>
-                                </span>
-                                {isToggle && (
-                                  <div
-                                    className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
-                                      isToggled
-                                        ? 'bg-primary text-on-primary'
-                                        : 'bg-surface-secondary border border-border'
-                                    }`}
-                                  >
-                                    {isToggled && <Check className="w-3 h-3" />}
-                                  </div>
-                                )}
-                              </button>
-                            )
-                          })}
-                        </div>
-                      )}
+                                </button>
+                              )
+                            })}
+                          </div>,
+                          document.body,
+                        )}
                     </div>
                   )}
                 </div>
