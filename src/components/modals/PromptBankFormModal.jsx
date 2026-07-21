@@ -123,7 +123,7 @@ function PromptBankFormModal({ promptBankEntry }) {
 
   function handleKindCreated(kindName) {
     setKind(kindName)
-    loadKinds()
+    setAllKinds((prev) => (prev.includes(kindName) ? prev : [...prev, kindName]))
   }
 
   const builtInKinds = getBuiltInKinds()
