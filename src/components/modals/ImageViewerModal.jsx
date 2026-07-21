@@ -8,6 +8,9 @@ import { Download, X } from '../../lib/icons'
 
 function ImageViewerInner({ src, alt, imgRef, onZoomRef }) {
   const { centerView, resetTransform } = useControls()
+  const lastTapRef = useRef(0)
+  const touchStartRef = useRef(null)
+
   useEffect(() => {
     onZoomRef.current = (scale, animationTime, animationType) =>
       centerView(scale, animationTime, animationType)
@@ -23,9 +26,6 @@ function ImageViewerInner({ src, alt, imgRef, onZoomRef }) {
     const el = imgRef.current
     if (!el) return
 
-    let lastTap = 0
-    let touchStart = null
-
     const doReset = () => resetTransform(200, 'easeOut')
 
     const handleDblClick = (e) => {
@@ -35,25 +35,25 @@ function ImageViewerInner({ src, alt, imgRef, onZoomRef }) {
 
     const handleTouchStart = (e) => {
       const t = e.changedTouches[0]
-      touchStart = { x: t.clientX, y: t.clientY }
+      touchStartRef.current = { x: t.clientX, y: t.clientY }
     }
 
     const handleTouchEnd = (e) => {
-      const start = touchStart
-      touchStart = null
+      const start = touchStartRef.current
+      touchStartRef.current = null
       const t = e.changedTouches[0]
       const moved = start ? Math.hypot(t.clientX - start.x, t.clientY - start.y) : 0
       if (moved > 10) {
-        lastTap = 0
+        lastTapRef.current = 0
         return
       }
       const now = Date.now()
-      if (now - lastTap < 300) {
-        lastTap = 0
+      if (now - lastTapRef.current < 300) {
+        lastTapRef.current = 0
         e.stopPropagation()
         doReset()
       } else {
-        lastTap = now
+        lastTapRef.current = now
       }
     }
 
@@ -75,7 +75,7 @@ function ImageViewerInner({ src, alt, imgRef, onZoomRef }) {
       <img
         src={src}
         alt={alt || ''}
-        className="max-w-[90vw] max-h-[90vh] object-contain select-none"
+        className="max-w-[90vw] max-h-[90vh] object-contain select-none !pointer-events-auto"
         draggable={false}
         ref={imgRef}
       />
