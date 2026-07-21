@@ -14,7 +14,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = await req.arrayBuffer()
+    const chunks = []
+    for await (const chunk of req) {
+      chunks.push(chunk)
+    }
+    const body = Buffer.concat(chunks)
     const contentType = req.headers['content-type'] || 'multipart/form-data'
 
     const catboxRes = await fetch('https://catbox.moe/user/api.php', {
