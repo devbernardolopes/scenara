@@ -8,14 +8,14 @@ import { getUIState } from '../../services/uiState'
 import { getThread } from '../../services/threads'
 
 const POSITION_CLASSES = {
-  'bottom-left': 'bottom-14 left-4',
-  'bottom-right': 'bottom-14 right-4',
-  'bottom-center': 'bottom-14 left-1/2 -translate-x-1/2',
-  'top-left': 'top-14 left-4',
-  'top-right': 'top-14 right-4',
-  'top-center': 'top-14 left-1/2 -translate-x-1/2',
-  'left-center': 'top-[calc(50%-2.5rem)] left-4',
-  'right-center': 'top-[calc(50%-2.5rem)] right-4',
+  'bottom-left': 'bottom-4 left-4',
+  'bottom-right': 'bottom-4 right-4',
+  'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2',
+  'top-left': 'top-24 left-4',
+  'top-right': 'top-24 right-4',
+  'top-center': 'top-24 left-1/2 -translate-x-1/2',
+  'left-center': 'top-[calc(50%+3.5rem)] left-4',
+  'right-center': 'top-[calc(50%+3.5rem)] right-4',
 }
 
 function LastChatButton({ open }) {
