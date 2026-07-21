@@ -111,7 +111,11 @@
     },
     "showHomeButton": {
       "label": "Startschaltfläche anzeigen",
-      "desc": "Zeigt auf kleinen Bildschirmen eine Schaltfläche „Start“ an, wenn man sich nicht in der Entdeckung befindet."
+      "desc": "Zeigt auf kleinen Bildschirmen eine Schaltfläche „Start" an, wenn man sich nicht in der Entdeckung befindet."
+    },
+    "showLastChatButton": {
+      "label": "Letzte-Chat-Schaltfläche anzeigen",
+      "desc": "Zeigt auf kleinen Bildschirmen eine Schaltfläche an, die den letzten Chat aus der Entdeckung öffnet."
     },
     "sidebarNavLayout": {
       "label": "Sidebar Navigation Layout",

@@ -49,6 +49,7 @@
   "topbar": {
     "toggleSidebar": "Attiva/disattiva barra laterale",
     "home": "Home",
+    "lastChat": "Ultima chat",
     "settings": "Impostazioni"
   },
   "editThreadTitle": {

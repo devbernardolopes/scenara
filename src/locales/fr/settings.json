@@ -113,6 +113,10 @@
       "label": "Afficher le bouton Accueil",
       "desc": "Affiche un bouton d'accueil flottant sur les petits écrans lorsqu'on n'est pas sur la Découverte."
     },
+    "showLastChatButton": {
+      "label": "Afficher le bouton Dernière discussion",
+      "desc": "Affiche un bouton flottant sur les petits écrans qui ouvre votre discussion la plus récente depuis la Découverte."
+    },
     "sidebarNavLayout": {
       "label": "Disposition de navigation de la barre latérale",
       "desc": "Comment les boutons de navigation de la barre latérale (Personas, Instructions d’écriture, etc.) sont affichés."

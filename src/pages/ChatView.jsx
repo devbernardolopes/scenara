@@ -13,6 +13,7 @@ import ChatInputArea from '../components/chat/ChatInputArea'
 import MessageBubble from '../components/chat/MessageBubble'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
 import { getThread, updateThread, forkThread } from '../services/threads'
+import { setUIState } from '../services/uiState'
 import { getCharacter } from '../services/characters'
 import { getAllPersonas, getPersona } from '../services/personas'
 import {
@@ -336,6 +337,7 @@ function ChatView() {
   useEffect(() => {
     const prevId = currentThreadIdRef.current
     currentThreadIdRef.current = threadId
+    setUIState('lastThreadId', Number(threadId))
 
     if (prevId && Number(prevId) !== Number(threadId)) {
       generatingRef.current = false

@@ -49,6 +49,7 @@
   "topbar": {
     "toggleSidebar": "Seitenleiste umschalten",
     "home": "Startseite",
+    "lastChat": "Letzter Chat",
     "settings": "Einstellungen"
   },
   "editThreadTitle": {

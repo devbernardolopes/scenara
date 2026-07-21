@@ -287,6 +287,15 @@ export const SETTINGS = [
     descKey: 'settings:appearance.showHomeButton.desc',
   },
   {
+    key: 'showLastChatButton',
+    category: 'appearance',
+    group: 'interface',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.showLastChatButton.label',
+    descKey: 'settings:appearance.showLastChatButton.desc',
+  },
+  {
     key: 'sidebarNavLayout',
     category: 'appearance',
     group: 'interface',

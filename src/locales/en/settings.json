@@ -113,6 +113,10 @@
       "label": "Show Home Button",
       "desc": "Show a floating Home button on small screens when not on the Discovery view."
     },
+    "showLastChatButton": {
+      "label": "Show Last Chat Button",
+      "desc": "Show a floating button on small screens that opens your most recent thread from the Discovery view."
+    },
     "sidebarNavLayout": {
       "label": "Sidebar Navigation Layout",
       "desc": "How sidebar navigation buttons (Personas, Writing Instructions, etc.) are displayed."

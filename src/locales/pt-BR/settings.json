@@ -113,6 +113,10 @@
       "label": "Mostrar botão Início",
       "desc": "Exibe um botão Início flutuante em telas pequenas quando não estiver na Descoberta."
     },
+    "showLastChatButton": {
+      "label": "Mostrar botão Último Chat",
+      "desc": "Exibe um botão flutuante em telas pequenas que abre sua conversa mais recente a partir da Descoberta."
+    },
     "sidebarNavLayout": {
       "label": "Layout da Navegação da Barra Lateral",
       "desc": "Como os botões de navegação da barra lateral são exibidos."

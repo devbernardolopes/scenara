@@ -113,6 +113,10 @@
       "label": "Mostra pulsante Home",
       "desc": "Mostra un pulsante Home fluttuante su schermi piccoli quando non ci si trova nella Scoperta."
     },
+    "showLastChatButton": {
+      "label": "Mostra pulsante Ultima chat",
+      "desc": "Mostra un pulsante fluttuante su schermi piccoli che apre la chat più recente dalla Scoperta."
+    },
     "sidebarNavLayout": {
       "label": "Layout navigazione barra laterale",
       "desc": "Come sono visualizzati i pulsanti di navigazione della barra laterale (Personas, Istruzioni di scrittura, ecc.)."

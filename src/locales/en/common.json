@@ -50,6 +50,7 @@
   "topbar": {
     "toggleSidebar": "Toggle sidebar",
     "home": "Home",
+    "lastChat": "Last Chat",
     "settings": "Settings"
   },
   "editThreadTitle": {

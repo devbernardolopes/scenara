@@ -113,6 +113,10 @@
       "label": "Mostrar botón Inicio",
       "desc": "Muestra un botón flotante de Inicio en pantallas pequeñas cuando no estás en Descubrimiento."
     },
+    "showLastChatButton": {
+      "label": "Mostrar botón Último chat",
+      "desc": "Muestra un botón flotante en pantallas pequeñas que abre tu chat más reciente desde Descubrimiento."
+    },
     "sidebarNavLayout": {
       "label": "Diseño de navegación de la barra lateral",
       "desc": "Cómo se muestran los botones de navegación de la barra lateral (Personas, Instrucciones de escritura, etc.)."
