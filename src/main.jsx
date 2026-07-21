@@ -23,6 +23,8 @@ import WritingInstructionManagementModal from './components/modals/WritingInstru
 import WritingInstructionFormModal from './components/modals/WritingInstructionFormModal'
 import ProfileManagementModal from './components/modals/ProfileManagementModal'
 import ProfileFormModal from './components/modals/ProfileFormModal'
+import CloudServiceManagementModal from './components/modals/CloudServiceManagementModal'
+import CloudServiceFormModal from './components/modals/CloudServiceFormModal'
 import InChatShortcutManagementModal from './components/modals/InChatShortcutManagementModal'
 import InChatShortcutFormModal from './components/modals/InChatShortcutFormModal'
 import LorebookManagementModal from './components/modals/LorebookManagementModal'
@@ -66,6 +68,8 @@ registerModal('writingInstructionManagement', WritingInstructionManagementModal)
 registerModal('writingInstructionForm', WritingInstructionFormModal)
 registerModal('profileManagement', ProfileManagementModal)
 registerModal('profileForm', ProfileFormModal)
+registerModal('cloudServiceManagement', CloudServiceManagementModal)
+registerModal('cloudServiceForm', CloudServiceFormModal)
 registerModal('inChatShortcutManagement', InChatShortcutManagementModal)
 registerModal('inChatShortcutForm', InChatShortcutFormModal)
 registerModal('lorebookManagement', LorebookManagementModal)

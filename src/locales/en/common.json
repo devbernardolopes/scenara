@@ -8,6 +8,7 @@
     "personas": "Personas",
     "writingInstructions": "Writing Instructions",
     "connectionProfiles": "Connection Profiles",
+    "cloudServices": "Cloud Services",
     "inChatShortcuts": "In-Chat Shortcuts",
     "lorebooks": "Lorebooks",
     "promptBank": "Prompt Bank",
@@ -211,6 +212,17 @@
       "exported": "{{name}} exported",
       "exportedMultiple": "{{count}} lorebooks exported",
       "imported": "{{count}} lorebooks imported"
+    },
+    "cloudService": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} cloud services deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} cloud services duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} cloud services exported",
+      "imported": "{{count}} cloud services imported"
     },
     "promptBank": {
       "created": "{{name}} created",

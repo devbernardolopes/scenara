@@ -1,14 +1,17 @@
 import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../../hooks/useModal'
+import { showToast } from '../../../lib/toast'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import Label from '../../shared/Label'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import PromptBankButton from '../../shared/PromptBankButton'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { getAllWritingInstructions } from '../../../services/writingInstructions'
+import { getCatboxService, catboxUploadAvatar } from '../../../services/cloudServices'
+import { validateUploadSize } from '../../../services/catbox'
 import Avatar from '../../shared/Avatar'
-import { FileText, X } from '../../../lib/icons'
+import { FileText, X, Cloud } from '../../../lib/icons'
 import { LIFETIME_OPTIONS, LifetimeButtonGroup } from './ScenarioSection'
 
 const inputClass =
@@ -25,6 +28,8 @@ function CharacterSection({ form, onChange, characterId }) {
   const { openModal } = useModal()
   const fileRef = useRef(null)
   const [writingInstructions, setWritingInstructions] = useState([])
+  const [catboxService, setCatboxService] = useState(null)
+  const [converting, setConverting] = useState(false)
 
   useEffect(() => {
     getAllWritingInstructions().then(setWritingInstructions)
@@ -32,6 +37,13 @@ function CharacterSection({ form, onChange, characterId }) {
     const handler = () => getAllWritingInstructions().then(setWritingInstructions)
     window.addEventListener('writingInstructions-changed', handler)
     return () => window.removeEventListener('writingInstructions-changed', handler)
+  }, [])
+
+  useEffect(() => {
+    getCatboxService().then(setCatboxService)
+    const handler = () => getCatboxService().then(setCatboxService)
+    window.addEventListener('cloudServices-changed', handler)
+    return () => window.removeEventListener('cloudServices-changed', handler)
   }, [])
 
   const hasWritingInstructions = writingInstructions.length > 0
@@ -50,6 +62,32 @@ function CharacterSection({ form, onChange, characterId }) {
       }
     }
     reader.readAsDataURL(file)
+  }
+
+  async function handleConvertToCatbox() {
+    if (!catboxService) {
+      showToast(t('catboxNoService'), { type: 'warning' })
+      return
+    }
+    const validation = validateUploadSize(form.avatar)
+    if (!validation.ok) {
+      const isGif = form.avatar.includes('image/gif')
+      showToast(
+        t('catboxSizeLimit', { limit: validation.limitMB, type: isGif ? 'GIF' : 'image' }),
+        { type: 'error' },
+      )
+      return
+    }
+    setConverting(true)
+    try {
+      const url = await catboxUploadAvatar(catboxService, form.avatar)
+      onChange('avatar', url)
+      showToast(t('catboxConvertSuccess'), { type: 'success' })
+    } catch (err) {
+      showToast(t('catboxConvertError', { error: err.message }), { type: 'error' })
+    } finally {
+      setConverting(false)
+    }
   }
 
   return (
@@ -149,6 +187,17 @@ function CharacterSection({ form, onChange, characterId }) {
             className="hidden"
           />
         </div>
+        {form.avatar.startsWith('data:') && catboxService && (
+          <button
+            type="button"
+            onClick={handleConvertToCatbox}
+            disabled={converting}
+            className="flex items-center gap-1.5 mt-1.5 text-xs text-accent hover:underline disabled:opacity-50"
+          >
+            <Cloud className="w-3 h-3" />
+            {converting ? t('convertingToCatbox') : t('convertToCatbox')}
+          </button>
+        )}
       </div>
 
       <CollapsibleSection

@@ -33,6 +33,7 @@ import {
   Tags,
   BrainCog,
   DatabaseZap,
+  Cloud,
   Plus,
   Upload,
   Globe,
@@ -495,6 +496,11 @@ function Sidebar({ open, onClose }) {
               onClick: () => openModal('profileManagement'),
               icon: SlidersHorizontal,
               labelKey: 'sidebar.connectionProfiles',
+            },
+            {
+              onClick: () => openModal('cloudServiceManagement'),
+              icon: Cloud,
+              labelKey: 'sidebar.cloudServices',
             },
             {
               onClick: () => openModal('inChatShortcutManagement'),

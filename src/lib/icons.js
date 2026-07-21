@@ -69,4 +69,5 @@ export {
   Clock,
   Theater,
   ScrollText,
+  Cloud,
 } from 'lucide-react'

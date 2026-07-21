@@ -1271,6 +1271,53 @@
       "importSuccess": "Imported {{count}} prompt(s)"
     }
   },
+  "cloudService": {
+    "title": "Cloud Services",
+    "noItems": "No cloud services configured yet. Add one to enable avatar uploads and data export.",
+    "createService": "Add Service",
+    "importService": "Import",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "confirmDelete": {
+      "title": "Delete Service",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} cloud services?"
+    },
+    "types": {
+      "catbox": {
+        "name": "Catbox",
+        "desc": "Image hosting with albums. Upload avatars and manage them in a Scenara album."
+      }
+    },
+    "credentials": {
+      "userhash": "User Hash"
+    },
+    "form": {
+      "title": "Add Cloud Service",
+      "editTitle": "Edit Cloud Service",
+      "name": "Name",
+      "namePlaceholder": "e.g. My Catbox Account",
+      "serviceType": "Service",
+      "baseUrl": "Base URL",
+      "baseUrlPlaceholder": "Leave empty for default",
+      "credentialPlaceholder": "Enter your {{field}}"
+    },
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid cloud service export.",
+      "fileError": "Failed to read the file."
+    }
+  },
   "versionLabel": "Version",
   "languageOptions": {
     "en": "English",
