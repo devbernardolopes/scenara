@@ -486,6 +486,7 @@ export async function buildTranscript({
   userPersonaPrefixOverride,
   personaMap,
   rolePrefixes,
+  replaceVarsIn,
 }) {
   const {
     systemRolePrefix,
@@ -539,6 +540,10 @@ export async function buildTranscript({
           }
           break
       }
+    }
+
+    if (replaceVarsIn && prefix) {
+      prefix = replaceVarsIn(prefix)
     }
 
     if (prefix && !/\s$/.test(prefix)) prefix += '\n'

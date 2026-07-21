@@ -152,20 +152,20 @@ export async function triggerAutoTitle({
     userPersonaPrefixOverride: userPersonaPrefix,
     personaMap,
     rolePrefixes,
+    replaceVarsIn,
   })
-  const transcriptWithVars = replaceVarsIn(transcript)
 
-  systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, transcriptWithVars)
+  systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, transcript)
 
   const payload = [{ role: 'system', content: systemContent }]
   const memoryText = await buildInjectedMemory(character, thread)
   const payloadWithMemory = appendMemoryToPayload(payload, memoryText, '')
 
   if (userContent) {
-    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/gi, transcriptWithVars)
+    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/gi, transcript)
     payloadWithMemory.push({ role: 'user', content: userContent })
   } else {
-    payloadWithMemory.push({ role: 'user', content: transcriptWithVars })
+    payloadWithMemory.push({ role: 'user', content: transcript })
   }
 
   let title = ''
@@ -174,7 +174,7 @@ export async function triggerAutoTitle({
   const useLocalInference = await getSetting('localInference.autoTitle')
   if (useLocalInference) {
     try {
-      title = await tryLocalTitle(transcriptWithVars)
+      title = await tryLocalTitle(transcript)
     } catch {
       title = ''
     }

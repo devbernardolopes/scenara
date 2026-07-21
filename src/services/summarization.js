@@ -107,17 +107,16 @@ export async function buildSummarizationPayload({
   const includeOOCOverride = character?.includeOOC !== false
   const userPersonaPrefixOverride = character?.userPersonaPrefix !== false
 
-  let transcript = replaceVarsIn(
-    await buildTranscript({
-      messages: processedMessages,
-      personaName,
-      currentPersonaName,
-      includeOOCOverride,
-      userPersonaPrefixOverride,
-      personaMap,
-      rolePrefixes,
-    }),
-  )
+  let transcript = await buildTranscript({
+    messages: processedMessages,
+    personaName,
+    currentPersonaName,
+    includeOOCOverride,
+    userPersonaPrefixOverride,
+    personaMap,
+    rolePrefixes,
+    replaceVarsIn,
+  })
 
   // When Add Character Prompt is enabled and persona injection is set to
   // "always" + "end of system prompt", mirror the chat payload by injecting the
