@@ -137,7 +137,7 @@ function CloudServiceFormModal({ cloudService }) {
         <div>
           <Label required>{t('cloudService.form.name')}</Label>
           <input
-            className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+            className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
             value={form.name}
             onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
             placeholder={t('cloudService.form.namePlaceholder')}
@@ -164,7 +164,7 @@ function CloudServiceFormModal({ cloudService }) {
               }))
             }}
             disabled={editing}
-            className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm disabled:opacity-50"
+            className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm disabled:opacity-50"
           >
             {SERVICE_TYPES.map((st) => (
               <option key={st.id} value={st.id}>
@@ -186,7 +186,7 @@ function CloudServiceFormModal({ cloudService }) {
             value={form.baseUrl}
             onChange={(e) => setForm((prev) => ({ ...prev, baseUrl: e.target.value }))}
             placeholder={t('cloudService.form.baseUrlPlaceholder')}
-            className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+            className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
           />
         </div>
 
@@ -198,7 +198,7 @@ function CloudServiceFormModal({ cloudService }) {
               value={form.credentials[field.key] || ''}
               onChange={(e) => updateCredential(field.key, e.target.value)}
               placeholder={t(`cloudService.form.credentialPlaceholder`, { field: field.key })}
-              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
             />
           </div>
         ))}

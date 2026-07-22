@@ -36,8 +36,8 @@ function ListEntryCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`border rounded-lg p-3 bg-surface transition-shadow cursor-pointer ${
-        selected ? 'border-primary ring-1 ring-primary' : 'border-border'
+      className={`rounded-lg p-3 bg-surface shadow-surface-sm transition-shadow cursor-pointer ${
+        selected ? 'ring-1 ring-primary' : ''
       }`}
       onClick={() => onEdit(item)}
     >

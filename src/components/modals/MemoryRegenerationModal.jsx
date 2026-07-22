@@ -214,7 +214,7 @@ function MemoryRegenerationModal({ threadId, entry }) {
           {sections.map((section) => {
             const isOpen = expanded.has(section.idx)
             return (
-              <div key={section.idx} className="border border-border rounded-lg overflow-hidden">
+              <div key={section.idx} className="rounded-lg overflow-hidden shadow-surface-sm">
                 <button
                   type="button"
                   onClick={() => toggleExpand(section.idx)}
@@ -236,7 +236,7 @@ function MemoryRegenerationModal({ threadId, entry }) {
                     <AutoResizeTextarea
                       value={section.value}
                       onChange={section.onChange}
-                      className="w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none"
+                      className="w-full p-3 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm resize-none focus:outline-none"
                       extraHeight={8}
                     />
                   </div>

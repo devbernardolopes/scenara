@@ -32,7 +32,7 @@ function ProgressModal({ status, label, onDone }) {
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
-      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
+      <div className="flex items-center justify-between p-6 pb-4 shadow-section shrink-0">
         <h2 className="text-xl font-semibold text-text">
           {status === 'exporting'
             ? t('database.exportModal.exporting')
@@ -75,7 +75,7 @@ function ProgressModal({ status, label, onDone }) {
         )}
       </div>
       {(isSuccess || isError) && (
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-border shrink-0">
+        <div className="flex justify-end gap-3 px-6 py-4 shadow-section shrink-0">
           <button
             type="button"
             onClick={status === 'imported' ? handleRestart : handleClose}

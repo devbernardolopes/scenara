@@ -41,7 +41,7 @@ function LogDetailsModal({ log }) {
   const { closeModal } = useModal()
 
   const textareaClass =
-    'w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none'
+    'w-full p-3 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm resize-none focus:outline-none'
 
   const isApi = log?.type === 'api'
 

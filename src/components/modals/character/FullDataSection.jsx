@@ -50,7 +50,7 @@ export default function FullDataSection({ form }) {
       <AutoResizeTextarea
         readOnly
         value={markdown}
-        className="w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none cursor-default font-mono"
+        className="w-full p-3 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm resize-none focus:outline-none cursor-default font-mono"
         extraHeight={8}
       />
     </div>

@@ -7,7 +7,7 @@ import { estimateTokens } from '../../../services/tokenEstimator'
 import { Plus, Trash2, BrainCog, Zap, Square, Copy, X } from '../../../lib/icons'
 
 const inputClass =
-  'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
+  'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
 
 export const LIFETIME_OPTIONS = [
   { value: 'oneTime', labelKey: 'scenarioLifetimeOptions.oneTime' },
@@ -203,7 +203,7 @@ function ScenarioSection({ form, onChange }) {
         <p className="text-sm text-tertiary text-center py-8">{t('noScenarios')}</p>
       ) : (
         scenarios.map((scenario, idx) => (
-          <div key={scenario.id} className="border border-border rounded-md">
+          <div key={scenario.id} className="rounded-md shadow-surface-sm">
             <CollapsibleSection
               label={scenario.name?.trim() || `${t('scenarioLabel')} #${idx + 1}`}
               open={expandedId === scenario.id}

@@ -29,7 +29,7 @@ function ImportSourceModal({ onFromFile, onFromUrl }) {
   if (mode === 'url') {
     return (
       <div className="flex flex-col min-h-0 flex-1">
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
+        <div className="flex items-center justify-between p-6 pb-4 shadow-section shrink-0">
           <h2 className="text-xl font-semibold text-text">
             {t('database.importModal.importSourceTitle')}
           </h2>
@@ -54,7 +54,7 @@ function ImportSourceModal({ onFromFile, onFromUrl }) {
             <p className="text-xs text-error mt-1.5">{t('database.importModal.urlInvalid')}</p>
           )}
         </div>
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-border shrink-0">
+        <div className="flex justify-end gap-3 px-6 py-4 shadow-section shrink-0">
           <button
             type="button"
             onClick={() => {
@@ -80,7 +80,7 @@ function ImportSourceModal({ onFromFile, onFromUrl }) {
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
-      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
+      <div className="flex items-center justify-between p-6 pb-4 shadow-section shrink-0">
         <h2 className="text-xl font-semibold text-text">
           {t('database.importModal.importSourceTitle')}
         </h2>

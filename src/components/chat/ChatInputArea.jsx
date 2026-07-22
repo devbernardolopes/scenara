@@ -608,9 +608,9 @@ function ChatInputArea({
         {promptHistoryOpen && (
           <div
             ref={promptPanelRef}
-            className="absolute bottom-full left-0 right-0 mb-2 max-h-60 bg-surface border border-border rounded-lg shadow-surface-lg z-20 overflow-y-auto"
+            className="absolute bottom-full left-0 right-0 mb-2 max-h-60 bg-surface rounded-lg shadow-surface-lg z-20 overflow-y-auto"
           >
-            <p className="px-3 py-2 text-xs font-medium text-tertiary uppercase tracking-wider sticky top-0 bg-surface z-10 border-b border-border">
+            <p className="px-3 py-2 text-xs font-medium text-tertiary uppercase tracking-wider sticky top-0 bg-surface z-10 shadow-section">
               {t('promptHistory.title')}
             </p>
             {promptHistory.length === 0 ? (
@@ -677,8 +677,8 @@ function ChatInputArea({
 
         {/* In-Chat Shortcuts Pills */}
         {shortcutsActive && parsedShortcuts && (
-          <div className="absolute bottom-full left-0 right-0 mb-2 bg-surface border border-border rounded-lg shadow-surface-lg z-20 max-h-60 overflow-y-auto">
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-border sticky top-0 bg-surface z-10">
+          <div className="absolute bottom-full left-0 right-0 mb-2 bg-surface rounded-lg shadow-surface-lg z-20 max-h-60 overflow-y-auto">
+            <div className="flex items-center gap-2 px-3 py-2 shadow-section sticky top-0 bg-surface z-10">
               <select
                 value={shortcutsSet?.id ?? ''}
                 onChange={(e) => handleSetChange(Number(e.target.value))}
@@ -897,7 +897,7 @@ function ChatInputArea({
                       <div
                         ref={quickPanelRef}
                         style={overflowMenuStyle}
-                        className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[220px] max-h-[60vh] overflow-y-auto"
+                        className="bg-surface rounded-lg shadow-surface-lg py-1 min-w-[220px] max-h-[60vh] overflow-y-auto"
                       >
                         <p className="px-3 py-1.5 text-xs font-medium text-tertiary uppercase tracking-wider">
                           {t('moreOptions')}

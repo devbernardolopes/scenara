@@ -22,7 +22,7 @@ function SettingButtonOrder({ value = [], onChange, disabled, buttons = [] }) {
               <div
                 ref={sortable.setNodeRef}
                 style={sortable.style}
-                className="flex items-center gap-1 min-h-[44px] px-2 rounded-md bg-surface-secondary border border-border"
+                className="flex items-center gap-1 min-h-[44px] px-2 rounded-md bg-surface-secondary shadow-surface-sm"
               >
                 {disabled ? (
                   <span className="min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary opacity-30 shrink-0">

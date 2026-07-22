@@ -107,7 +107,7 @@ function ShowPromptModal({
             const baseFlags = messageFlags?.[idx] || []
             const flags = baseFlags
             return (
-              <div key={idx} className="border border-border rounded-lg overflow-hidden">
+              <div key={idx} className="rounded-lg overflow-hidden shadow-surface-sm">
                 <button
                   type="button"
                   onClick={() => setExpandedIdx(isOpen ? null : idx)}
@@ -138,7 +138,7 @@ function ShowPromptModal({
                     <AutoResizeTextarea
                       readOnly
                       value={msg.content || ''}
-                      className="w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none cursor-default"
+                      className="w-full p-3 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm resize-none focus:outline-none cursor-default"
                       extraHeight={8}
                     />
                   </div>

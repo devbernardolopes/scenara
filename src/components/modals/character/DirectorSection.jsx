@@ -7,7 +7,7 @@ import { estimateTokens } from '../../../services/tokenEstimator'
 import { setUIState } from '../../../services/uiState'
 
 const inputClass =
-  'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
+  'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
 
 const GROUPS = [
   {
@@ -127,7 +127,7 @@ function Group({ group, form, onChange, characterId, directorEnabled }) {
   }
 
   return (
-    <div className="border border-border rounded-md">
+    <div className="rounded-md shadow-surface-sm">
       <div className="flex items-center justify-between gap-3 px-3 py-2">
         <span className="text-sm font-medium text-text">{t(group.labelKey)}</span>
         <Switch

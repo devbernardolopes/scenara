@@ -124,7 +124,7 @@ function SettingsModal() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
-      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
+      <div className="flex items-center justify-between p-6 pb-4 shadow-section shrink-0">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -175,7 +175,7 @@ function SettingsModal() {
           )}
         </div>
       </div>
-      <div className="px-6 py-3 border-t border-border shrink-0">
+      <div className="px-6 py-3 shadow-section shrink-0">
         <p className="text-xs text-tertiary">
           {t('versionLabel')} v{pkg.version}
         </p>

@@ -128,9 +128,9 @@ function PromptBankPicker({ open, onClose, onSelect, anchorRef }) {
   const content = (
     <div
       ref={ref}
-      className="w-[280px] max-h-80 flex flex-col bg-surface border border-border rounded-lg shadow-surface-lg"
+      className="w-[280px] max-h-80 flex flex-col bg-surface rounded-lg shadow-surface-lg"
     >
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
+      <div className="flex items-center gap-2 px-3 py-2 shadow-section">
         <Search className="w-3.5 h-3.5 text-tertiary shrink-0" />
         <input
           ref={searchRef}
@@ -176,7 +176,7 @@ function PromptBankPicker({ open, onClose, onSelect, anchorRef }) {
       <button
         type="button"
         onClick={handleManage}
-        className="flex items-center justify-center gap-1.5 px-3 py-2 border-t border-border text-xs text-secondary hover:text-text hover:bg-surface-hover min-h-[44px] shrink-0"
+        className="flex items-center justify-center gap-1.5 px-3 py-2 shadow-section text-xs text-secondary hover:text-text hover:bg-surface-hover min-h-[44px] shrink-0"
       >
         <Database className="w-3 h-3" />
         {t('promptBank.picker.manage')}

@@ -69,7 +69,7 @@ function ModelDropdown({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm text-left flex items-start gap-2"
+        className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm text-left flex items-start gap-2"
       >
         <div className="flex flex-col md:flex-row md:items-center gap-0.5 md:gap-2 flex-1 min-w-0">
           <span className={`truncate ${value ? '' : 'text-tertiary'}`}>
@@ -337,7 +337,7 @@ function ModelSelect({
         <select
           value={sortBy}
           onChange={(e) => persistSortBy(e.target.value)}
-          className="min-h-[44px] px-3 py-2 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+          className="min-h-[44px] px-3 py-2 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
         >
           {sortOptions.map((key) => (
             <option key={key} value={key}>
@@ -377,7 +377,7 @@ function ModelSelect({
             value={filter}
             onChange={(e) => persistFilter(e.target.value)}
             placeholder={t('api.modelSearchPlaceholder')}
-            className="w-full min-h-[44px] pl-10 pr-10 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full min-h-[44px] pl-10 pr-10 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
           />
           {filter && (
             <button
@@ -410,7 +410,7 @@ function ModelSelect({
       />
 
       {fetching ? (
-        <div className="flex items-center justify-between px-3 py-2 min-h-[44px] border border-border rounded-md">
+        <div className="flex items-center justify-between px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary">
           <span className="flex items-center gap-2 text-sm text-secondary">
             <RefreshCw className="w-4 h-4 animate-spin" />
             {t('api.fetchingModels')}
@@ -427,7 +427,7 @@ function ModelSelect({
           )}
         </div>
       ) : countdown > 0 ? (
-        <div className="flex items-center justify-center px-3 py-2 min-h-[44px] border border-border rounded-md">
+        <div className="flex items-center justify-center px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary">
           <span className="text-sm text-tertiary">{t('api.cooldown', { seconds: countdown })}</span>
         </div>
       ) : null}

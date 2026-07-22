@@ -66,7 +66,10 @@
   --thread-card-height: 112px;
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 
-  --thread-card-height: 112px;
+  --shadow-sidebar: 2px 0 8px rgba(0, 0, 0, 0.06);
+  --shadow-header: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-input-area: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-section: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* --- Dark --- */
@@ -123,6 +126,11 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+
+  --shadow-sidebar: 2px 0 10px rgba(0, 0, 0, 0.25);
+  --shadow-header: 0 2px 10px rgba(0, 0, 0, 0.25);
+  --shadow-input-area: 0 -2px 10px rgba(0, 0, 0, 0.25);
+  --shadow-section: 0 1px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* --- Sepia --- */
@@ -179,6 +187,11 @@
   --shadow-sm: 0 1px 2px rgba(69, 26, 3, 0.08);
   --shadow-md: 0 4px 6px -1px rgba(69, 26, 3, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(69, 26, 3, 0.12);
+
+  --shadow-sidebar: 2px 0 8px rgba(69, 26, 3, 0.08);
+  --shadow-header: 0 2px 8px rgba(69, 26, 3, 0.08);
+  --shadow-input-area: 0 -2px 8px rgba(69, 26, 3, 0.08);
+  --shadow-section: 0 1px 4px rgba(69, 26, 3, 0.06);
 }
 
 /* --- Pastel --- */
@@ -235,6 +248,11 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07);
+
+  --shadow-sidebar: 2px 0 8px rgba(0, 0, 0, 0.05);
+  --shadow-header: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-input-area: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-section: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 /* --- High Contrast --- */
@@ -291,6 +309,11 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.25);
+
+  --shadow-sidebar: 2px 0 8px rgba(0, 0, 0, 0.15);
+  --shadow-header: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-input-area: 0 -2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-section: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
 /* --- High Contrast Dark (black + yellow) --- */
@@ -347,6 +370,11 @@
   --shadow-sm: 0 1px 2px rgba(255, 215, 0, 0.15);
   --shadow-md: 0 4px 6px -1px rgba(255, 215, 0, 0.2);
   --shadow-lg: 0 10px 15px -3px rgba(255, 215, 0, 0.25);
+
+  --shadow-sidebar: 2px 0 8px rgba(255, 215, 0, 0.12);
+  --shadow-header: 0 2px 8px rgba(255, 215, 0, 0.12);
+  --shadow-input-area: 0 -2px 8px rgba(255, 215, 0, 0.12);
+  --shadow-section: 0 1px 4px rgba(255, 215, 0, 0.1);
 }
 
 /* --- Terminal (black + green) --- */
@@ -403,6 +431,11 @@
   --shadow-sm: 0 1px 2px rgba(0, 255, 0, 0.12);
   --shadow-md: 0 4px 6px -1px rgba(0, 255, 0, 0.18);
   --shadow-lg: 0 10px 15px -3px rgba(0, 255, 0, 0.24);
+
+  --shadow-sidebar: 2px 0 8px rgba(0, 255, 0, 0.1);
+  --shadow-header: 0 2px 8px rgba(0, 255, 0, 0.1);
+  --shadow-input-area: 0 -2px 8px rgba(0, 255, 0, 0.1);
+  --shadow-section: 0 1px 4px rgba(0, 255, 0, 0.08);
 }
 
 /* ==================== NEW THEMES ==================== */
@@ -461,6 +494,11 @@
   --shadow-sm: 0 1px 3px rgba(99, 102, 241, 0.15);
   --shadow-md: 0 4px 8px -2px rgba(99, 102, 241, 0.2);
   --shadow-lg: 0 10px 20px -4px rgba(99, 102, 241, 0.25);
+
+  --shadow-sidebar: 2px 0 10px rgba(99, 102, 241, 0.15);
+  --shadow-header: 0 2px 10px rgba(99, 102, 241, 0.15);
+  --shadow-input-area: 0 -2px 10px rgba(99, 102, 241, 0.15);
+  --shadow-section: 0 1px 6px rgba(99, 102, 241, 0.12);
 }
 
 /* --- Obsidian (Pure black + electric accents) --- */
@@ -508,6 +546,11 @@
   --shadow-sm: 0 1px 2px rgba(34, 211, 238, 0.2);
   --shadow-md: 0 4px 6px -1px rgba(34, 211, 238, 0.25);
   --shadow-lg: 0 10px 15px -3px rgba(34, 211, 238, 0.3);
+
+  --shadow-sidebar: 2px 0 10px rgba(34, 211, 238, 0.15);
+  --shadow-header: 0 2px 10px rgba(34, 211, 238, 0.15);
+  --shadow-input-area: 0 -2px 10px rgba(34, 211, 238, 0.15);
+  --shadow-section: 0 1px 6px rgba(34, 211, 238, 0.12);
 }
 
 /* --- Cyberpunk (Neon on dark) --- */
@@ -555,6 +598,11 @@
   --shadow-sm: 0 0 8px rgba(255, 0, 255, 0.4);
   --shadow-md: 0 0 15px rgba(0, 255, 255, 0.4);
   --shadow-lg: 0 0 25px rgba(255, 255, 0, 0.3);
+
+  --shadow-sidebar: 2px 0 12px rgba(255, 0, 255, 0.3);
+  --shadow-header: 0 2px 12px rgba(0, 255, 255, 0.3);
+  --shadow-input-area: 0 -2px 12px rgba(255, 255, 0, 0.2);
+  --shadow-section: 0 1px 8px rgba(255, 0, 255, 0.2);
 }
 
 /* --- Vaporwave (Synthwave aesthetic) --- */
@@ -601,6 +649,11 @@
   --shadow-sm: 0 2px 8px rgba(255, 105, 180, 0.3);
   --shadow-md: 0 4px 20px rgba(0, 255, 255, 0.25);
   --shadow-lg: 0 10px 30px rgba(255, 153, 204, 0.3);
+
+  --shadow-sidebar: 2px 0 10px rgba(255, 105, 180, 0.25);
+  --shadow-header: 0 2px 10px rgba(0, 255, 255, 0.2);
+  --shadow-input-area: 0 -2px 10px rgba(255, 105, 180, 0.2);
+  --shadow-section: 0 1px 6px rgba(255, 105, 180, 0.18);
 }
 
 /* --- Retro CRT (Warm phosphor) --- */
@@ -647,6 +700,11 @@
   --shadow-sm: 0 1px 4px rgba(163, 230, 53, 0.3);
   --shadow-md: 0 4px 12px rgba(163, 230, 53, 0.25);
   --shadow-lg: 0 8px 25px rgba(163, 230, 53, 0.2);
+
+  --shadow-sidebar: 2px 0 10px rgba(163, 230, 53, 0.2);
+  --shadow-header: 0 2px 10px rgba(163, 230, 53, 0.2);
+  --shadow-input-area: 0 -2px 10px rgba(163, 230, 53, 0.2);
+  --shadow-section: 0 1px 6px rgba(163, 230, 53, 0.15);
 }
 
 /* --- Solarized Dark (High contrast, accessible) --- */
@@ -689,6 +747,15 @@
   --color-ooc-placeholder: rgba(253, 246, 227, 0.45);
 
   --color-code-bg: rgba(131, 148, 150, 0.15);
+
+  --shadow-sm: 0 1px 2px rgba(131, 148, 150, 0.15);
+  --shadow-md: 0 4px 6px -1px rgba(131, 148, 150, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(131, 148, 150, 0.25);
+
+  --shadow-sidebar: 2px 0 8px rgba(131, 148, 150, 0.12);
+  --shadow-header: 0 2px 8px rgba(131, 148, 150, 0.12);
+  --shadow-input-area: 0 -2px 8px rgba(131, 148, 150, 0.12);
+  --shadow-section: 0 1px 4px rgba(131, 148, 150, 0.1);
 }
 
 /* --- Neon Abyss (Extreme high-contrast) --- */
@@ -735,6 +802,11 @@
   --shadow-sm: 0 0 10px #00ffea;
   --shadow-md: 0 0 20px #ff00ff;
   --shadow-lg: 0 0 35px #ffff00;
+
+  --shadow-sidebar: 2px 0 12px rgba(0, 255, 234, 0.4);
+  --shadow-header: 0 2px 12px rgba(0, 255, 234, 0.4);
+  --shadow-input-area: 0 -2px 12px rgba(255, 0, 255, 0.3);
+  --shadow-section: 0 1px 8px rgba(0, 255, 234, 0.25);
 }
 
 /* ============================================================
@@ -1180,6 +1252,18 @@ main {
 }
 .shadow-surface-lg {
   box-shadow: var(--shadow-lg);
+}
+.shadow-sidebar {
+  box-shadow: var(--shadow-sidebar);
+}
+.shadow-header {
+  box-shadow: var(--shadow-header);
+}
+.shadow-input-area {
+  box-shadow: var(--shadow-input-area);
+}
+.shadow-section {
+  box-shadow: var(--shadow-section);
 }
 
 .thread-card {

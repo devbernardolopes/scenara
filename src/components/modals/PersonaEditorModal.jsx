@@ -90,7 +90,7 @@ function PersonaEditorModal() {
   if (editing) {
     return (
       <form onSubmit={handleSave} className="flex flex-col min-h-0 flex-1">
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
+        <div className="flex items-center justify-between p-6 pb-4 shadow-section shrink-0">
           <h2 className="text-xl font-semibold text-text">
             {editing === 'new' ? t('addPersona') : t('editPersona')}
           </h2>
@@ -174,7 +174,7 @@ function PersonaEditorModal() {
           </div>
         </div>
 
-        <div className="flex justify-between px-6 py-4 border-t border-border shrink-0">
+        <div className="flex justify-between px-6 py-4 shadow-section shrink-0">
           <div>
             {editing !== 'new' && (
               <button
@@ -209,7 +209,7 @@ function PersonaEditorModal() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
-      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
+      <div className="flex items-center justify-between p-6 pb-4 shadow-section shrink-0">
         <div>
           <h2 className="text-xl font-semibold text-text">{t('personaTitle')}</h2>
           <p className="text-sm text-secondary mt-1">{t('personaSubtitle')}</p>

@@ -87,7 +87,7 @@ function StringListInput({ value, onChange, maxItems }) {
           onKeyDown={handleKeyDown}
           disabled={atLimit}
           placeholder={atLimit ? t('api.profile.maxStopItems') : t('api.profile.addStopItem')}
-          className="flex-1 min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+          className="flex-1 min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
         />
         <button
           type="button"
@@ -448,7 +448,7 @@ function ProfileFormModal({ profile }) {
         <div>
           <Label required>{t('api.profile.form.name')}</Label>
           <input
-            className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+            className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
             value={form.name}
             onChange={update('name')}
             placeholder={t('api.profile.form.namePlaceholder')}
@@ -484,7 +484,7 @@ function ProfileFormModal({ profile }) {
                 baseUrl: getDefaultBaseUrl(nextProvider) || '',
               }))
             }}
-            className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm"
+            className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm"
           >
             <option value="">{t('api.profile.form.selectProvider')}</option>
             {PROVIDERS.map((p) => {
@@ -507,7 +507,7 @@ function ProfileFormModal({ profile }) {
               value={form.baseUrl}
               onChange={(e) => setForm((prev) => ({ ...prev, baseUrl: e.target.value }))}
               placeholder={t('api.profile.form.baseUrlPlaceholder')}
-              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
             />
           </div>
         )}
@@ -523,7 +523,7 @@ function ProfileFormModal({ profile }) {
               <select
                 value={form.keyId || ''}
                 onChange={(e) => setForm((prev) => ({ ...prev, keyId: e.target.value || null }))}
-                className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm"
+                className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm"
               >
                 <option value="">{t('api.profile.form.selectKey')}</option>
                 {keys.map((k) => (
@@ -544,7 +544,7 @@ function ProfileFormModal({ profile }) {
             <select
               value={form.params.hordeMethod || 'native'}
               onChange={(e) => updateParam('hordeMethod', e.target.value)}
-              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text text-sm"
+              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm"
             >
               <option value="native">{t('api.profile.form.hordeMethodNative')}</option>
               <option value="openai-compatible">{t('api.profile.form.hordeMethodOpenAI')}</option>
@@ -623,7 +623,7 @@ function ProfileFormModal({ profile }) {
                 value={form.model || ''}
                 onChange={(e) => setForm((prev) => ({ ...prev, model: e.target.value }))}
                 placeholder={t('api.model.placeholder')}
-                className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+                className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
               />
             )}
           </div>

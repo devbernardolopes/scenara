@@ -43,7 +43,7 @@ function SettingOocDelimiters({ value, onChange }) {
           value={left}
           onChange={handleLeftChange}
           disabled={!enabled}
-          className="w-28 px-2 py-1.5 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm disabled:opacity-50"
+          className="w-28 px-2 py-1.5 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm disabled:opacity-50"
         />
         <span className="text-sm text-text whitespace-nowrap">
           {t('prompting.oocDelimiters.contentLabel')}
@@ -53,7 +53,7 @@ function SettingOocDelimiters({ value, onChange }) {
           value={right}
           onChange={handleRightChange}
           disabled={!enabled}
-          className="w-20 px-2 py-1.5 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm disabled:opacity-50"
+          className="w-20 px-2 py-1.5 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm disabled:opacity-50"
         />
       </div>
     </div>

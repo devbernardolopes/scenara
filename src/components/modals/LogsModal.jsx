@@ -171,12 +171,12 @@ function LogsModal() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
-      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
+      <div className="flex items-center justify-between p-6 pb-4 shadow-section shrink-0">
         <h2 className="text-xl font-semibold text-text">{t('logs:title')}</h2>
         <CloseButton onClick={closeModal} />
       </div>
 
-      <div className="p-6 pt-4 space-y-2 border-b border-border shrink-0">
+      <div className="p-6 pt-4 space-y-2 shadow-section shrink-0">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary pointer-events-none" />
           <input
@@ -184,7 +184,7 @@ function LogsModal() {
             value={filters.search}
             onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
             placeholder={t('logs:search')}
-            className="w-full min-h-[44px] pl-10 pr-3 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full min-h-[44px] pl-10 pr-3 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <button
@@ -210,7 +210,7 @@ function LogsModal() {
             <select
               value={filters.type}
               onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value }))}
-              className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+              className="min-h-[44px] px-3 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">{t('logs:filterType')}</option>
               {TYPES.map((tp) => (
@@ -222,7 +222,7 @@ function LogsModal() {
             <select
               value={filters.level}
               onChange={(e) => setFilters((f) => ({ ...f, level: e.target.value }))}
-              className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+              className="min-h-[44px] px-3 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">{t('logs:filterLevel')}</option>
               {LEVELS.map((lv) => (
@@ -234,7 +234,7 @@ function LogsModal() {
             <select
               value={filters.threadId}
               onChange={(e) => setFilters((f) => ({ ...f, threadId: e.target.value }))}
-              className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+              className="min-h-[44px] px-3 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">{t('logs:filterThread')}</option>
               {threads.map((thr) => (
@@ -246,7 +246,7 @@ function LogsModal() {
             <select
               value={filters.sort}
               onChange={(e) => setFilters((f) => ({ ...f, sort: e.target.value }))}
-              className="min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+              className="min-h-[44px] px-3 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="desc">{t('logs:sortNewest')}</option>
               <option value="asc">{t('logs:sortOldest')}</option>
@@ -317,7 +317,7 @@ function LogsModal() {
         )}
       </div>
 
-      <div className="flex items-center gap-2 px-6 py-4 border-t border-border shrink-0">
+      <div className="flex items-center gap-2 px-6 py-4 shadow-section shrink-0">
         <button
           type="button"
           onClick={handleExport}

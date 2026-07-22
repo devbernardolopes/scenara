@@ -6,7 +6,7 @@ import { estimateTokens } from '../../../services/tokenEstimator'
 import { Plus, Trash2, Edit3 } from '../../../lib/icons'
 
 const inputClass =
-  'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
+  'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
 
 function countWords(text) {
   const trimmed = (text || '').trim()
@@ -70,7 +70,7 @@ function ExampleMessagesSection({ form, onChange, characterId }) {
   return (
     <div className="space-y-4">
       {messages.map((msg, idx) => (
-        <div key={msg.id} className="border border-border rounded-md">
+        <div key={msg.id} className="rounded-md shadow-surface-sm">
           <CollapsibleSection
             label={`${t('exampleMessageLabel')} #${idx + 1}`}
             summary={

@@ -21,7 +21,7 @@ function SettingButtonGroup({ value, onChange, disabled, buttons = [] }) {
                 ? 'bg-surface text-tertiary border-border cursor-not-allowed'
                 : value === val
                   ? 'bg-primary text-on-primary border-primary'
-                  : 'bg-surface text-secondary border-border hover:bg-surface-hover'
+                  : 'bg-surface bg-surface-secondary text-secondary border-border hover:bg-surface-hover'
             }`}
           >
             {label}

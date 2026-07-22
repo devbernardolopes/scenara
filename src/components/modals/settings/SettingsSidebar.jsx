@@ -4,7 +4,7 @@ function SettingsSidebar({ categories, active, onSelect }) {
   const { t } = useTranslation('settings')
 
   return (
-    <nav className="w-44 shrink-0 border-r border-border overflow-y-auto px-4 py-4 hidden md:block">
+    <nav className="w-44 shrink-0 shadow-sidebar overflow-y-auto px-4 py-4 hidden md:block">
       <ul className="space-y-1">
         {categories.map((cat) => (
           <li key={cat.id}>

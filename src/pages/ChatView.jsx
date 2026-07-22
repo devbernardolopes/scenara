@@ -145,7 +145,7 @@ function ScenarioStatusBar({ scenario, charName, userName }) {
   })()
 
   return (
-    <div className="sticky top-[49px] z-10 bg-surface border-b border-border-light px-4 md:px-8 py-1 text-center">
+    <div className="sticky top-[49px] z-10 bg-surface shadow-section px-4 md:px-8 py-1 text-center">
       <MarqueeText className="text-xs text-tertiary" marquee>
         {display}
       </MarqueeText>
@@ -2183,7 +2183,7 @@ function ChatView() {
   return (
     <div className="flex flex-col h-full">
       <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto relative pb-4">
-        <div className="sticky top-0 z-10 bg-surface flex items-center justify-between px-4 md:px-8 py-3 border-b border-border">
+        <div className="sticky top-0 z-10 bg-surface flex items-center justify-between px-4 md:px-8 py-3 shadow-header">
           <div className="flex items-center gap-2 min-w-0">
             {character && (
               <Avatar
@@ -2254,7 +2254,7 @@ function ChatView() {
                   const summStatus = summPending?.status
                   return (
                     <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
-                      <div className="flex-1 h-px bg-border" />
+                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
                       <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
                         {summStatus && (
                           <button
@@ -2270,7 +2270,7 @@ function ChatView() {
                         {summStatus === 'queued' && <Clock className="w-3 h-3" />}
                         {summStatus === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
                       </span>
-                      <div className="flex-1 h-px bg-border" />
+                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
                     </div>
                   )
                 }
@@ -2289,7 +2289,7 @@ function ChatView() {
                   const atStatus = autoTitlePending?.status
                   return (
                     <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
-                      <div className="flex-1 h-px bg-border" />
+                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
                       <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
                         {atStatus && (
                           <button
@@ -2305,7 +2305,7 @@ function ChatView() {
                         {atStatus === 'queued' && <Clock className="w-3 h-3" />}
                         {atStatus === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
                       </span>
-                      <div className="flex-1 h-px bg-border" />
+                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
                     </div>
                   )
                 }
@@ -2403,7 +2403,7 @@ function ChatView() {
         </div>
       </div>
 
-      <div className="flex-shrink-0 border-t border-border bg-surface">
+      <div className="flex-shrink-0 shadow-input-area bg-surface">
         {' '}
         {/* Wrap input for better control */}
         {showStatus && chatModelName && (

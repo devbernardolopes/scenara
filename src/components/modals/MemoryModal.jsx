@@ -182,7 +182,7 @@ function MemoryModal({ threadId }) {
             const isUnread = entry.isRead === false
             const tokenCount = estimateTokens((drafts[entry.id] ?? entry.content) || '')
             return (
-              <div key={entry.id} className="border border-border rounded-lg overflow-hidden">
+              <div key={entry.id} className="rounded-lg overflow-hidden shadow-surface-sm">
                 <div className="flex items-center gap-2 px-3 py-2 bg-surface-secondary">
                   <button
                     type="button"
@@ -241,7 +241,7 @@ function MemoryModal({ threadId }) {
                       readOnly={index !== 0}
                       value={(drafts[entry.id] ?? entry.content) || ''}
                       onChange={(e) => updateDraft(entry.id, e.target.value)}
-                      className="w-full p-3 border border-border rounded-md bg-surface text-text text-sm resize-none focus:outline-none"
+                      className="w-full p-3 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm resize-none focus:outline-none"
                       extraHeight={8}
                     />
                   </div>

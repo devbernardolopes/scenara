@@ -35,7 +35,7 @@ function SettingToggleInput({ value, onChange }) {
         onChange={handleTextChange}
         disabled={!enabled}
         placeholder={t('prompting.toggleInputPlaceholder')}
-        className="w-full px-2 py-1.5 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm disabled:opacity-50"
+        className="w-full px-2 py-1.5 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm disabled:opacity-50"
       />
     </div>
   )

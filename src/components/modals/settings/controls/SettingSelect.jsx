@@ -15,7 +15,7 @@ function SettingSelect({ value, options, optionLabels, onChange, disabled }) {
               ? 'bg-surface text-tertiary border-border cursor-not-allowed'
               : value === opt
                 ? 'bg-primary text-on-primary border-primary'
-                : 'bg-surface text-secondary border-border hover:bg-surface-hover'
+                : 'bg-surface bg-surface-secondary text-secondary border-border hover:bg-surface-hover'
           }`}
         >
           {optionLabels?.[opt] ? t(optionLabels[opt].replace('settings:', '')) : opt}

@@ -19,7 +19,7 @@ function CharacterSidebar({ active, onSelect, highlights }) {
   const { t } = useTranslation('characterCreation')
 
   return (
-    <nav className="w-44 shrink-0 border-r border-border overflow-y-auto px-4 py-4 hidden md:block">
+    <nav className="w-44 shrink-0 shadow-sidebar overflow-y-auto px-4 py-4 hidden md:block">
       <ul className="space-y-1">
         {SECTIONS.map((sec) => (
           <li key={sec.id}>

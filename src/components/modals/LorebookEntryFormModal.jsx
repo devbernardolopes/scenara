@@ -13,7 +13,7 @@ import { createEntry, updateEntry } from '../../services/lorebookEntries'
 import { POSITION_OPTIONS } from '../../services/lorebookImportExport'
 
 const inputClass =
-  'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
+  'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
 
 const SECONDARY_LOGIC_OPTIONS = ['none', 'andAny', 'andAll', 'notAny', 'notAll']
 

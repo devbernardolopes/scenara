@@ -329,14 +329,14 @@ function Sidebar({ open, onClose }) {
       {open && <div className="fixed inset-0 bg-overlay z-30 md:hidden" onClick={onClose} />}
       <aside
         className={`
-          fixed inset-y-0 left-0 z-40 w-80 max-w-[85vw] lg:w-96 bg-surface-secondary border-r border-border
+          fixed inset-y-0 left-0 z-40 w-80 max-w-[85vw] lg:w-96 bg-surface-secondary shadow-sidebar
           flex flex-col
           transform transition-transform duration-200 ease-in-out
           md:relative md:transform-none md:z-auto
           ${open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}
       >
-        <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
+        <div className="flex items-center justify-between p-4 shadow-section shrink-0">
           <Link to="/" className="font-bold text-lg text-text hover:text-text" onClick={onClose}>
             {t('appName')}
           </Link>
@@ -391,7 +391,7 @@ function Sidebar({ open, onClose }) {
               {showImportMenu && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowImportMenu(false)} />
-                  <div className="absolute right-0 top-full mt-1 w-48 bg-surface border border-border rounded-md shadow-surface-lg z-20 py-1">
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-surface rounded-md shadow-surface-lg z-20 py-1">
                     <button
                       onClick={handleImportUrl}
                       className="flex items-center gap-2 w-full min-h-[44px] px-3 text-sm text-text hover:bg-surface-hover"
@@ -459,7 +459,7 @@ function Sidebar({ open, onClose }) {
         </div>
 
         {selectedIds.size > 0 && (
-          <div className="border-t border-border px-3 py-2 shrink-0 flex items-center gap-3">
+          <div className="shadow-section px-3 py-2 shrink-0 flex items-center gap-3">
             <span className="text-sm text-secondary">
               {t('sidebar.selectedCount', { count: selectedIds.size })}
             </span>
@@ -523,7 +523,7 @@ function Sidebar({ open, onClose }) {
           ]
           if (sidebarNavLayout === 'compact') {
             return (
-              <div className="border-t border-border p-3 shrink-0 flex flex-wrap gap-1">
+              <div className="shadow-section p-3 shrink-0 flex flex-wrap gap-1">
                 {navButtons.map((btn) => (
                   <button
                     key={btn.labelKey}
@@ -538,7 +538,7 @@ function Sidebar({ open, onClose }) {
             )
           }
           return (
-            <div className="border-t border-border p-3 shrink-0 space-y-1">
+            <div className="shadow-section p-3 shrink-0 space-y-1">
               {navButtons.map((btn) => (
                 <button
                   key={btn.labelKey}
@@ -563,7 +563,7 @@ function Sidebar({ open, onClose }) {
             return (
               <div
                 ref={colorPickerRef}
-                className="fixed bg-surface border border-border rounded-md shadow-surface-md z-50 p-1.5"
+                className="fixed bg-surface rounded-md shadow-surface-md z-50 p-1.5"
                 style={{ top: colorPickerPos.top, left: colorPickerPos.left }}
               >
                 <ColorPicker

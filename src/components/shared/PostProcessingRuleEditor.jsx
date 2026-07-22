@@ -41,7 +41,7 @@ function ChipInput({ label, values, placeholder, onAdd, onRemove }) {
         {values.map((v) => (
           <span
             key={v}
-            className="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-secondary text-text text-sm border border-border"
+            className="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-secondary text-text text-sm shadow-surface-sm"
           >
             <span className="font-mono">{v}</span>
             <button
@@ -62,7 +62,7 @@ function ChipInput({ label, values, placeholder, onAdd, onRemove }) {
         onKeyDown={handleKeyDown}
         onBlur={commit}
         placeholder={placeholder}
-        className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+        className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
       />
     </div>
   )
@@ -89,14 +89,14 @@ function RuleRow({ rule, index, total, onChange, onMove, onDelete }) {
   }
 
   return (
-    <div className="border border-border rounded-lg p-3 space-y-3 bg-surface">
+    <div className="rounded-lg p-3 space-y-3 bg-surface shadow-surface-sm">
       <div className="flex items-center gap-2">
         <input
           type="text"
           value={rule.label || ''}
           onChange={(e) => update({ label: e.target.value })}
           placeholder={t('postProcessing.label')}
-          className="flex-1 px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+          className="flex-1 px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
         />
         <button
           type="button"

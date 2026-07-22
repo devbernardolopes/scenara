@@ -207,7 +207,7 @@ function ApiSettingsPanel() {
         ))}
       </div>
 
-      <div className="border-t border-border pt-6">
+      <div className="shadow-section pt-6">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-text">{t('api.requestCooldown.label')}</h3>
@@ -223,7 +223,7 @@ function ApiSettingsPanel() {
         </div>
       </div>
 
-      <div className="border-t border-border pt-6">
+      <div className="shadow-section pt-6">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-text">{t('api.requestTimeout.label')}</h3>
@@ -239,7 +239,7 @@ function ApiSettingsPanel() {
         </div>
       </div>
 
-      <div className="border-t border-border pt-6">
+      <div className="shadow-section pt-6">
         <h3 className="text-sm font-semibold text-text mb-4">
           {t('api.profileAssignment.apiKeys')}
         </h3>
@@ -264,7 +264,7 @@ function ApiSettingsPanel() {
                     value={baseUrls[provider.id] || ''}
                     onChange={(e) => handleBaseUrlChange(provider.id, e.target.value)}
                     placeholder={t('api.serverUrl.placeholder')}
-                    className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+                    className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
                   />
                 </div>
               )}

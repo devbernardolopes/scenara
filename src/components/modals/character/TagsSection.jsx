@@ -196,7 +196,7 @@ function TagsSection({ form, onChange }) {
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder={t('tagsSectionPlaceholder')}
-          className="w-full min-h-[44px] px-3 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full min-h-[44px] px-3 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
         />
         {showSuggestions && suggestions.length > 0 && (
           <div className="absolute z-10 w-full mt-1 bg-surface border border-border rounded-md shadow-surface-md max-h-60 overflow-y-auto">
@@ -235,7 +235,7 @@ function TagsSection({ form, onChange }) {
               value={searchQuery}
               onChange={(e) => persistSearchQuery(e.target.value)}
               placeholder={tc('tags.searchPlaceholder')}
-              className="w-full min-h-[44px] pl-10 pr-10 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full min-h-[44px] pl-10 pr-10 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
             />
             {searchQuery && (
               <button
@@ -256,7 +256,7 @@ function TagsSection({ form, onChange }) {
               <select
                 value={sortBy}
                 onChange={(e) => persistSortBy(e.target.value)}
-                className="min-h-[44px] px-3 py-2 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+                className="min-h-[44px] px-3 py-2 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 {SORT_OPTIONS.map((key) => (
                   <option key={key} value={key}>

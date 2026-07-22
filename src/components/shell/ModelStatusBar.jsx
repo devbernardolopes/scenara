@@ -91,5 +91,5 @@ export default function ModelStatusBar({ embedded = false }) {
 
   if (embedded) return bar
 
-  return <div className="flex-shrink-0 border-t border-border bg-surface">{bar}</div>
+  return <div className="flex-shrink-0 shadow-input-area bg-surface">{bar}</div>
 }

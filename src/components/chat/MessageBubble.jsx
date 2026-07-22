@@ -850,7 +850,7 @@ function MessageBubble({
                           <div
                             ref={overflowPanelRef}
                             style={overflowMenuStyle}
-                            className="bg-surface border border-border rounded-lg shadow-surface-lg py-1 min-w-[160px]"
+                            className="bg-surface rounded-lg shadow-surface-lg py-1 min-w-[160px]"
                           >
                             {overflowKeys.map((key) => {
                               const def = BUTTON_DEFS[key]

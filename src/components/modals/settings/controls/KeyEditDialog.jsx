@@ -24,29 +24,25 @@ function KeyEditDialog({ title, initialValue, initialLabel, onSave, onCancel }) 
 
         <div className="space-y-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-secondary">
-              {t('api.keyValueLabel')}
-            </label>
+            <label className="text-xs font-medium text-secondary">{t('api.keyValueLabel')}</label>
             <input
               type="password"
               value={value}
               onChange={(e) => setValue(e.target.value)}
               placeholder={t('api.keyValuePlaceholder')}
               autoFocus
-              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-secondary">
-              {t('api.keyLabelLabel')}
-            </label>
+            <label className="text-xs font-medium text-secondary">{t('api.keyLabelLabel')}</label>
             <input
               type="text"
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               placeholder={t('api.keyLabelPlaceholder')}
-              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm"
+              className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
             />
           </div>
         </div>

@@ -187,7 +187,7 @@ function DatabaseSettingsPanel() {
               }
             }}
             placeholder={t('database.fromUrlPlaceholder')}
-            className="flex-1 min-h-[44px] px-3 py-2 rounded-lg border border-border bg-surface text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="flex-1 min-h-[44px] px-3 py-2 rounded-lg border border-border bg-surface bg-surface-secondary text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           />
           <button
             type="button"

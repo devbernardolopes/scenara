@@ -173,7 +173,7 @@ function ListManagementModal({ config }) {
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
-      <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
+      <div className="flex items-center justify-between p-6 pb-4 shadow-section shrink-0">
         <h2 className="text-xl font-semibold text-text">{t(titleKey)}</h2>
         <CloseButton onClick={closeModal} />
       </div>

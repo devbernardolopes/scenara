@@ -27,7 +27,7 @@ function SettingAvatarPicker({ value, onChange, disabled }) {
   }
 
   const inputClass =
-    'w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-tertiary text-sm'
+    'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
 
   return (
     <div className="flex items-center gap-2">

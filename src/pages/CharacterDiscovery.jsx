@@ -56,7 +56,7 @@ function StartChatButton({ character, onStart, open, onToggle, onClose }) {
 
   return (
     <div className="relative" ref={anchorRef}>
-      <div className="character-card__start-btn flex border border-border rounded-md overflow-hidden">
+      <div className="character-card__start-btn flex bg-surface-secondary rounded-md overflow-hidden">
         <button
           type="button"
           onClick={() => onStart(character, null)}
@@ -64,7 +64,7 @@ function StartChatButton({ character, onStart, open, onToggle, onClose }) {
         >
           {t('discovery.startChat')}
         </button>
-        <div className="w-px bg-border self-stretch" />
+        <div className="w-px bg-border-light self-stretch" />
         <button
           type="button"
           onClick={onToggle}
@@ -109,7 +109,7 @@ function TagRow({ tags }) {
         {tags.map((tag, i) => (
           <span
             key={i}
-            className="bg-white/15 text-on-image text-xs rounded-full px-2 py-0.5 whitespace-nowrap shrink-0"
+            className="bg-on-primary/10 text-on-image text-xs rounded-full px-2 py-0.5 whitespace-nowrap shrink-0"
           >
             {tag}
           </span>
@@ -493,7 +493,7 @@ function CharacterDiscovery() {
           name="characterSort"
           value={sortBy}
           onChange={(e) => persistSortBy(e.target.value)}
-          className="min-h-[44px] px-3 py-2 text-sm bg-surface border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
+          className="min-h-[44px] px-3 py-2 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-primary"
         >
           {SORT_OPTIONS.map((key) => (
             <option key={key} value={key}>
@@ -543,7 +543,7 @@ function CharacterDiscovery() {
                 value={searchQuery}
                 onChange={(e) => persistSearchQuery(e.target.value)}
                 placeholder={t('discovery.search.placeholder')}
-                className="w-full min-h-[44px] pl-10 pr-10 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full min-h-[44px] pl-10 pr-10 text-sm bg-surface bg-surface-secondary border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
               />
               {searchQuery && (
                 <button
@@ -597,7 +597,7 @@ function CharacterDiscovery() {
                       return
                     handleEditCharacter(char)
                   }}
-                  className="character-card border border-border rounded-lg bg-surface cursor-pointer flex flex-col aspect-[2/3] overflow-hidden"
+                  className="character-card rounded-lg bg-surface shadow-surface-sm cursor-pointer flex flex-col aspect-[2/3] overflow-hidden"
                 >
                   <div className="relative flex-1 overflow-hidden">
                     {char.avatar ? (
@@ -685,7 +685,7 @@ function CharacterDiscovery() {
       </div>
       {!isUnlimited && sortedCharacters.length > 0 ? (
         // <div className="shrink-0 px-4 md:px-8 pb-4 md:pb-8 pt-4 bg-surface border-t border-border">
-        <div className="shrink-0 px-4 md:px-8 pb-4 bg-surface border-t border-border">
+        <div className="shrink-0 px-4 md:px-8 pb-4 bg-surface shadow-input-area">
           <ModelStatusBar embedded />
           <Pagination
             currentPage={safePage}
