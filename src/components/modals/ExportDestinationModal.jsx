@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
+import { usePersistedState } from '../../hooks/usePersistedState'
 import CloseButton from '../shared/CloseButton'
 import { FileUp, GitBranch, Loader, CheckCircle, AlertTriangle, Eye, EyeOff } from '../../lib/icons'
 import { getGistService } from '../../services/cloudServices'
@@ -14,7 +15,7 @@ function ExportDestinationModal({ exportData }) {
   const [hasGistService, setHasGistService] = useState(false)
   const [phase, setPhase] = useState('select')
   const [errorLabel, setErrorLabel] = useState('')
-  const [passphrase, setPassphrase] = useState('')
+  const [passphrase, setPassphrase] = usePersistedState('export.passphrase', '')
   const [showPassphrase, setShowPassphrase] = useState(false)
 
   useEffect(() => {
@@ -151,6 +152,13 @@ function ExportDestinationModal({ exportData }) {
       </div>
       <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-4">
         <form onSubmit={(e) => e.preventDefault()}>
+          <input
+            type="text"
+            name="username"
+            autoComplete="username"
+            className="sr-only"
+            tabIndex={-1}
+          />
           <label className="block text-sm font-medium text-text mb-1">
             {t('database.exportModal.passphrase')}
           </label>
