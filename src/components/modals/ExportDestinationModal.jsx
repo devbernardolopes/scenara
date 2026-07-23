@@ -159,6 +159,7 @@ function ExportDestinationModal({ exportData }) {
               type={showPassphrase ? 'text' : 'password'}
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
+              autoComplete="new-password"
               placeholder={t('database.exportModal.passphrasePlaceholder')}
               className="w-full min-h-[44px] px-3 pr-10 py-2 rounded-lg border border-border bg-surface text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />

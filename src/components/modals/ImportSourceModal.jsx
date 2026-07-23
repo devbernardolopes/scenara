@@ -82,6 +82,7 @@ function ImportSourceModal({ onFromFile, onFromUrl, onFromGist }) {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && urlValid) handleFromUrl()
                 }}
+                autoComplete="new-password"
                 placeholder={t('database.importModal.passphrasePlaceholder')}
                 className="w-full min-h-[44px] px-3 pr-10 py-2 rounded-lg border border-border bg-surface text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
