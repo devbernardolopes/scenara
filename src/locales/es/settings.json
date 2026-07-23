@@ -976,6 +976,7 @@
     "fromUrl": "File URL",
     "fromUrlPlaceholder": "https://example.com/scenara-export.json",
     "importFromUrl": "Import",
+    "importFromGist": "Import",
     "urlInvalid": "Please enter a valid URL",
     "reset": "Reset Database",
     "exportDesc": "Export all data to a JSON file for backup or transfer.",

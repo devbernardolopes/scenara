@@ -57,9 +57,7 @@ export async function gistGetRaw(token, gistId) {
     throw new Error(`File "${GIST_FILENAME}" not found in gist`)
   }
   if (file.truncated) {
-    const rawRes = await fetch(file.raw_url, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    const rawRes = await fetch(file.raw_url)
     if (!rawRes.ok) throw new Error('Failed to fetch raw gist content')
     return rawRes.text()
   }

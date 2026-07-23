@@ -11,6 +11,13 @@ import { gistGetRaw } from '../../../services/githubGist'
 import { isEncrypted, decrypt } from '../../../lib/crypto'
 import { Download, Upload, AlertTriangle, RefreshCw } from '../../../lib/icons'
 
+function extractGistId(value) {
+  const trimmed = value.trim()
+  if (/^[0-9a-f]{32}$/i.test(trimmed)) return trimmed
+  const match = trimmed.match(/gist\.github\.com\/[^/]+\/([0-9a-f]{32})/i)
+  return match ? match[1] : null
+}
+
 function DatabaseSettingsPanel() {
   const { confirm } = useConfirm()
   const { openModal, updateModal } = useModal()
@@ -100,7 +107,7 @@ function DatabaseSettingsPanel() {
     }
   }
 
-  async function handleImportFromGist(passphrase) {
+  async function handleImportFromGist(passphrase, gistUrl) {
     setIsImporting(true)
     openModal('progress', { status: 'importing', label: t('database.importModal.importing') })
 
@@ -114,7 +121,10 @@ function DatabaseSettingsPanel() {
         return
       }
       const token = svc.credentials?.token || ''
-      const gistId = svc.metadata?.gistId
+      let gistId = svc.metadata?.gistId
+      if (!gistId && gistUrl) {
+        gistId = extractGistId(gistUrl)
+      }
       if (!gistId) {
         updateModal({
           status: 'error',
