@@ -39,8 +39,11 @@ export async function encrypt(plaintext, passphrase) {
   combined.set(salt, 0)
   combined.set(iv, SALT_LEN)
   combined.set(new Uint8Array(cipherBuffer), SALT_LEN + IV_LEN)
-  const b64 = btoa(String.fromCharCode(...combined))
-  return MAGIC + b64
+  let binary = ''
+  for (let i = 0; i < combined.length; i++) {
+    binary += String.fromCharCode(combined[i])
+  }
+  return MAGIC + btoa(binary)
 }
 
 export async function decrypt(encoded, passphrase) {

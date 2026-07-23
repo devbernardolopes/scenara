@@ -70,7 +70,7 @@ function ImportSourceModal({ onFromFile, onFromUrl, onFromGist }) {
               <p className="text-xs text-error mt-1.5">{t('database.importModal.urlInvalid')}</p>
             )}
           </div>
-          <div>
+          <form onSubmit={(e) => e.preventDefault()}>
             <label className="block text-sm font-medium text-text mb-1">
               {t('database.importModal.passphrase')}
             </label>
@@ -94,7 +94,7 @@ function ImportSourceModal({ onFromFile, onFromUrl, onFromGist }) {
               </button>
             </div>
             <p className="text-xs text-tertiary mt-1">{t('database.importModal.passphraseDesc')}</p>
-          </div>
+          </form>
         </div>
         <div className="flex justify-end gap-3 px-6 py-4 shadow-section shrink-0">
           <button
@@ -129,7 +129,7 @@ function ImportSourceModal({ onFromFile, onFromUrl, onFromGist }) {
         <CloseButton onClick={closeModal} />
       </div>
       <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-4">
-        <div>
+        <form onSubmit={(e) => e.preventDefault()}>
           <label className="block text-sm font-medium text-text mb-1">
             {t('database.importModal.passphrase')}
           </label>
@@ -150,7 +150,7 @@ function ImportSourceModal({ onFromFile, onFromUrl, onFromGist }) {
             </button>
           </div>
           <p className="text-xs text-tertiary mt-1">{t('database.importModal.passphraseDesc')}</p>
-        </div>
+        </form>
 
         <div className="space-y-3">
           <button

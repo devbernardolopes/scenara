@@ -150,7 +150,7 @@ function ExportDestinationModal({ exportData }) {
         <CloseButton onClick={closeModal} />
       </div>
       <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-4">
-        <div>
+        <form onSubmit={(e) => e.preventDefault()}>
           <label className="block text-sm font-medium text-text mb-1">
             {t('database.exportModal.passphrase')}
           </label>
@@ -171,7 +171,7 @@ function ExportDestinationModal({ exportData }) {
             </button>
           </div>
           <p className="text-xs text-tertiary mt-1">{t('database.exportModal.passphraseDesc')}</p>
-        </div>
+        </form>
 
         <button
           onClick={handleToFile}
