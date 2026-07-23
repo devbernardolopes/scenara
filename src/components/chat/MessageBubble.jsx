@@ -167,7 +167,7 @@ const BUBBLE_SIZES = {
   compact: 'max-w-[70%] md:max-w-[50%]',
   normal: 'max-w-[80%] md:max-w-[65%]',
   wide: 'max-w-[90%] md:max-w-[80%]',
-  full: 'max-w-full',
+  full: 'w-full max-w-full',
 }
 
 function estimateTokens(text) {
