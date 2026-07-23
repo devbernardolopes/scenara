@@ -93,14 +93,33 @@ function ImageViewerModal({ src, alt }) {
   const centerViewRef = useRef(null)
   const canShowImage = !isExternalImageUrl(src) || online
 
-  const handleDownload = (e) => {
+  const handleDownload = async (e) => {
     e.stopPropagation()
-    const a = document.createElement('a')
-    a.href = src
-    a.download = alt || 'image'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+    const filename = alt || 'image'
+    try {
+      if (isExternalImageUrl(src)) {
+        const res = await fetch(src)
+        if (!res.ok) throw new Error('Fetch failed')
+        const blob = await res.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      } else {
+        const a = document.createElement('a')
+        a.href = src
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      }
+    } catch {
+      window.open(src, '_blank')
+    }
   }
 
   const handlePointerDown = (e) => {
