@@ -79,7 +79,7 @@ function ProfilePicker({ open, onClose, onSelect, currentId, label, triggerRef }
   return (
     <div
       ref={ref}
-      className={`absolute right-0 w-72 max-w-[calc(100vw-2rem)] max-h-64 overflow-y-auto bg-surface rounded-lg shadow-surface-lg z-50 py-1 ${
+      className={`absolute right-0 w-72 max-w-[calc(100vw-2rem)] max-h-64 overflow-y-auto bg-glass border-glass rounded-lg shadow-surface-lg z-50 py-1 ${
         dropUp ? 'bottom-full mb-1' : 'top-full mt-1'
       }`}
     >

@@ -329,7 +329,7 @@ function Sidebar({ open, onClose }) {
       {open && <div className="fixed inset-0 bg-overlay z-30 md:hidden" onClick={onClose} />}
       <aside
         className={`
-          fixed inset-y-0 left-0 z-40 w-80 max-w-[85vw] lg:w-96 bg-surface-secondary shadow-sidebar
+          fixed inset-y-0 left-0 z-40 w-80 max-w-[85vw] lg:w-96 bg-glass-secondary border-glass shadow-sidebar
           flex flex-col
           transform transition-transform duration-200 ease-in-out
           md:relative md:transform-none md:z-auto

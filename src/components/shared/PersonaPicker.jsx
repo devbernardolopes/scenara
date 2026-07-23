@@ -83,7 +83,7 @@ function PersonaPicker({ open, onClose, onSelect, anchorRef, titleKey = 'persona
   const content = (
     <div
       ref={ref}
-      className="w-64 max-h-64 overflow-y-auto bg-surface rounded-lg shadow-surface-lg z-50 py-1"
+      className="w-64 max-h-64 overflow-y-auto bg-glass border-glass rounded-lg shadow-surface-lg z-50 py-1"
     >
       <p className="px-3 py-2 text-xs font-medium text-tertiary uppercase tracking-wider">
         {t(titleKey)}

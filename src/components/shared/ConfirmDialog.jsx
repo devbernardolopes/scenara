@@ -32,7 +32,7 @@ function ConfirmDialog({
       onClick={onCancel}
     >
       <div
-        className="bg-surface rounded-lg shadow-surface-lg max-w-md w-full mx-4 p-6"
+        className="bg-glass border-glass rounded-lg shadow-surface-lg max-w-md w-full mx-4 p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-semibold text-text mb-2">{title}</h2>

@@ -126,7 +126,7 @@ function ModelDropdown({
       </button>
 
       {open && (
-        <div className="absolute z-50 left-0 right-0 mt-1 border border-border rounded-md bg-surface text-text shadow-surface-lg max-h-72 overflow-y-auto">
+        <div className="absolute z-50 left-0 right-0 mt-1 border-glass rounded-md bg-glass text-text shadow-surface-lg max-h-72 overflow-y-auto">
           <div
             className="flex items-center gap-2 px-3 py-2.5 text-sm text-tertiary hover:bg-surface-hover cursor-pointer min-h-[44px]"
             onClick={() => {

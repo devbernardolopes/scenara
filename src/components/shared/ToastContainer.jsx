@@ -63,7 +63,7 @@ function ToastItem({ toast, onDismiss, position }) {
       onClick={() => onDismiss(toast.id)}
       className={`
         flex items-start gap-3 w-full max-w-sm min-h-[44px] px-4 py-3
-        bg-surface shadow-surface-md rounded-lg
+        bg-glass shadow-surface-md rounded-lg border-glass
         border-l-4 ${accentClass} cursor-pointer
         ${toast.exiting ? exitClass + ' pointer-events-none' : enterClass}
       `}

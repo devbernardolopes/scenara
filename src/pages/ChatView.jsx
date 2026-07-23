@@ -174,7 +174,7 @@ function ScenarioStatusBar({ scenario, charName, userName }) {
   })()
 
   return (
-    <div className="sticky top-[49px] z-10 bg-surface shadow-section px-4 md:px-8 py-1 text-center">
+    <div className="sticky top-[49px] z-10 bg-glass shadow-section px-4 md:px-8 py-1 text-center">
       <MarqueeText className="text-xs text-tertiary" marquee>
         {display}
       </MarqueeText>
@@ -2207,7 +2207,7 @@ function ChatView() {
   return (
     <div className="flex flex-col h-full">
       <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto relative pb-4">
-        <div className="sticky top-0 z-10 bg-surface flex items-center justify-between px-4 md:px-8 py-3 shadow-header">
+        <div className="sticky top-0 z-10 bg-glass border-glass flex items-center justify-between px-4 md:px-8 py-3 shadow-header">
           <div className="flex items-center gap-2 min-w-0">
             {character && (
               <Avatar
@@ -2427,7 +2427,7 @@ function ChatView() {
         </div>
       </div>
 
-      <div className="flex-shrink-0 shadow-input-area bg-surface">
+      <div className="flex-shrink-0 shadow-input-area bg-glass border-glass">
         {' '}
         {/* Wrap input for better control */}
         {showStatus && chatModelName && (
