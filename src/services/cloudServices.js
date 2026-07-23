@@ -237,9 +237,9 @@ export async function ensureCatboxAlbum(serviceRecord, fileShortCode) {
   return { short, created: true }
 }
 
-export async function catboxUploadAvatar(serviceRecord, dataUrl) {
+export async function catboxUploadAvatar(serviceRecord, dataUrl, { signal } = {}) {
   const userhash = serviceRecord.credentials?.userhash || ''
-  const url = await catboxUpload(userhash, dataUrl)
+  const url = await catboxUpload(userhash, dataUrl, { signal })
   const fileCode = extractFileRef(url)
   const { short, created } = await ensureCatboxAlbum(serviceRecord, fileCode)
   if (!created && fileCode) {

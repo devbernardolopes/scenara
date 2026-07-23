@@ -30,6 +30,13 @@ function CharacterSection({ form, onChange, characterId }) {
   const [writingInstructions, setWritingInstructions] = useState([])
   const [catboxService, setCatboxService] = useState(null)
   const [converting, setConverting] = useState(false)
+  const catboxAbortRef = useRef(null)
+
+  useEffect(() => {
+    return () => {
+      catboxAbortRef.current?.abort()
+    }
+  }, [])
 
   useEffect(() => {
     getAllWritingInstructions().then(setWritingInstructions)
@@ -78,14 +85,26 @@ function CharacterSection({ form, onChange, characterId }) {
       )
       return
     }
+    catboxAbortRef.current?.abort()
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 60000)
+    catboxAbortRef.current = controller
     setConverting(true)
     try {
-      const url = await catboxUploadAvatar(catboxService, form.avatar)
+      const url = await catboxUploadAvatar(catboxService, form.avatar, {
+        signal: controller.signal,
+      })
       onChange('avatar', url)
       showToast(t('catboxConvertSuccess'), { type: 'success' })
     } catch (err) {
-      showToast(t('catboxConvertError', { error: err.message }), { type: 'error' })
+      if (err.name === 'AbortError') {
+        showToast(t('catboxConvertError', { error: 'Timed out' }), { type: 'error' })
+      } else {
+        showToast(t('catboxConvertError', { error: err.message }), { type: 'error' })
+      }
     } finally {
+      clearTimeout(timeoutId)
+      catboxAbortRef.current = null
       setConverting(false)
     }
   }

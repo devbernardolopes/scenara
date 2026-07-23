@@ -35,7 +35,7 @@ function parseResponse(text) {
   throw new Error(trimmed || 'Upload failed')
 }
 
-export async function catboxUpload(userhash, dataUrl) {
+export async function catboxUpload(userhash, dataUrl, { signal } = {}) {
   const blob = dataUrlToBlob(dataUrl)
   const ext = getMimeType(dataUrl).split('/')[1] || 'png'
   const file = new File([blob], `avatar.${ext}`, { type: blob.type })
@@ -45,7 +45,7 @@ export async function catboxUpload(userhash, dataUrl) {
   if (userhash) form.append('userhash', userhash)
   form.append('fileToUpload', file)
 
-  const res = await fetch(API_URL, { method: 'POST', body: form })
+  const res = await fetch(API_URL, { method: 'POST', body: form, signal })
   if (!res.ok) throw new Error(`Catbox API error: ${res.status}`)
   const text = await res.text()
   return parseResponse(text)
