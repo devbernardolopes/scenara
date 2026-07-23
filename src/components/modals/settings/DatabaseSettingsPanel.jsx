@@ -8,7 +8,7 @@ import { getSetting, setSetting } from '../../../services/settings'
 import { jsonReviver } from '../../../lib/download'
 import { getGistService } from '../../../services/cloudServices'
 import { gistGetRaw } from '../../../services/githubGist'
-import { isEncrypted, decrypt } from '../../../lib/crypto'
+import { isEncrypted, decrypt, decryptTree, hasEncryptedValues } from '../../../lib/crypto'
 import { Download, Upload, AlertTriangle, RefreshCw } from '../../../lib/icons'
 
 function extractGistId(value) {
@@ -57,16 +57,35 @@ function DatabaseSettingsPanel() {
     })
   }
 
-  async function tryDecrypt(text, passphrase) {
-    if (!isEncrypted(text)) return text
-    if (!passphrase) {
-      throw new Error(t('database.importModal.encryptedNoPassphrase'))
+  async function tryDecryptData(rawText, passphrase) {
+    if (isEncrypted(rawText)) {
+      if (!passphrase) {
+        throw new Error(t('database.importModal.encryptedNoPassphrase'))
+      }
+      try {
+        const plain = await decrypt(rawText, passphrase)
+        return JSON.parse(plain, jsonReviver)
+      } catch {
+        throw new Error(t('database.importModal.decryptFailed'))
+      }
     }
+    let data
     try {
-      return await decrypt(text, passphrase)
+      data = JSON.parse(rawText, jsonReviver)
     } catch {
-      throw new Error(t('database.importModal.decryptFailed'))
+      throw new Error(t('database.importModal.invalidFormat'))
     }
+    if (hasEncryptedValues(data)) {
+      if (!passphrase) {
+        throw new Error(t('database.importModal.encryptedNoPassphrase'))
+      }
+      try {
+        return await decryptTree(data, passphrase)
+      } catch {
+        throw new Error(t('database.importModal.decryptFailed'))
+      }
+    }
+    return data
   }
 
   async function handleImportFromUrl(url, passphrase) {
@@ -85,8 +104,7 @@ function DatabaseSettingsPanel() {
       const text = await response.text()
       let data
       try {
-        const plain = await tryDecrypt(text, passphrase)
-        data = JSON.parse(plain, jsonReviver)
+        data = await tryDecryptData(text, passphrase)
       } catch (err) {
         updateModal({
           status: 'error',
@@ -136,8 +154,7 @@ function DatabaseSettingsPanel() {
       const text = await gistGetRaw(token, gistId)
       let data
       try {
-        const plain = await tryDecrypt(text, passphrase)
-        data = JSON.parse(plain, jsonReviver)
+        data = await tryDecryptData(text, passphrase)
       } catch (err) {
         updateModal({
           status: 'error',
@@ -173,8 +190,7 @@ function DatabaseSettingsPanel() {
       const text = await file.text()
       let data
       try {
-        const plain = await tryDecrypt(text, passphrase)
-        data = JSON.parse(plain, jsonReviver)
+        data = await tryDecryptData(text, passphrase)
       } catch (err) {
         updateModal({
           status: 'error',
@@ -285,7 +301,7 @@ function DatabaseSettingsPanel() {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".json"
+        accept=".json,.txt"
         onChange={handleFileSelected}
         className="hidden"
       />

@@ -7,7 +7,7 @@ import { FileUp, GitBranch, Loader, CheckCircle, AlertTriangle, Eye, EyeOff } fr
 import { getGistService } from '../../services/cloudServices'
 import { gistCreate, gistUpdate } from '../../services/githubGist'
 import { jsonReplacer } from '../../lib/download'
-import { encrypt } from '../../lib/crypto'
+import { encryptTree } from '../../lib/crypto'
 
 function ExportDestinationModal({ exportData }) {
   const { t } = useTranslation('settings')
@@ -23,11 +23,11 @@ function ExportDestinationModal({ exportData }) {
   }, [])
 
   async function prepareContent() {
-    const json = JSON.stringify(exportData, jsonReplacer, 2)
     if (passphrase.trim()) {
-      return encrypt(json, passphrase.trim())
+      const encrypted = await encryptTree(exportData, passphrase.trim())
+      return JSON.stringify(encrypted, jsonReplacer, 2)
     }
-    return json
+    return JSON.stringify(exportData, jsonReplacer, 2)
   }
 
   async function handleToFile() {
@@ -36,12 +36,11 @@ function ExportDestinationModal({ exportData }) {
       const content = await prepareContent()
       const now = new Date()
       const ts = now.toISOString().replace(/[:.]/g, '-').slice(0, 19)
-      const ext = passphrase.trim() ? 'txt' : 'json'
-      const blob = new Blob([content], { type: 'text/plain' })
+      const blob = new Blob([content], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `scenara-export-${ts}.${ext}`
+      a.download = `scenara-export-${ts}.json`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
@@ -119,7 +118,7 @@ function ExportDestinationModal({ exportData }) {
               <p className="text-text text-sm font-medium">
                 {passphrase.trim()
                   ? t('database.exportModal.encryptedExported')
-                  : t('database.exportModal.gistExported')}
+                  : t('database.exportModal.exported')}
               </p>
             </>
           ) : (
