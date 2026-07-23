@@ -94,6 +94,35 @@ function rebuildFailedState(msgs) {
   return { slots }
 }
 
+function isRealMessage(m) {
+  return !m?.isSummaryMarker && !m?.isAutoTitleMarker
+}
+
+function dedupeMessages(msgs) {
+  const seen = new Map()
+  for (const m of msgs) seen.set(m.id, m)
+  return Array.from(seen.values())
+}
+
+function createTrailingThrottle(fn, intervalMs) {
+  let timer = null
+  let lastArgs = null
+  function throttled(...args) {
+    lastArgs = args
+    if (!timer) {
+      timer = setTimeout(() => {
+        timer = null
+        fn(...lastArgs)
+      }, intervalMs)
+    }
+  }
+  throttled.cancel = () => {
+    clearTimeout(timer)
+    timer = null
+  }
+  return throttled
+}
+
 function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
   const wrapperRef = useRef(null)
   const [overflows, setOverflows] = useState(false)
@@ -177,6 +206,7 @@ function ChatView() {
   const streamingMsgIdRef = useRef(null)
   const messagesRef = useRef(null)
   const failedIdsRef = useRef(new Set())
+  const hasUnreadRef = useRef(false)
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
@@ -198,6 +228,7 @@ function ChatView() {
   const [visibleStartIndex, setVisibleStartIndex] = useState(0)
   const [messageThreshold, setMessageThreshold] = useState(0)
   const [activeSlotIndices, setActiveSlotIndices] = useState({})
+  const activeSlotIndicesRef = useRef({})
   const [streamingSlotIndices, setStreamingSlotIndices] = useState({})
   const [isTabVisible, setIsTabVisible] = useState(true)
   const [systemAvatar, setSystemAvatar] = useState('')
@@ -418,7 +449,10 @@ function ChatView() {
       setShowScrollButton(!initialAtBottom)
       if (initialAtBottom) {
         clearUnread(threadId)
-        setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
+        if (hasUnreadRef.current) {
+          hasUnreadRef.current = false
+          setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
+        }
       }
 
       let sticking = true
@@ -510,7 +544,12 @@ function ChatView() {
 
   useEffect(() => {
     messagesRef.current = messages
+    hasUnreadRef.current = messages.some((m) => m.isUnread)
   }, [messages])
+
+  useEffect(() => {
+    activeSlotIndicesRef.current = activeSlotIndices
+  }, [activeSlotIndices])
 
   useEffect(() => {
     async function loadChatModel() {
@@ -639,6 +678,7 @@ function ChatView() {
   useEffect(() => {
     function handleMessagesChanged(e) {
       if (Number(e.detail?.threadId) !== Number(threadId)) return
+      if (generatingRef.current && isLocalStreamerRef.current) return
       getMessagesByThread(threadId).then((msgs) => {
         const fresh = dedupeMessages(msgs)
         if (!generatingRef.current) {
@@ -834,7 +874,10 @@ function ChatView() {
     if (atBottom) {
       clearUnread(threadId)
       scrollClearedRef.current = true
-      setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
+      if (hasUnreadRef.current) {
+        hasUnreadRef.current = false
+        setMessages((prev) => prev.map((m) => ({ ...m, isUnread: false })))
+      }
       if (messageThreshold > 0 && Date.now() > loadEarlierSuppressUntilRef.current) {
         setVisibleStartIndex((prev) =>
           Math.max(prev, messagesRef.current.length - messageThreshold),
@@ -860,7 +903,11 @@ function ChatView() {
           if (!msgId) return
           observer.unobserve(el)
           markMessageRead(msgId, threadId)
-          setMessages((prev) => prev.map((m) => (m.id === msgId ? { ...m, isUnread: false } : m)))
+          setMessages((prev) => {
+            const target = prev.find((m) => m.id === msgId)
+            if (!target || !target.isUnread) return prev
+            return prev.map((m) => (m.id === msgId ? { ...m, isUnread: false } : m))
+          })
         })
       },
       { root: container, threshold: 0.3 },
@@ -955,44 +1002,12 @@ function ChatView() {
     openModal('summaryCancel', { threadId })
   }
 
+  const handleDeleteRequest = useCallback((id) => setConfirmDeleteId(id), [])
+  const handleSpeak = useCallback(() => {}, [])
+
   function withoutFailedMessages(msgs) {
     const ids = failedIdsRef.current
     return ids.size > 0 ? msgs.filter((m) => !ids.has(m.id)) : msgs
-  }
-
-  function isRealMessage(m) {
-    return !m?.isSummaryMarker && !m?.isAutoTitleMarker
-  }
-
-  // Defensive: collapse any duplicate ids in a DB-fetched message list so a stale
-  // race between a full-replace setMessages and an optimistic append can never
-  // render two bubbles for the same message.
-  function dedupeMessages(msgs) {
-    const seen = new Map()
-    for (const m of msgs) seen.set(m.id, m)
-    return Array.from(seen.values())
-  }
-
-  // Trailing-edge throttle: buffers rapid onToken calls and fires at most once per interval.
-  // The caller writes the final content explicitly after generateChatResponse returns, so no
-  // flush-on-completion is needed.
-  function createTrailingThrottle(fn, intervalMs) {
-    let timer = null
-    let lastArgs = null
-    function throttled(...args) {
-      lastArgs = args
-      if (!timer) {
-        timer = setTimeout(() => {
-          timer = null
-          fn(...lastArgs)
-        }, intervalMs)
-      }
-    }
-    throttled.cancel = () => {
-      clearTimeout(timer)
-      timer = null
-    }
-    return throttled
   }
 
   async function doChatRequest(
@@ -1489,8 +1504,8 @@ function ChatView() {
     }
   }
 
-  async function handleBundleNavigate(messageId, slotIndex) {
-    const msg = messages.find((m) => m.id === messageId)
+  const handleBundleNavigate = useCallback(async (messageId, slotIndex) => {
+    const msg = messagesRef.current.find((m) => m.id === messageId)
     const entries = parseBundleEntries(msg?.bundleMessages)
     if (!entries || slotIndex < 0 || slotIndex >= entries.length) return
     const entry = entries[slotIndex]
@@ -1516,15 +1531,15 @@ function ChatView() {
       ),
     )
     setActiveSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
-  }
+  }, [])
 
-  async function handleToggleCodeBlock(messageId, blockIndex) {
+  const handleToggleCodeBlock = useCallback(async (messageId, blockIndex) => {
     const msg = messagesRef.current.find((m) => m.id === messageId)
     if (!msg) return
     const entries = parseBundleEntries(msg.bundleMessages)
     if (!entries || entries.length === 0) return
 
-    const trackIdx = msg.activeSlotIndex ?? activeSlotIndices[messageId] ?? 0
+    const trackIdx = msg.activeSlotIndex ?? activeSlotIndicesRef.current[messageId] ?? 0
     const idx = Math.min(trackIdx, entries.length - 1)
     const entry = { ...entries[idx] }
     const collapsed = new Set(entry.collapsedCodeBlocks || [])
@@ -1553,9 +1568,9 @@ function ChatView() {
         setShowScrollButton(false)
       }
     })
-  }
+  }, [])
 
-  async function handleToggleVisible(messageId, slotIndex, hidden) {
+  const handleToggleVisible = useCallback(async (messageId, slotIndex, hidden) => {
     const msg = messagesRef.current.find((m) => m.id === messageId)
     if (!msg) return
     const entries = parseBundleEntries(msg.bundleMessages)
@@ -1570,7 +1585,7 @@ function ChatView() {
     setMessages((prev) =>
       prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: nextBundleJson } : m)),
     )
-  }
+  }, [])
 
   async function handleRegenerate(messageId, skipConfirmation = false) {
     if (!skipConfirmation) {
@@ -1596,10 +1611,10 @@ function ChatView() {
     let throttledToken
     let currentPersona = null
     try {
-      const idx = messages.findIndex((m) => m.id === messageId)
+      const idx = messagesRef.current.findIndex((m) => m.id === messageId)
       if (idx === -1) return
 
-      const msg = messages[idx]
+      const msg = messagesRef.current[idx]
       const isOOCRegen = !!msg.isOOC
 
       // Pre-flight profile check — must happen before any bundle slot mutations to avoid
@@ -1612,7 +1627,7 @@ function ChatView() {
         return
       }
 
-      let currentMsgs = messages.slice(0, idx)
+      let currentMsgs = messagesRef.current.slice(0, idx)
       currentMsgs = withoutFailedMessages(currentMsgs)
 
       const lastMsgBefore = currentMsgs[currentMsgs.length - 1]
@@ -1912,7 +1927,7 @@ function ChatView() {
   async function handleEditMessage(id, content) {
     const trimMsgs = await getSetting('prompting.trimMessages')
     const finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
-    const msg = messages.find((m) => m.id === id)
+    const msg = messagesRef.current.find((m) => m.id === id)
     let entries = parseBundleEntries(msg?.bundleMessages)
     if (!entries) {
       entries = [
@@ -1946,12 +1961,12 @@ function ChatView() {
 
   async function handleDeleteMessage(id) {
     setConfirmDeleteId(null)
-    const msg = messages.find((m) => m.id === id)
+    const msg = messagesRef.current.find((m) => m.id === id)
     const entries = parseBundleEntries(msg?.bundleMessages)
     if (entries && entries.length > 1) {
       const idx =
-        activeSlotIndices[id] !== undefined
-          ? activeSlotIndices[id]
+        activeSlotIndicesRef.current[id] !== undefined
+          ? activeSlotIndicesRef.current[id]
           : entries.findIndex((e) => e.content === msg.content)
       const removeIdx = idx !== -1 ? idx : 0
       entries.splice(removeIdx, 1)
@@ -2008,7 +2023,7 @@ function ChatView() {
       variant: 'danger',
     })
     if (!ok) return
-    const delMsg = messages.find((m) => m.id === id)
+    const delMsg = messagesRef.current.find((m) => m.id === id)
     await deleteMessage(id)
     setActiveSlotIndices((prev) => {
       const next = { ...prev }
@@ -2043,13 +2058,14 @@ function ChatView() {
       variant: 'danger',
     })
     if (!ok) return
-    const idx = messages.findIndex((m) => m.id === id)
-    const deletedIds = idx === -1 ? new Set() : new Set(messages.slice(idx).map((m) => m.id))
+    const idx = messagesRef.current.findIndex((m) => m.id === id)
+    const deletedIds =
+      idx === -1 ? new Set() : new Set(messagesRef.current.slice(idx).map((m) => m.id))
 
     const thr = await getThread(threadId)
     let postSummDeletedCount = 0
     if (thr?.lastSummarizationAt && idx !== -1) {
-      postSummDeletedCount = messages
+      postSummDeletedCount = messagesRef.current
         .slice(idx)
         .filter(
           (m) =>
@@ -2146,6 +2162,16 @@ function ChatView() {
     return null
   }, [character, messages, memoryDefaults])
 
+  const visibleMessages = visibleStartIndex > 0 ? messages.slice(visibleStartIndex) : messages
+
+  const bundleMap = useMemo(() => {
+    const map = new Map()
+    for (const m of visibleMessages) {
+      map.set(m.id, parseBundleEntries(m.bundleMessages))
+    }
+    return map
+  }, [visibleMessages])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -2177,8 +2203,6 @@ function ChatView() {
     _msgNum++
     msgNumMap.set(m.id, _msgNum)
   }
-
-  const visibleMessages = visibleStartIndex > 0 ? messages.slice(visibleStartIndex) : messages
 
   return (
     <div className="flex flex-col h-full">
@@ -2310,7 +2334,7 @@ function ChatView() {
                   )
                 }
 
-                const entries = parseBundleEntries(msg.bundleMessages)
+                const entries = bundleMap.get(msg.id)
                 const bundleMessages = entries
                 const trackIdx = msg.activeSlotIndex ?? activeSlotIndices[msg.id]
                 const bundleIndex =
@@ -2362,13 +2386,13 @@ function ChatView() {
                       slotCreatedAt={slotCreatedAt}
                       apiDurationMs={slotApiDurationMs}
                       onBundleNavigate={handleBundleNavigate}
-                      onDeleteRequest={(id) => setConfirmDeleteId(id)}
+                      onDeleteRequest={handleDeleteRequest}
                       onDeleteAllSlots={handleDeleteAllSlots}
                       onDeleteFromHere={handleDeleteFromHere}
                       onEdit={handleEditMessage}
                       onFork={handleForkMessage}
                       onRegenerate={handleRegenerate}
-                      onSpeak={() => {}}
+                      onSpeak={handleSpeak}
                       generating={blockingGenerating}
                       requestFailed={isFailedSlot}
                       errorText={errorText}

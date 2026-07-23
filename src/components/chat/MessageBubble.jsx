@@ -57,7 +57,6 @@ const VISIBILITY_KEYS = [
   'showUserVisible',
 ]
 
-const ORDER_KEYS = ['assistantButtonOrder', 'userButtonOrder']
 const DEFAULT_ASSISTANT_ORDER = [
   'delete',
   'deleteAll',
@@ -271,75 +270,55 @@ function MessageBubble({
 
   useEffect(() => {
     async function load() {
-      const entries = await Promise.all(VISIBILITY_KEYS.map(async (k) => [k, await getSetting(k)]))
-      setVisibility(Object.fromEntries(entries))
-    }
-    load()
-  }, [])
-
-  useEffect(() => {
-    async function load() {
-      const [assistantOrder, userOrder] = await Promise.all([
-        getSetting('assistantButtonOrder'),
-        getSetting('userButtonOrder'),
-      ])
-      setOrder({ assistantButtonOrder: assistantOrder, userButtonOrder: userOrder })
-    }
-    load()
-  }, [])
-
-  useEffect(() => {
-    function handler() {
-      VISIBILITY_KEYS.forEach(async (k) => {
-        const v = await getSetting(k)
-        setVisibility((prev) => ({ ...prev, [k]: v }))
+      const allKeys = [
+        ...VISIBILITY_KEYS,
+        'assistantButtonOrder',
+        'userButtonOrder',
+        'chatFontFamily',
+        'chatFontSize',
+        'messageBubbleSize',
+        'renderMarkdown',
+        'defaultPostProcessing',
+        'postProcessingRules',
+      ]
+      const entries = await Promise.all(allKeys.map(async (k) => [k, await getSetting(k)]))
+      const map = Object.fromEntries(entries)
+      setVisibility(Object.fromEntries(VISIBILITY_KEYS.map((k) => [k, map[k]])))
+      setOrder({
+        assistantButtonOrder: map.assistantButtonOrder,
+        userButtonOrder: map.userButtonOrder,
       })
-    }
-    window.addEventListener('settings-changed', handler)
-    return () => window.removeEventListener('settings-changed', handler)
-  }, [])
-
-  useEffect(() => {
-    async function load() {
-      const [family, size, bubbleSize, md] = await Promise.all([
-        getSetting('chatFontFamily'),
-        getSetting('chatFontSize'),
-        getSetting('messageBubbleSize'),
-        getSetting('renderMarkdown'),
-      ])
-      setChatFontFamily(family || 'system')
-      setChatFontSize(size || 'sm')
-      setMessageBubbleSize(bubbleSize || 'normal')
-      setRenderMarkdown(md !== false)
-    }
-    load()
-    function handler(e) {
-      if (e.detail?.key === 'chatFontFamily') setChatFontFamily(e.detail.value || 'system')
-      if (e.detail?.key === 'chatFontSize') setChatFontSize(e.detail.value || 'sm')
-      if (e.detail?.key === 'messageBubbleSize') setMessageBubbleSize(e.detail.value || 'normal')
-      if (e.detail?.key === 'renderMarkdown') setRenderMarkdown(e.detail.value !== false)
-      if (ORDER_KEYS.includes(e.detail?.key)) {
-        getSetting(e.detail.key).then((v) => setOrder((prev) => ({ ...prev, [e.detail.key]: v })))
+      setChatFontFamily(map.chatFontFamily || 'system')
+      setChatFontSize(map.chatFontSize || 'sm')
+      setMessageBubbleSize(map.messageBubbleSize || 'normal')
+      setRenderMarkdown(map.renderMarkdown !== false)
+      setPostProcessingEnabled(map.defaultPostProcessing !== false)
+      if (
+        map.postProcessingRules &&
+        Array.isArray(map.postProcessingRules) &&
+        map.postProcessingRules.length
+      ) {
+        setGlobalPPRules(map.postProcessingRules)
       }
     }
-    window.addEventListener('settings-changed', handler)
-    return () => window.removeEventListener('settings-changed', handler)
-  }, [])
-
-  useEffect(() => {
-    async function load() {
-      const [enabled, rules] = await Promise.all([
-        getSetting('defaultPostProcessing'),
-        getSetting('postProcessingRules'),
-      ])
-      setPostProcessingEnabled(enabled !== false)
-      if (rules && Array.isArray(rules) && rules.length) setGlobalPPRules(rules)
-    }
     load()
+
+    const VIS_SET = new Set(VISIBILITY_KEYS)
     function handler(e) {
-      if (e.detail?.key === 'defaultPostProcessing')
-        setPostProcessingEnabled(e.detail.value !== false)
-      if (e.detail?.key === 'postProcessingRules') {
+      const key = e.detail?.key
+      if (!key) return
+      if (VIS_SET.has(key)) {
+        getSetting(key).then((v) => setVisibility((prev) => ({ ...prev, [key]: v })))
+      }
+      if (key === 'assistantButtonOrder' || key === 'userButtonOrder') {
+        getSetting(key).then((v) => setOrder((prev) => ({ ...prev, [key]: v })))
+      }
+      if (key === 'chatFontFamily') setChatFontFamily(e.detail.value || 'system')
+      if (key === 'chatFontSize') setChatFontSize(e.detail.value || 'sm')
+      if (key === 'messageBubbleSize') setMessageBubbleSize(e.detail.value || 'normal')
+      if (key === 'renderMarkdown') setRenderMarkdown(e.detail.value !== false)
+      if (key === 'defaultPostProcessing') setPostProcessingEnabled(e.detail.value !== false)
+      if (key === 'postProcessingRules') {
         const v = e.detail.value
         if (v && Array.isArray(v) && v.length) setGlobalPPRules(v)
       }
