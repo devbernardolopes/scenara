@@ -218,7 +218,7 @@ function ExportDatabaseModal() {
         type="button"
         onClick={handleExport}
         disabled={isExporting}
-        className="min-h-[44px] px-4 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm"
+        className="min-h-[44px] px-4 btn-primary text-sm"
       >
         {t('database.exportModal.export')}
       </button>

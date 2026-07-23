@@ -140,7 +140,7 @@ function MemoryRegenerationResultModal({ threadId, entry, systemContent, userCon
             type="button"
             onClick={handleRegenerate}
             disabled={!canAct}
-            className="min-h-[44px] px-4 rounded-md text-sm bg-primary text-on-primary hover:bg-primary-hover disabled:opacity-60"
+            className="min-h-[44px] px-4 text-sm btn-primary disabled:opacity-60"
           >
             {t('memoryRegeneration.regenerate')}
           </button>
@@ -148,7 +148,7 @@ function MemoryRegenerationResultModal({ threadId, entry, systemContent, userCon
             type="button"
             onClick={handleAccept}
             disabled={!canAct}
-            className="min-h-[44px] px-4 rounded-md text-sm bg-primary text-on-primary hover:bg-primary-hover disabled:opacity-60"
+            className="min-h-[44px] px-4 text-sm btn-primary disabled:opacity-60"
           >
             {t('memoryRegeneration.accept')}
           </button>

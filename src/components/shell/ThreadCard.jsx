@@ -77,7 +77,10 @@ const ThreadCard = forwardRef(function ThreadCard(
               {character?.avatar || '👤'}
             </span>
           )}
-          <div className="absolute bottom-0 inset-x-0 bg-image-scrim px-1 py-0.5 flex flex-col gap-0.5">
+          <div
+            className="absolute bottom-0 inset-x-0 px-1 py-0.5 flex flex-col gap-0.5"
+            style={{ background: 'var(--gradient-image-scrim)' }}
+          >
             {thread.activeScenario?.content?.trim() && (
               <p className="text-center text-[11px] text-on-image leading-none truncate">
                 {thread.activeScenario.name?.trim() ||

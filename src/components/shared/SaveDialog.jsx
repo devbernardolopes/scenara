@@ -45,7 +45,7 @@ function SaveDialog({ onSave, onDiscard, onCancel, saveDisabled = false, message
             type="button"
             onClick={onSave}
             disabled={saveDisabled}
-            className={`min-h-[44px] px-4 rounded-md text-sm bg-primary text-on-primary hover:bg-primary-hover ${
+            className={`min-h-[44px] px-4 text-sm btn-primary ${
               saveDisabled ? 'opacity-50 cursor-not-allowed hover:bg-primary' : ''
             }`}
           >

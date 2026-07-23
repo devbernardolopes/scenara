@@ -209,7 +209,7 @@ function DirectorDetailsModal({
             type="button"
             onClick={handleApply}
             disabled={!dirty}
-            className="min-h-[44px] px-4 rounded-md text-sm bg-primary text-on-primary hover:bg-primary-hover disabled:opacity-60"
+            className="min-h-[44px] px-4 text-sm btn-primary disabled:opacity-60"
           >
             {t('directorDetailsModal.apply')}
           </button>
@@ -217,7 +217,7 @@ function DirectorDetailsModal({
             type="button"
             onClick={handleRegenerate}
             disabled={!canRegenerate}
-            className="min-h-[44px] px-4 rounded-md text-sm bg-primary text-on-primary hover:bg-primary-hover disabled:opacity-60"
+            className="min-h-[44px] px-4 text-sm btn-primary disabled:opacity-60"
           >
             {t('directorDetailsModal.regenerate')}
           </button>

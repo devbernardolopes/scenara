@@ -59,7 +59,7 @@ function KeyEditDialog({ title, initialValue, initialLabel, onSave, onCancel }) 
             type="button"
             onClick={handleSave}
             disabled={!value.trim()}
-            className="min-h-[44px] px-4 rounded-md text-sm bg-primary text-on-primary hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed"
+            className="min-h-[44px] px-4 text-sm btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {t('save', { ns: 'common' })}
           </button>

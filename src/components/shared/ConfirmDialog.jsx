@@ -21,10 +21,7 @@ function ConfirmDialog({
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [onCancel])
 
-  const confirmClass =
-    variant === 'danger'
-      ? 'bg-error text-white hover:opacity-90'
-      : 'bg-primary text-on-primary hover:bg-primary-hover'
+  const confirmClass = variant === 'danger' ? 'bg-error text-white hover:opacity-90' : 'btn-primary'
 
   return (
     <div

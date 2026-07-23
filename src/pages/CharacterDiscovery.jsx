@@ -561,7 +561,7 @@ function CharacterDiscovery() {
         </CollapsibleSection>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 md:px-8 pt-1 pb-4">
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 pt-1 pb-4 bg-gradient-surface-radial">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-secondary text-sm">{t('loading')}</p>
@@ -610,7 +610,10 @@ function CharacterDiscovery() {
                         {'👤'}
                       </div>
                     )}
-                    <div className="absolute bottom-0 left-0 right-0 bg-image-scrim p-3 space-y-1">
+                    <div
+                      className="absolute bottom-0 left-0 right-0 p-3 space-y-1"
+                      style={{ background: 'var(--gradient-image-scrim)' }}
+                    >
                       <CharacterNameCell
                         name={char.displayName || char.name}
                         characterCardMarquee={characterCardMarquee}

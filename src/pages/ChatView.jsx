@@ -2413,7 +2413,7 @@ function ChatView() {
             <button
               type="button"
               onClick={scrollToBottom}
-              className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center bg-primary text-on-primary rounded-full shadow-surface-lg hover:bg-primary-hover transition-all duration-200 relative"
+              className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center btn-primary rounded-full shadow-surface-lg transition-all duration-200 relative"
               aria-label={t('scrollToBottom')}
             >
               <ChevronDown className="w-5 h-5" />

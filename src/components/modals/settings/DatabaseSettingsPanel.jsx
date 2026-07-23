@@ -195,7 +195,7 @@ function DatabaseSettingsPanel() {
               if (importUrl.trim()) handleImportFromUrl(importUrl.trim())
             }}
             disabled={isImporting || !importUrl.trim()}
-            className="min-h-[44px] px-4 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+            className="min-h-[44px] px-4 btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
           >
             {t('database.importFromUrl')}
           </button>

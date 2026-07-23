@@ -86,7 +86,7 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect, onCanc
           <button
             type="button"
             onClick={handleSelect}
-            className="min-h-[44px] px-4 py-2 rounded-md text-sm font-medium bg-primary text-on-primary hover:bg-primary-hover transition-colors"
+            className="min-h-[44px] px-4 py-2 text-sm font-medium btn-primary transition-colors"
           >
             {t('scenarioSelector.startWithScenario')}
           </button>

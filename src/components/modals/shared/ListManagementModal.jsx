@@ -184,7 +184,7 @@ function ListManagementModal({ config }) {
               <button
                 type="button"
                 onClick={startCreate}
-                className="min-h-[44px] px-4 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm flex items-center gap-2"
+                className="min-h-[44px] px-4 btn-primary text-sm flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" /> {t(createLabelKey)}
               </button>

@@ -930,7 +930,7 @@ function ChatInputArea({
                               }}
                               className={`w-full flex items-center justify-between px-3 py-2 text-sm min-h-[44px] ${
                                 isToggleable && isToggled
-                                  ? 'bg-primary text-on-primary hover:bg-primary-hover'
+                                  ? 'btn-primary'
                                   : 'text-text hover:bg-surface-hover'
                               } ${separatorClass}`}
                             >
@@ -1003,9 +1003,7 @@ function ChatInputArea({
             type="button"
             onClick={handleSend}
             className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-sm flex-shrink-0 ${
-              generating || hasQueued
-                ? 'bg-error text-on-primary hover:opacity-90'
-                : 'bg-primary text-on-primary hover:bg-primary-hover'
+              generating || hasQueued ? 'bg-error text-on-primary hover:opacity-90' : 'btn-primary'
             }`}
           >
             {generating || hasQueued ? (

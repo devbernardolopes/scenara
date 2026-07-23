@@ -93,7 +93,7 @@ function StringListInput({ value, onChange, maxItems }) {
           type="button"
           onClick={handleAdd}
           disabled={!input.trim() || atLimit}
-          className="min-h-[44px] px-3 text-sm bg-primary text-on-primary rounded-md hover:bg-primary-hover disabled:opacity-50"
+          className="min-h-[44px] px-3 text-sm btn-primary disabled:opacity-50"
         >
           {t('api.profile.add')}
         </button>

@@ -69,7 +69,7 @@ function ImportSourceModal({ onFromFile, onFromUrl }) {
             type="button"
             onClick={handleFromUrl}
             disabled={!urlValid}
-            className="min-h-[44px] px-4 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-[44px] px-4 btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('database.importFromUrl')}
           </button>

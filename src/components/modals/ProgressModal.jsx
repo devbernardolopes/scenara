@@ -79,7 +79,7 @@ function ProgressModal({ status, label, onDone }) {
           <button
             type="button"
             onClick={status === 'imported' ? handleRestart : handleClose}
-            className="min-h-[44px] px-4 bg-primary text-on-primary rounded-md hover:bg-primary-hover text-sm"
+            className="min-h-[44px] px-4 btn-primary text-sm"
           >
             {status === 'imported'
               ? t('database.importModal.restart')
