@@ -126,6 +126,7 @@ function ExportDatabaseModal() {
       })
 
       openModal('exportDestination', { exportData: data, modalSize: 'md' })
+      setPhase('select')
     } catch (err) {
       setErrorLabel(err.message || 'Export failed')
       setPhase('error')
