@@ -6,6 +6,8 @@ import { showToast } from '../../../lib/toast'
 import { resetDatabase, resetSettings, importDatabase } from '../../../services/database'
 import { getSetting, setSetting } from '../../../services/settings'
 import { jsonReviver } from '../../../lib/download'
+import { getGistService } from '../../../services/cloudServices'
+import { gistGetRaw } from '../../../services/githubGist'
 import { Download, Upload, AlertTriangle, RefreshCw } from '../../../lib/icons'
 
 function DatabaseSettingsPanel() {
@@ -41,6 +43,7 @@ function DatabaseSettingsPanel() {
         fileInputRef.current?.click()
       },
       onFromUrl: handleImportFromUrl,
+      onFromGist: handleImportFromGist,
     })
   }
 
@@ -75,6 +78,53 @@ function DatabaseSettingsPanel() {
       updateModal({
         status: 'error',
         label: err.message || t('database.importModal.fetchFailed'),
+      })
+    } finally {
+      setIsImporting(false)
+    }
+  }
+
+  async function handleImportFromGist() {
+    setIsImporting(true)
+    openModal('progress', { status: 'importing', label: t('database.importModal.importing') })
+
+    try {
+      const svc = await getGistService()
+      if (!svc) {
+        updateModal({
+          status: 'error',
+          label: t('database.importModal.noGistService'),
+        })
+        return
+      }
+      const token = svc.credentials?.token || ''
+      const gistId = svc.metadata?.gistId
+      if (!gistId) {
+        updateModal({
+          status: 'error',
+          label: t('database.importModal.noGistExport'),
+        })
+        return
+      }
+
+      const text = await gistGetRaw(token, gistId)
+      let data
+      try {
+        data = JSON.parse(text, jsonReviver)
+      } catch {
+        updateModal({
+          status: 'error',
+          label: t('database.importModal.invalidFormat'),
+        })
+        return
+      }
+
+      await importDatabase(data)
+      updateModal({ status: 'imported', label: t('database.importModal.imported') })
+    } catch (err) {
+      updateModal({
+        status: 'error',
+        label: err.message || t('database.importModal.gistFetchFailed'),
       })
     } finally {
       setIsImporting(false)

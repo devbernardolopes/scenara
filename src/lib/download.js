@@ -1,4 +1,4 @@
-function jsonReplacer(_key, val) {
+export function jsonReplacer(_key, val) {
   if (val === Infinity) return { $type: 'Infinity' }
   if (val === -Infinity) return { $type: '-Infinity' }
   return val

@@ -14,6 +14,15 @@ export const SERVICE_TYPES = [
       { key: 'userhash', labelKey: 'settings:cloudService.credentials.userhash', type: 'password' },
     ],
   },
+  {
+    id: 'github-gist',
+    nameKey: 'settings:cloudService.types.githubGist.name',
+    descKey: 'settings:cloudService.types.githubGist.desc',
+    defaultBaseUrl: 'https://api.github.com',
+    credentialFields: [
+      { key: 'token', labelKey: 'settings:cloudService.credentials.githubToken', type: 'password' },
+    ],
+  },
 ]
 
 const ORDER_KEY = 'cloudServiceOrder'
@@ -237,4 +246,9 @@ export async function catboxUploadAvatar(serviceRecord, dataUrl) {
     await catboxAddToAlbum(userhash, short, [fileCode])
   }
   return url
+}
+
+export async function getGistService() {
+  const all = await db.cloudServices.toArray()
+  return all.find((s) => s.serviceType === 'github-gist') || null
 }

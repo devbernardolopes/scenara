@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { exportDatabase } from '../../services/database'
-import { downloadJson } from '../../lib/download'
 import db from '../../db'
 import ModalShell from '../shared/ModalShell'
 import CollapsibleSection from '../shared/CollapsibleSection'
@@ -11,7 +10,7 @@ import ProgressModal from './ProgressModal'
 
 function ExportDatabaseModal() {
   const { t } = useTranslation('settings')
-  const { closeModal } = useModal()
+  const { openModal, closeModal } = useModal()
 
   const [loading, setLoading] = useState(true)
   const [isExporting, setIsExporting] = useState(false)
@@ -126,11 +125,8 @@ function ExportDatabaseModal() {
         settings: selectedSettings,
       })
 
-      const now = new Date()
-      const ts = now.toISOString().replace(/[:.]/g, '-').slice(0, 19)
-      downloadJson(data, `scenara-export-${ts}.json`)
-
-      setPhase('exported')
+      openModal('exportDestination', { exportData: data, modalSize: 'md' })
+      closeModal()
     } catch (err) {
       setErrorLabel(err.message || 'Export failed')
       setPhase('error')

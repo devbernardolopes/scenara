@@ -1,16 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import CloseButton from '../shared/CloseButton'
-import { FileUp, Globe } from '../../lib/icons'
+import { FileUp, Globe, GitBranch } from '../../lib/icons'
+import { getGistService } from '../../services/cloudServices'
 
 const URL_REGEX = /^https?:\/\/.+/i
 
-function ImportSourceModal({ onFromFile, onFromUrl }) {
+function ImportSourceModal({ onFromFile, onFromUrl, onFromGist }) {
   const { t } = useTranslation('settings')
   const { closeModal } = useModal()
   const [mode, setMode] = useState(null)
   const [url, setUrl] = useState('')
+  const [hasGistService, setHasGistService] = useState(false)
+
+  useEffect(() => {
+    getGistService().then((svc) => setHasGistService(!!svc))
+  }, [])
 
   function handleFromFile() {
     onFromFile?.()
@@ -21,6 +27,11 @@ function ImportSourceModal({ onFromFile, onFromUrl }) {
     const trimmed = url.trim()
     if (!URL_REGEX.test(trimmed)) return
     onFromUrl?.(trimmed)
+    closeModal()
+  }
+
+  function handleFromGist() {
+    onFromGist?.()
     closeModal()
   }
 
@@ -117,6 +128,24 @@ function ImportSourceModal({ onFromFile, onFromUrl }) {
             </div>
           </div>
         </button>
+        {hasGistService && (
+          <button
+            onClick={handleFromGist}
+            className="flex items-start gap-4 w-full min-h-[44px] p-4 rounded-lg border border-border hover:bg-surface-hover hover:border-border-light transition-colors text-left"
+          >
+            <div className="p-2 rounded-lg bg-primary-subtle text-primary shrink-0">
+              <GitBranch className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm font-medium text-text">
+                {t('database.importModal.fromGist')}
+              </div>
+              <div className="text-xs text-secondary mt-0.5">
+                {t('database.importModal.fromGistDesc')}
+              </div>
+            </div>
+          </button>
+        )}
       </div>
     </div>
   )
