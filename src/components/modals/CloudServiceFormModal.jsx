@@ -190,30 +190,28 @@ function CloudServiceFormModal({ cloudService }) {
           />
         </div>
 
-        {activeType.credentialFields.length > 0 && (
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-            <input
-              type="text"
-              name="username"
-              autoComplete="username"
-              className="sr-only"
-              tabIndex={-1}
-            />
-            {activeType.credentialFields.map((field) => (
-              <div key={field.key}>
-                <Label>{t(field.labelKey.replace('settings:', ''))}</Label>
-                <input
-                  type={field.type || 'text'}
-                  autoComplete={field.type === 'password' ? 'new-password' : undefined}
-                  value={form.credentials[field.key] || ''}
-                  onChange={(e) => updateCredential(field.key, e.target.value)}
-                  placeholder={t(`cloudService.form.credentialPlaceholder`, { field: field.key })}
-                  className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
-                />
-              </div>
-            ))}
-          </form>
-        )}
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+          <input
+            type="text"
+            name="username"
+            autoComplete="username"
+            className="sr-only"
+            tabIndex={-1}
+          />
+          {activeType.credentialFields.map((field) => (
+            <div key={field.key}>
+              <Label>{t(field.labelKey.replace('settings:', ''))}</Label>
+              <input
+                type={field.type || 'text'}
+                autoComplete={field.type === 'password' ? 'new-password' : undefined}
+                value={form.credentials[field.key] || ''}
+                onChange={(e) => updateCredential(field.key, e.target.value)}
+                placeholder={t(`cloudService.form.credentialPlaceholder`, { field: field.key })}
+                className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
+              />
+            </div>
+          ))}
+        </form>
       </div>
     </ModalShell>
   )
