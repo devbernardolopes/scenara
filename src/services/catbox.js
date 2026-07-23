@@ -107,8 +107,7 @@ export async function catboxAddToAlbum(userhash, albumShort, fileShortCodes) {
 }
 
 export function extractFileRef(url) {
-  const match = url.match(/\/([a-f0-9]{6}\.\w+)$/)
-  console.log('[Catbox] extractFileRef:', { url, result: match ? match[1] : null })
+  const match = url.match(/\/([a-z0-9]{6}\.\w+)$/i)
   return match ? match[1] : null
 }
 
