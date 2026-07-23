@@ -2,7 +2,7 @@ import db from '../db'
 import { getSetting, setSetting } from './settings'
 import { showToast } from '../lib/toast'
 import i18n from '../lib/i18n'
-import { catboxUpload, catboxCreateAlbum, catboxAddToAlbum, extractFileShortCode } from './catbox'
+import { catboxUpload, catboxCreateAlbum, catboxAddToAlbum, extractFileRef } from './catbox'
 
 export const SERVICE_TYPES = [
   {
@@ -227,7 +227,7 @@ export async function ensureCatboxAlbum(serviceRecord, fileShortCode) {
 export async function catboxUploadAvatar(serviceRecord, dataUrl) {
   const userhash = serviceRecord.credentials?.userhash || ''
   const url = await catboxUpload(userhash, dataUrl)
-  const fileCode = extractFileShortCode(url)
+  const fileCode = extractFileRef(url)
   const { short, created } = await ensureCatboxAlbum(serviceRecord, fileCode)
   if (!created && fileCode) {
     await catboxAddToAlbum(userhash, short, [fileCode])

@@ -80,8 +80,8 @@ export async function catboxAddToAlbum(userhash, albumShort, fileShortCodes) {
   if (text.trim() !== 'OK') throw new Error(text.trim() || 'Failed to add to album')
 }
 
-export function extractFileShortCode(url) {
-  const match = url.match(/\/([a-f0-9]{6})\.\w+$/)
+export function extractFileRef(url) {
+  const match = url.match(/\/([a-f0-9]{6}\.\w+)$/)
   return match ? match[1] : null
 }
 
