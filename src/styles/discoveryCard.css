@@ -9,6 +9,7 @@
 /* Core hover effects — always on for mouse/trackpad users */
 @media (hover: hover) and (pointer: fine) {
   .character-card {
+    border-radius: var(--radius-lg) !important;
     transition:
       transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
       box-shadow 220ms ease;
@@ -47,6 +48,9 @@
 
 /* Active thread card pulse — mirrors the character Start Chat button ring
    and respects the active theme via --color-primary-rgb. */
+.thread-card {
+  border-radius: var(--radius-lg) !important;
+}
 @media (hover: hover) and (pointer: fine) {
   .thread-card.is-active {
     animation: scenara-pulse-ring 2.75s ease-in-out infinite;

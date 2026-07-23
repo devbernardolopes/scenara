@@ -94,6 +94,7 @@ export function ModalProvider({ children }) {
               ) : (
                 <div
                   className="bg-glass border-glass rounded-lg shadow-surface-lg max-w-4xl w-full mx-4 h-[75vh] max-h-[85vh] flex flex-col overflow-hidden"
+                  style={{ borderRadius: 'var(--radius-lg)' }}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <ModalComponent {...state.props} />

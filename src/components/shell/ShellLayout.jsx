@@ -19,7 +19,7 @@ function ShellLayout() {
     <div className="flex h-full bg-surface text-text">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex flex-col flex-1 min-w-0">
-        <main className="flex-1 overflow-auto min-w-0">
+        <main className="flex-1 overflow-auto min-w-0 relative main-content">
           <Outlet />
         </main>
       </div>
