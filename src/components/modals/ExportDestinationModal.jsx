@@ -22,7 +22,7 @@ function ExportDestinationModal({ exportData }) {
     const now = new Date()
     const ts = now.toISOString().replace(/[:.]/g, '-').slice(0, 19)
     downloadJson(exportData, `scenara-export-${ts}.json`)
-    closeModal()
+    setPhase('exported')
   }
 
   async function handleToGist() {
