@@ -181,7 +181,7 @@ export async function triggerAutoTitle({
   }
 
   if (!title) {
-    const profile = await getEffectiveProfileFor('autoTitle')
+    const profile = await getEffectiveProfileFor('autoTitle', character)
     if (!profile?.model) {
       throw new Error('No auto-title profile configured')
     }
@@ -207,7 +207,7 @@ export async function triggerAutoTitle({
   const directorConfig = await getDirectorConfig(character, 'autoTitle')
   if (directorConfig) {
     try {
-      const dProfile = await getEffectiveProfileFor('director')
+      const dProfile = await getEffectiveProfileFor('director', character)
       if (!dProfile?.model) throw new Error('No Director profile configured')
       await waitForCooldown()
       showToast(i18n.t('chat:directorReviewing'), { type: 'info' })

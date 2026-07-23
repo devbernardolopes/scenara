@@ -76,7 +76,9 @@ export async function generateChatResponse({
   ctx,
   beforeDate,
 }) {
-  const profile = isOOC ? await getEffectiveProfileFor('ooc') : await getEffectiveProfileFor('chat')
+  const profile = isOOC
+    ? await getEffectiveProfileFor('ooc', character)
+    : await getEffectiveProfileFor('chat', character)
 
   if (!profile?.model) {
     showToast(i18n.t('chat:noProfileModel'), { type: 'error' })
@@ -197,7 +199,7 @@ export async function generateChatResponse({
       directorUserPrompt = userInstructions
       directorOriginalMessage = content
 
-      const dProfile = await getEffectiveProfileFor('director')
+      const dProfile = await getEffectiveProfileFor('director', character)
       if (!dProfile?.model) {
         throw new Error(i18n.t('chat:noProfileModel'))
       }

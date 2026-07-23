@@ -17,6 +17,7 @@ import SaveButton from '../shared/SaveButton'
 import CharacterSidebar from './character/CharacterSidebar'
 import CharacterSection from './character/CharacterSection'
 import OverridesSection from './character/OverridesSection'
+import ApiOverridesSection from './character/ApiOverridesSection'
 import PostProcessingSection from './character/PostProcessingSection'
 import PlaceholderSection from './character/PlaceholderSection'
 import InitialMessagesSection from './character/InitialMessagesSection'
@@ -85,6 +86,11 @@ const INITIAL_FORM = {
   personaInjectionTiming: 'always',
   personaInjectionPlacement: 'endOfSystemPrompt',
   personaInjectionMessageRole: 'system',
+  apiProfileChatId: null,
+  apiProfileAutoTitleId: null,
+  apiProfileSummarizationId: null,
+  apiProfileOocId: null,
+  apiProfileDirectorId: null,
   tags: [],
   lorebookIds: [],
   lastSection: null,
@@ -197,6 +203,7 @@ function buildInitialForm(existing) {
 const SECTION_COMPONENTS = {
   character: CharacterSection,
   overrides: OverridesSection,
+  apiOverrides: ApiOverridesSection,
   postProcessing: PostProcessingSection,
   initialMessages: InitialMessagesSection,
   exampleMessages: ExampleMessagesSection,
@@ -396,6 +403,12 @@ function CharacterCreateModal({ character: existing, initialData }) {
       scenarios: (form.scenarios || []).length > 0,
       postProcessing: ppEnabledDiff || ppOverrideDiff || ppRulesDiff,
       overrides: false,
+      apiOverrides:
+        form.apiProfileChatId != null ||
+        form.apiProfileAutoTitleId != null ||
+        form.apiProfileSummarizationId != null ||
+        form.apiProfileOocId != null ||
+        form.apiProfileDirectorId != null,
       director:
         form.directorEnabled &&
         DIRECTOR_GROUP_FIELDS.some((g) => form[g.enabledKey] && form[g.instructionsKey]?.trim()),
@@ -513,6 +526,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
           {[
             { id: 'character', labelKey: 'sectionCharacter' },
             { id: 'overrides', labelKey: 'sectionOverrides' },
+            { id: 'apiOverrides', labelKey: 'sectionApiOverrides' },
             { id: 'postProcessing', labelKey: 'sectionPostProcessing' },
             { id: 'initialMessages', labelKey: 'sectionInitialMessages' },
             { id: 'exampleMessages', labelKey: 'sectionExampleMessages' },

@@ -333,7 +333,7 @@ export async function triggerSummarization({
     memoryText,
   })
 
-  const profile = await getEffectiveProfileFor('summarization')
+  const profile = await getEffectiveProfileFor('summarization', character)
   if (!profile?.model) {
     throw new Error('No summarization profile configured')
   }

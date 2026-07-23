@@ -237,8 +237,19 @@ export async function usedByProfileCount(providerId, keyId) {
   return all.filter((p) => p.providerId === providerId && p.keyId === keyId).length
 }
 
-export async function getEffectiveProfileFor(requestKind) {
-  let profileId = await getSetting(`requestKind.${requestKind}.profileId`)
+export async function getEffectiveProfileFor(requestKind, character) {
+  const CHARACTER_FIELD_MAP = {
+    chat: 'apiProfileChatId',
+    autoTitle: 'apiProfileAutoTitleId',
+    summarization: 'apiProfileSummarizationId',
+    ooc: 'apiProfileOocId',
+    director: 'apiProfileDirectorId',
+  }
+  const charField = CHARACTER_FIELD_MAP[requestKind]
+  let profileId = (charField && character?.[charField]) || null
+  if (!profileId) {
+    profileId = await getSetting(`requestKind.${requestKind}.profileId`)
+  }
   if (!profileId && requestKind !== 'chat') {
     profileId = await getSetting('requestKind.chat.profileId')
   }
