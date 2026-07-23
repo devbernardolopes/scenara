@@ -103,7 +103,9 @@ export async function catboxAddToAlbum(userhash, albumShort, fileShortCodes) {
   const text = await res.text()
   console.log('[Catbox] addtoalbum response:', { status: res.status, body: text })
   if (!res.ok) throw new Error(`Catbox API error: ${res.status}`)
-  if (text.trim() !== 'OK') throw new Error(text.trim() || 'Failed to add to album')
+  const trimmed = text.trim()
+  if (trimmed !== 'OK' && !trimmed.startsWith('http'))
+    throw new Error(trimmed || 'Failed to add to album')
 }
 
 export function extractFileRef(url) {
