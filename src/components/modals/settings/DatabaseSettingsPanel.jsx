@@ -1,10 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useConfirm } from '../../../lib/confirm'
 import { useModal } from '../../../hooks/useModal'
 import { showToast } from '../../../lib/toast'
 import { resetDatabase, resetSettings, importDatabase } from '../../../services/database'
-import { getSetting, setSetting } from '../../../services/settings'
 import { jsonReviver } from '../../../lib/download'
 import { getGistService } from '../../../services/cloudServices'
 import { gistGetRaw } from '../../../services/githubGist'
@@ -27,20 +26,6 @@ function DatabaseSettingsPanel() {
   const [isImporting, setIsImporting] = useState(false)
   const fileInputRef = useRef(null)
   const importPassphraseRef = useRef('')
-
-  const [importUrl, setImportUrl] = useState('')
-  const importViaUrlRef = useRef(null)
-
-  useEffect(() => {
-    getSetting('database.importUrl').then((val) => {
-      if (val) setImportUrl(val)
-    })
-  }, [])
-
-  function handleImportUrlChange(value) {
-    setImportUrl(value)
-    setSetting('database.importUrl', value)
-  }
 
   const handleExport = () => {
     openModal('exportDatabase', { modalSize: 'lg' })
@@ -270,34 +255,6 @@ function DatabaseSettingsPanel() {
         onClick={handleImport}
         disabled={isImporting}
       />
-      <div>
-        <label className="block text-sm font-medium text-text mb-2">{t('database.fromUrl')}</label>
-        <div className="flex gap-2">
-          <input
-            ref={importViaUrlRef}
-            type="url"
-            value={importUrl}
-            onChange={(e) => handleImportUrlChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && importUrl.trim()) {
-                handleImportFromUrl(importUrl.trim())
-              }
-            }}
-            placeholder={t('database.fromUrlPlaceholder')}
-            className="flex-1 min-h-[44px] px-3 py-2 rounded-lg border border-border bg-surface bg-surface-secondary text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
-          <button
-            type="button"
-            onClick={() => {
-              if (importUrl.trim()) handleImportFromUrl(importUrl.trim())
-            }}
-            disabled={isImporting || !importUrl.trim()}
-            className="min-h-[44px] px-4 btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-          >
-            {t('database.importFromUrl')}
-          </button>
-        </div>
-      </div>
       <input
         ref={fileInputRef}
         type="file"
