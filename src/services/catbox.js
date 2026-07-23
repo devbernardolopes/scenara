@@ -40,14 +40,21 @@ export async function catboxUpload(userhash, dataUrl) {
   const ext = getMimeType(dataUrl).split('/')[1] || 'png'
   const file = new File([blob], `avatar.${ext}`, { type: blob.type })
 
+  console.log('[Catbox] fileupload request:', {
+    userhash: userhash ? '***' : '(none)',
+    fileName: file.name,
+    fileSize: file.size,
+  })
+
   const form = new FormData()
   form.append('reqtype', 'fileupload')
   if (userhash) form.append('userhash', userhash)
   form.append('fileToUpload', file)
 
   const res = await fetch(API_URL, { method: 'POST', body: form })
-  if (!res.ok) throw new Error(`Catbox API error: ${res.status}`)
   const text = await res.text()
+  console.log('[Catbox] fileupload response:', { status: res.status, body: text })
+  if (!res.ok) throw new Error(`Catbox API error: ${res.status}`)
   return parseResponse(text)
 }
 
@@ -59,13 +66,21 @@ export async function catboxCreateAlbum(userhash, title, desc = '', files = '') 
   params.append('desc', desc)
   params.append('files', files)
 
+  console.log('[Catbox] createalbum request:', {
+    userhash: userhash ? '***' : '(none)',
+    title,
+    desc,
+    files,
+  })
+
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: params,
   })
-  if (!res.ok) throw new Error(`Catbox API error: ${res.status}`)
   const text = await res.text()
+  console.log('[Catbox] createalbum response:', { status: res.status, body: text })
+  if (!res.ok) throw new Error(`Catbox API error: ${res.status}`)
   const url = parseResponse(text)
   const short = url.split('/').pop()
   return { short, url }
@@ -78,18 +93,22 @@ export async function catboxAddToAlbum(userhash, albumShort, fileShortCodes) {
   params.append('short', albumShort)
   params.append('files', fileShortCodes.join(' '))
 
+  console.log('[Catbox] addtoalbum request:', { short: albumShort, files: fileShortCodes })
+
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: params,
   })
-  if (!res.ok) throw new Error(`Catbox API error: ${res.status}`)
   const text = await res.text()
+  console.log('[Catbox] addtoalbum response:', { status: res.status, body: text })
+  if (!res.ok) throw new Error(`Catbox API error: ${res.status}`)
   if (text.trim() !== 'OK') throw new Error(text.trim() || 'Failed to add to album')
 }
 
 export function extractFileRef(url) {
   const match = url.match(/\/([a-f0-9]{6}\.\w+)$/)
+  console.log('[Catbox] extractFileRef:', { url, result: match ? match[1] : null })
   return match ? match[1] : null
 }
 
