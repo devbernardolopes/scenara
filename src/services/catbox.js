@@ -51,13 +51,13 @@ export async function catboxUpload(userhash, dataUrl) {
   return parseResponse(text)
 }
 
-export async function catboxCreateAlbum(userhash, title, desc = '') {
+export async function catboxCreateAlbum(userhash, title, desc = '', files = '') {
   const form = new FormData()
   form.append('reqtype', 'createalbum')
   if (userhash) form.append('userhash', userhash)
   form.append('title', title)
   form.append('desc', desc)
-  form.append('files', '')
+  form.append('files', files)
 
   const res = await fetch(API_URL, { method: 'POST', body: form })
   if (!res.ok) throw new Error(`Catbox API error: ${res.status}`)

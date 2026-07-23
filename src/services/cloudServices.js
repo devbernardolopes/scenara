@@ -208,22 +208,28 @@ export async function getCatboxService() {
   return all.find((s) => s.serviceType === 'catbox') || null
 }
 
-export async function ensureCatboxAlbum(serviceRecord) {
-  if (serviceRecord.metadata?.albumShort) return serviceRecord.metadata.albumShort
+export async function ensureCatboxAlbum(serviceRecord, fileShortCode) {
+  if (serviceRecord.metadata?.albumShort)
+    return { short: serviceRecord.metadata.albumShort, created: false }
   const userhash = serviceRecord.credentials?.userhash || ''
-  const { short } = await catboxCreateAlbum(userhash, 'Scenara', 'Scenara avatar uploads')
+  const { short } = await catboxCreateAlbum(
+    userhash,
+    'Scenara',
+    'Scenara avatar uploads',
+    fileShortCode || '',
+  )
   await db.cloudServices.update(serviceRecord.id, {
     metadata: { ...serviceRecord.metadata, albumShort: short },
   })
-  return short
+  return { short, created: true }
 }
 
 export async function catboxUploadAvatar(serviceRecord, dataUrl) {
   const userhash = serviceRecord.credentials?.userhash || ''
   const url = await catboxUpload(userhash, dataUrl)
-  const short = await ensureCatboxAlbum(serviceRecord)
   const fileCode = extractFileShortCode(url)
-  if (fileCode) {
+  const { short, created } = await ensureCatboxAlbum(serviceRecord, fileCode)
+  if (!created && fileCode) {
     await catboxAddToAlbum(userhash, short, [fileCode])
   }
   return url
