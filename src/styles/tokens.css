@@ -38,6 +38,9 @@
   --color-delete: #dc2626;
   --color-delete-hover: #b91c1c;
   --color-on-delete: #ffffff;
+  --color-delete-always: #dc2626;
+  --color-delete-hover-always: #b91c1c;
+  --color-on-delete-always: #ffffff;
 
   --color-ooc: #b45309;
   --color-ooc-subtle: rgba(180, 83, 9, 0.1);
@@ -109,6 +112,9 @@
   --color-delete: #ef4444;
   --color-delete-hover: #dc2626;
   --color-on-delete: #ffffff;
+  --color-delete-always: #ef4444;
+  --color-delete-hover-always: #dc2626;
+  --color-on-delete-always: #ffffff;
 
   --color-ooc: #f59e0b;
   --color-ooc-subtle: rgba(245, 158, 11, 0.12);
@@ -174,6 +180,9 @@
   --color-delete: #b91c1c;
   --color-delete-hover: #991b1b;
   --color-on-delete: #ffffff;
+  --color-delete-always: #b91c1c;
+  --color-delete-hover-always: #991b1b;
+  --color-on-delete-always: #ffffff;
 
   --color-ooc: #9a3412;
   --color-ooc-subtle: rgba(154, 52, 18, 0.1);
@@ -239,6 +248,9 @@
   --color-delete: #e11d48;
   --color-delete-hover: #be123c;
   --color-on-delete: #ffffff;
+  --color-delete-always: #e11d48;
+  --color-delete-hover-always: #be123c;
+  --color-on-delete-always: #ffffff;
 
   --color-ooc: #8b5cf6;
   --color-ooc-subtle: rgba(139, 92, 246, 0.1);
@@ -304,6 +316,9 @@
   --color-delete: #b91c1c;
   --color-delete-hover: #991b1b;
   --color-on-delete: #ffffff;
+  --color-delete-always: #b91c1c;
+  --color-delete-hover-always: #991b1b;
+  --color-on-delete-always: #ffffff;
 
   --color-ooc: #7c3aed;
   --color-ooc-subtle: rgba(124, 58, 237, 0.12);
@@ -369,6 +384,9 @@
   --color-delete: #ff4500;
   --color-delete-hover: #cc3700;
   --color-on-delete: #000000;
+  --color-delete-always: #ff4500;
+  --color-delete-hover-always: #cc3700;
+  --color-on-delete-always: #000000;
 
   --color-ooc: #eab308;
   --color-ooc-subtle: rgba(234, 179, 8, 0.12);
@@ -434,6 +452,9 @@
   --color-delete: #cc0000;
   --color-delete-hover: #990000;
   --color-on-delete: #ffffff;
+  --color-delete-always: #cc0000;
+  --color-delete-hover-always: #990000;
+  --color-on-delete-always: #ffffff;
 
   --color-ooc: #fbbf24;
   --color-ooc-subtle: rgba(251, 191, 36, 0.1);
@@ -501,6 +522,9 @@
   --color-delete: #f87171;
   --color-delete-hover: #ef4444;
   --color-on-delete: #ffffff;
+  --color-delete-always: #f87171;
+  --color-delete-hover-always: #ef4444;
+  --color-on-delete-always: #ffffff;
 
   --color-ooc: #3b82f6;
   --color-ooc-subtle: rgba(59, 130, 246, 0.12);
@@ -566,6 +590,9 @@
   --color-delete: #fb7185;
   --color-delete-hover: #f43f5e;
   --color-on-delete: #111827;
+  --color-delete-always: #fb7185;
+  --color-delete-hover-always: #f43f5e;
+  --color-on-delete-always: #111827;
 
   --color-ooc: #f59e0b;
   --color-ooc-subtle: rgba(245, 158, 11, 0.12);
@@ -622,6 +649,9 @@
   --color-delete: #ff0044;
   --color-delete-hover: #cc0033;
   --color-on-delete: #ffffff;
+  --color-delete-always: #ff0044;
+  --color-delete-hover-always: #cc0033;
+  --color-on-delete-always: #ffffff;
 
   --color-ooc: #f59e0b;
   --color-ooc-subtle: rgba(245, 158, 11, 0.12);
@@ -677,8 +707,10 @@
 
   --color-delete: #ff4488;
   --color-delete-hover: #e11d48;
-
-  --color-ooc: #fbbf24;
+  --color-on-delete: #ffffff;
+  --color-delete-always: #ff4488;
+  --color-delete-hover-always: #e11d48;
+  --color-on-delete-always: #ffffff;
   --color-ooc-subtle: rgba(251, 191, 36, 0.12);
   --color-ooc-text: #fef3c7;
   --color-ooc-muted: rgba(254, 243, 199, 0.7);
@@ -732,10 +764,10 @@
 
   --color-delete: #ef4444;
   --color-delete-hover: #b91c1c;
-
-  --color-ooc: #f59e0b;
-  --color-ooc-subtle: rgba(245, 158, 11, 0.1);
-  --color-ooc-text: #422006;
+  --color-on-delete: #ffffff;
+  --color-delete-always: #ef4444;
+  --color-delete-hover-always: #b91c1c;
+  --color-on-delete-always: #ffffff;
   --color-ooc-muted: rgba(66, 32, 6, 0.65);
   --color-ooc-placeholder: rgba(66, 32, 6, 0.45);
 
@@ -787,8 +819,10 @@
 
   --color-delete: #dc322f;
   --color-delete-hover: #b22c2a;
-
-  --color-ooc: #2aa198;
+  --color-on-delete: #ffffff;
+  --color-delete-always: #dc322f;
+  --color-delete-hover-always: #b22c2a;
+  --color-on-delete-always: #ffffff;
   --color-ooc-subtle: rgba(42, 161, 152, 0.12);
   --color-ooc-text: #fdf6e3;
   --color-ooc-muted: rgba(253, 246, 227, 0.7);
@@ -842,8 +876,10 @@
 
   --color-delete: #ff0055;
   --color-delete-hover: #cc0044;
-
-  --color-ooc: #22d3ee;
+  --color-on-delete: #ffffff;
+  --color-delete-always: #ff0055;
+  --color-delete-hover-always: #cc0044;
+  --color-on-delete-always: #ffffff;
   --color-ooc-subtle: rgba(34, 211, 238, 0.12);
   --color-ooc-text: #083344;
   --color-ooc-muted: rgba(8, 51, 68, 0.75);
@@ -1189,6 +1225,17 @@
 }
 .text-delete {
   color: var(--color-delete);
+}
+
+/* Always-highlighted delete — bypasses the "Highlight Delete Buttons" toggle */
+.bg-delete-always {
+  background-color: var(--color-delete-always);
+}
+.hover\:bg-delete-always-hover:hover {
+  background-color: var(--color-delete-hover-always);
+}
+.text-on-delete-always {
+  color: var(--color-on-delete-always);
 }
 
 /* Badge (thread status indicators — fixed across themes) */

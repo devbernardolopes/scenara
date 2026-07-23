@@ -331,7 +331,7 @@ function LogsModal() {
           type="button"
           onClick={handleDeleteSelected}
           disabled={validSelectedCount === 0}
-          className="min-h-[44px] px-3 text-sm text-on-delete bg-delete hover:bg-delete-hover rounded-md inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="min-h-[44px] px-3 text-sm text-on-delete-always bg-delete-always hover:bg-delete-always-hover rounded-md inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Trash2 className="w-4 h-4" />
           {t('logs:deleteSelected', { count: validSelectedCount })}

@@ -266,7 +266,7 @@ function ListManagementModal({ config }) {
                   <button
                     type="button"
                     onClick={handleDeleteSelected}
-                    className="min-h-[44px] px-3 text-sm text-on-delete bg-delete hover:bg-delete-hover rounded-md"
+                    className="min-h-[44px] px-3 text-sm text-on-delete-always bg-delete-always hover:bg-delete-always-hover rounded-md"
                   >
                     {t(`${entityKey}.batch.delete`, { count: selectedIds.size })}
                   </button>

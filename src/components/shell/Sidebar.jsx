@@ -467,7 +467,7 @@ function Sidebar({ open, onClose }) {
             <button
               type="button"
               onClick={handleBatchDelete}
-              className="min-h-[44px] px-4 rounded-md text-sm font-medium text-on-delete bg-delete hover:bg-delete-hover flex items-center gap-2"
+              className="min-h-[44px] px-4 rounded-md text-sm font-medium text-on-delete-always bg-delete-always hover:bg-delete-always-hover flex items-center gap-2"
             >
               <Trash2 className="w-4 h-4" />
               {t('sidebar.deleteSelected')}
