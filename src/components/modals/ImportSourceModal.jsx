@@ -31,13 +31,13 @@ function ImportSourceModal({ onFromFile, onFromUrl, onFromGist }) {
   function handleFromUrl() {
     const trimmed = url.trim()
     if (!URL_REGEX.test(trimmed)) return
-    onFromUrl?.(trimmed, pw)
     closeModal()
+    onFromUrl?.(trimmed, pw)
   }
 
   function handleFromGist() {
-    onFromGist?.(pw)
     closeModal()
+    onFromGist?.(pw)
   }
 
   const urlValid = URL_REGEX.test(url.trim())
