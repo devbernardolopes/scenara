@@ -906,6 +906,18 @@
 }
 
 /* ============================================================
+   Glow tokens — interactive feedback via light-based effects.
+   Use var(--color-primary-rgb) for theme-aware coloring.
+   ============================================================ */
+:root {
+  --glow-primary: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
+  --glow-primary-strong:
+    0 0 0 4px rgba(var(--color-primary-rgb), 0.35), 0 0 12px rgba(var(--color-primary-rgb), 0.15);
+  --glow-hover-sm: 0 0 8px rgba(var(--color-primary-rgb), 0.12);
+  --glow-hover-md: 0 0 16px rgba(var(--color-primary-rgb), 0.18);
+}
+
+/* ============================================================
    Utility classes
    Use these in JSX className instead of hardcoded color values.
    Example: <div className="bg-surface text-text border-border">
@@ -1394,6 +1406,36 @@ main {
   background: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary));
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
   transform: scale(0.98);
+}
+
+/* Glow utility classes (interactive feedback) */
+.focus-glow:focus-visible {
+  box-shadow: var(--glow-primary);
+  outline: none;
+}
+.focus-glow-strong:focus-visible {
+  box-shadow: var(--glow-primary-strong);
+  outline: none;
+}
+.hover-glow-sm:hover {
+  box-shadow: var(--glow-hover-sm);
+}
+.hover-glow-md:hover {
+  box-shadow: var(--glow-hover-md);
+}
+
+/* Glow pulse animation (streaming indicators) */
+@keyframes glow-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px rgba(var(--color-primary-rgb), 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(var(--color-primary-rgb), 0.6));
+  }
+}
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
 }
 
 .thread-card {

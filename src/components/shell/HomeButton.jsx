@@ -49,7 +49,7 @@ function HomeButton({ open }) {
   return (
     <button
       onClick={() => navigate('/')}
-      className={`fixed ${HOME_POSITION_CLASSES[position] || HOME_POSITION_CLASSES['bottom-left']} z-20 md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-surface shadow-surface-md text-tertiary hover:text-text hover:bg-surface-hover transition-all duration-200 ease-in-out ${hidden ? 'opacity-0 scale-75 pointer-events-none' : 'opacity-100 scale-100'}`}
+      className={`fixed ${HOME_POSITION_CLASSES[position] || HOME_POSITION_CLASSES['bottom-left']} z-20 md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-surface shadow-surface-md text-tertiary hover:text-text hover:bg-surface-hover hover-glow-sm transition-all duration-200 ease-in-out ${hidden ? 'opacity-0 scale-75 pointer-events-none' : 'opacity-100 scale-100'}`}
       aria-label={t('topbar.home')}
     >
       <Home className="w-6 h-6" />

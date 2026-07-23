@@ -2230,7 +2230,7 @@ function ChatView() {
               />
             </div>
             {blockingGenerating && (
-              <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />
+              <RefreshCw className="w-4 h-4 text-primary animate-spin animate-glow-pulse shrink-0" />
             )}
             {blockingQueued && (
               <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-primary rounded-full shrink-0">

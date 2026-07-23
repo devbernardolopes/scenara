@@ -15,7 +15,7 @@
   }
   .character-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-lg), var(--glow-hover-sm);
   }
   .character-card:hover .character-card__portrait-img {
     transform: scale(1.06);
