@@ -44,6 +44,10 @@ export async function exportDatabase(selection) {
     data.connectionProfiles = [...filtered]
   }
 
+  if (selection.cloudServices) {
+    data.cloudServices = await db.cloudServices.toArray()
+  }
+
   if (selection.logs) {
     data.logs = await db.logs.toArray()
   }
@@ -145,6 +149,7 @@ export async function importDatabase(data) {
     'promptBank',
     'lorebooks',
     'lorebookEntries',
+    'cloudServices',
   ]
 
   function addWithId(table, record) {
@@ -215,6 +220,12 @@ export async function importDatabase(data) {
     if (Array.isArray(data.connectionProfiles)) {
       for (const profile of data.connectionProfiles) {
         await addWithId(db.connectionProfiles, profile)
+      }
+    }
+
+    if (Array.isArray(data.cloudServices)) {
+      for (const svc of data.cloudServices) {
+        await addWithId(db.cloudServices, svc)
       }
     }
 
@@ -322,6 +333,7 @@ export async function resetDatabase() {
   await db.promptBank.clear()
   await db.lorebooks.clear()
   await db.lorebookEntries.clear()
+  await db.cloudServices.clear()
 
   for (const setting of SETTINGS) {
     await db.settings.add({ key: setting.key, value: setting.default })

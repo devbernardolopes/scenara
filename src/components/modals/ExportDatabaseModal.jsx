@@ -37,6 +37,7 @@ function ExportDatabaseModal() {
   const [selectedLorebookIds, setSelectedLorebookIds] = useState(new Set())
   const [selectedTags, setSelectedTags] = useState(true)
   const [selectedSettings, setSelectedSettings] = useState(true)
+  const [selectedCloudServices, setSelectedCloudServices] = useState(true)
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -123,6 +124,7 @@ function ExportDatabaseModal() {
         lorebookIds: selectedLorebookIds,
         tags: selectedTags,
         settings: selectedSettings,
+        cloudServices: selectedCloudServices,
       })
 
       openModal('exportDestination', { exportData: data, modalSize: 'md' })
@@ -446,8 +448,8 @@ function ExportDatabaseModal() {
 
         <CollapsibleSection
           label={t('database.exportModal.extra')}
-          summary={`${[selectedTags, selectedSettings, selectedLogs].filter(Boolean).length}`}
-          hasContent={selectedTags || selectedSettings || selectedLogs}
+          summary={`${[selectedTags, selectedSettings, selectedLogs, selectedCloudServices].filter(Boolean).length}`}
+          hasContent={selectedTags || selectedSettings || selectedLogs || selectedCloudServices}
           storageKey="export.extra"
         >
           <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
@@ -503,6 +505,25 @@ function ExportDatabaseModal() {
               </span>
               <span className="text-xs text-tertiary ml-2">
                 {t('database.exportModal.logsDescription')}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
+            <label className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={selectedCloudServices}
+                onChange={(e) => setSelectedCloudServices(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+              />
+            </label>
+            <div className="flex-1 min-w-0">
+              <span className="text-sm font-medium text-text">
+                {t('database.exportModal.cloudServices')}
+              </span>
+              <span className="text-xs text-tertiary ml-2">
+                {t('database.exportModal.cloudServicesDescription')}
               </span>
             </div>
           </div>

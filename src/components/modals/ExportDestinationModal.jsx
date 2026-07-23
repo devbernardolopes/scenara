@@ -25,6 +25,11 @@ function ExportDestinationModal({ exportData }) {
     setPhase('exported')
   }
 
+  function handleClose() {
+    closeModal()
+    closeModal()
+  }
+
   async function handleToGist() {
     setPhase('exporting')
     try {
@@ -77,7 +82,7 @@ function ExportDestinationModal({ exportData }) {
       <div className="flex flex-col min-h-0 flex-1">
         <div className="flex items-center justify-between p-6 pb-4 shadow-section shrink-0">
           <h2 className="text-xl font-semibold text-text">{t('database.exportModal.title')}</h2>
-          <CloseButton onClick={closeModal} />
+          <CloseButton onClick={handleClose} />
         </div>
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 gap-4">
           {phase === 'exported' ? (
@@ -97,7 +102,7 @@ function ExportDestinationModal({ exportData }) {
         <div className="flex justify-end gap-3 px-6 py-4 shadow-section shrink-0">
           <button
             type="button"
-            onClick={closeModal}
+            onClick={handleClose}
             className="min-h-[44px] px-4 btn-primary text-sm"
           >
             {phase === 'error' ? t('database.importModal.close') : t('database.exportModal.close')}
