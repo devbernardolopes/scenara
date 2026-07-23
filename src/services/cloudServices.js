@@ -218,7 +218,11 @@ export async function ensureCatboxAlbum(serviceRecord, fileShortCode) {
     'Scenara avatar uploads',
     fileShortCode || '',
   )
-  await db.cloudServices.update(serviceRecord.id, {
+  await updateService(serviceRecord.id, {
+    name: serviceRecord.name,
+    serviceType: serviceRecord.serviceType,
+    baseUrl: serviceRecord.baseUrl || null,
+    credentials: { ...serviceRecord.credentials },
     metadata: { ...serviceRecord.metadata, albumShort: short },
   })
   return { short, created: true }

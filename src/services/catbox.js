@@ -52,14 +52,18 @@ export async function catboxUpload(userhash, dataUrl) {
 }
 
 export async function catboxCreateAlbum(userhash, title, desc = '', files = '') {
-  const form = new FormData()
-  form.append('reqtype', 'createalbum')
-  if (userhash) form.append('userhash', userhash)
-  form.append('title', title)
-  form.append('desc', desc)
-  form.append('files', files)
+  const params = new URLSearchParams()
+  params.append('reqtype', 'createalbum')
+  if (userhash) params.append('userhash', userhash)
+  params.append('title', title)
+  params.append('desc', desc)
+  params.append('files', files)
 
-  const res = await fetch(API_URL, { method: 'POST', body: form })
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params,
+  })
   if (!res.ok) throw new Error(`Catbox API error: ${res.status}`)
   const text = await res.text()
   const url = parseResponse(text)
@@ -68,13 +72,17 @@ export async function catboxCreateAlbum(userhash, title, desc = '', files = '') 
 }
 
 export async function catboxAddToAlbum(userhash, albumShort, fileShortCodes) {
-  const form = new FormData()
-  form.append('reqtype', 'addtoalbum')
-  if (userhash) form.append('userhash', userhash)
-  form.append('short', albumShort)
-  form.append('files', fileShortCodes.join(' '))
+  const params = new URLSearchParams()
+  params.append('reqtype', 'addtoalbum')
+  if (userhash) params.append('userhash', userhash)
+  params.append('short', albumShort)
+  params.append('files', fileShortCodes.join(' '))
 
-  const res = await fetch(API_URL, { method: 'POST', body: form })
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params,
+  })
   if (!res.ok) throw new Error(`Catbox API error: ${res.status}`)
   const text = await res.text()
   if (text.trim() !== 'OK') throw new Error(text.trim() || 'Failed to add to album')
