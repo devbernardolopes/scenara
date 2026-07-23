@@ -8,6 +8,7 @@ import { getSetting, setSetting } from '../../../services/settings'
 import { jsonReviver } from '../../../lib/download'
 import { getGistService } from '../../../services/cloudServices'
 import { gistGetRaw } from '../../../services/githubGist'
+import { isEncrypted, decrypt } from '../../../lib/crypto'
 import { Download, Upload, AlertTriangle, RefreshCw } from '../../../lib/icons'
 
 function DatabaseSettingsPanel() {
@@ -18,6 +19,7 @@ function DatabaseSettingsPanel() {
   const [resettingSettings, setResettingSettings] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
   const fileInputRef = useRef(null)
+  const importPassphraseRef = useRef('')
 
   const [importUrl, setImportUrl] = useState('')
   const importViaUrlRef = useRef(null)
@@ -39,7 +41,8 @@ function DatabaseSettingsPanel() {
 
   const handleImport = () => {
     openModal('importSource', {
-      onFromFile: () => {
+      onFromFile: (passphrase) => {
+        importPassphraseRef.current = passphrase || ''
         fileInputRef.current?.click()
       },
       onFromUrl: handleImportFromUrl,
@@ -47,7 +50,19 @@ function DatabaseSettingsPanel() {
     })
   }
 
-  async function handleImportFromUrl(url) {
+  async function tryDecrypt(text, passphrase) {
+    if (!isEncrypted(text)) return text
+    if (!passphrase) {
+      throw new Error(t('database.importModal.encryptedNoPassphrase'))
+    }
+    try {
+      return await decrypt(text, passphrase)
+    } catch {
+      throw new Error(t('database.importModal.decryptFailed'))
+    }
+  }
+
+  async function handleImportFromUrl(url, passphrase) {
     setIsImporting(true)
     openModal('progress', { status: 'importing', label: t('database.importModal.fetching') })
 
@@ -63,11 +78,12 @@ function DatabaseSettingsPanel() {
       const text = await response.text()
       let data
       try {
-        data = JSON.parse(text, jsonReviver)
-      } catch {
+        const plain = await tryDecrypt(text, passphrase)
+        data = JSON.parse(plain, jsonReviver)
+      } catch (err) {
         updateModal({
           status: 'error',
-          label: t('database.importModal.invalidFormat'),
+          label: err.message || t('database.importModal.invalidFormat'),
         })
         return
       }
@@ -84,7 +100,7 @@ function DatabaseSettingsPanel() {
     }
   }
 
-  async function handleImportFromGist() {
+  async function handleImportFromGist(passphrase) {
     setIsImporting(true)
     openModal('progress', { status: 'importing', label: t('database.importModal.importing') })
 
@@ -110,11 +126,12 @@ function DatabaseSettingsPanel() {
       const text = await gistGetRaw(token, gistId)
       let data
       try {
-        data = JSON.parse(text, jsonReviver)
-      } catch {
+        const plain = await tryDecrypt(text, passphrase)
+        data = JSON.parse(plain, jsonReviver)
+      } catch (err) {
         updateModal({
           status: 'error',
-          label: t('database.importModal.invalidFormat'),
+          label: err.message || t('database.importModal.invalidFormat'),
         })
         return
       }
@@ -136,6 +153,9 @@ function DatabaseSettingsPanel() {
     if (!file) return
     e.target.value = ''
 
+    const passphrase = importPassphraseRef.current
+    importPassphraseRef.current = ''
+
     setIsImporting(true)
     openModal('progress', { status: 'importing', label: t('database.importModal.importing') })
 
@@ -143,11 +163,12 @@ function DatabaseSettingsPanel() {
       const text = await file.text()
       let data
       try {
-        data = JSON.parse(text, jsonReviver)
-      } catch {
+        const plain = await tryDecrypt(text, passphrase)
+        data = JSON.parse(plain, jsonReviver)
+      } catch (err) {
         updateModal({
           status: 'error',
-          label: t('database.importModal.invalidFile'),
+          label: err.message || t('database.importModal.invalidFile'),
         })
         return
       }

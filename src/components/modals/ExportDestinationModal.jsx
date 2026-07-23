@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import CloseButton from '../shared/CloseButton'
-import { FileUp, GitBranch, Loader, CheckCircle, AlertTriangle } from '../../lib/icons'
+import { FileUp, GitBranch, Loader, CheckCircle, AlertTriangle, Eye, EyeOff } from '../../lib/icons'
 import { getGistService } from '../../services/cloudServices'
 import { gistCreate, gistUpdate } from '../../services/githubGist'
-import { downloadJson, jsonReplacer } from '../../lib/download'
+import { jsonReplacer } from '../../lib/download'
+import { encrypt } from '../../lib/crypto'
 
 function ExportDestinationModal({ exportData }) {
   const { t } = useTranslation('settings')
@@ -13,16 +14,42 @@ function ExportDestinationModal({ exportData }) {
   const [hasGistService, setHasGistService] = useState(false)
   const [phase, setPhase] = useState('select')
   const [errorLabel, setErrorLabel] = useState('')
+  const [passphrase, setPassphrase] = useState('')
+  const [showPassphrase, setShowPassphrase] = useState(false)
 
   useEffect(() => {
     getGistService().then((svc) => setHasGistService(!!svc))
   }, [])
 
-  function handleToFile() {
-    const now = new Date()
-    const ts = now.toISOString().replace(/[:.]/g, '-').slice(0, 19)
-    downloadJson(exportData, `scenara-export-${ts}.json`)
-    setPhase('exported')
+  async function prepareContent() {
+    const json = JSON.stringify(exportData, jsonReplacer, 2)
+    if (passphrase.trim()) {
+      return encrypt(json, passphrase.trim())
+    }
+    return json
+  }
+
+  async function handleToFile() {
+    setPhase('exporting')
+    try {
+      const content = await prepareContent()
+      const now = new Date()
+      const ts = now.toISOString().replace(/[:.]/g, '-').slice(0, 19)
+      const ext = passphrase.trim() ? 'txt' : 'json'
+      const blob = new Blob([content], { type: 'text/plain' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `scenara-export-${ts}.${ext}`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      setPhase('exported')
+    } catch (err) {
+      setErrorLabel(err.message || 'Export failed')
+      setPhase('error')
+    }
   }
 
   function handleClose() {
@@ -38,7 +65,7 @@ function ExportDestinationModal({ exportData }) {
         throw new Error('No GitHub Gist service configured')
       }
       const token = svc.credentials?.token || ''
-      const content = JSON.stringify(exportData, jsonReplacer, 2)
+      const content = await prepareContent()
       const now = new Date()
       const description = `Scenara export — ${now.toISOString().slice(0, 19)}`
 
@@ -89,7 +116,9 @@ function ExportDestinationModal({ exportData }) {
             <>
               <CheckCircle className="w-10 h-10 text-success" />
               <p className="text-text text-sm font-medium">
-                {t('database.exportModal.gistExported')}
+                {passphrase.trim()
+                  ? t('database.exportModal.encryptedExported')
+                  : t('database.exportModal.gistExported')}
               </p>
             </>
           ) : (
@@ -120,7 +149,30 @@ function ExportDestinationModal({ exportData }) {
         </h2>
         <CloseButton onClick={closeModal} />
       </div>
-      <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t('database.exportModal.passphrase')}
+          </label>
+          <div className="relative">
+            <input
+              type={showPassphrase ? 'text' : 'password'}
+              value={passphrase}
+              onChange={(e) => setPassphrase(e.target.value)}
+              placeholder={t('database.exportModal.passphrasePlaceholder')}
+              className="w-full min-h-[44px] px-3 pr-10 py-2 rounded-lg border border-border bg-surface text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassphrase(!showPassphrase)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-secondary hover:text-text"
+            >
+              {showPassphrase ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+          <p className="text-xs text-tertiary mt-1">{t('database.exportModal.passphraseDesc')}</p>
+        </div>
+
         <button
           onClick={handleToFile}
           className="flex items-start gap-4 w-full min-h-[44px] p-4 rounded-lg border border-border hover:bg-surface-hover hover:border-border-light transition-colors text-left"
