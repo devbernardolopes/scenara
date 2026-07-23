@@ -1,10 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 
-function clampAndSnap(v, min, max, step) {
-  const clamped = Math.min(max, Math.max(min, v))
-  const snapped = Math.round((clamped - min) / step) * step + min
-  const rounded = parseFloat(snapped.toPrecision(12))
-  return Math.min(max, Math.max(min, rounded))
+function clampValue(v, min, max) {
+  return Math.min(max, Math.max(min, v))
 }
 
 function formatDisplay(value, step, formatValue) {
@@ -51,7 +48,7 @@ function SettingSlider({
       setEditing(false)
       return
     }
-    const final = clampAndSnap(parsed, min, max, step)
+    const final = clampValue(parsed, min, max)
     onChange(final)
     setEditing(false)
   }
@@ -104,7 +101,7 @@ function SettingSlider({
           onKeyDown={handleKeyDown}
           onBlur={commitEdit}
           aria-label={label}
-          className="w-14 text-sm text-right font-medium bg-transparent border-b border-accent outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          className="w-14 text-sm text-text text-right font-medium bg-transparent border-b border-accent outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
       ) : (
         <span
