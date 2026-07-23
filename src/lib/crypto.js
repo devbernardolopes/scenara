@@ -115,6 +115,7 @@ export async function encryptTree(obj, passphrase) {
       }
       return out
     }
+    if (val instanceof Date) return val
     if (val && typeof val === 'object') {
       const out = {}
       for (const k of Object.keys(val)) {
@@ -140,6 +141,7 @@ export async function decryptTree(obj, passphrase) {
       }
       return out
     }
+    if (val instanceof Date) return val
     if (val && typeof val === 'object') {
       const out = {}
       for (const k of Object.keys(val)) {
