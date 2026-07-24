@@ -14,7 +14,7 @@ import MessageBubble from '../components/chat/MessageBubble'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
 import { getThread, updateThread, forkThread } from '../services/threads'
 import { setUIState } from '../services/uiState'
-import { getCharacter } from '../services/characters'
+import { getCharacter, touchCharacterLastUsed } from '../services/characters'
 import { getAllPersonas, getPersona } from '../services/personas'
 import {
   getMessagesByThread,
@@ -1970,6 +1970,7 @@ function ChatView() {
     setMessages(dedupeMessages(msgs))
     setActiveSlotIndices((prev) => ({ ...prev, [id]: entries.length - 1 }))
     showToast(t('messageUpdated'), { type: 'success' })
+    if (character?.id) touchCharacterLastUsed(character.id)
   }
 
   async function handleDeleteMessage(id) {
