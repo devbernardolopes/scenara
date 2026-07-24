@@ -501,12 +501,9 @@ export function getActiveParams(profile) {
       }
     }
   }
-  // OpenAI-compatible reasoning params: always pass through as strings
+  // OpenAI-compatible reasoning params
   if (active.reasoning_effort != null) {
     active.reasoning_effort = String(active.reasoning_effort)
-  }
-  if (active.include_reasoning != null) {
-    active.include_reasoning = active.include_reasoning ? 'true' : 'false'
   }
   return active
 }
