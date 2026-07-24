@@ -238,6 +238,7 @@ function ChatView() {
   const [chatModelTemp, setChatModelTemp] = useState(null)
   const [chatModelTopP, setChatModelTopP] = useState(null)
   const [chatProfile, setChatProfile] = useState(null)
+  const [chatProfileIsOverride, setChatProfileIsOverride] = useState(false)
   const [showStatus, setShowStatus] = useState(true)
   const [statusBarRefresh, setStatusBarRefresh] = useState(30)
   const [oocActive, setOocActive] = useState(false)
@@ -562,6 +563,7 @@ function ChatView() {
       const charField = kind === 'ooc' ? 'apiProfileOocId' : 'apiProfileChatId'
       const profileId =
         (character && character[charField]) || (await getSetting(`requestKind.${kind}.profileId`))
+      setChatProfileIsOverride(Boolean(character?.[charField]))
       setChatProfile(profileId ? await getProfile(profileId) : null)
     }
     loadChatModel()
@@ -2442,6 +2444,7 @@ function ChatView() {
                 className="text-xs text-tertiary hover:text-text hover:underline inline-flex items-center gap-1 max-w-full"
                 title={t('statusBar.editProfile')}
               >
+                {chatProfileIsOverride && <span className="text-accent font-bold">*</span>}
                 {chatModelTemp != null && <>{chatModelTemp}t · </>}
                 {chatModelTopP != null && <>{chatModelTopP}p · </>}
                 <MarqueeText className="inline-block align-bottom max-w-full">
@@ -2451,6 +2454,7 @@ function ChatView() {
               </button>
             ) : (
               <span className="text-xs text-tertiary">
+                {chatProfileIsOverride && <span className="text-accent font-bold">*</span>}
                 {chatModelTemp != null && <>{chatModelTemp}t · </>}
                 {chatModelTopP != null && <>{chatModelTopP}p · </>}
                 <MarqueeText className="inline-block align-bottom max-w-full">
