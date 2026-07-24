@@ -21,8 +21,9 @@ export default function ModelStatusBar({ embedded = false }) {
   const [profile, setProfile] = useState(null)
   const [statusEnabled, setStatusEnabled] = useState(false)
   const [statusBarRefresh, setStatusBarRefresh] = useState(30)
-
   const hordeEta = useHordeEta(statusEnabled, 'chat', statusBarRefresh)
+  const temperatureDisabled = profile?.disabledParams?.temperature === true
+  const topPDisabled = profile?.disabledParams?.top_p === true
 
   useEffect(() => {
     async function load() {
@@ -73,15 +74,15 @@ export default function ModelStatusBar({ embedded = false }) {
           className="text-xs text-tertiary hover:text-text hover:underline inline-flex items-center gap-1 max-w-full flex-nowrap whitespace-nowrap"
           title={t('statusBar.editProfile')}
         >
-          {temperature != null && <>{temperature}t · </>}
-          {topP != null && <>{topP}p · </>}
+          {temperature != null && !temperatureDisabled && <>{temperature}t · </>}
+          {topP != null && !topPDisabled && <>{topP}p · </>}
           <MarqueeText className="inline-block align-bottom max-w-full">{modelName}</MarqueeText>
           {hordeEta && <> · {hordeEta}</>}
         </button>
       ) : (
         <span className="text-xs text-tertiary inline-flex items-center gap-1 max-w-full flex-nowrap whitespace-nowrap">
-          {temperature != null && <>{temperature}t · </>}
-          {topP != null && <>{topP}p · </>}
+          {temperature != null && !temperatureDisabled && <>{temperature}t · </>}
+          {topP != null && !topPDisabled && <>{topP}p · </>}
           <MarqueeText className="inline-block align-bottom max-w-full">{modelName}</MarqueeText>
           {hordeEta && <> · {hordeEta}</>}
         </span>
