@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Plus, Trash2, ArrowUp, ArrowDown, RefreshCw } from '../../lib/icons'
+import { Plus, Trash2, RefreshCw } from '../../lib/icons'
 import { useConfirm } from '../../lib/confirm'
+import DragHandle from './DragHandle'
+import { SortableList, SortableItem } from './SortableList'
 import SettingSlider from '../modals/settings/controls/SettingSlider'
 import { applyRulesToPlainText, DEFAULT_PP_RULES } from '../../lib/postProcessing'
 
@@ -11,7 +13,7 @@ function coerceHex(color) {
   return typeof color === 'string' && /^#[0-9a-fA-F]{6}$/.test(color) ? color : '#888888'
 }
 
-function ChipInput({ label, values, placeholder, onAdd, onRemove }) {
+function ChipInput({ label, values, placeholder, onAdd, onRemove, confirmRemove }) {
   const { t } = useTranslation('settings')
   const [draft, setDraft] = useState('')
 
@@ -34,6 +36,14 @@ function ChipInput({ label, values, placeholder, onAdd, onRemove }) {
     }
   }
 
+  async function handleRemove(v) {
+    if (confirmRemove) {
+      const ok = await confirmRemove(v)
+      if (!ok) return
+    }
+    onRemove(values.filter((x) => x !== v))
+  }
+
   return (
     <div className="space-y-1.5">
       {label && <label className="text-xs font-medium text-secondary">{label}</label>}
@@ -46,7 +56,7 @@ function ChipInput({ label, values, placeholder, onAdd, onRemove }) {
             <span className="font-mono">{v}</span>
             <button
               type="button"
-              onClick={() => onRemove(values.filter((x) => x !== v))}
+              onClick={() => handleRemove(v)}
               className="text-tertiary hover:text-error min-h-[24px] min-w-[24px]"
               aria-label={`${t('postProcessing.delete')} ${v}`}
             >
@@ -68,7 +78,7 @@ function ChipInput({ label, values, placeholder, onAdd, onRemove }) {
   )
 }
 
-function RuleRow({ rule, index, total, onChange, onMove, onDelete }) {
+function RuleRow({ rule, index, onChange, onDelete, setNodeRef, style, dragHandleProps }) {
   const { t } = useTranslation('settings')
   const { confirm } = useConfirm()
 
@@ -89,7 +99,11 @@ function RuleRow({ rule, index, total, onChange, onMove, onDelete }) {
   }
 
   return (
-    <div className="rounded-lg p-3 space-y-3 bg-surface shadow-surface-sm">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="rounded-lg p-3 space-y-3 bg-surface shadow-surface-sm"
+    >
       <div className="flex items-center gap-2">
         <input
           type="text"
@@ -115,6 +129,16 @@ function RuleRow({ rule, index, total, onChange, onMove, onDelete }) {
           placeholder="*"
           onAdd={(v) => update({ openChars: v })}
           onRemove={(v) => update({ openChars: v })}
+          confirmRemove={async (v) => {
+            const ok = await confirm({
+              title: t('postProcessing.removeCharConfirmTitle'),
+              message: t('postProcessing.removeCharConfirmMessage', { value: v }),
+              confirmLabel: t('postProcessing.remove'),
+              cancelLabel: t('common:cancel'),
+              variant: 'danger',
+            })
+            return ok
+          }}
         />
         <ChipInput
           label={t('postProcessing.closing')}
@@ -122,6 +146,16 @@ function RuleRow({ rule, index, total, onChange, onMove, onDelete }) {
           placeholder="*"
           onAdd={(v) => update({ closeChars: v })}
           onRemove={(v) => update({ closeChars: v })}
+          confirmRemove={async (v) => {
+            const ok = await confirm({
+              title: t('postProcessing.removeCharConfirmTitle'),
+              message: t('postProcessing.removeCharConfirmMessage', { value: v }),
+              confirmLabel: t('postProcessing.remove'),
+              cancelLabel: t('common:cancel'),
+              variant: 'danger',
+            })
+            return ok
+          }}
         />
       </div>
 
@@ -148,25 +182,11 @@ function RuleRow({ rule, index, total, onChange, onMove, onDelete }) {
             formatValue={(v) => `${v}%`}
           />
         </div>
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => onMove(index, -1)}
-            disabled={index === 0}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md border border-border text-secondary hover:bg-surface-hover disabled:opacity-30 disabled:pointer-events-none"
-            aria-label={t('postProcessing.moveUp')}
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => onMove(index, 1)}
-            disabled={index === total - 1}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md border border-border text-secondary hover:bg-surface-hover disabled:opacity-30 disabled:pointer-events-none"
-            aria-label={t('postProcessing.moveDown')}
-          >
-            <ArrowDown className="w-4 h-4" />
-          </button>
+        <div className="flex items-center gap-3 flex-1 min-w-[200px]">
+          <span className="text-xs font-medium text-secondary shrink-0">
+            {t('postProcessing.dragReorder')}
+          </span>
+          <DragHandle {...dragHandleProps} label={t('common:list.actions.reorder')} />
         </div>
       </div>
     </div>
@@ -183,13 +203,9 @@ export default function PostProcessingRuleEditor({ rules, onChange, resetToRules
     onChange(copy)
   }
 
-  function moveRule(index, dir) {
-    const target = index + dir
-    if (target < 0 || target >= rules.length) return
-    const copy = rules.slice()
-    const [item] = copy.splice(index, 1)
-    copy.splice(target, 0, item)
-    onChange(copy)
+  function handleReorder(ids) {
+    const reordered = ids.map((id) => rules.find((r) => r.id === id)).filter(Boolean)
+    onChange(reordered)
   }
 
   function deleteRule(index) {
@@ -254,19 +270,26 @@ export default function PostProcessingRuleEditor({ rules, onChange, resetToRules
       </div>
 
       <div className="space-y-3">
-        {rules.map((rule, idx) => (
-          <RuleRow
-            key={rule.id}
-            rule={rule}
-            index={idx}
-            total={rules.length}
-            onChange={(next) => updateRule(idx, next)}
-            onMove={moveRule}
-            onDelete={deleteRule}
-          />
-        ))}
-        {rules.length === 0 && (
+        {rules.length === 0 ? (
           <p className="text-sm text-tertiary italic">{t('postProcessing.noRules')}</p>
+        ) : (
+          <SortableList items={rules} getId={(r) => r.id} onReorder={handleReorder}>
+            {(rule, idx) => (
+              <SortableItem id={rule.id} key={rule.id}>
+                {(sortable) => (
+                  <RuleRow
+                    rule={rule}
+                    index={idx}
+                    onChange={(next) => updateRule(idx, next)}
+                    onDelete={deleteRule}
+                    setNodeRef={sortable.setNodeRef}
+                    style={sortable.style}
+                    dragHandleProps={sortable.dragHandleProps}
+                  />
+                )}
+              </SortableItem>
+            )}
+          </SortableList>
         )}
       </div>
 
