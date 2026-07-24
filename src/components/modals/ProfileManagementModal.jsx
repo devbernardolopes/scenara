@@ -23,7 +23,7 @@ function ProfileManagementModal() {
 
   const config = {
     entityKey: 'api.profile',
-    titleKey: 'sidebar.connectionProfiles',
+    titleKey: 'common:sidebar.connectionProfiles',
     createLabelKey: 'api.profile.createProfile',
     importLabelKey: 'api.profile.importProfile',
     changeEvent: 'connectionProfiles-changed',

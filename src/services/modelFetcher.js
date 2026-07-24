@@ -125,7 +125,7 @@ export async function fetchModels(
       }
       apiKey = keyEntry.value
     }
-    let baseUrl = profileBaseUrl || null
+    let baseUrl = profileBaseUrl ? profileBaseUrl.replace(/\/v1\/?$/, '') : null
     if (!baseUrl) {
       const rawUrl = await getBaseUrl(providerId)
       if (rawUrl) baseUrl = rawUrl.replace(/\/v1\/?$/, '')
@@ -154,7 +154,7 @@ export async function fetchModels(
 
   let models
   if (strategy.type === 'openai') {
-    let baseUrl = profileBaseUrl || null
+    let baseUrl = profileBaseUrl ? profileBaseUrl.replace(/\/v1\/?$/, '') : null
     if (!baseUrl) {
       const rawUrl = await getBaseUrl(providerId)
       if (rawUrl) baseUrl = rawUrl.replace(/\/v1\/?$/, '')
