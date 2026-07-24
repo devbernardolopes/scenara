@@ -17,6 +17,7 @@
     "database": "Base de datos",
     "deleteThread": "Eliminar conversación",
     "editCharacter": "Editar personaje",
+    "editThreadTitle": "Editar título de conversación",
     "duplicateThread": "Duplicar conversación",
     "confirmDuplicateTitle": "Duplicar conversación",
     "confirmDuplicateMessage": "¿Seguro que quieres duplicar esta conversación?",

@@ -517,7 +517,8 @@ function CharacterDiscovery() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="shrink-0 px-4 md:px-8 pt-4 md:pt-8 pb-1">
+      {/* <div className="shrink-0 px-4 md:px-8 pt-4 md:pt-8 pb-1"> */}
+      <div className="shrink-0 px-4 md:px-8 pt-4 pb-1">
         <CollapsibleSection
           label={
             <span className="flex items-center gap-2">

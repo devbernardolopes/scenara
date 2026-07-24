@@ -18,6 +18,7 @@
     "database": "Database",
     "deleteThread": "Delete thread",
     "editCharacter": "Edit character",
+    "editThreadTitle": "Edit thread title",
     "duplicateThread": "Duplicate thread",
     "confirmDuplicateTitle": "Duplicate Thread",
     "confirmDuplicateMessage": "Are you sure you want to duplicate this thread?",

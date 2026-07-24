@@ -161,6 +161,19 @@ export async function getUnreadMemoryCount(threadId) {
   return memories.filter((m) => m.isRead === false).length
 }
 
+export async function getMemoryIdForMarker(threadId, markerId) {
+  const tid = Number(threadId)
+  const allMessages = await getMessagesByThread(tid)
+  const markers = allMessages
+    .filter((m) => m.isSummaryMarker)
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+  const markerIndex = markers.findIndex((m) => m.id === Number(markerId))
+  if (markerIndex === -1) return null
+  const memories = await db.threadMemories.where('threadId').equals(tid).sortBy('createdAt')
+  if (markerIndex >= memories.length) return null
+  return memories[markerIndex].id
+}
+
 async function resequenceMemories(threadId) {
   const tid = Number(threadId)
   const memories = await db.threadMemories.where('threadId').equals(tid).sortBy('createdAt')

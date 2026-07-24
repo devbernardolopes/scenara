@@ -17,6 +17,7 @@
     "database": "Banco de Dados",
     "deleteThread": "Excluir conversa",
     "editCharacter": "Editar personagem",
+    "editThreadTitle": "Editar título da conversa",
     "duplicateThread": "Duplicar conversa",
     "confirmDuplicateTitle": "Duplicar Conversa",
     "confirmDuplicateMessage": "Tem certeza que deseja duplicar esta conversa?",

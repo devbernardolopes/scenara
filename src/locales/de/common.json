@@ -17,6 +17,7 @@
     "database": "Datenbank",
     "deleteThread": "Unterhaltung löschen",
     "editCharacter": "Charakter bearbeiten",
+    "editThreadTitle": "Unterhaltungstitel bearbeiten",
     "duplicateThread": "Unterhaltung duplizieren",
     "confirmDuplicateTitle": "Unterhaltung duplizieren",
     "confirmDuplicateMessage": "Möchtest du diese Unterhaltung wirklich duplizieren?",

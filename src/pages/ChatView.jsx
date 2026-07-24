@@ -65,6 +65,7 @@ import {
   clearPendingMarker,
 } from '../services/summarization'
 import { setBaseTitle } from '../services/titleManager'
+import { getMemoryIdForMarker } from '../services/threadMemories'
 import { estimateTokens } from '../services/tokenEstimator'
 import {
   isAwayFromThread,
@@ -2294,7 +2295,20 @@ function ChatView() {
                             <Square className="w-3 h-3" />
                           </button>
                         )}
-                        {t('summarizationMarker')}
+                        {summStatus ? (
+                          t('summarizationMarker')
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              const memoryId = await getMemoryIdForMarker(threadId, msg.id)
+                              openModal('memory', { threadId, expandedMemoryId: memoryId })
+                            }}
+                            className="min-h-[44px] text-accent hover:underline underline-offset-2 transition-colors"
+                          >
+                            {t('summarizationMarker')}
+                          </button>
+                        )}
                         {summStatus === 'queued' && <Clock className="w-3 h-3" />}
                         {summStatus === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
                       </span>
@@ -2329,7 +2343,17 @@ function ChatView() {
                             <Square className="w-3 h-3" />
                           </button>
                         )}
-                        {t('autoTitleMarker')}
+                        {atStatus ? (
+                          t('autoTitleMarker')
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => openModal('editThreadTitle', { thread })}
+                            className="min-h-[44px] text-accent hover:underline underline-offset-2 transition-colors"
+                          >
+                            {t('autoTitleMarker')}
+                          </button>
+                        )}
                         {atStatus === 'queued' && <Clock className="w-3 h-3" />}
                         {atStatus === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
                       </span>

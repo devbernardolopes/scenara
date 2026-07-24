@@ -15,7 +15,7 @@ import {
 import { updateThread } from '../../services/threads'
 import { ChevronDown, Trash2, RefreshCw, Eye } from '../../lib/icons'
 
-function MemoryModal({ threadId }) {
+function MemoryModal({ threadId, expandedMemoryId }) {
   const { t } = useTranslation(['chat', 'common'])
   const { closeModal, setCloseGuard, openModal } = useModal()
   const { promptSave } = useSaveConfirm()
@@ -30,10 +30,14 @@ function MemoryModal({ threadId }) {
     const list = await getThreadMemories(threadId)
     setMemories(list)
     if (list.length > 0) {
-      setExpandedId(list[0].id)
-      setDrafts({ [list[0].id]: list[0].content || '' })
+      const targetId =
+        expandedMemoryId && list.some((m) => m.id === expandedMemoryId)
+          ? expandedMemoryId
+          : list[0].id
+      setExpandedId(targetId)
+      setDrafts({ [targetId]: list.find((m) => m.id === targetId)?.content || '' })
     }
-  }, [threadId])
+  }, [threadId, expandedMemoryId])
 
   useEffect(() => {
     loadMemories()
