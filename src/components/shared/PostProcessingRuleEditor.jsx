@@ -182,12 +182,7 @@ function RuleRow({ rule, index, onChange, onDelete, setNodeRef, style, dragHandl
             formatValue={(v) => `${v}%`}
           />
         </div>
-        <div className="flex items-center gap-3 flex-1 min-w-[200px]">
-          <span className="text-xs font-medium text-secondary shrink-0">
-            {t('postProcessing.dragReorder')}
-          </span>
-          <DragHandle {...dragHandleProps} label={t('common:list.actions.reorder')} />
-        </div>
+        <DragHandle {...dragHandleProps} label={t('common:list.actions.reorder')} />
       </div>
     </div>
   )
