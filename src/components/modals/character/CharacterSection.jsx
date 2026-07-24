@@ -305,6 +305,7 @@ function CharacterSection({ form, onChange, characterId }) {
           options={LIFETIME_OPTIONS}
           value={form.globalContextLifetime || 'always'}
           onChange={(value) => onChange('globalContextLifetime', value)}
+          disabled={!form.globalContext?.trim()}
         />
       </div>
 

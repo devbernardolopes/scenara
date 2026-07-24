@@ -15,7 +15,7 @@ export const LIFETIME_OPTIONS = [
   { value: 'always', labelKey: 'scenarioLifetimeOptions.always' },
 ]
 
-export function LifetimeButtonGroup({ options, value, onChange }) {
+export function LifetimeButtonGroup({ options, value, onChange, disabled }) {
   const { t } = useTranslation('characterCreation')
   return (
     <div className="flex flex-wrap gap-1.5">
@@ -27,11 +27,12 @@ export function LifetimeButtonGroup({ options, value, onChange }) {
             key={val}
             type="button"
             onClick={() => onChange(val)}
+            disabled={disabled}
             className={`min-h-[44px] min-w-[44px] px-4 py-2 rounded-md text-sm font-medium border transition-colors ${
               value === val
                 ? 'bg-primary text-on-primary border-primary'
                 : 'bg-surface text-secondary border-border hover:bg-surface-hover'
-            }`}
+            }${disabled ? ' opacity-40 cursor-not-allowed' : ''}`}
           >
             {label}
           </button>
@@ -150,6 +151,8 @@ function ScenarioSection({ form, onChange }) {
     handleContentChange(scenario.id, '')
   }
 
+  const hasAnyContent = scenarios.some((s) => s.content?.trim())
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -159,10 +162,11 @@ function ScenarioSection({ form, onChange }) {
           role="switch"
           aria-checked={form.promptUser !== false}
           aria-label={t('promptUser')}
+          disabled={!hasAnyContent}
           onClick={() => onChange('promptUser', form.promptUser === false)}
           className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ${
             form.promptUser !== false ? 'bg-primary' : 'bg-gray-300'
-          }`}
+          }${!hasAnyContent ? ' opacity-40 cursor-not-allowed' : ''}`}
         >
           <span
             className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition-transform duration-200 ${
@@ -178,6 +182,7 @@ function ScenarioSection({ form, onChange }) {
         <LifetimeButtonGroup
           options={LIFETIME_OPTIONS}
           value={scenarios[0]?.lifetime || 'firstSummary'}
+          disabled={!hasAnyContent}
           onChange={async (value) => {
             // Section-level default: applies to every existing scenario and is
             // inherited by newly added ones (see handleAdd).
