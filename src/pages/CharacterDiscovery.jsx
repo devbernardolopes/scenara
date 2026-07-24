@@ -38,6 +38,7 @@ import {
   X,
   ArrowUpDown,
   SlidersHorizontal,
+  CloudCog,
 } from '../lib/icons'
 
 const SORT_OPTIONS = ['createdAt', 'updatedAt', 'lastUsed', 'chatCount', 'name']
@@ -585,6 +586,12 @@ function CharacterDiscovery() {
                   (char.directorRegularChatEnabled &&
                     char.directorRegularChatInstructions?.trim()) ||
                   (char.directorOOCEnabled && char.directorOOCInstructions?.trim()))
+              const hasApiOverrides =
+                char.apiProfileChatId != null ||
+                char.apiProfileAutoTitleId != null ||
+                char.apiProfileSummarizationId != null ||
+                char.apiProfileOocId != null ||
+                char.apiProfileDirectorId != null
               return (
                 <div
                   key={char.id}
@@ -629,8 +636,11 @@ function CharacterDiscovery() {
                         </div>
                       )}
                       {displayTags.length > 0 && <TagRow tags={displayTags} />}
-                      {(chatCount > 0 || has1st || hasMem || hasDir) && (
+                      {(chatCount > 0 || has1st || hasMem || hasDir || hasApiOverrides) && (
                         <div className="flex items-center gap-1 text-on-image-muted">
+                          {hasApiOverrides && (
+                            <CloudCog className="w-3 h-3" title="API overrides" />
+                          )}
                           {chatCount > 0 && (
                             <>
                               <MessageSquare className="w-3 h-3" />

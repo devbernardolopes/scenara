@@ -70,4 +70,5 @@ export {
   Theater,
   ScrollText,
   Cloud,
+  CloudCog,
 } from 'lucide-react'
