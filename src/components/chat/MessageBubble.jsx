@@ -392,8 +392,8 @@ function MessageBubble({
     if (requestFailed) return !['delete', 'regenerate', 'deleteAll', 'deleteFromHere'].includes(key)
     if (key === 'deleteAll' && contentSlotCount <= 1) return true
     if (key === 'regenerate' && generating) return true
-    if (key === 'requestDetails' && (!promptData || streaming || generating)) return true
-    if (key === 'directorDetails' && (!promptData?.directorAttempted || streaming)) return true
+    if (key === 'requestDetails' && (!slotPromptData || streaming || generating)) return true
+    if (key === 'directorDetails' && (!slotPromptData?.directorAttempted || streaming)) return true
     if (!message.content?.trim() && ['edit', 'copy', 'fork', 'speak', 'makeShortcut'].includes(key))
       return true
     return false
@@ -429,6 +429,14 @@ function MessageBubble({
   } catch {
     promptData = null
   }
+
+  let slotPromptData = null
+  try {
+    slotPromptData = activeEntry?.promptData ? JSON.parse(activeEntry.promptData) : null
+  } catch {
+    slotPromptData = null
+  }
+
   const directorReviewed = promptData?.directorReviewed || false
 
   let userBgClass = 'bg-primary text-on-primary'
@@ -504,34 +512,34 @@ function MessageBubble({
   }
 
   function handleShowPrompt() {
-    if (!promptData) return
+    if (!slotPromptData) return
     openModal('showPrompt', {
-      payload: promptData.payload,
-      model: promptData.model,
-      params: promptData.params,
-      msgNumbers: promptData.msgNumbers || null,
-      messageFlags: promptData.messageFlags || null,
-      directorReviewed: promptData.directorReviewed || false,
+      payload: slotPromptData.payload,
+      model: slotPromptData.model,
+      params: slotPromptData.params,
+      msgNumbers: slotPromptData.msgNumbers || null,
+      messageFlags: slotPromptData.messageFlags || null,
+      directorReviewed: slotPromptData.directorReviewed || false,
     })
   }
 
   function handleShowRequestDetails() {
-    if (!promptData) return
+    if (!slotPromptData) return
     openModal('requestDetails', {
-      payload: promptData.payload,
+      payload: slotPromptData.payload,
       responseData: message.responseData,
       responseContent: message.content,
     })
   }
 
   function handleShowDirectorDetails() {
-    if (!promptData?.directorAttempted) return
+    if (!slotPromptData?.directorAttempted) return
     openModal('directorDetails', {
-      originalMessage: promptData.directorOriginalMessage || '',
-      systemPrompt: promptData.directorSystemPrompt || '',
-      userPrompt: promptData.directorUserPrompt || '',
-      response: promptData.directorResponse || '',
-      failed: promptData.directorFailed || false,
+      originalMessage: slotPromptData.directorOriginalMessage || '',
+      systemPrompt: slotPromptData.directorSystemPrompt || '',
+      userPrompt: slotPromptData.directorUserPrompt || '',
+      response: slotPromptData.directorResponse || '',
+      failed: slotPromptData.directorFailed || false,
       messageId: message.id,
       threadId: message.threadId,
       outputDirectorResponse: character?.directorRegularChatOutputDirectorResponse !== false,
@@ -860,7 +868,7 @@ function MessageBubble({
                                     }
                                   }}
                                   disabled={
-                                    (key === 'prompt' && !promptData) || isButtonDisabled(key)
+                                    (key === 'prompt' && !slotPromptData) || isButtonDisabled(key)
                                   }
                                   className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm min-h-[44px] disabled:opacity-30 disabled:pointer-events-none ${
                                     isDelete
@@ -1030,12 +1038,12 @@ function MessageBubble({
                 {t('apiDuration', { duration: formatDuration(apiDurationMs) })}
               </span>
             )}
-            {!streaming && displayContent?.trim() && (
+            {!streaming && !isSlotError && displayContent?.trim() && (
               <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
                 {t('tokens', { count: tokenCount })}
               </span>
             )}
-            {!streaming && displayContent?.trim() && (
+            {!streaming && !isSlotError && displayContent?.trim() && (
               <span className={`text-xs ${isUser ? '' : 'opacity-60'}`}>
                 {t('words', { count: wordCount })}
               </span>
