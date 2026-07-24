@@ -53,6 +53,12 @@ const MESSAGE_ROLLOVER_OPTIONS = [
   { value: 'static', labelKey: 'messageRolloverOptions.static' },
 ]
 
+const PROMPT_ROLE_OPTIONS = [
+  { value: 'system', labelKey: 'promptRoleOptions.system' },
+  { value: 'assistant', labelKey: 'promptRoleOptions.assistant' },
+  { value: 'user', labelKey: 'promptRoleOptions.user' },
+]
+
 // Maps each Overrides form field to its counterpart in Settings > Defaults.
 // Settings > Defaults contains more settings than the Overrides section, so only
 // the fields with a matching key are reset (copied from the global defaults).
@@ -79,6 +85,10 @@ const OVERRIDE_DEFAULTS_MAP = [
   ['personaInjectionTiming', 'prompting.personaInjectionTiming'],
   ['personaInjectionPlacement', 'prompting.personaInjectionPlacement'],
   ['personaInjectionMessageRole', 'prompting.personaInjectionMessageRole'],
+  ['firstMessageRole', 'prompting.firstMessageRole'],
+  ['firstMessagePrompt', 'prompting.firstMessagePrompt'],
+  ['continueRole', 'prompting.continueRole'],
+  ['continuePrompt', 'prompting.continuePrompt'],
 ]
 
 function ToggleRow({ label, checked, onChange }) {
@@ -541,6 +551,76 @@ function OverridesSection({ form, onChange, characterId }) {
             }
           />
         </div>
+      </div>
+
+      <hr className="border-border" />
+
+      <div className="space-y-4">
+        <p className="text-xs text-tertiary uppercase tracking-wider font-medium">
+          {t('promptOverrides')}
+        </p>
+
+        <div className="flex items-center gap-3">
+          <label className="text-sm text-text shrink-0">{t('firstMessageRole')}</label>
+          <ButtonGroup
+            options={PROMPT_ROLE_OPTIONS}
+            value={form.firstMessageRole}
+            onChange={(v) => onChange('firstMessageRole', v)}
+          />
+        </div>
+
+        <CollapsibleSection
+          label={t('firstMessagePrompt')}
+          summary={
+            form.firstMessagePrompt
+              ? t('common:tokenCount', { count: estimateTokens(form.firstMessagePrompt) })
+              : null
+          }
+          storageKey={characterId ? `charSection.firstMessagePrompt.${characterId}` : undefined}
+          defaultExpanded={false}
+          headerExtra={
+            <PromptBankButton onSelect={(content) => onChange('firstMessagePrompt', content)} />
+          }
+        >
+          <AutoResizeTextarea
+            className={`${inputClass} resize-none mt-2`}
+            value={form.firstMessagePrompt}
+            onChange={(e) => onChange('firstMessagePrompt', e.target.value)}
+            placeholder={t('firstMessagePromptPlaceholder')}
+            extraHeight={8}
+          />
+        </CollapsibleSection>
+
+        <div className="flex items-center gap-3">
+          <label className="text-sm text-text shrink-0">{t('continueRole')}</label>
+          <ButtonGroup
+            options={PROMPT_ROLE_OPTIONS}
+            value={form.continueRole}
+            onChange={(v) => onChange('continueRole', v)}
+          />
+        </div>
+
+        <CollapsibleSection
+          label={t('continuePrompt')}
+          summary={
+            form.continuePrompt
+              ? t('common:tokenCount', { count: estimateTokens(form.continuePrompt) })
+              : null
+          }
+          storageKey={characterId ? `charSection.continuePrompt.${characterId}` : undefined}
+          defaultExpanded={false}
+          headerExtra={
+            <PromptBankButton onSelect={(content) => onChange('continuePrompt', content)} />
+          }
+        >
+          <AutoResizeTextarea
+            className={`${inputClass} resize-none mt-2`}
+            value={form.continuePrompt}
+            onChange={(e) => onChange('continuePrompt', e.target.value)}
+            placeholder={t('continuePromptPlaceholder')}
+            extraHeight={8}
+          />
+        </CollapsibleSection>
       </div>
     </div>
   )

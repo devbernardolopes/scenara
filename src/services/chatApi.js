@@ -855,6 +855,11 @@ export async function buildChatRequestPayload({
       personaInjectionMessageRole: await getSetting('prompting.personaInjectionMessageRole'),
     }
 
+    if (character?.firstMessageRole) settings.firstMessageRole = character.firstMessageRole
+    if (character?.firstMessagePrompt) settings.firstMessagePrompt = character.firstMessagePrompt
+    if (character?.continueRole) settings.continueRole = character.continueRole
+    if (character?.continuePrompt) settings.continuePrompt = character.continuePrompt
+
     const chatResult = await buildMessagesPayload({
       character,
       chatPersona,

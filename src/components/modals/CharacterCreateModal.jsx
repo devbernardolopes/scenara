@@ -86,6 +86,10 @@ const INITIAL_FORM = {
   personaInjectionTiming: 'always',
   personaInjectionPlacement: 'endOfSystemPrompt',
   personaInjectionMessageRole: 'system',
+  firstMessageRole: 'user',
+  firstMessagePrompt: '',
+  continueRole: 'user',
+  continuePrompt: '',
   apiProfileChatId: null,
   apiProfileAutoTitleId: null,
   apiProfileSummarizationId: null,
@@ -120,6 +124,10 @@ const DEFAULTS_MAP = {
   'prompting.personaInjectionTiming': 'personaInjectionTiming',
   'prompting.personaInjectionPlacement': 'personaInjectionPlacement',
   'prompting.personaInjectionMessageRole': 'personaInjectionMessageRole',
+  'prompting.firstMessageRole': 'firstMessageRole',
+  'prompting.firstMessagePrompt': 'firstMessagePrompt',
+  'prompting.continueRole': 'continueRole',
+  'prompting.continuePrompt': 'continuePrompt',
 }
 
 const OVERRIDE_FIELDS = [
@@ -150,6 +158,10 @@ const OVERRIDE_FIELDS = [
   'personaInjectionTiming',
   'personaInjectionPlacement',
   'personaInjectionMessageRole',
+  'firstMessageRole',
+  'firstMessagePrompt',
+  'continueRole',
+  'continuePrompt',
 ]
 
 const DIRECTOR_GROUP_FIELDS = [

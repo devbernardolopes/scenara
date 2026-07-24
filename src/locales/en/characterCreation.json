@@ -232,5 +232,17 @@
   "lorebooksSectionNoLorebooksBrowse": "No lorebooks available to link.",
   "lorebooksSectionBrowseLorebooks": "Browse All Lorebooks",
   "lorebooksSectionRemove": "Remove {{name}}",
-  "lorebooksSectionSearchPlaceholder": "Search lorebooks…"
+  "lorebooksSectionSearchPlaceholder": "Search lorebooks…",
+  "promptOverrides": "Prompt Overrides",
+  "firstMessageRole": "FIRST MESSAGE Prompt Role",
+  "firstMessagePrompt": "FIRST MESSAGE Prompt",
+  "firstMessagePromptPlaceholder": "Leave empty to use the global default from Settings > Prompting…",
+  "continueRole": "CONTINUE Prompt Role",
+  "continuePrompt": "CONTINUE Prompt",
+  "continuePromptPlaceholder": "Leave empty to use the global default from Settings > Prompting…",
+  "promptRoleOptions": {
+    "system": "SYSTEM",
+    "assistant": "ASSISTANT",
+    "user": "USER"
+  }
 }

@@ -46,6 +46,22 @@ function buildFullDataMarkdown(form, writingInstructionText) {
     }
   }
 
+  const hasFirstMessagePrompt = form.firstMessagePrompt?.trim()
+  const hasContinuePrompt = form.continuePrompt?.trim()
+  if (hasFirstMessagePrompt || hasContinuePrompt) {
+    blocks.push('# Prompt Overrides')
+    if (hasFirstMessagePrompt) {
+      blocks.push(
+        `**FIRST MESSAGE Prompt Role:** ${(form.firstMessageRole || 'user').toUpperCase()}`,
+      )
+      blocks.push(`**FIRST MESSAGE Prompt:**\n\n${form.firstMessagePrompt.trim()}`)
+    }
+    if (hasContinuePrompt) {
+      blocks.push(`**CONTINUE Prompt Role:** ${(form.continueRole || 'user').toUpperCase()}`)
+      blocks.push(`**CONTINUE Prompt:**\n\n${form.continuePrompt.trim()}`)
+    }
+  }
+
   return blocks.join('\n\n') + '\n'
 }
 
