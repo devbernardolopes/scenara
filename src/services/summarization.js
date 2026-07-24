@@ -24,8 +24,17 @@ import {
   getThreadInflightCount,
 } from './apiQueue'
 import { removeCodeBlocksFromMessages, removeMarkdownImagesFromMessages } from './chatApi'
+import { parseBundleEntries } from './chatGeneration'
 
 const DEFAULT_SYSTEM_INSTRUCTION = 'You are a memory generator for conversational AI.'
+
+function isMessageError(message) {
+  const entries = parseBundleEntries(message?.bundleMessages)
+  if (!entries) return false
+  const idx = message?.activeSlotIndex ?? 0
+  const entry = entries[idx] ?? entries[0]
+  return entry?.isError === true
+}
 
 export function getUnsummarizedMessages(messages, { includeOOC = true } = {}) {
   if (!Array.isArray(messages)) return []
@@ -35,6 +44,7 @@ export function getUnsummarizedMessages(messages, { includeOOC = true } = {}) {
       !message?.isAutoTitleMarker &&
       !message?.summarizedAt &&
       !isMessageHidden(message) &&
+      !isMessageError(message) &&
       (includeOOC || !message?.isOOC || !isMessageHidden(message)),
   )
 }
