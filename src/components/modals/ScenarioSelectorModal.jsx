@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
+import { useSwipe } from '../../hooks/useSwipe'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import ModalShell from '../shared/ModalShell'
 import { replaceVars } from '../../services/chatApi'
 import { getSetting } from '../../services/settings'
@@ -11,6 +13,8 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect, onCanc
   const { t } = useTranslation('characterCreation')
   const { closeModal } = useModal()
 
+  const contentRef = useRef(null)
+  const isMobile = useIsMobile()
   const activeIdx = scenarios.findIndex((s) => s.active)
   const [currentIndex, setCurrentIndex] = useState(activeIdx >= 0 ? activeIdx : 0)
   const [resolvedPersonaName, setResolvedPersonaName] = useState(persona?.name || '')
@@ -52,6 +56,13 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect, onCanc
   function handleNext() {
     setCurrentIndex((i) => (i + 1) % scenarios.length)
   }
+
+  useSwipe(contentRef, {
+    onSwipeLeft: handleNext,
+    onSwipeRight: handlePrev,
+    enabled: isMobile && scenarios.length > 1,
+    threshold: 50,
+  })
 
   function handleCancel() {
     onCancel?.()
@@ -111,7 +122,11 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect, onCanc
             </span>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-border bg-surface-secondary p-4">
+          <div
+            ref={contentRef}
+            style={{ willChange: isMobile && scenarios.length > 1 ? 'transform' : undefined }}
+            className="flex-1 min-h-0 overflow-y-auto rounded-md border border-border bg-surface-secondary p-4"
+          >
             {resolvedContent ? (
               <p className="text-sm text-text whitespace-pre-wrap leading-relaxed">
                 {resolvedContent}

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useOverflowButtons } from '../../hooks/useOverflowButtons'
+import { useSwipe } from '../../hooks/useSwipe'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { useTranslation } from 'react-i18next'
 import {
   Send,
@@ -170,6 +172,8 @@ function ChatInputArea({
   const [shortcutsActive, setShortcutsActive] = useState(false)
   const [allShortcutsSets, setAllShortcutsSets] = useState([])
   const [shortcutsSet, setShortcutsSet] = useState(null)
+  const shortcutsPanelRef = useRef(null)
+  const isMobile = useIsMobile()
   const [overflowOpen, setOverflowOpen] = useState(false)
   const [overflowMenuStyle, setOverflowMenuStyle] = useState(null)
   const overflowBtnRef = useRef(null)
@@ -410,6 +414,28 @@ function ChatInputArea({
     },
     [allShortcutsSets, threadId],
   )
+
+  const hasMultipleShortcutSets = allShortcutsSets.length > 1
+  const handleSwipePrev = useCallback(() => {
+    if (!shortcutsSet || !hasMultipleShortcutSets) return
+    const idx = allShortcutsSets.findIndex((s) => s.id === shortcutsSet.id)
+    const prevIdx = (idx - 1 + allShortcutsSets.length) % allShortcutsSets.length
+    handleSetChange(allShortcutsSets[prevIdx].id)
+  }, [allShortcutsSets, shortcutsSet, hasMultipleShortcutSets, handleSetChange])
+
+  const handleSwipeNext = useCallback(() => {
+    if (!shortcutsSet || !hasMultipleShortcutSets) return
+    const idx = allShortcutsSets.findIndex((s) => s.id === shortcutsSet.id)
+    const nextIdx = (idx + 1) % allShortcutsSets.length
+    handleSetChange(allShortcutsSets[nextIdx].id)
+  }, [allShortcutsSets, shortcutsSet, hasMultipleShortcutSets, handleSetChange])
+
+  useSwipe(shortcutsPanelRef, {
+    onSwipeLeft: handleSwipeNext,
+    onSwipeRight: handleSwipePrev,
+    enabled: isMobile && shortcutsActive && hasMultipleShortcutSets,
+    threshold: 50,
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -677,7 +703,14 @@ function ChatInputArea({
 
         {/* In-Chat Shortcuts Pills */}
         {shortcutsActive && parsedShortcuts && (
-          <div className="absolute bottom-full left-0 right-0 mb-2 bg-glass border-glass rounded-lg shadow-surface-lg z-20 max-h-60 overflow-y-auto">
+          <div
+            ref={shortcutsPanelRef}
+            style={{
+              willChange:
+                isMobile && shortcutsActive && hasMultipleShortcutSets ? 'transform' : undefined,
+            }}
+            className="absolute bottom-full left-0 right-0 mb-2 bg-glass border-glass rounded-lg shadow-surface-lg z-20 max-h-60 overflow-y-auto"
+          >
             <div className="flex items-center gap-2 px-3 py-2 shadow-section sticky top-0 bg-surface z-10">
               <select
                 value={shortcutsSet?.id ?? ''}
