@@ -369,6 +369,18 @@ function ChatInputArea({
     return () => document.removeEventListener('mousedown', handleClick)
   }, [promptHistoryOpen])
 
+  useEffect(() => {
+    if (!shortcutsActive) return
+    function handleClick(e) {
+      const panel = shortcutsPanelRef.current
+      if (panel && !panel.contains(e.target) && !e.target.closest('[data-shortcuts-toggle]')) {
+        setShortcutsActive(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [shortcutsActive])
+
   // Load In-Chat Shortcuts sets + resolve active set for this thread
   useEffect(() => {
     let cancelled = false
@@ -873,6 +885,7 @@ function ChatInputArea({
                     <button
                       key={key}
                       type="button"
+                      data-shortcuts-toggle={key === 'shortcuts' ? '' : undefined}
                       onClick={() => {
                         if (key === 'memories') openModal('memory', { threadId })
                         else toggleButton(key)
@@ -952,6 +965,7 @@ function ChatInputArea({
                             <button
                               key={key}
                               type="button"
+                              data-shortcuts-toggle={key === 'shortcuts' ? '' : undefined}
                               onClick={() => {
                                 if (key === 'memories') {
                                   openModal('memory', { threadId })
