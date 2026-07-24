@@ -277,6 +277,7 @@ export async function getEffectiveProfileFor(requestKind, character) {
     model: profile.model,
     params: { ...profile.params },
     baseUrl: profile.baseUrl || null,
+    disabledParams: { ...(profile.disabledParams || {}) },
   }
 }
 
