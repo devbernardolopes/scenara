@@ -2441,7 +2441,7 @@ function ChatView() {
               <button
                 type="button"
                 onClick={() => openModal('profileForm', { profile: chatProfile })}
-                className="text-xs text-tertiary hover:text-text hover:underline inline-flex items-center gap-1 max-w-full"
+                className="text-xs text-tertiary hover:text-text hover:underline inline-flex items-center gap-1 max-w-full flex-nowrap whitespace-nowrap"
                 title={t('statusBar.editProfile')}
               >
                 {chatProfileIsOverride && <span className="text-accent font-bold">*</span>}
@@ -2453,7 +2453,7 @@ function ChatView() {
                 {hordeEta && <> · {hordeEta}</>}
               </button>
             ) : (
-              <span className="text-xs text-tertiary">
+              <span className="text-xs text-tertiary inline-flex items-center gap-1 max-w-full flex-nowrap whitespace-nowrap">
                 {chatProfileIsOverride && <span className="text-accent font-bold">*</span>}
                 {chatModelTemp != null && <>{chatModelTemp}t · </>}
                 {chatModelTopP != null && <>{chatModelTopP}p · </>}

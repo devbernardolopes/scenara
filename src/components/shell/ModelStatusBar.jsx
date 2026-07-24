@@ -70,7 +70,7 @@ export default function ModelStatusBar({ embedded = false }) {
         <button
           type="button"
           onClick={() => openModal('profileForm', { profile })}
-          className="text-xs text-tertiary hover:text-text hover:underline inline-flex items-center gap-1 max-w-full"
+          className="text-xs text-tertiary hover:text-text hover:underline inline-flex items-center gap-1 max-w-full flex-nowrap whitespace-nowrap"
           title={t('statusBar.editProfile')}
         >
           {temperature != null && <>{temperature}t · </>}
@@ -79,7 +79,7 @@ export default function ModelStatusBar({ embedded = false }) {
           {hordeEta && <> · {hordeEta}</>}
         </button>
       ) : (
-        <span className="text-xs text-tertiary">
+        <span className="text-xs text-tertiary inline-flex items-center gap-1 max-w-full flex-nowrap whitespace-nowrap">
           {temperature != null && <>{temperature}t · </>}
           {topP != null && <>{topP}p · </>}
           <MarqueeText className="inline-block align-bottom max-w-full">{modelName}</MarqueeText>
