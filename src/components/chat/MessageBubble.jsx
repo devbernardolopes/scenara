@@ -7,7 +7,7 @@ import { useIsMobile } from '../../hooks/useIsMobile'
 import { useOverflowButtons } from '../../hooks/useOverflowButtons'
 import { showToast } from '../../lib/toast'
 import { getSetting } from '../../services/settings'
-import { replaceVars } from '../../services/chatApi'
+import { replaceVars, stripOOCDelimiters } from '../../services/chatApi'
 import { getStreamingStartTime } from '../../services/generatingState'
 import { injectRuleTags, applyRulesToPlainText, DEFAULT_PP_RULES } from '../../lib/postProcessing'
 import {
@@ -218,14 +218,18 @@ function MessageBubble({
   personaName,
 }) {
   function renderContent(text) {
+    let content = text
     if (currentOrigin === 'initial') {
-      return replaceVars(text, {
+      content = replaceVars(content, {
         charName: character?.name,
         personaName,
         currentPersonaName: personaName,
       })
     }
-    return text
+    if (isOOC && oocDelimiters?.enabled) {
+      content = stripOOCDelimiters(content, oocDelimiters)
+    }
+    return content
   }
   const { t } = useTranslation('chat')
   const { openModal } = useModal()
@@ -249,6 +253,7 @@ function MessageBubble({
   const [order, setOrder] = useState({ assistantButtonOrder: null, userButtonOrder: null })
   const [postProcessingEnabled, setPostProcessingEnabled] = useState(true)
   const [globalPPRules, setGlobalPPRules] = useState(DEFAULT_PP_RULES)
+  const [oocDelimiters, setOocDelimiters] = useState(null)
   const [elapsedMs, setElapsedMs] = useState(null)
 
   useEffect(() => {
@@ -280,6 +285,7 @@ function MessageBubble({
         'renderMarkdown',
         'defaultPostProcessing',
         'postProcessingRules',
+        'prompting.oocDelimiters',
       ]
       const entries = await Promise.all(allKeys.map(async (k) => [k, await getSetting(k)]))
       const map = Object.fromEntries(entries)
@@ -300,6 +306,7 @@ function MessageBubble({
       ) {
         setGlobalPPRules(map.postProcessingRules)
       }
+      setOocDelimiters(map['prompting.oocDelimiters'] || null)
     }
     load()
 
@@ -322,6 +329,7 @@ function MessageBubble({
         const v = e.detail.value
         if (v && Array.isArray(v) && v.length) setGlobalPPRules(v)
       }
+      if (key === 'prompting.oocDelimiters') setOocDelimiters(e.detail.value || null)
     }
     window.addEventListener('settings-changed', handler)
     return () => window.removeEventListener('settings-changed', handler)

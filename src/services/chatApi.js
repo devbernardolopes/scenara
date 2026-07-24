@@ -62,15 +62,38 @@ export function replacePersonaTemplate(
     .replace(/{{description_default}}/gi, descDefault)
 }
 
+// Strips the configured OOC delimiters from message content when the
+// "Use OOC Delimiters" setting is enabled and at least one delimiter value is
+// non-empty. Removes a leading prefix and/or trailing suffix only when they
+// exactly match the configured delimiters. Returns the content unchanged
+// otherwise.
+export function stripOOCDelimiters(content, delimiters) {
+  if (!delimiters?.enabled) return content
+  const left = delimiters.left || ''
+  const right = delimiters.right || ''
+  if (!left && !right) return content
+  if (!content) return content
+  let result = content
+  if (left && result.startsWith(left)) {
+    result = result.slice(left.length)
+  }
+  if (right && result.endsWith(right)) {
+    result = result.slice(0, -right.length)
+  }
+  return result
+}
+
 // Wraps OOC message content with the configured delimiters when the
 // "Use OOC Delimiters" setting is enabled and at least one delimiter value is
-// non-empty. Returns the content unchanged otherwise.
+// non-empty. Strips any existing delimiters first to avoid double-wrapping.
+// Returns the content unchanged otherwise.
 function applyOOCDelimiters(content, delimiters) {
   if (!delimiters?.enabled) return content
   const left = delimiters.left || ''
   const right = delimiters.right || ''
   if (!left && !right) return content
-  return `${left}${content ?? ''}${right}`
+  const stripped = stripOOCDelimiters(content, delimiters)
+  return `${left}${stripped ?? ''}${right}`
 }
 
 export function getMessagesForApiRequest(
@@ -795,9 +818,10 @@ export async function buildChatRequestPayload({
     const assistantRolePrefixOoc = await getSetting('prompting.assistantRolePrefixOoc')
     const userRolePrefixOoc = await getSetting('prompting.userRolePrefixOoc')
 
+    const oocDelimiters = await getSetting('prompting.oocDelimiters')
     const lastUserMsg =
       messages.length > 0 && messages[messages.length - 1].role === 'user'
-        ? messages[messages.length - 1].content
+        ? stripOOCDelimiters(messages[messages.length - 1].content, oocDelimiters)
         : ''
 
     const oocMsg = effectiveMessages[effectiveMessages.length - 1]

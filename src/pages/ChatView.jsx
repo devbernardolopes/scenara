@@ -35,7 +35,7 @@ import {
 } from '../services/connectionProfiles'
 import { getSetting } from '../services/settings'
 import { generateChatResponse, parseBundleEntries } from '../services/chatGeneration'
-import { isMessageHidden } from '../services/chatApi'
+import { isMessageHidden, stripOOCDelimiters } from '../services/chatApi'
 import * as apiQueue from '../services/apiQueue'
 import {
   getGeneratingThreads,
@@ -1432,6 +1432,10 @@ function ChatView() {
         let userText = trimMsgs ? trimLeadingTrailingNewlines(text) : text
         const trimWs = await getSetting('prompting.trimWhitespaces')
         if (trimWs) userText = trimWhitespace(userText)
+        if (isOOC) {
+          const oocDelimiters = await getSetting('prompting.oocDelimiters')
+          userText = stripOOCDelimiters(userText, oocDelimiters)
+        }
         await createMessage(
           threadId,
           'user',
@@ -1931,8 +1935,12 @@ function ChatView() {
 
   async function handleEditMessage(id, content) {
     const trimMsgs = await getSetting('prompting.trimMessages')
-    const finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
+    let finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
     const msg = messagesRef.current.find((m) => m.id === id)
+    if (msg?.isOOC) {
+      const oocDelimiters = await getSetting('prompting.oocDelimiters')
+      finalContent = stripOOCDelimiters(finalContent, oocDelimiters)
+    }
     let entries = parseBundleEntries(msg?.bundleMessages)
     if (!entries) {
       entries = [

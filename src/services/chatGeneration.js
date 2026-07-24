@@ -1,6 +1,11 @@
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { getDirectorReviewConfig, buildDirectorMessages, applyDirectorTemplate } from './director'
-import { buildChatRequestPayload, getActiveParams, sendChatCompletion } from './chatApi'
+import {
+  buildChatRequestPayload,
+  getActiveParams,
+  sendChatCompletion,
+  stripOOCDelimiters,
+} from './chatApi'
 import { getWritingInstruction } from './writingInstructions'
 import { getSetting } from './settings'
 import { trimLeadingTrailingNewlines } from './messages'
@@ -277,6 +282,11 @@ export async function generateChatResponse({
     directorReviewed && chatDurationMs != null && directorDurationMs != null
       ? chatDurationMs + directorDurationMs
       : chatDurationMs
+
+  if (isOOC) {
+    const oocDelimiters = await getSetting('prompting.oocDelimiters')
+    finalContent = stripOOCDelimiters(finalContent, oocDelimiters)
+  }
 
   return {
     status: 'success',
