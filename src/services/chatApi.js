@@ -482,7 +482,6 @@ export async function buildTranscript({
   messages,
   personaName,
   currentPersonaName,
-  includeOOCOverride,
   userPersonaPrefixOverride,
   personaMap,
   rolePrefixes,
@@ -505,7 +504,6 @@ export async function buildTranscript({
   for (const msg of messages) {
     if (msg.isSummaryMarker || msg.isAutoTitleMarker) continue
     if (isMessageHidden(msg)) continue
-    if (msg.isOOC && !includeOOCOverride) continue
 
     let prefix = ''
 
@@ -590,7 +588,6 @@ export async function buildOOCMessagesPayload({
   const oocUserInstr = oocSettings.oocUserInstructions
   const systemHasTranscript = (oocSystemInstr || '').includes('{{transcript}}')
 
-  const includeOOCOverride = character?.includeOOC === false ? false : true
   const userPersonaPrefixOverride = character?.userPersonaPrefix === false ? false : true
 
   let transcriptWithVars = ''
@@ -599,7 +596,6 @@ export async function buildOOCMessagesPayload({
       messages,
       personaName,
       currentPersonaName,
-      includeOOCOverride,
       userPersonaPrefixOverride,
       personaMap,
       rolePrefixes: {

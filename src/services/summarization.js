@@ -104,14 +104,12 @@ export async function buildSummarizationPayload({
 
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
 
-  const includeOOCOverride = character?.includeOOC !== false
   const userPersonaPrefixOverride = character?.userPersonaPrefix !== false
 
   let transcript = await buildTranscript({
     messages: processedMessages,
     personaName,
     currentPersonaName,
-    includeOOCOverride,
     userPersonaPrefixOverride,
     personaMap,
     rolePrefixes,

@@ -131,7 +131,6 @@ export async function triggerAutoTitle({
       userContent = 'Create a title in the language of the provided message exchange.'
   }
 
-  const includeOOC = character.includeOOC !== false
   const userPersonaPrefix = character.userPersonaPrefix !== false
 
   const rolePrefixes = {
@@ -148,7 +147,6 @@ export async function triggerAutoTitle({
     messages,
     personaName,
     currentPersonaName,
-    includeOOCOverride: includeOOC,
     userPersonaPrefixOverride: userPersonaPrefix,
     personaMap,
     rolePrefixes,
