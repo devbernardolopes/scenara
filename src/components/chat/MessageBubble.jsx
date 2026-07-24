@@ -226,7 +226,7 @@ function MessageBubble({
         currentPersonaName: personaName,
       })
     }
-    if (isOOC && oocDelimiters?.enabled) {
+    if (message.isOOC && oocDelimiters?.enabled) {
       content = stripOOCDelimiters(content, oocDelimiters)
     }
     return content
