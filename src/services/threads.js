@@ -241,6 +241,7 @@ export async function forkThread(id, messageId) {
     autoTitleGenerated: original.autoTitleGenerated || false,
     memory: original.memory || null,
     lastSummarizationAt: original.lastSummarizationAt || null,
+    keptConsumedCount: original.keptConsumedCount || 0,
     activeScenario: original.activeScenario || null,
   })
 
