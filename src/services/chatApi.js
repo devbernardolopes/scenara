@@ -505,7 +505,7 @@ export async function buildTranscript({
   for (const msg of messages) {
     if (msg.isSummaryMarker || msg.isAutoTitleMarker) continue
     if (isMessageHidden(msg)) continue
-    if (msg.isOOC && !includeOOCOverride && isMessageHidden(msg)) continue
+    if (msg.isOOC && !includeOOCOverride) continue
 
     let prefix = ''
 
@@ -804,11 +804,14 @@ export async function buildChatRequestPayload({
         ? messages[messages.length - 1].content
         : ''
 
+    const oocMsg = effectiveMessages[effectiveMessages.length - 1]
+    const transcriptMessages = processedMessages.filter((m) => m.id !== oocMsg.id)
+
     const oocResult = await buildOOCMessagesPayload({
       character,
       chatPersona,
       currentPersona,
-      messages: processedMessages.slice(0, -1),
+      messages: transcriptMessages,
       userMessage: lastUserMsg,
       personaMap,
       memoryText,
