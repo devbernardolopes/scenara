@@ -38,7 +38,7 @@
     "moveDown": "Nach unten",
     "noRules": "Keine Regeln konfiguriert.",
     "removeCharConfirmTitle": "Zeichen entfernen?",
-    "removeCharConfirmMessage": "Zeichen {value} aus der Liste entfernen?",
+    "removeCharConfirmMessage": "Zeichen {{value}} aus der Liste entfernen?",
     "remove": "Entfernen",
     "deleteConfirmTitle": "Regel löschen?",
     "deleteConfirmMessage": "This will permanently delete this post-processing rule.",

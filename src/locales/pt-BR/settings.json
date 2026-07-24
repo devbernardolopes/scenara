@@ -38,7 +38,7 @@
     "moveDown": "Mover para baixo",
     "noRules": "Nenhuma regra configurada.",
     "removeCharConfirmTitle": "Remover caractere?",
-    "removeCharConfirmMessage": "Remover o caractere {value} da lista?",
+    "removeCharConfirmMessage": "Remover o caractere {{value}} da lista?",
     "remove": "Remover",
     "deleteConfirmTitle": "Excluir regra?",
     "deleteConfirmMessage": "Isso excluirá permanentemente esta regra de pós-processamento.",

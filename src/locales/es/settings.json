@@ -38,7 +38,7 @@
     "moveDown": "Bajar",
     "noRules": "No hay reglas configuradas.",
     "removeCharConfirmTitle": "¿Eliminar carácter?",
-    "removeCharConfirmMessage": "¿Eliminar el carácter {value} de la lista?",
+    "removeCharConfirmMessage": "¿Eliminar el carácter {{value}} de la lista?",
     "remove": "Eliminar",
     "deleteConfirmTitle": "¿Eliminar regla?",
     "deleteConfirmMessage": "This will permanently delete this post-processing rule.",
