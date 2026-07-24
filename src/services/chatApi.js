@@ -477,16 +477,26 @@ export function getActiveParams(profile) {
   const deprecatedKeys = new Set(
     (providerDef?.params || []).filter((p) => p.deprecated).map((p) => p.key),
   )
+  const disabledKeys = new Set(
+    Object.entries(profile.disabledParams || {})
+      .filter(([, v]) => v)
+      .map(([k]) => k),
+  )
   const active = Object.fromEntries(
     Object.entries(profile.params || {}).filter(
-      ([key]) => !deprecatedKeys.has(key) && key !== 'hordeMethod',
+      ([key]) => !deprecatedKeys.has(key) && key !== 'hordeMethod' && !disabledKeys.has(key),
     ),
   )
   // Always send penalty params with their effective value (0 when unset) so a
-  // profile explicitly configured to zero still passes 0 to the API.
+  // profile explicitly configured to zero still passes 0 to the API — unless the
+  // user explicitly disabled them.
   if (providerDef) {
     for (const key of ['frequency_penalty', 'presence_penalty']) {
-      if (providerDef.params.some((p) => p.key === key) && !(key in active)) {
+      if (
+        !disabledKeys.has(key) &&
+        providerDef.params.some((p) => p.key === key) &&
+        !(key in active)
+      ) {
         active[key] = 0
       }
     }

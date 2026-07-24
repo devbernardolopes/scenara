@@ -147,6 +147,20 @@ function ProfileFormModal({ profile }) {
   const { confirm } = useConfirm()
   const editing = Boolean(profile)
 
+  const TOGGLEABLE_PARAM_KEYS = useMemo(
+    () =>
+      new Set([
+        'max_completion_tokens',
+        'max_tokens',
+        'temperature',
+        'top_p',
+        'top_k',
+        'frequency_penalty',
+        'presence_penalty',
+      ]),
+    [],
+  )
+
   const initial = useMemo(
     () => ({
       name: profile?.name || '',
@@ -154,6 +168,7 @@ function ProfileFormModal({ profile }) {
       keyId: profile?.keyId || null,
       model: profile?.model || '',
       params: resolveParams(profile),
+      disabledParams: profile?.disabledParams ? { ...profile.disabledParams } : {},
       baseUrl: profile?.baseUrl || getDefaultBaseUrl(profile?.providerId) || '',
     }),
     [],
@@ -219,6 +234,8 @@ function ProfileFormModal({ profile }) {
   const isDirty = Object.keys(initial).some((key) => {
     if (key === 'params')
       return JSON.stringify(sortParams(form.params)) !== JSON.stringify(sortParams(initial.params))
+    if (key === 'disabledParams')
+      return JSON.stringify(form.disabledParams) !== JSON.stringify(initial.disabledParams)
     return form[key] !== initial[key]
   })
 
@@ -308,6 +325,18 @@ function ProfileFormModal({ profile }) {
     }))
   }
 
+  function toggleParamDisabled(paramKey) {
+    setForm((prev) => {
+      const next = { ...prev.disabledParams }
+      if (next[paramKey]) {
+        delete next[paramKey]
+      } else {
+        next[paramKey] = true
+      }
+      return { ...prev, disabledParams: next }
+    })
+  }
+
   async function saveProfile() {
     setSaving(true)
     try {
@@ -317,6 +346,7 @@ function ProfileFormModal({ profile }) {
         keyId: form.keyId || null,
         model: form.model || null,
         params: { ...form.params },
+        disabledParams: { ...form.disabledParams },
         baseUrl: form.baseUrl || null,
       }
       if (editing) {
@@ -405,7 +435,7 @@ function ProfileFormModal({ profile }) {
           delete merged[def.key]
         }
       }
-      return { ...prev, params: merged }
+      return { ...prev, params: merged, disabledParams: {} }
     })
   }
 
@@ -481,6 +511,7 @@ function ProfileFormModal({ profile }) {
                 keyId,
                 model: '',
                 params: {},
+                disabledParams: {},
                 baseUrl: getDefaultBaseUrl(nextProvider) || '',
               }))
             }}
@@ -712,35 +743,50 @@ function ProfileFormModal({ profile }) {
                 {t('api.profile.form.resetParams')}
               </button>
             </div>
-            {paramDefs.map((param) => (
-              <div key={param.key}>
-                <label className="block text-xs font-medium text-secondary mb-1">
-                  {param.label || param.key}
-                </label>
-                {param.type === 'range' && (
-                  <SettingSlider
-                    value={form.params[param.key] ?? param.default ?? param.min ?? 0}
-                    onChange={(v) => updateParam(param.key, v)}
-                    min={param.min ?? 0}
-                    max={param.max ?? 100}
-                    step={param.step ?? 1}
-                  />
-                )}
-                {param.type === 'boolean' && (
-                  <SettingToggle
-                    value={form.params[param.key] ?? param.default ?? false}
-                    onChange={(v) => updateParam(param.key, v)}
-                  />
-                )}
-                {param.type === 'string-list' && (
-                  <StringListInput
-                    value={form.params[param.key] ?? []}
-                    onChange={(v) => updateParam(param.key, v)}
-                    maxItems={param.maxItems}
-                  />
-                )}
-              </div>
-            ))}
+            {paramDefs.map((param) => {
+              const isToggleable = TOGGLEABLE_PARAM_KEYS.has(param.key)
+              const isDisabled = isToggleable && !!form.disabledParams[param.key]
+              return (
+                <div key={param.key}>
+                  <div className="flex items-center justify-between mb-1">
+                    <label
+                      className={`text-xs font-medium ${isDisabled ? 'text-tertiary' : 'text-secondary'}`}
+                    >
+                      {param.label || param.key}
+                    </label>
+                    {isToggleable && (
+                      <SettingToggle
+                        value={!isDisabled}
+                        onChange={() => toggleParamDisabled(param.key)}
+                      />
+                    )}
+                  </div>
+                  {param.type === 'range' && (
+                    <SettingSlider
+                      value={form.params[param.key] ?? param.default ?? param.min ?? 0}
+                      onChange={(v) => updateParam(param.key, v)}
+                      min={param.min ?? 0}
+                      max={param.max ?? 100}
+                      step={param.step ?? 1}
+                      disabled={isDisabled}
+                    />
+                  )}
+                  {param.type === 'boolean' && (
+                    <SettingToggle
+                      value={form.params[param.key] ?? param.default ?? false}
+                      onChange={(v) => updateParam(param.key, v)}
+                    />
+                  )}
+                  {param.type === 'string-list' && (
+                    <StringListInput
+                      value={form.params[param.key] ?? []}
+                      onChange={(v) => updateParam(param.key, v)}
+                      maxItems={param.maxItems}
+                    />
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>
