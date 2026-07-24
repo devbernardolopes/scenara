@@ -248,7 +248,7 @@ function ChatView() {
     contextWindowThreshold: 1024,
   })
   const scrollHeightBeforeRef = useRef(null)
-  const hordeEta = useHordeEta(showStatus, oocActive ? 'ooc' : 'chat', statusBarRefresh)
+  const hordeEta = useHordeEta(showStatus, oocActive ? 'ooc' : 'chat', statusBarRefresh, character)
 
   async function loadPersonas() {
     const list = await getAllPersonas()
