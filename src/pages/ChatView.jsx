@@ -554,12 +554,14 @@ function ChatView() {
   useEffect(() => {
     async function loadChatModel() {
       const kind = oocActive ? 'ooc' : 'chat'
-      const profile = await getEffectiveProfileFor(kind)
+      const profile = await getEffectiveProfileFor(kind, character)
       setChatModelName(profile?.model || '')
       const temp = profile?.params?.temperature
       setChatModelTemp(typeof temp === 'number' ? temp : null)
       setChatModelTopP(getEffectiveTopP(profile))
-      const profileId = await getSetting(`requestKind.${kind}.profileId`)
+      const charField = kind === 'ooc' ? 'apiProfileOocId' : 'apiProfileChatId'
+      const profileId =
+        (character && character[charField]) || (await getSetting(`requestKind.${kind}.profileId`))
       setChatProfile(profileId ? await getProfile(profileId) : null)
     }
     loadChatModel()
@@ -578,7 +580,7 @@ function ChatView() {
       window.removeEventListener('settings-changed', onSettingsChanged)
       window.removeEventListener('connectionProfiles-changed', onProfileChanged)
     }
-  }, [oocActive])
+  }, [oocActive, character])
 
   useEffect(() => {
     async function loadShowStatus() {
