@@ -19,6 +19,7 @@ import {
   RefreshCw,
   Play,
   Square,
+  Loader,
   Terminal,
   MoreHorizontal,
   ChevronLeft,
@@ -271,6 +272,8 @@ function MessageBubble({
   const isUser = role === 'user'
   const isSystem = role === 'system'
   const isSpeakingThis = playbackState.speakingMessageId === message.id
+  const isSpeakingLoading = isSpeakingThis && playbackState.phase === 'loading'
+  const isSpeakingPlaying = isSpeakingThis && playbackState.phase === 'playing'
   const displayContent = renderContent(
     streaming && streamingContent != null ? streamingContent : message.content,
   )
@@ -818,13 +821,15 @@ function MessageBubble({
                                       ) : (
                                         <EyeOff className="w-4 h-4" />
                                       )
-                                    ) : key === 'speak' && isSpeakingThis ? (
+                                    ) : key === 'speak' && isSpeakingLoading ? (
+                                      <Loader className="w-4 h-4 animate-spin" />
+                                    ) : key === 'speak' && isSpeakingPlaying ? (
                                       <Square className="w-4 h-4" />
                                     ) : (
                                       <Icon className="w-4 h-4" />
                                     )}
                                     <span>
-                                      {key === 'speak' && isSpeakingThis
+                                      {key === 'speak' && isSpeakingPlaying
                                         ? t('stop')
                                         : t(def.labelKey)}
                                     </span>
