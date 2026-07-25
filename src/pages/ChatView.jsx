@@ -1514,10 +1514,14 @@ function ChatView() {
           userText = stripOOCDelimiters(userText, oocDelimiters)
         }
         if (!isOOC) {
-          const charInjectQuotes = character?.injectQuotes
-          const globalInjectQuotes = await getSetting('defaultInjectQuotes')
-          const injectQuotes =
-            charInjectQuotes !== undefined ? charInjectQuotes : globalInjectQuotes !== false
+          let injectQuotes
+          if (character?.postProcessingOverride) {
+            injectQuotes = character.injectQuotes !== false
+          } else {
+            const globalPP = await getSetting('defaultPostProcessing')
+            const globalInjectQuotes = await getSetting('defaultInjectQuotes')
+            injectQuotes = globalPP !== false && globalInjectQuotes !== false
+          }
           if (injectQuotes) {
             userText = injectQuoteMarks(userText)
           }
