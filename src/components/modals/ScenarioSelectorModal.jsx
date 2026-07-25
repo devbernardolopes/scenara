@@ -47,7 +47,14 @@ function ScenarioSelectorModal({ character, persona, scenarios, onSelect, onCanc
     currentPersonaName: resolvedPersonaName,
   })
 
-  const scenarioTitle = scenario?.name?.trim() || `${t('scenarioLabel')} #${currentIndex + 1}`
+  const scenarioTitle = replaceVars(
+    scenario?.name?.trim() || `${t('scenarioLabel')} #${currentIndex + 1}`,
+    {
+      charName,
+      personaName: resolvedPersonaName,
+      currentPersonaName: resolvedPersonaName,
+    },
+  )
 
   function handlePrev() {
     setCurrentIndex((i) => (i - 1 + scenarios.length) % scenarios.length)

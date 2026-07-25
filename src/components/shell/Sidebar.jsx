@@ -12,6 +12,7 @@ import {
   duplicateThread,
 } from '../../services/threads'
 import { getCharacter, importCharacterFromFile } from '../../services/characters'
+import { getAllPersonas } from '../../services/personas'
 import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
 import { showToast } from '../../lib/toast'
@@ -54,6 +55,7 @@ function Sidebar({ open, onClose }) {
   const { theme } = useTheme()
   const [threads, setThreads] = useState([])
   const [characters, setCharacters] = useState({})
+  const [personaMap, setPersonaMap] = useState({})
   const [colorPickerId, setColorPickerId] = useState(null)
   const [colorPickerPos, setColorPickerPos] = useState(null)
   const colorPickerRef = useRef(null)
@@ -119,6 +121,12 @@ function Sidebar({ open, onClose }) {
       if (c) map[c.id] = c
     })
     setCharacters(map)
+    const personas = await getAllPersonas()
+    const pMap = {}
+    personas.forEach((p) => {
+      if (p) pMap[p.id] = p
+    })
+    setPersonaMap(pMap)
     const counts = new Map()
     for (const t of all) {
       counts.set(t.id, t.messageCount || 0)
@@ -437,6 +445,7 @@ function Sidebar({ open, onClose }) {
                   key={thread.id}
                   thread={thread}
                   character={character}
+                  personaMap={personaMap}
                   theme={theme}
                   messageCount={messageCounts.get(thread.id) || 0}
                   isActive={isActive}

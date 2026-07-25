@@ -16,6 +16,7 @@ import {
 } from '../../lib/icons'
 import ThreadCardTitle from './ThreadCardTitle'
 import { getColorHex } from '../../config/colorPalettes'
+import { replaceVars } from '../../services/chatApi'
 import { useOnlineStatus } from '../../hooks/useOnlineStatus'
 import { isExternalImageUrl } from '../../lib/image'
 
@@ -23,6 +24,7 @@ const ThreadCard = forwardRef(function ThreadCard(
   {
     thread,
     character,
+    personaMap,
     theme,
     messageCount,
     isActive,
@@ -83,8 +85,15 @@ const ThreadCard = forwardRef(function ThreadCard(
           >
             {thread.activeScenario?.content?.trim() && (
               <p className="text-center text-[11px] text-on-image leading-none truncate">
-                {thread.activeScenario.name?.trim() ||
-                  `Scenario #${thread.activeScenario.scenarioNumber ?? ''}`}
+                {replaceVars(
+                  thread.activeScenario.name?.trim() ||
+                    `Scenario #${thread.activeScenario.scenarioNumber ?? ''}`,
+                  {
+                    charName: character?.name || '',
+                    personaName: personaMap?.[thread.personaId]?.name || '',
+                    currentPersonaName: personaMap?.[thread.personaId]?.name || '',
+                  },
+                )}
               </p>
             )}
             <p className="text-center text-[11px] text-on-image leading-none truncate">
