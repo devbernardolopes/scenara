@@ -206,6 +206,7 @@ function ChatView() {
   const scrollClearedRef = useRef(false)
   const generatingFetchIdRef = useRef(0)
   const streamingMsgIdRef = useRef(null)
+  const streamingContentRef = useRef(null)
   const messagesRef = useRef(null)
   const failedIdsRef = useRef(new Set())
   const hasUnreadRef = useRef(false)
@@ -222,6 +223,7 @@ function ChatView() {
   const [autoTitling, setAutoTitling] = useState(false)
   const [pendingMarkers, setPendingMarkers] = useState([])
   const [streamingMsgId, setStreamingMsgId] = useState(null)
+  const [streamingContent, setStreamingContent] = useState(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [noChatProfile, setNoChatProfile] = useState(false)
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
@@ -385,6 +387,7 @@ function ChatView() {
       setShowScrollButton(false)
       setGenerating(false)
       setStreamingMsgId(null)
+      setStreamingContent(null)
       setActiveSlotIndices({})
       setPendingRecovery(null)
       loadData()
@@ -682,6 +685,10 @@ function ChatView() {
   }, [streamingMsgId])
 
   useEffect(() => {
+    streamingContentRef.current = streamingContent
+  }, [streamingContent])
+
+  useEffect(() => {
     function handleMessagesChanged(e) {
       if (Number(e.detail?.threadId) !== Number(threadId)) return
       if (generatingRef.current && isLocalStreamerRef.current) return
@@ -860,6 +867,14 @@ function ChatView() {
       const msgs = await getMessagesByThread(threadId)
       if (cancelled || isLocalStreamerRef.current) return
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
+        const prev = messagesRef.current
+        if (
+          prev &&
+          prev.length === msgs.length &&
+          prev[prev.length - 1]?.id === msgs[msgs.length - 1]?.id
+        ) {
+          return
+        }
         setMessages(dedupeMessages(msgs))
       }
     }
@@ -1058,9 +1073,7 @@ function ChatView() {
     const streamIntoBubble = (fullContent) => {
       updateMessage(assistantMsgId, { content: fullContent })
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
-        setMessages((prev) =>
-          prev.map((m) => (m.id === assistantMsgId ? { ...m, content: fullContent } : m)),
-        )
+        setStreamingContent(fullContent)
       }
     }
     const throttledToken = createTrailingThrottle(streamIntoBubble, 100)
@@ -1235,6 +1248,7 @@ function ChatView() {
       clearStreamingMessageId(threadId)
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setStreamingMsgId(null)
+        setStreamingContent(null)
       }
     }
     return { outcome, messageId: assistantMsgId }
@@ -1722,11 +1736,7 @@ function ChatView() {
           bundleMessages: bundleJson,
         })
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === messageId ? { ...m, content: full, bundleMessages: bundleJson } : m,
-            ),
-          )
+          setStreamingContent(full)
         }
       }
       throttledToken = createTrailingThrottle(streamSlotIntoBubble, 100)
@@ -1927,6 +1937,7 @@ function ChatView() {
       })
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setStreamingMsgId(null)
+        setStreamingContent(null)
       }
       generatingRef.current = false
       generatingFetchIdRef.current += 1
@@ -2196,6 +2207,17 @@ function ChatView() {
     return map
   }, [visibleMessages])
 
+  const msgNumMap = useMemo(() => {
+    const map = new Map()
+    let num = 0
+    for (const m of messages) {
+      if (m.isSummaryMarker || m.isAutoTitleMarker) continue
+      num++
+      map.set(m.id, num)
+    }
+    return map
+  }, [messages])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -2218,14 +2240,6 @@ function ChatView() {
         <p className="text-secondary text-sm text-center max-w-md">{t('noChatProfile')}</p>
       </div>
     )
-  }
-
-  const msgNumMap = new Map()
-  let _msgNum = 0
-  for (const m of messages) {
-    if (m.isSummaryMarker || m.isAutoTitleMarker) continue
-    _msgNum++
-    msgNumMap.set(m.id, _msgNum)
   }
 
   return (
@@ -2425,6 +2439,7 @@ function ChatView() {
                       personaMap={personaMap}
                       nameLabel={getMessageName(msg)}
                       streaming={msg.id === streamingMsgId}
+                      streamingContent={msg.id === streamingMsgId ? streamingContent : null}
                       streamingSlotIndex={streamingSlotIndices[msg.id]}
                       bundleMessages={bundleMessages}
                       bundleIndex={bundleIndex}

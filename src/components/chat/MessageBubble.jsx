@@ -196,6 +196,7 @@ function MessageBubble({
   bundleMessages,
   bundleIndex,
   streamingSlotIndex,
+  streamingContent,
   currentOrigin,
   onBundleNavigate,
   onDeleteRequest,
@@ -347,7 +348,9 @@ function MessageBubble({
 
   const isUser = role === 'user'
   const isSystem = role === 'system'
-  const displayContent = renderContent(message.content)
+  const displayContent = renderContent(
+    streaming && streamingContent != null ? streamingContent : message.content,
+  )
 
   const displayContentForRender = useMemo(() => {
     if (renderMarkdown && activeRules.length) return injectRuleTags(displayContent, activeRules)
