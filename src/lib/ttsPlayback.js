@@ -43,11 +43,15 @@ export async function speak(messageId, message, context) {
   const provider = await getSetting('tts.provider')
   if (provider === 'browser') {
     const voiceName = await getSetting('tts.browserVoice')
-    speakBrowser(messageId, text, voiceName)
+    const rate = await getSetting('tts.browserRate')
+    const pitch = await getSetting('tts.browserPitch')
+    const volume = await getSetting('tts.browserVolume')
+    speakBrowser(messageId, text, voiceName, rate, pitch, volume)
   } else {
     const voice = await getSetting('tts.kittenVoice')
     const backend = await getSetting('tts.backend')
-    speakKitten(messageId, text, provider, voice, backend)
+    const speed = await getSetting('tts.kittenSpeed')
+    speakKitten(messageId, text, provider, voice, backend, speed)
   }
 }
 
@@ -79,7 +83,7 @@ export function subscribe(listener) {
   return () => listeners.delete(listener)
 }
 
-function speakBrowser(messageId, text, voiceName) {
+function speakBrowser(messageId, text, voiceName, rate, pitch, volume) {
   const myId = messageId
   activeMessageId = myId
   setState({ speakingMessageId: myId, phase: 'playing' })
@@ -97,6 +101,10 @@ function speakBrowser(messageId, text, voiceName) {
     const chunk = chunks[index++]
     const utterance = new SpeechSynthesisUtterance(chunk)
     currentUtterances.push(utterance)
+
+    if (rate != null) utterance.rate = rate
+    if (pitch != null) utterance.pitch = pitch
+    if (volume != null) utterance.volume = volume
 
     if (voiceName) {
       const voices = speechSynthesis.getVoices()
@@ -136,13 +144,13 @@ function chunkForBrowserTts(text, maxLen = 200) {
   return chunks.length ? chunks : [text]
 }
 
-async function speakKitten(messageId, text, modelKey, voice, backend) {
+async function speakKitten(messageId, text, modelKey, voice, backend, speed) {
   const myId = messageId
   activeMessageId = myId
   setState({ speakingMessageId: myId, phase: 'loading' })
 
   try {
-    const result = await speakTts(modelKey, text, voice || 'Leo', backend || 'auto')
+    const result = await speakTts(modelKey, text, voice || 'Leo', backend || 'auto', speed)
 
     if (activeMessageId !== myId) return
 

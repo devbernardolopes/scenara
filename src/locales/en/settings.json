@@ -65,7 +65,19 @@
       },
       "noVoices": "No voices available. Your browser may still be loading voices.",
       "preview": "Preview",
-      "previewText": "Hello! This is a preview of the selected voice."
+      "previewText": "Hello! This is a preview of the selected voice.",
+      "rate": {
+        "label": "Speech Rate",
+        "desc": "How fast the voice speaks. 1 is normal speed."
+      },
+      "pitch": {
+        "label": "Pitch",
+        "desc": "How high or low the voice sounds. 1 is normal pitch."
+      },
+      "volume": {
+        "label": "Volume",
+        "desc": "Loudness of the voice. 1 is full volume."
+      }
     },
     "kitten": {
       "title": "Kitten TTS",
@@ -119,7 +131,11 @@
       "iosWarning": "The WASM phonemizer may hang on iOS Safari.",
       "confirmDeleteTitle": "Delete model?",
       "confirmDeleteMessage": "This will remove the downloaded model files. You can re-download them later.",
-      "webgpuUnavailable": "WebGPU is not available in this browser."
+      "webgpuUnavailable": "WebGPU is not available in this browser.",
+      "speed": {
+        "label": "Speech Speed",
+        "desc": "How fast the voice speaks. 1 is normal speed."
+      }
     }
   },
   "groups": {

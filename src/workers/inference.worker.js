@@ -817,7 +817,7 @@ async function deleteTtsModel(modelKey) {
   return { modelKey, success: deleted }
 }
 
-async function previewTtsVoice(modelKey, voiceName, text) {
+async function previewTtsVoice(modelKey, voiceName, text, speed) {
   const entry = kittenSessions.get(modelKey)
   if (!entry) throw new Error('Model not loaded')
   if (!entry.voices || entry.voices.size === 0) throw new Error('Voices not loaded')
@@ -825,7 +825,7 @@ async function previewTtsVoice(modelKey, voiceName, text) {
   const displayVoice = voiceName || 'Leo'
   const internalVoice = KITTEN_VOICE_ALIASES[displayVoice] || displayVoice
   const speedPrior = KITTEN_SPEED_PRIORS[internalVoice] ?? 1.0
-  const effectiveSpeed = speedPrior
+  const effectiveSpeed = speed != null ? Number(speed) : speedPrior
 
   const inputText = text || 'Hello! This is a preview of the Kitten TTS voice.'
   const chunks = chunkTtsText(preprocessTtsText(inputText))
@@ -873,7 +873,7 @@ async function previewTtsVoice(modelKey, voiceName, text) {
   }
 }
 
-async function speakTtsFull(modelKey, text, voiceName) {
+async function speakTtsFull(modelKey, text, voiceName, speed) {
   ttsCancelled = false
   const entry = kittenSessions.get(modelKey)
   if (!entry) throw new Error('Model not loaded')
@@ -882,7 +882,7 @@ async function speakTtsFull(modelKey, text, voiceName) {
   const displayVoice = voiceName || 'Leo'
   const internalVoice = KITTEN_VOICE_ALIASES[displayVoice] || displayVoice
   const speedPrior = KITTEN_SPEED_PRIORS[internalVoice] ?? 1.0
-  const effectiveSpeed = speedPrior
+  const effectiveSpeed = speed != null ? Number(speed) : speedPrior
 
   const inputText = (text || '').toString()
   if (!inputText.trim()) throw new Error('Empty text')
@@ -942,9 +942,9 @@ const TTS_TASK_HANDLERS = {
   'tts-unload': (payload, options, modelKey) => unloadKittenModel(modelKey),
   'tts-delete': (payload, options, modelKey) => deleteTtsModel(modelKey),
   'tts-preview': (payload, options, modelKey) =>
-    previewTtsVoice(modelKey, options?.voice, options?.text),
+    previewTtsVoice(modelKey, options?.voice, options?.text, options?.speed),
   'tts-speak': (payload, options, modelKey) =>
-    speakTtsFull(modelKey, payload?.text, options?.voice),
+    speakTtsFull(modelKey, payload?.text, options?.voice, options?.speed),
   'tts-cancel': () => {
     ttsCancelled = true
     return { success: true }

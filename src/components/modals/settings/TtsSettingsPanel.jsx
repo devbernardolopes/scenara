@@ -15,6 +15,7 @@ import {
   onModelLoading,
 } from '../../../lib/inferenceClient'
 import CollapsibleSection from '../../shared/CollapsibleSection'
+import SettingSlider from './controls/SettingSlider'
 import { Download, Trash2, Play, Volume2, Loader, HardDrive } from '../../../lib/icons'
 
 function formatBytes(bytes) {
@@ -150,6 +151,10 @@ function TtsSettingsPanel() {
   const [backend, setBackend] = useState('auto')
   const [browserVoice, setBrowserVoice] = useState('')
   const [kittenVoice, setKittenVoice] = useState('Leo')
+  const [browserRate, setBrowserRate] = useState(1)
+  const [browserPitch, setBrowserPitch] = useState(1)
+  const [browserVolume, setBrowserVolume] = useState(1)
+  const [kittenSpeed, setKittenSpeed] = useState(1)
   const [browserVoices, setBrowserVoices] = useState([])
   const [modelStates, setModelStates] = useState({})
   const [storageInfo, setStorageInfo] = useState(null)
@@ -162,17 +167,34 @@ function TtsSettingsPanel() {
   useEffect(() => {
     let cancelled = false
     async function load() {
-      const [provider, backendVal, browserVoiceVal, kittenVoiceVal] = await Promise.all([
+      const [
+        provider,
+        backendVal,
+        browserVoiceVal,
+        kittenVoiceVal,
+        browserRateVal,
+        browserPitchVal,
+        browserVolumeVal,
+        kittenSpeedVal,
+      ] = await Promise.all([
         getSetting('tts.provider'),
         getSetting('tts.backend'),
         getSetting('tts.browserVoice'),
         getSetting('tts.kittenVoice'),
+        getSetting('tts.browserRate'),
+        getSetting('tts.browserPitch'),
+        getSetting('tts.browserVolume'),
+        getSetting('tts.kittenSpeed'),
       ])
       if (cancelled) return
       if (provider) setActiveProvider(provider)
       if (backendVal) setBackend(backendVal)
       if (browserVoiceVal) setBrowserVoice(browserVoiceVal)
       if (kittenVoiceVal) setKittenVoice(kittenVoiceVal)
+      if (browserRateVal != null) setBrowserRate(browserRateVal)
+      if (browserPitchVal != null) setBrowserPitch(browserPitchVal)
+      if (browserVolumeVal != null) setBrowserVolume(browserVolumeVal)
+      if (kittenSpeedVal != null) setKittenSpeed(kittenSpeedVal)
     }
     load()
     return () => {
@@ -257,14 +279,37 @@ function TtsSettingsPanel() {
     await setSetting('tts.kittenVoice', val)
   }, [])
 
+  const saveBrowserRate = useCallback(async (val) => {
+    setBrowserRate(val)
+    await setSetting('tts.browserRate', val)
+  }, [])
+
+  const saveBrowserPitch = useCallback(async (val) => {
+    setBrowserPitch(val)
+    await setSetting('tts.browserPitch', val)
+  }, [])
+
+  const saveBrowserVolume = useCallback(async (val) => {
+    setBrowserVolume(val)
+    await setSetting('tts.browserVolume', val)
+  }, [])
+
+  const saveKittenSpeed = useCallback(async (val) => {
+    setKittenSpeed(val)
+    await setSetting('tts.kittenSpeed', val)
+  }, [])
+
   const handleBrowserPreview = useCallback(() => {
     if (!window.speechSynthesis) return
     window.speechSynthesis.cancel()
     const utt = new SpeechSynthesisUtterance(t('tts.browser.previewText'))
     const voice = browserVoices.find((v) => v.name === browserVoice)
     if (voice) utt.voice = voice
+    utt.rate = browserRate
+    utt.pitch = browserPitch
+    utt.volume = browserVolume
     window.speechSynthesis.speak(utt)
-  }, [browserVoice, browserVoices, t])
+  }, [browserVoice, browserVoices, browserRate, browserPitch, browserVolume, t])
 
   const withActionLock = useCallback(
     (fn) => async () => {
@@ -394,7 +439,7 @@ function TtsSettingsPanel() {
     if (modelStates[activeProvider]?.status !== 'loaded') return
     setPreviewing(true)
     try {
-      const result = await previewTtsModel(activeProvider, kittenVoice)
+      const result = await previewTtsModel(activeProvider, kittenVoice, undefined, kittenSpeed)
       if (result?.audio) {
         const blob = new Blob([result.audio], { type: 'audio/wav' })
         const url = URL.createObjectURL(blob)
@@ -407,7 +452,7 @@ function TtsSettingsPanel() {
     } finally {
       setPreviewing(false)
     }
-  }, [activeProvider, modelStates, kittenVoice])
+  }, [activeProvider, modelStates, kittenVoice, kittenSpeed])
 
   return (
     <div className="space-y-8">
@@ -440,6 +485,53 @@ function TtsSettingsPanel() {
               ))}
             </select>
             <p className="text-xs text-secondary mt-1">{t('tts.browser.voice.desc')}</p>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">
+                {t('tts.browser.rate.label')}
+              </label>
+              <SettingSlider
+                value={browserRate}
+                onChange={saveBrowserRate}
+                min={0.5}
+                max={2}
+                step={0.1}
+                label={t('tts.browser.rate.label')}
+              />
+              <p className="text-xs text-secondary mt-1">{t('tts.browser.rate.desc')}</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">
+                {t('tts.browser.pitch.label')}
+              </label>
+              <SettingSlider
+                value={browserPitch}
+                onChange={saveBrowserPitch}
+                min={0.5}
+                max={1.5}
+                step={0.1}
+                label={t('tts.browser.pitch.label')}
+              />
+              <p className="text-xs text-secondary mt-1">{t('tts.browser.pitch.desc')}</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">
+                {t('tts.browser.volume.label')}
+              </label>
+              <SettingSlider
+                value={browserVolume}
+                onChange={saveBrowserVolume}
+                min={0}
+                max={1}
+                step={0.05}
+                label={t('tts.browser.volume.label')}
+              />
+              <p className="text-xs text-secondary mt-1">{t('tts.browser.volume.desc')}</p>
+            </div>
           </div>
 
           <button
@@ -555,6 +647,21 @@ function TtsSettingsPanel() {
               ))}
             </select>
             <p className="text-xs text-secondary mt-1">{t('tts.kitten.voice.desc')}</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-text mb-1">
+              {t('tts.kitten.speed.label')}
+            </label>
+            <SettingSlider
+              value={kittenSpeed}
+              onChange={saveKittenSpeed}
+              min={0.5}
+              max={2}
+              step={0.1}
+              label={t('tts.kitten.speed.label')}
+            />
+            <p className="text-xs text-secondary mt-1">{t('tts.kitten.speed.desc')}</p>
           </div>
 
           {/* Preview button */}
