@@ -2205,19 +2205,10 @@ function ChatView() {
     ? messages.findIndex((m) => m.id === confirmDeleteId) + 1
     : null
 
-  const summProgressKey = useMemo(() => {
-    return `${messages.length}:${messages[messages.length - 1]?.id || 0}:${messages[messages.length - 1]?.summarizedAt || 0}`
-  }, [messages])
-
-  const prevSummProgressRef = useRef(null)
   const summarizationProgress = useMemo(() => {
     if (!character) return null
     const resolvedMemory = character.memory ?? memoryDefaults.mode
     if (resolvedMemory === 'never') return null
-
-    if (prevSummProgressRef.current?.key === summProgressKey) {
-      return prevSummProgressRef.current.result
-    }
 
     const includeOOC = character.includeOOC !== false
     const unsummarized = getUnsummarizedMessages(messages, { includeOOC })
@@ -2243,9 +2234,8 @@ function ChatView() {
       }
     }
 
-    prevSummProgressRef.current = { key: summProgressKey, result }
     return result
-  }, [character, messages, memoryDefaults, summProgressKey])
+  }, [character, messages, memoryDefaults])
 
   const visibleMessages = visibleStartIndex > 0 ? messages.slice(visibleStartIndex) : messages
 
