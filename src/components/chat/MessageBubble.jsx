@@ -349,7 +349,7 @@ function MessageBubble({
     }
   } else if (isUser && isOOC) {
     userMutedClass = 'text-ooc-muted'
-    userHoverBg = 'hover:bg-ooc-subtle'
+    userHoverBg = 'hover:bg-white/10'
   }
 
   let promptData = null
@@ -679,9 +679,9 @@ function MessageBubble({
                         isUser
                           ? `${userHoverBg} ${userMutedClass}`
                           : isOOC
-                            ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
+                            ? 'hover:bg-black/10 text-ooc-muted hover:text-ooc'
                             : 'hover:bg-black/10 text-tertiary hover:text-text'
-                      } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''}`}
+                      } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''} ${isSlotHidden ? 'opacity-100' : ''}`}
                       style={isUser ? userMutedStyle : undefined}
                       title={t('previousInitialMessage')}
                     >
@@ -704,9 +704,9 @@ function MessageBubble({
                         isUser
                           ? `${userHoverBg} ${userMutedClass}`
                           : isOOC
-                            ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
+                            ? 'hover:bg-black/10 text-ooc-muted hover:text-ooc'
                             : 'hover:bg-black/10 text-tertiary hover:text-text'
-                      } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''}`}
+                      } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''} ${isSlotHidden ? 'opacity-100' : ''}`}
                       style={isUser ? userMutedStyle : undefined}
                       title={t('nextInitialMessage')}
                     >
@@ -731,7 +731,7 @@ function MessageBubble({
                         ? `${userHoverBg} ${userMutedClass}`
                         : userHoverBg
                       : isOOC
-                        ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
+                        ? 'hover:bg-black/10 text-ooc-muted hover:text-ooc'
                         : 'hover:bg-black/10 text-tertiary hover:text-text'
                     const toggleColor = isToggled ? 'text-primary' : ''
                     return (
@@ -742,7 +742,7 @@ function MessageBubble({
                         disabled={disabled}
                         className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${baseColor} ${toggleColor} ${
                           disabled ? 'opacity-30 pointer-events-none' : ''
-                        }`}
+                        } ${isSlotHidden ? 'opacity-100' : ''}`}
                         style={isUser && !isDelete && userMutedStyle ? userMutedStyle : undefined}
                         title={t(def.labelKey)}
                       >
@@ -774,9 +774,9 @@ function MessageBubble({
                               ? `${userHoverBg} ${userMutedClass}`
                               : userHoverBg
                             : isOOC
-                              ? 'hover:bg-ooc-subtle text-ooc-muted hover:text-ooc'
+                              ? 'hover:bg-black/10 text-ooc-muted hover:text-ooc'
                               : 'hover:bg-black/10 text-tertiary hover:text-text'
-                        }`}
+                        } ${isSlotHidden ? 'opacity-100' : ''}`}
                         style={isUser && userMutedStyle ? userMutedStyle : undefined}
                         title={t('moreOptions')}
                       >
