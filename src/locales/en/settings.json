@@ -82,7 +82,7 @@
         "desc": "Select a voice for Kitten TTS."
       },
       "status": {
-        "notDownloaded": "Not downloaded",
+        "not-downloaded": "Not downloaded",
         "downloading": "Downloading…",
         "downloaded": "Downloaded",
         "loaded": "Loaded",
