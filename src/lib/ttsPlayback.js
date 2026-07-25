@@ -1,6 +1,7 @@
 import { getSetting } from '../services/settings'
 import { speakTts, cancelTtsTask } from './inferenceClient'
 import { prepareTtsText } from './ttsText'
+import { showToast } from './toast'
 
 let state = { speakingMessageId: null, phase: 'idle' }
 const listeners = new Set()
@@ -29,21 +30,24 @@ function resetState() {
   setState({ speakingMessageId: null, phase: 'idle' })
 }
 
-export function speak(messageId, rawText, context) {
+export async function speak(messageId, message, context) {
   if (state.speakingMessageId === messageId) {
     stop()
     return
   }
   stop()
 
-  const text = prepareTtsText(rawText, context)
+  const text = prepareTtsText(message, context)
   if (!text.trim()) return
 
-  const provider = getSetting('tts.provider') || 'browser'
+  const provider = await getSetting('tts.provider')
   if (provider === 'browser') {
-    speakBrowser(messageId, text)
+    const voiceName = await getSetting('tts.browserVoice')
+    speakBrowser(messageId, text, voiceName)
   } else {
-    speakKitten(messageId, text, provider)
+    const voice = await getSetting('tts.kittenVoice')
+    const backend = await getSetting('tts.backend')
+    speakKitten(messageId, text, provider, voice, backend)
   }
 }
 
@@ -76,7 +80,7 @@ export function subscribe(listener) {
   return () => listeners.delete(listener)
 }
 
-function speakBrowser(messageId, text) {
+function speakBrowser(messageId, text, voiceName) {
   const myId = messageId
   activeMessageId = myId
   setState({ speakingMessageId: myId, phase: 'playing' })
@@ -95,7 +99,6 @@ function speakBrowser(messageId, text) {
     const utterance = new SpeechSynthesisUtterance(chunk)
     currentUtterances.push(utterance)
 
-    const voiceName = getSetting('tts.browserVoice')
     if (voiceName) {
       const voices = speechSynthesis.getVoices()
       const match = voices.find((v) => v.name === voiceName)
@@ -134,16 +137,13 @@ function chunkForBrowserTts(text, maxLen = 200) {
   return chunks.length ? chunks : [text]
 }
 
-async function speakKitten(messageId, text, provider) {
+async function speakKitten(messageId, text, modelKey, voice, backend) {
   const myId = messageId
   activeMessageId = myId
   setState({ speakingMessageId: myId, phase: 'loading' })
 
   try {
-    const modelKey = provider
-    const voice = getSetting('tts.kittenVoice') || 'Leo'
-    const backend = getSetting('tts.backend') || 'auto'
-    const result = await speakTts(modelKey, text, voice, backend)
+    const result = await speakTts(modelKey, text, voice || 'Leo', backend || 'auto')
 
     if (activeMessageId !== myId) return
 
@@ -173,6 +173,7 @@ async function speakKitten(messageId, text, provider) {
       return
     }
     console.error('[TTS] Kitten synthesis error:', err)
+    showToast('Speech synthesis failed.', { type: 'error' })
     if (activeMessageId === myId) resetState()
   }
 }

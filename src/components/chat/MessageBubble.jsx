@@ -548,7 +548,7 @@ function MessageBubble({
           if (isSpeakingThis) {
             stop()
           } else {
-            speak(message.id, message.content, {
+            speak(message.id, message, {
               character,
               oocDelimiters,
             })
