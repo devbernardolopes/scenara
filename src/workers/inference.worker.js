@@ -45,24 +45,28 @@ const KITTEN_MODEL_REGISTRY = {
     repoId: 'KittenML/kitten-tts-mini-0.8',
     modelFile: 'kitten_tts_mini_v0_8.onnx',
     files: ['config.json', 'kitten_tts_mini_v0_8.onnx', 'voices.npz'],
+    webgpu: false,
     idleTimeoutMs: DEFAULT_IDLE_TIMEOUT_MS,
   },
   'kitten-micro': {
     repoId: 'KittenML/kitten-tts-micro-0.8',
     modelFile: 'kitten_tts_micro_v0_8.onnx',
     files: ['config.json', 'kitten_tts_micro_v0_8.onnx', 'voices.npz'],
+    webgpu: false,
     idleTimeoutMs: DEFAULT_IDLE_TIMEOUT_MS,
   },
   'kitten-nano-fp32': {
     repoId: 'KittenML/kitten-tts-nano-0.8-fp32',
     modelFile: 'kitten_tts_nano_v0_8.onnx',
     files: ['config.json', 'kitten_tts_nano_v0_8.onnx', 'voices.npz'],
+    webgpu: true,
     idleTimeoutMs: DEFAULT_IDLE_TIMEOUT_MS,
   },
   'kitten-nano-int8': {
     repoId: 'KittenML/kitten-tts-nano-0.8-int8',
     modelFile: 'kitten_tts_nano_v0_8.onnx',
     files: ['config.json', 'kitten_tts_nano_v0_8.onnx', 'voices.npz'],
+    webgpu: true,
     idleTimeoutMs: DEFAULT_IDLE_TIMEOUT_MS,
   },
 }
@@ -760,8 +764,8 @@ async function loadTtsModel(modelKey, callId, backend) {
   if (!response) throw new Error('Model file not found in cache. Download it first.')
   const buffer = await response.arrayBuffer()
 
-  const executionProviders =
-    backend === 'webgpu' ? ['webgpu'] : backend === 'wasm' ? ['wasm'] : ['webgpu', 'wasm']
+  const useWebgpu = backend === 'webgpu' || (backend === 'auto' && config.webgpu)
+  const executionProviders = useWebgpu ? ['webgpu', 'wasm'] : ['wasm']
 
   let session
   try {
