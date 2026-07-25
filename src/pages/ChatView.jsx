@@ -34,6 +34,7 @@ import {
   getProfile,
 } from '../services/connectionProfiles'
 import { getSetting } from '../services/settings'
+import { injectQuoteMarks } from '../lib/postProcessing'
 import { generateChatResponse, parseBundleEntries } from '../services/chatGeneration'
 import { isMessageHidden, stripOOCDelimiters } from '../services/chatApi'
 import * as apiQueue from '../services/apiQueue'
@@ -1435,6 +1436,15 @@ function ChatView() {
         if (isOOC) {
           const oocDelimiters = await getSetting('prompting.oocDelimiters')
           userText = stripOOCDelimiters(userText, oocDelimiters)
+        }
+        if (!isOOC) {
+          const charInjectQuotes = character?.injectQuotes
+          const globalInjectQuotes = await getSetting('defaultInjectQuotes')
+          const injectQuotes =
+            charInjectQuotes !== undefined ? charInjectQuotes : globalInjectQuotes !== false
+          if (injectQuotes) {
+            userText = injectQuoteMarks(userText)
+          }
         }
         await createMessage(
           threadId,

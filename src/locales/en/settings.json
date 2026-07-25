@@ -24,6 +24,10 @@
       "label": "Enable Post-Processing",
       "desc": "Globally enable or disable post-processing styling for all messages."
     },
+    "injectQuotes": {
+      "label": "Inject Quotes in User Dialogue",
+      "desc": "Wrap unformatted segments of user messages in straight double quotes when sending messages in a chat."
+    },
     "override": "Override global rules",
     "label": "Label (optional)",
     "opening": "Opening character(s)",

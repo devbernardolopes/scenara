@@ -49,14 +49,18 @@ function PostProcessingSection({ form, onChange, onDiffChange }) {
   const { t } = useTranslation('characterCreation')
   const [globalRules, setGlobalRules] = useState([])
   const [globalEnabled, setGlobalEnabled] = useState(true)
+  const [globalInjectQuotes, setGlobalInjectQuotes] = useState(true)
 
   useEffect(() => {
-    Promise.all([getPostProcessingRules(), getSetting('defaultPostProcessing')]).then(
-      ([rules, enabled]) => {
-        setGlobalRules(rules)
-        setGlobalEnabled(enabled !== false)
-      },
-    )
+    Promise.all([
+      getPostProcessingRules(),
+      getSetting('defaultPostProcessing'),
+      getSetting('defaultInjectQuotes'),
+    ]).then(([rules, enabled, injectQuotes]) => {
+      setGlobalRules(rules)
+      setGlobalEnabled(enabled !== false)
+      setGlobalInjectQuotes(injectQuotes !== false)
+    })
   }, [])
 
   useEffect(() => {
@@ -65,13 +69,16 @@ function PostProcessingSection({ form, onChange, onDiffChange }) {
     const overrideDiff = form.postProcessingOverride === true
     const rulesDiff =
       form.postProcessingOverride && rulesDiffer(form.postProcessingRules || [], globalRules)
-    onDiffChange(enabledDiff || overrideDiff || rulesDiff)
+    const injectDiff = form.injectQuotes !== globalInjectQuotes
+    onDiffChange(enabledDiff || overrideDiff || rulesDiff || injectDiff)
   }, [
     form.postProcessing,
     form.postProcessingOverride,
     form.postProcessingRules,
+    form.injectQuotes,
     globalRules,
     globalEnabled,
+    globalInjectQuotes,
     onDiffChange,
   ])
 
@@ -97,6 +104,13 @@ function PostProcessingSection({ form, onChange, onDiffChange }) {
         label={t('postProcessingOverride')}
         checked={form.postProcessingOverride}
         onChange={handleOverrideChange}
+        disabled={!form.postProcessing}
+      />
+
+      <ToggleRow
+        label={t('settings:postProcessing.injectQuotes.label')}
+        checked={form.injectQuotes !== false}
+        onChange={(v) => onChange('injectQuotes', v)}
         disabled={!form.postProcessing}
       />
 

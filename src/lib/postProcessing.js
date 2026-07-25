@@ -251,3 +251,81 @@ export function injectRuleTags(md, rules) {
   out += md.slice(pos)
   return out
 }
+
+function findDelimitedRanges(text) {
+  const ranges = []
+  const pairs = [
+    ["'", "'"],
+    ['(', ')'],
+    ['[', ']'],
+    ['{', '}'],
+  ]
+  for (const [open, close] of pairs) {
+    let i = 0
+    while (i < text.length) {
+      const start = text.indexOf(open, i)
+      if (start === -1) break
+      const end = text.indexOf(close, start + 1)
+      if (end === -1) break
+      ranges.push([start, end + 1])
+      i = end + 1
+    }
+  }
+  return ranges
+}
+
+function wrapGap(gapText) {
+  if (!gapText.trim()) return gapText
+  const paragraphs = gapText.split('\n\n')
+  return paragraphs
+    .map((p) => {
+      const trimmed = p.trim()
+      if (!trimmed) return p
+      return '"' + trimmed + '"'
+    })
+    .join('\n\n')
+}
+
+export function injectQuoteMarks(text) {
+  if (!text) return text
+
+  const codeRanges = findCodeRanges(text)
+
+  const ppRanges = []
+  const ppSegments = scan(text, DEFAULT_PP_RULES, codeRanges)
+  for (const seg of ppSegments) {
+    if (seg.type === 'styled') {
+      ppRanges.push([seg.start, seg.end])
+    }
+  }
+
+  const delimRanges = findDelimitedRanges(text)
+
+  const allRanges = [...codeRanges, ...ppRanges, ...delimRanges]
+  allRanges.sort((a, b) => a[0] - b[0])
+
+  const merged = []
+  for (const range of allRanges) {
+    if (merged.length === 0 || merged[merged.length - 1][1] < range[0]) {
+      merged.push([range[0], range[1]])
+    } else {
+      merged[merged.length - 1][1] = Math.max(merged[merged.length - 1][1], range[1])
+    }
+  }
+
+  let result = ''
+  let prevEnd = 0
+
+  for (const [start, end] of merged) {
+    if (start > prevEnd) {
+      result += wrapGap(text.slice(prevEnd, start))
+    }
+    result += text.slice(start, end)
+    prevEnd = end
+  }
+  if (prevEnd < text.length) {
+    result += wrapGap(text.slice(prevEnd))
+  }
+
+  return result
+}
