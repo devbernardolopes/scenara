@@ -1,4 +1,5 @@
 import { pipeline, env } from '@huggingface/transformers'
+import * as ort from 'onnxruntime-web/webgpu'
 
 env.allowLocalModels = false
 
@@ -764,10 +765,10 @@ async function loadTtsModel(modelKey, callId, backend) {
 
   let session
   try {
-    session = await env.backends.onnx.InferenceSession.create(buffer, { executionProviders })
+    session = await ort.InferenceSession.create(buffer, { executionProviders })
   } catch (err) {
     if (executionProviders.length > 1) {
-      session = await env.backends.onnx.InferenceSession.create(buffer, {
+      session = await ort.InferenceSession.create(buffer, {
         executionProviders: ['wasm'],
       })
     } else {
@@ -836,9 +837,9 @@ async function previewTtsVoice(modelKey, voiceName, text) {
     const styleEmbedding = embeddings[refId]
 
     const feeds = {
-      input_ids: new env.backends.onnx.Tensor('int64', inputIds, [1, ids.length]),
-      style: new env.backends.onnx.Tensor('float32', styleEmbedding, [1, styleEmbedding.length]),
-      speed: new env.backends.onnx.Tensor('float32', new Float32Array([effectiveSpeed]), [1]),
+      input_ids: new ort.Tensor('int64', inputIds, [1, ids.length]),
+      style: new ort.Tensor('float32', styleEmbedding, [1, styleEmbedding.length]),
+      speed: new ort.Tensor('float32', new Float32Array([effectiveSpeed]), [1]),
     }
 
     const results = await entry.session.run(feeds)
