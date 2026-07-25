@@ -3,11 +3,13 @@ import { getEffectiveProfileFor } from './connectionProfiles'
 import {
   sendChatCompletion,
   replaceVars,
+  replacePersonaTemplate,
   buildTranscript,
   appendMemoryToPayload,
   isMessageHidden,
 } from './chatApi'
 import { getSetting } from './settings'
+import { getPersona } from './personas'
 import { updateThread } from './threads'
 import { trimLeadingTrailingNewlines } from './messages'
 import { buildInjectedMemory } from './threadMemories'
@@ -109,12 +111,27 @@ export async function triggerAutoTitle({
 }) {
   const charName = character.name || ''
   let personaName = ''
+  let chatPersona = currentPersona
   if (thread.personaId) {
     const persona = await db.personas.get(thread.personaId)
+    chatPersona = persona || chatPersona
     personaName = persona?.name || ''
   }
   const currentPersonaName = currentPersona?.name || personaName
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
+
+  const defaultPersonaId = await getSetting('defaultPersonaId')
+  const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
+
+  const replaceVarsWithDesc = (text) =>
+    replacePersonaTemplate(text, {
+      charName,
+      personaName,
+      currentPersonaName,
+      currentPersona,
+      chatPersona,
+      defaultPersona,
+    })
 
   let systemContent = character.autoTitleSystemInstructions
   if (!systemContent) {
@@ -151,6 +168,7 @@ export async function triggerAutoTitle({
     personaMap,
     rolePrefixes,
     replaceVarsIn,
+    replaceVarsWithDesc,
   })
 
   systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, transcript)

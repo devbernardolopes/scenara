@@ -392,6 +392,7 @@ export async function buildMessagesPayload({
             let resolved = userRolePrefixWithPersona
               .replace(/{{name}}/gi, pName)
               .replace(/{{persona_name}}/gi, pName)
+            resolved = replaceVarsWithDesc(resolved)
             if (resolved && !/\s$/.test(resolved)) resolved += '\n'
             content = resolved + content
           } else if (userPrefix) {
@@ -516,6 +517,7 @@ export async function buildTranscript({
   personaMap,
   rolePrefixes,
   replaceVarsIn,
+  replaceVarsWithDesc,
 }) {
   const {
     systemRolePrefix,
@@ -570,8 +572,9 @@ export async function buildTranscript({
       }
     }
 
-    if (replaceVarsIn && prefix) {
-      prefix = replaceVarsIn(prefix)
+    const resolvePrefix = replaceVarsWithDesc || replaceVarsIn
+    if (resolvePrefix && prefix) {
+      prefix = resolvePrefix(prefix)
     }
 
     if (prefix && !/\s$/.test(prefix)) prefix += '\n'
@@ -612,6 +615,19 @@ export async function buildOOCMessagesPayload({
   const currentPersonaName = currentPersona?.name || personaName
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
 
+  const defaultPersonaId = await getSetting('defaultPersonaId')
+  const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
+
+  const replaceVarsWithDesc = (text) =>
+    replacePersonaTemplate(text, {
+      charName,
+      personaName,
+      currentPersonaName,
+      currentPersona,
+      chatPersona,
+      defaultPersona,
+    })
+
   const systemParts = []
 
   const oocSystemInstr = oocSettings.oocSystemInstructions
@@ -637,6 +653,7 @@ export async function buildOOCMessagesPayload({
         assistantRolePrefixOoc: oocSettings.assistantRolePrefixOoc,
         userRolePrefixOoc: oocSettings.userRolePrefixOoc,
       },
+      replaceVarsWithDesc,
     })
     transcriptWithVars = replaceVarsIn(transcript)
   }

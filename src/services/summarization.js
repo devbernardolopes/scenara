@@ -114,6 +114,16 @@ export async function buildSummarizationPayload({
 
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
 
+  const replaceVarsWithDesc = (text) =>
+    replacePersonaTemplate(text, {
+      charName,
+      personaName,
+      currentPersonaName,
+      currentPersona,
+      chatPersona,
+      defaultPersona,
+    })
+
   const userPersonaPrefixOverride = character?.userPersonaPrefix !== false
 
   let transcript = await buildTranscript({
@@ -124,6 +134,7 @@ export async function buildSummarizationPayload({
     personaMap,
     rolePrefixes,
     replaceVarsIn,
+    replaceVarsWithDesc,
   })
 
   // When Add Character Prompt is enabled and persona injection is set to
