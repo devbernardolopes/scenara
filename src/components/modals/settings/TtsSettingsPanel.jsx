@@ -30,6 +30,7 @@ function StatusChip({ status, t }) {
   const map = {
     'not-downloaded': 'bg-surface-secondary text-tertiary',
     downloading: 'bg-primary/10 text-primary',
+    loading: 'bg-primary/10 text-primary',
     downloaded: 'bg-success/10 text-success',
     loaded: 'bg-accent/10 text-accent',
     error: 'bg-error/10 text-error',
@@ -38,7 +39,9 @@ function StatusChip({ status, t }) {
     <span
       className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${map[status] || map['not-downloaded']}`}
     >
-      {status === 'downloading' && <Loader className="w-3 h-3 mr-1 animate-spin" />}
+      {(status === 'downloading' || status === 'loading') && (
+        <Loader className="w-3 h-3 mr-1 animate-spin" />
+      )}
       {t(`tts.kitten.status.${status}`)}
     </span>
   )
@@ -56,9 +59,20 @@ function ProgressBar({ progress }) {
   )
 }
 
-function KittenModelCard({ model, state, t, onDownload, onLoad, onUnload, onDelete, disabled }) {
+function KittenModelCard({
+  model,
+  state,
+  loadedBackend,
+  t,
+  onDownload,
+  onLoad,
+  onUnload,
+  onDelete,
+  disabled,
+}) {
   const status = state?.status || 'not-downloaded'
   const isDownloading = status === 'downloading'
+  const isLoading = status === 'loading'
   const isLoaded = status === 'loaded'
   const isDownloaded = status === 'downloaded' || isLoaded
   const isError = status === 'error'
@@ -71,6 +85,11 @@ function KittenModelCard({ model, state, t, onDownload, onLoad, onUnload, onDele
             <span className="text-sm font-medium text-text">{t(model.labelKey)}</span>
             <span className="text-xs text-tertiary">{model.params}</span>
             <span className="text-xs text-tertiary">~{model.approxSize}</span>
+            {isLoaded && loadedBackend && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/10 text-accent font-medium">
+                {t(`tts.kitten.backend.${loadedBackend}`)}
+              </span>
+            )}
           </div>
           <p className="text-xs text-secondary mt-0.5">{t(model.descKey)}</p>
         </div>
@@ -86,10 +105,16 @@ function KittenModelCard({ model, state, t, onDownload, onLoad, onUnload, onDele
         </div>
       )}
 
+      {isLoading && (
+        <div className="space-y-1">
+          <ProgressBar progress={null} />
+        </div>
+      )}
+
       {isError && <p className="text-xs text-error">Download or load failed. Try again.</p>}
 
       <div className="flex items-center gap-2 flex-wrap">
-        {!isDownloaded && !isDownloading && (
+        {!isDownloaded && !isDownloading && !isLoading && (
           <button
             type="button"
             onClick={onDownload}
@@ -103,10 +128,16 @@ function KittenModelCard({ model, state, t, onDownload, onLoad, onUnload, onDele
         {isDownloading && (
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md bg-primary/10 text-primary">
             <Loader className="w-3.5 h-3.5 animate-spin" />
+            {t('tts.kitten.actions.downloading')}
+          </span>
+        )}
+        {isLoading && (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md bg-primary/10 text-primary">
+            <Loader className="w-3.5 h-3.5 animate-spin" />
             {t('tts.kitten.actions.loading')}
           </span>
         )}
-        {isDownloaded && !isLoaded && (
+        {isDownloaded && !isLoaded && !isLoading && (
           <button
             type="button"
             onClick={onLoad}
@@ -161,6 +192,7 @@ function TtsSettingsPanel() {
   const [actionDisabled, setActionDisabled] = useState(false)
   const [hasWebGPU] = useState(() => typeof navigator !== 'undefined' && !!navigator.gpu)
   const [previewing, setPreviewing] = useState(false)
+  const [loadedBackend, setLoadedBackend] = useState(null)
 
   const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)
 
@@ -240,21 +272,25 @@ function TtsSettingsPanel() {
   useEffect(() => {
     const unsubscribe = onModelLoading((data) => {
       if (!data.modelKey?.startsWith('kitten-')) return
-      setModelStates((prev) => ({
-        ...prev,
-        [data.modelKey]: {
-          ...prev[data.modelKey],
-          status:
-            data.status === 'done'
-              ? 'downloaded'
-              : data.status === 'error'
-                ? 'error'
-                : 'downloading',
-          progress: data.progress,
-          loaded: data.loaded,
-          total: data.total,
-        },
-      }))
+      setModelStates((prev) => {
+        const current = prev[data.modelKey]
+        if (current?.status === 'loading') return prev
+        return {
+          ...prev,
+          [data.modelKey]: {
+            ...current,
+            status:
+              data.status === 'done'
+                ? 'downloaded'
+                : data.status === 'error'
+                  ? 'error'
+                  : 'downloading',
+            progress: data.progress,
+            loaded: data.loaded,
+            total: data.total,
+          },
+        }
+      })
     })
     return unsubscribe
   }, [])
@@ -371,17 +407,22 @@ function TtsSettingsPanel() {
               status: 'downloaded',
             }
           }
-          next[modelKey] = { ...next[modelKey], status: 'downloading', progress: 0 }
+          next[modelKey] = { ...next[modelKey], status: 'loading', progress: 0 }
           return next
         })
 
         try {
-          await loadTtsModel(modelKey, backend)
+          const result = await loadTtsModel(modelKey, backend)
           setModelStates((prev) => ({
             ...prev,
             [modelKey]: { ...prev[modelKey], status: 'loaded' },
           }))
+          if (result.actualBackend) {
+            setLoadedBackend(result.actualBackend)
+          }
           await saveProvider(modelKey)
+          const backendLabel = t(`tts.kitten.backend.${result.actualBackend || backend}`)
+          showToast(`${backendLabel} — ${t('tts.kitten.status.loaded')}`, { type: 'success' })
         } catch (err) {
           showToast(err.message || 'Load failed', { type: 'error' })
           setModelStates((prev) => ({
@@ -390,7 +431,7 @@ function TtsSettingsPanel() {
           }))
         }
       })(),
-    [backend, modelStates, withActionLock, saveProvider],
+    [backend, modelStates, withActionLock, saveProvider, t],
   )
 
   const handleUnload = useCallback(
@@ -402,6 +443,7 @@ function TtsSettingsPanel() {
             ...prev,
             [modelKey]: { ...prev[modelKey], status: 'downloaded' },
           }))
+          setLoadedBackend(null)
           await saveProvider('browser')
         } catch (err) {
           showToast(err.message || 'Unload failed', { type: 'error' })
@@ -606,27 +648,41 @@ function TtsSettingsPanel() {
             <label className="block text-sm font-medium text-text mb-1">
               {t('tts.kitten.backend.label')}
             </label>
-            <div className="flex items-center gap-2">
-              {['auto', 'wasm', 'webgpu'].map((b) => {
-                const disabled = b === 'webgpu' && !hasWebGPU
-                return (
-                  <button
-                    key={b}
-                    type="button"
-                    onClick={() => !disabled && saveBackend(b)}
-                    disabled={disabled}
-                    title={disabled ? t('tts.kitten.webgpuUnavailable') : undefined}
-                    className={`px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md transition-colors ${
-                      backend === b
-                        ? 'bg-primary text-on-primary'
-                        : 'bg-surface-secondary text-text hover:bg-surface-hover'
-                    } ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
-                  >
-                    {t(`tts.kitten.backend.${b}`)}
-                  </button>
-                )
-              })}
-            </div>
+            {(() => {
+              const isModelLoaded = KITTEN_TTS_MODELS.some(
+                (m) => modelStates[m.key]?.status === 'loaded',
+              )
+              return (
+                <div className="flex items-center gap-2">
+                  {['auto', 'wasm', 'webgpu'].map((b) => {
+                    const webgpuDisabled = b === 'webgpu' && !hasWebGPU
+                    const locked = isModelLoaded
+                    const disabled = webgpuDisabled || locked
+                    const tooltip = locked
+                      ? t('tts.kitten.backendLocked')
+                      : webgpuDisabled
+                        ? t('tts.kitten.webgpuUnavailable')
+                        : undefined
+                    return (
+                      <button
+                        key={b}
+                        type="button"
+                        onClick={() => !disabled && saveBackend(b)}
+                        disabled={disabled}
+                        title={tooltip}
+                        className={`px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md transition-colors ${
+                          backend === b
+                            ? 'bg-primary text-on-primary'
+                            : 'bg-surface-secondary text-text hover:bg-surface-hover'
+                        } ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+                      >
+                        {t(`tts.kitten.backend.${b}`)}
+                      </button>
+                    )
+                  })}
+                </div>
+              )
+            })()}
             <p className="text-xs text-secondary mt-1">{t('tts.kitten.backend.desc')}</p>
           </div>
 
@@ -691,6 +747,7 @@ function TtsSettingsPanel() {
                 key={model.key}
                 model={model}
                 state={modelStates[model.key]}
+                loadedBackend={modelStates[model.key]?.status === 'loaded' ? loadedBackend : null}
                 t={t}
                 onDownload={() => handleDownload(model.key)}
                 onLoad={() => handleLoad(model.key)}

@@ -96,12 +96,14 @@
       "status": {
         "not-downloaded": "Not downloaded",
         "downloading": "Downloading…",
+        "loading": "Loading…",
         "downloaded": "Downloaded",
         "loaded": "Loaded",
         "error": "Error"
       },
       "actions": {
         "download": "Download",
+        "downloading": "Downloading…",
         "loading": "Loading…",
         "load": "Load",
         "unload": "Unload",
@@ -132,6 +134,7 @@
       "confirmDeleteTitle": "Delete model?",
       "confirmDeleteMessage": "This will remove the downloaded model files. You can re-download them later.",
       "webgpuUnavailable": "WebGPU is not available in this browser.",
+      "backendLocked": "Unload the model first to change backend.",
       "speed": {
         "label": "Speech Speed",
         "desc": "How fast the voice speaks. 1 is normal speed."

@@ -716,8 +716,28 @@ async function downloadTtsModel(modelKey, callId) {
 
     const response = await fetch(url)
     if (!response.ok) throw new Error(`Failed to download ${file}: ${response.status}`)
-    const arrayBuffer = await response.arrayBuffer()
-    loadedBytes += arrayBuffer.byteLength
+    const reader = response.body.getReader()
+    const chunks = []
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      chunks.push(value)
+      loadedBytes += value.byteLength
+      progressCb({
+        status: 'progress',
+        file,
+        name: file,
+        progress: totalBytes > 0 ? loadedBytes / totalBytes : 0,
+        loaded: loadedBytes,
+        total: totalBytes,
+      })
+    }
+    const arrayBuffer = new Uint8Array(loadedBytes)
+    let offset = 0
+    for (const chunk of chunks) {
+      arrayBuffer.set(chunk, offset)
+      offset += chunk.byteLength
+    }
     await cache.put(
       url,
       new Response(arrayBuffer, {
@@ -725,14 +745,6 @@ async function downloadTtsModel(modelKey, callId) {
         headers: { 'content-type': 'application/octet-stream' },
       }),
     )
-    progressCb({
-      status: 'progress',
-      file,
-      name: file,
-      progress: totalBytes > 0 ? loadedBytes / totalBytes : 0,
-      loaded: loadedBytes,
-      total: totalBytes,
-    })
   }
 
   try {
@@ -770,6 +782,7 @@ async function loadTtsModel(modelKey, callId, backend) {
   const executionProviders = useWebgpu ? ['webgpu', 'wasm'] : ['wasm']
 
   let session
+  let actualBackend = useWebgpu ? 'webgpu' : 'wasm'
   try {
     session = await ort.InferenceSession.create(buffer, { executionProviders })
   } catch (err) {
@@ -777,6 +790,7 @@ async function loadTtsModel(modelKey, callId, backend) {
       session = await ort.InferenceSession.create(buffer, {
         executionProviders: ['wasm'],
       })
+      actualBackend = 'wasm'
     } else {
       throw err
     }
@@ -790,7 +804,7 @@ async function loadTtsModel(modelKey, callId, backend) {
     // voices will remain null — preview will fail gracefully
   }
   scheduleIdleUnload(modelKey)
-  return { modelKey, success: true }
+  return { modelKey, success: true, actualBackend }
 }
 
 async function unloadKittenModel(modelKey) {
