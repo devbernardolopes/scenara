@@ -69,7 +69,8 @@ function PostProcessingSection({ form, onChange, onDiffChange }) {
     const overrideDiff = form.postProcessingOverride === true
     const rulesDiff =
       form.postProcessingOverride && rulesDiffer(form.postProcessingRules || [], globalRules)
-    const injectDiff = form.injectQuotes !== globalInjectQuotes
+    const injectDiff =
+      form.postProcessing && form.postProcessingOverride && form.injectQuotes !== globalInjectQuotes
     onDiffChange(enabledDiff || overrideDiff || rulesDiff || injectDiff)
   }, [
     form.postProcessing,
@@ -107,15 +108,13 @@ function PostProcessingSection({ form, onChange, onDiffChange }) {
         disabled={!form.postProcessing}
       />
 
-      <ToggleRow
-        label={t('settings:postProcessing.injectQuotes.label')}
-        checked={form.injectQuotes !== false}
-        onChange={(v) => onChange('injectQuotes', v)}
-        disabled={!form.postProcessing}
-      />
-
       {form.postProcessing && form.postProcessingOverride && (
         <div className="space-y-4">
+          <ToggleRow
+            label={t('settings:postProcessing.injectQuotes.label')}
+            checked={form.injectQuotes !== false}
+            onChange={(v) => onChange('injectQuotes', v)}
+          />
           <PostProcessingRuleEditor
             rules={form.postProcessingRules || []}
             onChange={(rules) => onChange('postProcessingRules', rules)}
