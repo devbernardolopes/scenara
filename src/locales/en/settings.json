@@ -50,6 +50,78 @@
     "resetConfirmMessage": "This will replace all rules with the built-in defaults. This cannot be undone.",
     "resetOverrideConfirmMessage": "This will reset the character's rules to match the ones currently set in Settings. This cannot be undone."
   },
+  "tts": {
+    "panelDesc": "Configure text-to-speech engine, voice, and model settings.",
+    "activeProvider": {
+      "label": "Active Provider",
+      "desc": "Select which text-to-speech engine to use for speech output."
+    },
+    "browser": {
+      "title": "Browser (Built-in)",
+      "desc": "Uses your operating system's built-in speech synthesis. No download required.",
+      "voice": {
+        "label": "Voice",
+        "desc": "Select a voice for browser speech synthesis."
+      },
+      "noVoices": "No voices available. Your browser may still be loading voices.",
+      "preview": "Preview",
+      "previewText": "Hello! This is a preview of the selected voice."
+    },
+    "kitten": {
+      "title": "Kitten TTS",
+      "desc": "High-quality local text-to-speech. Download a model to get started.",
+      "backend": {
+        "label": "Backend",
+        "desc": "Hardware acceleration for model inference.",
+        "auto": "Auto",
+        "wasm": "WASM",
+        "webgpu": "WebGPU"
+      },
+      "voice": {
+        "label": "Voice",
+        "desc": "Select a voice for Kitten TTS."
+      },
+      "status": {
+        "notDownloaded": "Not downloaded",
+        "downloading": "Downloading…",
+        "downloaded": "Downloaded",
+        "loaded": "Loaded",
+        "error": "Error"
+      },
+      "actions": {
+        "download": "Download",
+        "loading": "Loading…",
+        "load": "Load",
+        "unload": "Unload",
+        "delete": "Delete",
+        "preview": "Preview"
+      },
+      "models": {
+        "mini": {
+          "label": "Mini",
+          "desc": "80M params — Highest quality, best for production."
+        },
+        "micro": {
+          "label": "Micro",
+          "desc": "40M params — Balanced quality and speed."
+        },
+        "nanoFp32": {
+          "label": "Nano (FP32)",
+          "desc": "15M params — Fast, good for real-time."
+        },
+        "nanoInt8": {
+          "label": "Nano (INT8)",
+          "desc": "15M params — Smallest, quantized for mobile."
+        }
+      },
+      "storageUsed": "{{used}} of {{quota}} used",
+      "storageUnknown": "Storage usage unknown",
+      "iosWarning": "The WASM phonemizer may hang on iOS Safari.",
+      "confirmDeleteTitle": "Delete model?",
+      "confirmDeleteMessage": "This will remove the downloaded model files. You can re-download them later.",
+      "webgpuUnavailable": "WebGPU is not available in this browser."
+    }
+  },
   "groups": {
     "autoTitle": "Auto-Title",
     "summarization": "Summarization",

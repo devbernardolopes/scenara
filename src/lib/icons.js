@@ -71,4 +71,5 @@ export {
   ScrollText,
   Cloud,
   CloudCog,
+  HardDrive,
 } from 'lucide-react'

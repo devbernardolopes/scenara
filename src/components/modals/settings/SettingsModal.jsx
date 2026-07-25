@@ -11,6 +11,7 @@ import CollapsibleSection from '../../shared/CollapsibleSection'
 import ApiSettingsPanel from './ApiSettingsPanel'
 import DatabaseSettingsPanel from './DatabaseSettingsPanel'
 import PostProcessingRulesPanel from './PostProcessingRulesPanel'
+import TtsSettingsPanel from './TtsSettingsPanel'
 import CloseButton from '../../shared/CloseButton'
 import { useModalScrollPosition } from '../../../hooks/useModalScrollPosition'
 import pkg from '../../../../package.json'
@@ -168,6 +169,8 @@ function SettingsModal() {
             <ApiSettingsPanel />
           ) : activeCategory === 'database' ? (
             <DatabaseSettingsPanel />
+          ) : activeCategory === 'tts' ? (
+            <TtsSettingsPanel />
           ) : activeCategory === 'postProcessing' ? (
             <PostProcessingRulesPanel />
           ) : (

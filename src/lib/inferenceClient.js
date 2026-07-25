@@ -99,3 +99,71 @@ export function onModelLoading(listener) {
   progressListeners.add(listener)
   return () => progressListeners.delete(listener)
 }
+
+// ── TTS helpers ──────────────────────────────────────────────────────────────
+
+export const KITTEN_TTS_MODELS = [
+  {
+    key: 'kitten-mini',
+    labelKey: 'settings:tts.kitten.models.mini.label',
+    descKey: 'settings:tts.kitten.models.mini.desc',
+    params: '80M',
+    approxSize: '80 MB',
+  },
+  {
+    key: 'kitten-micro',
+    labelKey: 'settings:tts.kitten.models.micro.label',
+    descKey: 'settings:tts.kitten.models.micro.desc',
+    params: '40M',
+    approxSize: '41 MB',
+  },
+  {
+    key: 'kitten-nano-fp32',
+    labelKey: 'settings:tts.kitten.models.nanoFp32.label',
+    descKey: 'settings:tts.kitten.models.nanoFp32.desc',
+    params: '15M',
+    approxSize: '56 MB',
+  },
+  {
+    key: 'kitten-nano-int8',
+    labelKey: 'settings:tts.kitten.models.nanoInt8.label',
+    descKey: 'settings:tts.kitten.models.nanoInt8.desc',
+    params: '15M',
+    approxSize: '25 MB',
+  },
+]
+
+export const KITTEN_TTS_VOICES = [
+  'Bella',
+  'Jasper',
+  'Luna',
+  'Bruno',
+  'Rosie',
+  'Hugo',
+  'Kiki',
+  'Leo',
+]
+
+export function checkTtsCache(modelKey) {
+  return run('tts-check-cache', {}, { modelKey }, { timeout: 10000 })
+}
+
+export function downloadTtsModel(modelKey) {
+  return run('tts-download', {}, { modelKey }, { timeout: 600000 })
+}
+
+export function loadTtsModel(modelKey, backend) {
+  return run('tts-load', {}, { modelKey, backend }, { timeout: 120000 })
+}
+
+export function unloadTtsModel(modelKey) {
+  return run('tts-unload', {}, { modelKey }, { timeout: 10000 })
+}
+
+export function deleteTtsModel(modelKey) {
+  return run('tts-delete', {}, { modelKey }, { timeout: 10000 })
+}
+
+export function previewTtsModel(modelKey) {
+  return run('tts-preview', {}, { modelKey }, { timeout: 30000 })
+}

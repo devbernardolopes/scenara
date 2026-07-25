@@ -1,7 +1,7 @@
 {
   "name": "scenara",
   "private": true,
-  "version": "0.0.935",
+  "version": "0.0.936",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -23,6 +23,7 @@
     "gpt-tokenizer": "^3.4.0",
     "i18next": "^26.3.4",
     "lucide-react": "^1.22.0",
+    "phonemizer": "^1.2.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-i18next": "^17.0.8",
