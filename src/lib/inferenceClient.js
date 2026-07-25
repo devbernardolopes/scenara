@@ -53,7 +53,6 @@ function handleWorkerMessage(message) {
 
   if (type === 'debug') {
     if (debugEnabled) {
-      // eslint-disable-next-line no-console
       console.debug('[inference:debug]', data)
     }
     return
@@ -164,6 +163,6 @@ export function deleteTtsModel(modelKey) {
   return run('tts-delete', {}, { modelKey }, { timeout: 10000 })
 }
 
-export function previewTtsModel(modelKey) {
-  return run('tts-preview', {}, { modelKey }, { timeout: 30000 })
+export function previewTtsModel(modelKey, voice, text) {
+  return run('tts-preview', {}, { modelKey, voice, text }, { timeout: 30000 })
 }

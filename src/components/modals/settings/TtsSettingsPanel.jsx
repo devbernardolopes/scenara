@@ -11,6 +11,7 @@ import {
   loadTtsModel,
   unloadTtsModel,
   deleteTtsModel,
+  previewTtsModel,
   onModelLoading,
 } from '../../../lib/inferenceClient'
 import CollapsibleSection from '../../shared/CollapsibleSection'
@@ -153,7 +154,8 @@ function TtsSettingsPanel() {
   const [modelStates, setModelStates] = useState({})
   const [storageInfo, setStorageInfo] = useState(null)
   const [actionDisabled, setActionDisabled] = useState(false)
-  const [hasWebGPU, setHasWebGPU] = useState(false)
+  const [hasWebGPU] = useState(() => typeof navigator !== 'undefined' && !!navigator.gpu)
+  const [previewing, setPreviewing] = useState(false)
 
   const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)
 
@@ -176,10 +178,6 @@ function TtsSettingsPanel() {
     return () => {
       cancelled = true
     }
-  }, [])
-
-  useEffect(() => {
-    setHasWebGPU(!!navigator.gpu)
   }, [])
 
   useEffect(() => {
@@ -370,6 +368,26 @@ function TtsSettingsPanel() {
     [confirm, t, withActionLock],
   )
 
+  const handleKittenPreview = useCallback(async () => {
+    const loadedModel = KITTEN_TTS_MODELS.find((m) => modelStates[m.key]?.status === 'loaded')
+    if (!loadedModel) return
+    setPreviewing(true)
+    try {
+      const result = await previewTtsModel(loadedModel.key, kittenVoice)
+      if (result?.audio) {
+        const blob = new Blob([result.audio], { type: 'audio/wav' })
+        const url = URL.createObjectURL(blob)
+        const audio = new Audio(url)
+        audio.onended = () => URL.revokeObjectURL(url)
+        await audio.play()
+      }
+    } catch (err) {
+      showToast(err.message || 'Preview failed', { type: 'error' })
+    } finally {
+      setPreviewing(false)
+    }
+  }, [modelStates, kittenVoice])
+
   return (
     <div className="space-y-8">
       <p className="text-xs text-secondary">{t('tts.panelDesc')}</p>
@@ -517,6 +535,25 @@ function TtsSettingsPanel() {
             </select>
             <p className="text-xs text-secondary mt-1">{t('tts.kitten.voice.desc')}</p>
           </div>
+
+          {/* Preview button */}
+          <button
+            type="button"
+            onClick={handleKittenPreview}
+            disabled={
+              previewing ||
+              actionDisabled ||
+              !KITTEN_TTS_MODELS.some((m) => modelStates[m.key]?.status === 'loaded')
+            }
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md bg-surface-secondary text-text hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {previewing ? (
+              <Loader className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Volume2 className="w-3.5 h-3.5" />
+            )}
+            {t('tts.kitten.actions.preview')}
+          </button>
 
           {/* Model cards */}
           <div className="space-y-3">
