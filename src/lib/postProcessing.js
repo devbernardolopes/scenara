@@ -279,9 +279,12 @@ function wrapGap(gapText) {
   const paragraphs = gapText.split('\n\n')
   return paragraphs
     .map((p) => {
-      const trimmed = p.trim()
-      if (!trimmed) return p
-      return '"' + trimmed + '"'
+      const match = p.match(/^(\s*)(.*?)(\s*)$/s)
+      const leading = match[1]
+      const core = match[2]
+      const trailing = match[3]
+      if (!core.trim()) return p
+      return leading + '"' + core.trim() + '"' + trailing
     })
     .join('\n\n')
 }
