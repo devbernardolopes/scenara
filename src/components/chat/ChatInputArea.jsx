@@ -136,6 +136,7 @@ function ChatInputArea({
   hasQueued,
   onPersonaChange,
   onOocChange,
+  onAutoTtsChange,
 }) {
   const { t } = useTranslation('chat')
   const { openModal } = useModal()
@@ -146,6 +147,9 @@ function ChatInputArea({
   const initializedRef = useRef(false)
   const onPersonaChangeRef = useRef(onPersonaChange)
   onPersonaChangeRef.current = onPersonaChange
+  const onAutoTtsChangeRef = useRef(onAutoTtsChange)
+  onAutoTtsChangeRef.current = onAutoTtsChange
+  const prevAutoTtsRef = useRef(DEFAULT_QUICK_SETTINGS.autoTTS)
   const latestRef = useRef({
     personaId: null,
     oocActive: false,
@@ -268,6 +272,14 @@ function ChatInputArea({
   useEffect(() => {
     onOocChange?.(oocActive)
   }, [oocActive, onOocChange])
+
+  useEffect(() => {
+    const prev = prevAutoTtsRef.current
+    prevAutoTtsRef.current = quickSettings.autoTTS
+    if (quickSettings.autoTTS !== prev) {
+      onAutoTtsChangeRef.current?.(quickSettings.autoTTS)
+    }
+  }, [quickSettings.autoTTS])
 
   // Sync latestRef after every render so cleanup always has freshest values
   useEffect(() => {

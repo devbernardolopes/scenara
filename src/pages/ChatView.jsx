@@ -13,7 +13,7 @@ import ChatInputArea from '../components/chat/ChatInputArea'
 import MessageBubble from '../components/chat/MessageBubble'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
 import { getThread, updateThread, forkThread } from '../services/threads'
-import { setUIState } from '../services/uiState'
+import { getUIState, setUIState } from '../services/uiState'
 import { getCharacter, touchCharacterLastUsed } from '../services/characters'
 import { getAllPersonas, getPersona } from '../services/personas'
 import {
@@ -69,7 +69,7 @@ import { setBaseTitle } from '../services/titleManager'
 import { getMemoryIdForMarker } from '../services/threadMemories'
 import { estimateTokens } from '../services/tokenEstimator'
 import { ChatSettingsProvider } from '../hooks/useChatSettings'
-import { stop as stopTts, getPlaybackState } from '../lib/ttsPlayback'
+import { speak as speakTts, stop as stopTts, getPlaybackState } from '../lib/ttsPlayback'
 import {
   isAwayFromThread,
   addUnread,
@@ -1049,6 +1049,10 @@ function ChatView() {
 
   const handleDeleteRequest = useCallback((id) => setConfirmDeleteId(id), [])
 
+  const handleAutoTtsChange = useCallback((autoTTS) => {
+    if (!autoTTS) stopTts()
+  }, [])
+
   function withoutFailedMessages(msgs) {
     const ids = failedIdsRef.current
     return ids.size > 0 ? msgs.filter((m) => !ids.has(m.id)) : msgs
@@ -1275,6 +1279,20 @@ function ChatView() {
       }
     }
     return { outcome, messageId: assistantMsgId }
+  }
+
+  async function maybeAutoTTS(tid, messageId, outcome) {
+    if (outcome !== 'succeeded' || !messageId) return
+    try {
+      const ui = await getUIState(`chatInput.${tid}`)
+      if (!ui?.quickSettings?.autoTTS) return
+      const msg = await db.messages.get(Number(messageId))
+      if (!msg || msg.role !== 'assistant' || msg.isOOC) return
+      const oocDelimiters = await getSetting('prompting.oocDelimiters')
+      speakTts(msg.id, msg, { character, oocDelimiters })
+    } catch {
+      // Non-critical: auto-TTS failure shouldn't block post-generation flow
+    }
   }
 
   async function runPostGenerationTasks({
@@ -1578,6 +1596,7 @@ function ChatView() {
         includeSummarization: true,
         currentPersona,
       })
+      await maybeAutoTTS(threadId, sendMessageId, sendOutcome)
     }
   }
 
@@ -1996,6 +2015,7 @@ function ChatView() {
         includeSummarization: true,
         currentPersona,
       })
+      await maybeAutoTTS(threadId, messageId, outcome)
     }
   }
 
@@ -2609,6 +2629,7 @@ function ChatView() {
             hasQueued={blockingQueued}
             onPersonaChange={setSelectedPersonaId}
             onOocChange={setOocActive}
+            onAutoTtsChange={handleAutoTtsChange}
           />
         </div>
 
