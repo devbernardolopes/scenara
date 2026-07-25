@@ -6,6 +6,7 @@ import { estimateTokens } from '../../../services/tokenEstimator'
 import { getSetting } from '../../../services/settings'
 import { useConfirm } from '../../../lib/confirm'
 import { RefreshCw } from '../../../lib/icons'
+import SettingSlider from '../settings/controls/SettingSlider'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
@@ -290,18 +291,14 @@ function OverridesSection({ form, onChange, characterId }) {
       <div className={`ml-7 space-y-4 ${disabledCls(form.memory !== 'contextWindow')}`}>
         <div className="flex items-center gap-3">
           <label className="text-sm text-secondary shrink-0">{t('contextWindowThreshold')}</label>
-          <input
-            type="range"
+          <SettingSlider
+            value={form.contextWindowThreshold}
+            onChange={(v) => onChange('contextWindowThreshold', v)}
             min={256}
             max={8192}
             step={128}
-            value={form.contextWindowThreshold}
-            onChange={(e) => onChange('contextWindowThreshold', Number(e.target.value))}
-            className="w-48 accent-primary"
+            disabled={form.memory !== 'contextWindow'}
           />
-          <span className="text-sm text-text font-medium w-14 text-right">
-            {form.contextWindowThreshold}
-          </span>
         </div>
       </div>
 
