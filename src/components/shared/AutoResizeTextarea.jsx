@@ -20,7 +20,7 @@ const AutoResizeTextarea = forwardRef(function AutoResizeTextarea(props, forward
 
   const handleInput = useCallback(
     (e) => {
-      autoResize(e.target, { adjustScroll: true, extraHeight })
+      autoResize(e.target, { adjustScroll: false, extraHeight })
       onInput?.(e)
     },
     [onInput, extraHeight],

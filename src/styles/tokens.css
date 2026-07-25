@@ -1413,6 +1413,11 @@ body,
   overscroll-behavior-y: contain;
 }
 
+/* Prevent scroll anchoring on textareas inside scrollable containers */
+textarea {
+  overflow-anchor: none;
+}
+
 /* .chat-container,
 main {
   padding-bottom: env(safe-area-inset-bottom);
