@@ -210,6 +210,7 @@ function ChatView() {
   const messagesRef = useRef(null)
   const failedIdsRef = useRef(new Set())
   const hasUnreadRef = useRef(false)
+  const unreadObserverRef = useRef(null)
   const [thread, setThread] = useState(null)
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
@@ -894,19 +895,15 @@ function ChatView() {
 
   useEffect(() => {
     const container = scrollRef.current
-    if (!container || messages.length === 0) return
-
-    if (messages[0].threadId !== undefined && messages[0].threadId !== Number(threadId)) {
-      return
-    }
+    if (!container) return
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue
           const el = entry.target
           const msgId = Number(el.dataset.messageId)
-          if (!msgId) return
+          if (!msgId) continue
           observer.unobserve(el)
           markMessageRead(msgId, threadId)
           setMessages((prev) => {
@@ -914,10 +911,26 @@ function ChatView() {
             if (!target || !target.isUnread) return prev
             return prev.map((m) => (m.id === msgId ? { ...m, isUnread: false } : m))
           })
-        })
+        }
       },
       { root: container, threshold: 0.3 },
     )
+    unreadObserverRef.current = observer
+
+    return () => {
+      observer.disconnect()
+      unreadObserverRef.current = null
+    }
+  }, [threadId])
+
+  useEffect(() => {
+    const observer = unreadObserverRef.current
+    const container = scrollRef.current
+    if (!observer || !container || messages.length === 0) return
+
+    if (messages[0].threadId !== undefined && messages[0].threadId !== Number(threadId)) {
+      return
+    }
 
     const unreadElements = container.querySelectorAll('[data-message-id][data-unread="true"]')
 
@@ -961,8 +974,6 @@ function ChatView() {
         })
       }
     }
-
-    return () => observer.disconnect()
   }, [messages, threadId, isTabVisible])
 
   function scrollToBottom() {
@@ -986,7 +997,18 @@ function ChatView() {
     }
   })
 
+  const failedBundleStringsRef = useRef(new Map())
   useEffect(() => {
+    const prevStrings = failedBundleStringsRef.current
+    let anyChanged = false
+    for (const msg of messages) {
+      if (prevStrings.get(msg.id) !== msg.bundleMessages) {
+        anyChanged = true
+        break
+      }
+    }
+    if (!anyChanged && prevStrings.size === messages.length) return
+
     const ids = new Set()
     for (const msg of messages) {
       const entries = parseBundleEntries(msg.bundleMessages)
@@ -998,6 +1020,7 @@ function ChatView() {
       }
     }
     failedIdsRef.current = ids
+    failedBundleStringsRef.current = new Map(messages.map((m) => [m.id, m.bundleMessages]))
   }, [messages, activeSlotIndices])
 
   async function handleCancel() {
@@ -2181,22 +2204,31 @@ function ChatView() {
     ? messages.findIndex((m) => m.id === confirmDeleteId) + 1
     : null
 
+  const summProgressKey = useMemo(() => {
+    return `${messages.length}:${messages[messages.length - 1]?.id || 0}:${messages[messages.length - 1]?.summarizedAt || 0}`
+  }, [messages])
+
+  const prevSummProgressRef = useRef(null)
   const summarizationProgress = useMemo(() => {
     if (!character) return null
     const resolvedMemory = character.memory ?? memoryDefaults.mode
     if (resolvedMemory === 'never') return null
 
+    if (prevSummProgressRef.current?.key === summProgressKey) {
+      return prevSummProgressRef.current.result
+    }
+
     const includeOOC = character.includeOOC !== false
     const unsummarized = getUnsummarizedMessages(messages, { includeOOC })
 
+    let result = null
     if (resolvedMemory === 'messages') {
       const threshold = Number(character.messagesThreshold ?? memoryDefaults.messagesThreshold)
       const remaining = threshold - unsummarized.length
-      if (remaining <= 0) return null
-      return { mode: 'messages', remaining, threshold, current: unsummarized.length }
-    }
-
-    if (resolvedMemory === 'contextWindow') {
+      if (remaining > 0) {
+        result = { mode: 'messages', remaining, threshold, current: unsummarized.length }
+      }
+    } else if (resolvedMemory === 'contextWindow') {
       const threshold = Number(
         character.contextWindowThreshold ?? memoryDefaults.contextWindowThreshold,
       )
@@ -2205,20 +2237,31 @@ function ChatView() {
         0,
       )
       const remaining = threshold - tokenCount
-      if (remaining <= 0) return null
-      return { mode: 'contextWindow', remaining, threshold, current: tokenCount }
+      if (remaining > 0) {
+        result = { mode: 'contextWindow', remaining, threshold, current: tokenCount }
+      }
     }
 
-    return null
-  }, [character, messages, memoryDefaults])
+    prevSummProgressRef.current = { key: summProgressKey, result }
+    return result
+  }, [character, messages, memoryDefaults, summProgressKey])
 
   const visibleMessages = visibleStartIndex > 0 ? messages.slice(visibleStartIndex) : messages
 
+  const bundlePrevStringsRef = useRef(new Map())
+  const bundlePrevParsedRef = useRef(new Map())
   const bundleMap = useMemo(() => {
     const map = new Map()
     for (const m of visibleMessages) {
-      map.set(m.id, parseBundleEntries(m.bundleMessages))
+      const prevString = bundlePrevStringsRef.current.get(m.id)
+      if (prevString === m.bundleMessages) {
+        map.set(m.id, bundlePrevParsedRef.current.get(m.id))
+      } else {
+        map.set(m.id, parseBundleEntries(m.bundleMessages))
+      }
     }
+    bundlePrevStringsRef.current = new Map(visibleMessages.map((m) => [m.id, m.bundleMessages]))
+    bundlePrevParsedRef.current = map
     return map
   }, [visibleMessages])
 
