@@ -388,4 +388,43 @@ db.version(28).stores({
   cloudServices: '++id, name, createdAt',
 })
 
+// v29: add messageCount to threads so the Sidebar can read counts
+// directly from the threads table instead of scanning all messages.
+db.version(29)
+  .stores({
+    threads:
+      '++id, title, characterId, personaId, updatedAt, isFavorite, isLocked, threadNumber, activeShortcutSetId, activeScenario',
+    characters:
+      '++id, name, displayName, createdAt, updatedAt, characterNumber, *tags, *lorebookIds',
+    personas: '++id, name, title, createdAt, isDefault',
+    settings: '++id, key',
+    uiState: '++id, key',
+    messages: '++id, threadId, role, personaId, createdAt, summarizedAt',
+    writingInstructions: '++id, name, createdAt',
+    connectionProfiles: '++id, name, createdAt',
+    inChatShortcuts: '++id, name, createdAt, order',
+    lorebooks: '++id, name, createdAt, avatar, isGlobal',
+    lorebookEntries: '++id, lorebookId, order, enabled, createdAt, updatedAt',
+    promptHistory: '++id, threadId, createdAt, isOOC',
+    promptBank: '++id, name, kind, createdAt',
+    tags: '++id, &name, createdAt',
+    threadMemories: '++id, threadId, createdAt',
+    logs: '++id, type, threadId, createdAt, level',
+    cloudServices: '++id, name, createdAt',
+  })
+  .upgrade(async (tx) => {
+    const threads = await tx.table('threads').toArray()
+    const allMessages = await tx.table('messages').toArray()
+    const counts = new Map()
+    for (const m of allMessages) {
+      if (m?.isSummaryMarker || m?.isAutoTitleMarker) continue
+      counts.set(m.threadId, (counts.get(m.threadId) || 0) + 1)
+    }
+    for (const thread of threads) {
+      await tx.table('threads').update(thread.id, {
+        messageCount: counts.get(thread.id) || 0,
+      })
+    }
+  })
+
 export default db

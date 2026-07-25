@@ -44,7 +44,6 @@ import {
 import { getGeneratingThreads } from '../../services/generatingState'
 import * as apiQueue from '../../services/apiQueue'
 import { useUnread } from '../../hooks/useUnread'
-import { getThreadMessageCounts } from '../../services/messages'
 
 function Sidebar({ open, onClose }) {
   const { t } = useTranslation('common')
@@ -120,7 +119,10 @@ function Sidebar({ open, onClose }) {
       if (c) map[c.id] = c
     })
     setCharacters(map)
-    const counts = await getThreadMessageCounts()
+    const counts = new Map()
+    for (const t of all) {
+      counts.set(t.id, t.messageCount || 0)
+    }
     setMessageCounts(counts)
   }, [])
 

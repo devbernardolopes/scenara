@@ -53,6 +53,7 @@ export async function createThread({ characterId, personaId, title, initialMessa
     threadNumber,
     memory: null,
     lastSummarizationAt: null,
+    messageCount: 0,
   })
   await touchCharacterLastUsed(characterId)
   window.dispatchEvent(
@@ -181,6 +182,7 @@ export async function duplicateThread(id) {
     memory: original.memory || null,
     lastSummarizationAt: original.lastSummarizationAt || null,
     activeScenario: original.activeScenario || null,
+    messageCount: 0,
   })
   const messages = await db.messages.where('threadId').equals(Number(id)).toArray()
   if (messages.length > 0) {
@@ -190,6 +192,13 @@ export async function duplicateThread(id) {
         threadId: newId,
       })),
     )
+    const realCount = messages.filter((m) => !m.isSummaryMarker && !m.isAutoTitleMarker).length
+    await db.threads
+      .where('id')
+      .equals(newId)
+      .modify((t) => {
+        t.messageCount = realCount
+      })
   }
   const memories = await db.threadMemories.where('threadId').equals(Number(id)).toArray()
   if (memories.length > 0) {
@@ -243,6 +252,7 @@ export async function forkThread(id, messageId) {
     lastSummarizationAt: original.lastSummarizationAt || null,
     keptConsumedCount: original.keptConsumedCount || 0,
     activeScenario: original.activeScenario || null,
+    messageCount: 0,
   })
 
   const allMessages = await db.messages.where('threadId').equals(Number(id)).sortBy('createdAt')
@@ -256,6 +266,15 @@ export async function forkThread(id, messageId) {
         threadId: newId,
       })),
     )
+    const realCount = messagesToCopy.filter(
+      (m) => !m.isSummaryMarker && !m.isAutoTitleMarker,
+    ).length
+    await db.threads
+      .where('id')
+      .equals(newId)
+      .modify((t) => {
+        t.messageCount = realCount
+      })
   }
 
   const memories = await db.threadMemories.where('threadId').equals(Number(id)).toArray()

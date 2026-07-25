@@ -2,11 +2,10 @@ import db from '../db'
 import { updateThreadTimestamp } from './threads'
 
 export async function getThreadMessageCounts() {
-  const all = await db.messages.toArray()
+  const threads = await db.threads.toArray()
   const counts = new Map()
-  for (const m of all) {
-    if (m?.isSummaryMarker || m?.isAutoTitleMarker) continue
-    counts.set(m.threadId, (counts.get(m.threadId) || 0) + 1)
+  for (const t of threads) {
+    counts.set(t.id, t.messageCount || 0)
   }
   return counts
 }
@@ -34,6 +33,12 @@ export async function createMessage(
     createdAt: new Date(),
     summarizedAt: null,
   })
+  await db.threads
+    .where('id')
+    .equals(Number(threadId))
+    .modify((t) => {
+      t.messageCount = (t.messageCount || 0) + 1
+    })
   if (role === 'user') {
     await db.promptHistory.add({
       threadId: Number(threadId),
@@ -66,6 +71,12 @@ export async function createAssistantMessage(
     createdAt: createdAt || new Date(),
     summarizedAt: null,
   })
+  await db.threads
+    .where('id')
+    .equals(Number(threadId))
+    .modify((t) => {
+      t.messageCount = (t.messageCount || 0) + 1
+    })
   await updateThreadTimestamp(threadId)
   window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId } }))
   return id
@@ -108,8 +119,17 @@ export async function updateMessage(id, updates) {
 export async function deleteMessage(id) {
   const msg = await db.messages.get(Number(id))
   const threadId = msg?.threadId
+  const isReal = msg && !msg.isSummaryMarker && !msg.isAutoTitleMarker
   await db.messages.delete(Number(id))
   if (threadId != null) {
+    if (isReal) {
+      await db.threads
+        .where('id')
+        .equals(Number(threadId))
+        .modify((t) => {
+          t.messageCount = Math.max(0, (t.messageCount || 0) - 1)
+        })
+    }
     await updateThreadTimestamp(threadId)
     window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId } }))
   }
@@ -127,12 +147,24 @@ export async function deleteMessagesFrom(id) {
     .map((m) => m.id)
   if (toDelete.length === 0) return
   await db.messages.bulkDelete(toDelete)
+  await db.threads
+    .where('id')
+    .equals(Number(msg.threadId))
+    .modify((t) => {
+      t.messageCount = Math.max(0, (t.messageCount || 0) - toDelete.length)
+    })
   await updateThreadTimestamp(msg.threadId)
   window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId: msg.threadId } }))
 }
 
 export async function deleteMessagesByThread(threadId) {
   const result = await db.messages.where('threadId').equals(Number(threadId)).delete()
+  await db.threads
+    .where('id')
+    .equals(Number(threadId))
+    .modify((t) => {
+      t.messageCount = 0
+    })
   window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId } }))
   return result
 }
