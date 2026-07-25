@@ -8,6 +8,7 @@ const MODAL_COMPONENTS = {}
 export function ModalProvider({ children }) {
   const [modalStack, setModalStack] = useState([])
   const closeGuardRef = useRef(null)
+  const mousedownInsideRef = useRef(false)
 
   const setCloseGuard = useCallback((guard) => {
     closeGuardRef.current = guard
@@ -78,7 +79,17 @@ export function ModalProvider({ children }) {
             key={index}
             className={`fixed inset-0 ${isFullscreen ? 'bg-overlay' : 'flex items-center justify-center bg-overlay'}`}
             style={{ zIndex: 50 + index }}
-            onClick={isTop ? closeWithGuard : undefined}
+            onClick={
+              isTop
+                ? () => {
+                    if (mousedownInsideRef.current) {
+                      mousedownInsideRef.current = false
+                      return
+                    }
+                    closeWithGuard()
+                  }
+                : undefined
+            }
           >
             <Suspense
               fallback={
@@ -88,13 +99,21 @@ export function ModalProvider({ children }) {
               }
             >
               {isFullscreen ? (
-                <div className="w-full h-full">
+                <div
+                  className="w-full h-full"
+                  onMouseDown={() => {
+                    mousedownInsideRef.current = true
+                  }}
+                >
                   <ModalComponent {...state.props} />
                 </div>
               ) : (
                 <div
                   className="bg-glass border-glass rounded-lg shadow-surface-lg max-w-4xl w-full mx-4 h-[75vh] max-h-[85vh] flex flex-col overflow-hidden"
                   style={{ borderRadius: 'var(--radius-lg)' }}
+                  onMouseDown={() => {
+                    mousedownInsideRef.current = true
+                  }}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <ModalComponent {...state.props} />
