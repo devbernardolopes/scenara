@@ -68,6 +68,7 @@ import {
 import { setBaseTitle } from '../services/titleManager'
 import { getMemoryIdForMarker } from '../services/threadMemories'
 import { estimateTokens } from '../services/tokenEstimator'
+import { ChatSettingsProvider } from '../hooks/useChatSettings'
 import {
   isAwayFromThread,
   addUnread,
@@ -2301,322 +2302,330 @@ function ChatView() {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto relative pb-4">
-        <div className="sticky top-0 z-10 bg-glass border-glass flex items-center justify-between px-4 md:px-8 py-3 shadow-header">
-          <div className="flex items-center gap-2 min-w-0">
-            {character && (
-              <Avatar
-                src={character.avatar}
-                size="sm"
-                className="flex-shrink-0 cursor-pointer"
-                onClick={() => openModal('characterCreate', { character })}
-              />
-            )}
+    <ChatSettingsProvider>
+      <div className="flex flex-col h-full">
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex-1 overflow-y-auto relative pb-4"
+        >
+          <div className="sticky top-0 z-10 bg-glass border-glass flex items-center justify-between px-4 md:px-8 py-3 shadow-header">
             <div className="flex items-center gap-2 min-w-0">
               {character && (
-                <h1 className="font-semibold text-text shrink-0">
-                  {character.displayName || character.name}
-                </h1>
+                <Avatar
+                  src={character.avatar}
+                  size="sm"
+                  className="flex-shrink-0 cursor-pointer"
+                  onClick={() => openModal('characterCreate', { character })}
+                />
               )}
-              <ChatTitle
-                title={thread.title}
-                chatTitleMarquee={chatTitleMarquee}
-                onDoubleClick={() => openModal('editThreadTitle', { thread })}
-              />
-            </div>
-            {blockingGenerating && (
-              <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />
-            )}
-            {blockingQueued && (
-              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-primary rounded-full shrink-0">
-                {queuedCount}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {thread?.activeScenario?.content?.trim() && (
-          <ScenarioStatusBar
-            scenario={thread.activeScenario}
-            charName={character?.name || ''}
-            userName={personaMap?.[thread?.personaId]?.name || ''}
-          />
-        )}
-
-        <div className="px-4 md:px-8 py-4 space-y-4">
-          {messages.length === 0 && !generating ? (
-            <p className="text-secondary text-sm text-center py-8">{t('placeholder')}</p>
-          ) : (
-            <>
-              {visibleStartIndex > 0 && (
-                <div className="flex justify-center">
-                  <button
-                    type="button"
-                    onClick={handleLoadEarlier}
-                    className="min-h-[44px] px-4 py-2 text-sm text-secondary hover:text-text border border-border-light rounded-lg hover:border-border transition-colors"
-                  >
-                    {t('loadEarlierMessages', {
-                      count: Math.min(visibleStartIndex, messageThreshold || 50),
-                    })}
-                  </button>
-                </div>
+              <div className="flex items-center gap-2 min-w-0">
+                {character && (
+                  <h1 className="font-semibold text-text shrink-0">
+                    {character.displayName || character.name}
+                  </h1>
+                )}
+                <ChatTitle
+                  title={thread.title}
+                  chatTitleMarquee={chatTitleMarquee}
+                  onDoubleClick={() => openModal('editThreadTitle', { thread })}
+                />
+              </div>
+              {blockingGenerating && (
+                <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />
               )}
-              {visibleMessages.map((msg, sliceIdx) => {
-                const idx = visibleStartIndex + sliceIdx
-                if (msg.isSummaryMarker) {
-                  const isVisible = idx >= visibleStartIndex
-                  let nextIdx = idx + 1
-                  while (nextIdx < messages.length && messages[nextIdx].isSummaryMarker) nextIdx++
-                  const nextVisible = nextIdx >= messages.length || nextIdx >= visibleStartIndex
-                  if (!isVisible || !nextVisible) return null
-                  const summPending = pendingMarkers.find((m) => m.type === 'summarization')
-                  const summStatus = summPending?.status
-                  return (
-                    <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
-                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                      <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
-                        {summStatus && (
-                          <button
-                            type="button"
-                            onClick={handleCancelSummarization}
-                            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-error hover:bg-error/10 transition-colors"
-                            title={t('cancelConfirmTitle')}
-                          >
-                            <Square className="w-3 h-3" />
-                          </button>
-                        )}
-                        {summStatus ? (
-                          t('summarizationMarker')
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              const memoryId = await getMemoryIdForMarker(threadId, msg.id)
-                              openModal('memory', { threadId, expandedMemoryId: memoryId })
-                            }}
-                            className="min-h-[44px] text-accent hover:underline underline-offset-2 transition-colors"
-                          >
-                            {t('summarizationMarker')}
-                          </button>
-                        )}
-                        {summStatus === 'queued' && <Clock className="w-3 h-3" />}
-                        {summStatus === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
-                      </span>
-                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                    </div>
-                  )
-                }
-
-                if (msg.isAutoTitleMarker) {
-                  const isVisible = idx >= visibleStartIndex
-                  let nextIdx = idx + 1
-                  while (
-                    nextIdx < messages.length &&
-                    (messages[nextIdx].isAutoTitleMarker || messages[nextIdx].isSummaryMarker)
-                  )
-                    nextIdx++
-                  const nextVisible = nextIdx >= messages.length || nextIdx >= visibleStartIndex
-                  if (!isVisible || !nextVisible) return null
-                  const autoTitlePending = pendingMarkers.find((m) => m.type === 'autoTitle')
-                  const atStatus = autoTitlePending?.status
-                  return (
-                    <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
-                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                      <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
-                        {atStatus && (
-                          <button
-                            type="button"
-                            onClick={handleCancelAutoTitle}
-                            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-error hover:bg-error/10 transition-colors"
-                            title={t('cancelConfirmTitle')}
-                          >
-                            <Square className="w-3 h-3" />
-                          </button>
-                        )}
-                        {atStatus ? (
-                          t('autoTitleMarker')
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => openModal('editThreadTitle', { thread })}
-                            className="min-h-[44px] text-accent hover:underline underline-offset-2 transition-colors"
-                          >
-                            {t('autoTitleMarker')}
-                          </button>
-                        )}
-                        {atStatus === 'queued' && <Clock className="w-3 h-3" />}
-                        {atStatus === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
-                      </span>
-                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                    </div>
-                  )
-                }
-
-                const entries = bundleMap.get(msg.id)
-                const bundleMessages = entries
-                const trackIdx = msg.activeSlotIndex ?? activeSlotIndices[msg.id]
-                const bundleIndex =
-                  trackIdx != null && bundleMessages
-                    ? Math.min(trackIdx, bundleMessages.length - 1)
-                    : bundleMessages && msg.content
-                      ? Math.max(
-                          0,
-                          bundleMessages.findIndex((e) => e?.content === msg.content),
-                        )
-                      : 0
-                const collapsedCodeBlocks =
-                  entries && bundleIndex >= 0 && bundleIndex < entries.length
-                    ? entries[bundleIndex].collapsedCodeBlocks || null
-                    : null
-                const currentOrigin =
-                  entries && bundleIndex >= 0 && bundleIndex < entries.length
-                    ? entries[bundleIndex].origin || null
-                    : null
-                const slotCreatedAt = entries?.[bundleIndex]?.createdAt || msg.createdAt
-                const bundleEntry = entries?.[bundleIndex]
-                const slotApiDurationMs = entries
-                  ? (bundleEntry?.apiDurationMs ?? null)
-                  : (msg.apiDurationMs ?? null)
-                const isFailedSlot = bundleEntry?.isError === true
-                const errorText = isFailedSlot
-                  ? bundleEntry.error || bundleEntry.content || ''
-                  : null
-                return (
-                  <div
-                    key={msg.id}
-                    data-message-id={msg.id}
-                    data-unread={msg.isUnread ? 'true' : 'false'}
-                  >
-                    <MessageBubble
-                      message={msg}
-                      messageNumber={msgNumMap.get(msg.id)}
-                      avatarSrc={getAvatarSrc(msg)}
-                      avatarScale={getAvatarScale(msg)}
-                      role={msg.role}
-                      personaMap={personaMap}
-                      nameLabel={getMessageName(msg)}
-                      streaming={msg.id === streamingMsgId}
-                      streamingContent={msg.id === streamingMsgId ? streamingContent : null}
-                      streamingSlotIndex={streamingSlotIndices[msg.id]}
-                      bundleMessages={bundleMessages}
-                      bundleIndex={bundleIndex}
-                      collapsedCodeBlocks={collapsedCodeBlocks}
-                      currentOrigin={currentOrigin}
-                      slotCreatedAt={slotCreatedAt}
-                      apiDurationMs={slotApiDurationMs}
-                      onBundleNavigate={handleBundleNavigate}
-                      onDeleteRequest={handleDeleteRequest}
-                      onDeleteAllSlots={handleDeleteAllSlots}
-                      onDeleteFromHere={handleDeleteFromHere}
-                      onEdit={handleEditMessage}
-                      onFork={handleForkMessage}
-                      onRegenerate={handleRegenerate}
-                      onSpeak={handleSpeak}
-                      generating={blockingGenerating}
-                      requestFailed={isFailedSlot}
-                      errorText={errorText}
-                      isUnread={msg.isUnread || false}
-                      character={character}
-                      personaName={personaMap?.[thread?.personaId]?.name || ''}
-                      onToggleCodeBlock={handleToggleCodeBlock}
-                      onToggleVisible={handleToggleVisible}
-                    />
-                  </div>
-                )
-              })}
-            </>
-          )}
-          <div ref={messagesEndRef} />
-
-          {showScrollButton && (
-            <button
-              type="button"
-              onClick={scrollToBottom}
-              className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center btn-primary rounded-full shadow-surface-lg transition-all duration-200 relative"
-              aria-label={t('scrollToBottom')}
-            >
-              <ChevronDown className="w-5 h-5" />
-              {(thread?.unreadCount || 0) > 0 && (
-                <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-badge-unread-text bg-badge-unread rounded-full leading-none">
-                  {thread.unreadCount > 99 ? '99+' : thread.unreadCount}
+              {blockingQueued && (
+                <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-primary rounded-full shrink-0">
+                  {queuedCount}
                 </span>
               )}
-            </button>
-          )}
-        </div>
-      </div>
+            </div>
+          </div>
 
-      <div className="flex-shrink-0 shadow-input-area bg-glass border-glass">
-        {' '}
-        {/* Wrap input for better control */}
-        {showStatus && chatModelName && (
-          // <div className="px-3 py-1.5 text-center">
-          <div className="px-3 text-center">
-            {chatProfile ? (
+          {thread?.activeScenario?.content?.trim() && (
+            <ScenarioStatusBar
+              scenario={thread.activeScenario}
+              charName={character?.name || ''}
+              userName={personaMap?.[thread?.personaId]?.name || ''}
+            />
+          )}
+
+          <div className="px-4 md:px-8 py-4 space-y-4">
+            {messages.length === 0 && !generating ? (
+              <p className="text-secondary text-sm text-center py-8">{t('placeholder')}</p>
+            ) : (
+              <>
+                {visibleStartIndex > 0 && (
+                  <div className="flex justify-center">
+                    <button
+                      type="button"
+                      onClick={handleLoadEarlier}
+                      className="min-h-[44px] px-4 py-2 text-sm text-secondary hover:text-text border border-border-light rounded-lg hover:border-border transition-colors"
+                    >
+                      {t('loadEarlierMessages', {
+                        count: Math.min(visibleStartIndex, messageThreshold || 50),
+                      })}
+                    </button>
+                  </div>
+                )}
+                {visibleMessages.map((msg, sliceIdx) => {
+                  const idx = visibleStartIndex + sliceIdx
+                  if (msg.isSummaryMarker) {
+                    const isVisible = idx >= visibleStartIndex
+                    let nextIdx = idx + 1
+                    while (nextIdx < messages.length && messages[nextIdx].isSummaryMarker) nextIdx++
+                    const nextVisible = nextIdx >= messages.length || nextIdx >= visibleStartIndex
+                    if (!isVisible || !nextVisible) return null
+                    const summPending = pendingMarkers.find((m) => m.type === 'summarization')
+                    const summStatus = summPending?.status
+                    return (
+                      <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                        <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
+                          {summStatus && (
+                            <button
+                              type="button"
+                              onClick={handleCancelSummarization}
+                              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-error hover:bg-error/10 transition-colors"
+                              title={t('cancelConfirmTitle')}
+                            >
+                              <Square className="w-3 h-3" />
+                            </button>
+                          )}
+                          {summStatus ? (
+                            t('summarizationMarker')
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const memoryId = await getMemoryIdForMarker(threadId, msg.id)
+                                openModal('memory', { threadId, expandedMemoryId: memoryId })
+                              }}
+                              className="min-h-[44px] text-accent hover:underline underline-offset-2 transition-colors"
+                            >
+                              {t('summarizationMarker')}
+                            </button>
+                          )}
+                          {summStatus === 'queued' && <Clock className="w-3 h-3" />}
+                          {summStatus === 'active' && (
+                            <RefreshCw className="w-3 h-3 animate-spin" />
+                          )}
+                        </span>
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                      </div>
+                    )
+                  }
+
+                  if (msg.isAutoTitleMarker) {
+                    const isVisible = idx >= visibleStartIndex
+                    let nextIdx = idx + 1
+                    while (
+                      nextIdx < messages.length &&
+                      (messages[nextIdx].isAutoTitleMarker || messages[nextIdx].isSummaryMarker)
+                    )
+                      nextIdx++
+                    const nextVisible = nextIdx >= messages.length || nextIdx >= visibleStartIndex
+                    if (!isVisible || !nextVisible) return null
+                    const autoTitlePending = pendingMarkers.find((m) => m.type === 'autoTitle')
+                    const atStatus = autoTitlePending?.status
+                    return (
+                      <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                        <span className="text-xs text-tertiary uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5">
+                          {atStatus && (
+                            <button
+                              type="button"
+                              onClick={handleCancelAutoTitle}
+                              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-error hover:bg-error/10 transition-colors"
+                              title={t('cancelConfirmTitle')}
+                            >
+                              <Square className="w-3 h-3" />
+                            </button>
+                          )}
+                          {atStatus ? (
+                            t('autoTitleMarker')
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => openModal('editThreadTitle', { thread })}
+                              className="min-h-[44px] text-accent hover:underline underline-offset-2 transition-colors"
+                            >
+                              {t('autoTitleMarker')}
+                            </button>
+                          )}
+                          {atStatus === 'queued' && <Clock className="w-3 h-3" />}
+                          {atStatus === 'active' && <RefreshCw className="w-3 h-3 animate-spin" />}
+                        </span>
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                      </div>
+                    )
+                  }
+
+                  const entries = bundleMap.get(msg.id)
+                  const bundleMessages = entries
+                  const trackIdx = msg.activeSlotIndex ?? activeSlotIndices[msg.id]
+                  const bundleIndex =
+                    trackIdx != null && bundleMessages
+                      ? Math.min(trackIdx, bundleMessages.length - 1)
+                      : bundleMessages && msg.content
+                        ? Math.max(
+                            0,
+                            bundleMessages.findIndex((e) => e?.content === msg.content),
+                          )
+                        : 0
+                  const collapsedCodeBlocks =
+                    entries && bundleIndex >= 0 && bundleIndex < entries.length
+                      ? entries[bundleIndex].collapsedCodeBlocks || null
+                      : null
+                  const currentOrigin =
+                    entries && bundleIndex >= 0 && bundleIndex < entries.length
+                      ? entries[bundleIndex].origin || null
+                      : null
+                  const slotCreatedAt = entries?.[bundleIndex]?.createdAt || msg.createdAt
+                  const bundleEntry = entries?.[bundleIndex]
+                  const slotApiDurationMs = entries
+                    ? (bundleEntry?.apiDurationMs ?? null)
+                    : (msg.apiDurationMs ?? null)
+                  const isFailedSlot = bundleEntry?.isError === true
+                  const errorText = isFailedSlot
+                    ? bundleEntry.error || bundleEntry.content || ''
+                    : null
+                  return (
+                    <div
+                      key={msg.id}
+                      data-message-id={msg.id}
+                      data-unread={msg.isUnread ? 'true' : 'false'}
+                    >
+                      <MessageBubble
+                        message={msg}
+                        messageNumber={msgNumMap.get(msg.id)}
+                        avatarSrc={getAvatarSrc(msg)}
+                        avatarScale={getAvatarScale(msg)}
+                        role={msg.role}
+                        personaMap={personaMap}
+                        nameLabel={getMessageName(msg)}
+                        streaming={msg.id === streamingMsgId}
+                        streamingContent={msg.id === streamingMsgId ? streamingContent : null}
+                        streamingSlotIndex={streamingSlotIndices[msg.id]}
+                        bundleMessages={bundleMessages}
+                        bundleIndex={bundleIndex}
+                        collapsedCodeBlocks={collapsedCodeBlocks}
+                        currentOrigin={currentOrigin}
+                        slotCreatedAt={slotCreatedAt}
+                        apiDurationMs={slotApiDurationMs}
+                        onBundleNavigate={handleBundleNavigate}
+                        onDeleteRequest={handleDeleteRequest}
+                        onDeleteAllSlots={handleDeleteAllSlots}
+                        onDeleteFromHere={handleDeleteFromHere}
+                        onEdit={handleEditMessage}
+                        onFork={handleForkMessage}
+                        onRegenerate={handleRegenerate}
+                        onSpeak={handleSpeak}
+                        generating={blockingGenerating}
+                        requestFailed={isFailedSlot}
+                        errorText={errorText}
+                        isUnread={msg.isUnread || false}
+                        character={character}
+                        personaName={personaMap?.[thread?.personaId]?.name || ''}
+                        onToggleCodeBlock={handleToggleCodeBlock}
+                        onToggleVisible={handleToggleVisible}
+                      />
+                    </div>
+                  )
+                })}
+              </>
+            )}
+            <div ref={messagesEndRef} />
+
+            {showScrollButton && (
               <button
                 type="button"
-                onClick={() => openModal('profileForm', { profile: chatProfile })}
-                className="text-xs text-tertiary hover:text-text hover:underline inline-flex items-center gap-1 max-w-full flex-nowrap whitespace-nowrap"
-                title={t('statusBar.editProfile')}
+                onClick={scrollToBottom}
+                className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center btn-primary rounded-full shadow-surface-lg transition-all duration-200 relative"
+                aria-label={t('scrollToBottom')}
               >
-                {chatProfileIsOverride && <span className="text-accent font-bold">*</span>}
-                {chatModelTemp != null && <>{chatModelTemp}t · </>}
-                {chatModelTopP != null && <>{chatModelTopP}p · </>}
-                <MarqueeText className="inline-block align-bottom max-w-full">
-                  {chatModelName.split('/').pop()}
-                </MarqueeText>
-                {hordeEta && <> · {hordeEta}</>}
+                <ChevronDown className="w-5 h-5" />
+                {(thread?.unreadCount || 0) > 0 && (
+                  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-badge-unread-text bg-badge-unread rounded-full leading-none">
+                    {thread.unreadCount > 99 ? '99+' : thread.unreadCount}
+                  </span>
+                )}
               </button>
-            ) : (
-              <span className="text-xs text-tertiary inline-flex items-center gap-1 max-w-full flex-nowrap whitespace-nowrap">
-                {chatProfileIsOverride && <span className="text-accent font-bold">*</span>}
-                {chatModelTemp != null && <>{chatModelTemp}t · </>}
-                {chatModelTopP != null && <>{chatModelTopP}p · </>}
-                <MarqueeText className="inline-block align-bottom max-w-full">
-                  {chatModelName.split('/').pop()}
-                </MarqueeText>
-                {hordeEta && <> · {hordeEta}</>}
-              </span>
             )}
           </div>
-        )}
-        {summarizationProgress && (
-          <div className="px-3 py-1 text-center">
-            <span className="text-xs text-tertiary">
-              {summarizationProgress.mode === 'messages'
-                ? t('summarizationProgressMessages', { count: summarizationProgress.remaining })
-                : t('summarizationProgressTokens', {
-                    current: summarizationProgress.current,
-                    threshold: summarizationProgress.threshold,
-                  })}
-            </span>
-          </div>
-        )}
-        <ChatInputArea
-          threadId={threadId}
-          onSend={handleSend}
-          onCancel={handleCancel}
-          generating={blockingGenerating}
-          autoTitling={autoTitling}
-          hasQueued={blockingQueued}
-          onPersonaChange={setSelectedPersonaId}
-          onOocChange={setOocActive}
-        />
-      </div>
+        </div>
 
-      {confirmDeleteId && (
-        <ConfirmDialog
-          title={t('messageDeleteTitle')}
-          message={t('messageDeleteConfirm', { number: deletedMsgNumber })}
-          confirmLabel={t('deleteThread')}
-          cancelLabel={t('cancel')}
-          variant="danger"
-          onConfirm={() => handleDeleteMessage(confirmDeleteId)}
-          onCancel={() => setConfirmDeleteId(null)}
-        />
-      )}
-    </div>
+        <div className="flex-shrink-0 shadow-input-area bg-glass border-glass">
+          {' '}
+          {/* Wrap input for better control */}
+          {showStatus && chatModelName && (
+            // <div className="px-3 py-1.5 text-center">
+            <div className="px-3 text-center">
+              {chatProfile ? (
+                <button
+                  type="button"
+                  onClick={() => openModal('profileForm', { profile: chatProfile })}
+                  className="text-xs text-tertiary hover:text-text hover:underline inline-flex items-center gap-1 max-w-full flex-nowrap whitespace-nowrap"
+                  title={t('statusBar.editProfile')}
+                >
+                  {chatProfileIsOverride && <span className="text-accent font-bold">*</span>}
+                  {chatModelTemp != null && <>{chatModelTemp}t · </>}
+                  {chatModelTopP != null && <>{chatModelTopP}p · </>}
+                  <MarqueeText className="inline-block align-bottom max-w-full">
+                    {chatModelName.split('/').pop()}
+                  </MarqueeText>
+                  {hordeEta && <> · {hordeEta}</>}
+                </button>
+              ) : (
+                <span className="text-xs text-tertiary inline-flex items-center gap-1 max-w-full flex-nowrap whitespace-nowrap">
+                  {chatProfileIsOverride && <span className="text-accent font-bold">*</span>}
+                  {chatModelTemp != null && <>{chatModelTemp}t · </>}
+                  {chatModelTopP != null && <>{chatModelTopP}p · </>}
+                  <MarqueeText className="inline-block align-bottom max-w-full">
+                    {chatModelName.split('/').pop()}
+                  </MarqueeText>
+                  {hordeEta && <> · {hordeEta}</>}
+                </span>
+              )}
+            </div>
+          )}
+          {summarizationProgress && (
+            <div className="px-3 py-1 text-center">
+              <span className="text-xs text-tertiary">
+                {summarizationProgress.mode === 'messages'
+                  ? t('summarizationProgressMessages', { count: summarizationProgress.remaining })
+                  : t('summarizationProgressTokens', {
+                      current: summarizationProgress.current,
+                      threshold: summarizationProgress.threshold,
+                    })}
+              </span>
+            </div>
+          )}
+          <ChatInputArea
+            threadId={threadId}
+            onSend={handleSend}
+            onCancel={handleCancel}
+            generating={blockingGenerating}
+            autoTitling={autoTitling}
+            hasQueued={blockingQueued}
+            onPersonaChange={setSelectedPersonaId}
+            onOocChange={setOocActive}
+          />
+        </div>
+
+        {confirmDeleteId && (
+          <ConfirmDialog
+            title={t('messageDeleteTitle')}
+            message={t('messageDeleteConfirm', { number: deletedMsgNumber })}
+            confirmLabel={t('deleteThread')}
+            cancelLabel={t('cancel')}
+            variant="danger"
+            onConfirm={() => handleDeleteMessage(confirmDeleteId)}
+            onCancel={() => setConfirmDeleteId(null)}
+          />
+        )}
+      </div>
+    </ChatSettingsProvider>
   )
 }
 

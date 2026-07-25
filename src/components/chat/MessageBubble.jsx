@@ -5,11 +5,11 @@ import { useModal } from '../../hooks/useModal'
 import { useSwipe } from '../../hooks/useSwipe'
 import { useIsMobile } from '../../hooks/useIsMobile'
 import { useOverflowButtons } from '../../hooks/useOverflowButtons'
+import { useChatSettings } from '../../hooks/useChatSettings'
 import { showToast } from '../../lib/toast'
-import { getSetting } from '../../services/settings'
 import { replaceVars, stripOOCDelimiters } from '../../services/chatApi'
 import { getStreamingStartTime } from '../../services/generatingState'
-import { injectRuleTags, applyRulesToPlainText, DEFAULT_PP_RULES } from '../../lib/postProcessing'
+import { injectRuleTags, applyRulesToPlainText } from '../../lib/postProcessing'
 import {
   Trash2,
   Edit3,
@@ -33,29 +33,6 @@ import {
 import Avatar from '../shared/Avatar'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { CodeBlocksMarkdown } from './CodeBlockWrapper'
-
-const VISIBILITY_KEYS = [
-  'showAssistantDelete',
-  'showAssistantDeleteAll',
-  'showAssistantDeleteFromHere',
-  'showAssistantEdit',
-  'showAssistantCopy',
-  'showAssistantFork',
-  'showAssistantRegenerate',
-  'showAssistantSpeak',
-  'showAssistantPrompt',
-  'showAssistantRequestDetails',
-  'showAssistantDirectorDetails',
-  'showAssistantVisible',
-  'showUserDelete',
-  'showUserDeleteAll',
-  'showUserDeleteFromHere',
-  'showUserEdit',
-  'showUserCopy',
-  'showUserFork',
-  'showUserMakeShortcut',
-  'showUserVisible',
-]
 
 const DEFAULT_ASSISTANT_ORDER = [
   'delete',
@@ -244,17 +221,18 @@ function MessageBubble({
   const overflowPanelRef = useRef(null)
   const bubbleRef = useRef(null)
   const [overflowMenuStyle, setOverflowMenuStyle] = useState(null)
-  const [visibility, setVisibility] = useState(
-    Object.fromEntries(VISIBILITY_KEYS.map((k) => [k, true])),
-  )
-  const [chatFontFamily, setChatFontFamily] = useState('system')
-  const [chatFontSize, setChatFontSize] = useState('sm')
-  const [messageBubbleSize, setMessageBubbleSize] = useState('normal')
-  const [renderMarkdown, setRenderMarkdown] = useState(true)
-  const [order, setOrder] = useState({ assistantButtonOrder: null, userButtonOrder: null })
-  const [postProcessingEnabled, setPostProcessingEnabled] = useState(true)
-  const [globalPPRules, setGlobalPPRules] = useState(DEFAULT_PP_RULES)
-  const [oocDelimiters, setOocDelimiters] = useState(null)
+  const chatSettings = useChatSettings()
+  const {
+    visibility,
+    chatFontFamily,
+    chatFontSize,
+    messageBubbleSize,
+    renderMarkdown,
+    order,
+    postProcessingEnabled,
+    globalPPRules,
+    oocDelimiters,
+  } = chatSettings || {}
   const [elapsedMs, setElapsedMs] = useState(null)
 
   useEffect(() => {
@@ -273,68 +251,6 @@ function MessageBubble({
       clearInterval(interval)
     }
   }, [streaming, message.id])
-
-  useEffect(() => {
-    async function load() {
-      const allKeys = [
-        ...VISIBILITY_KEYS,
-        'assistantButtonOrder',
-        'userButtonOrder',
-        'chatFontFamily',
-        'chatFontSize',
-        'messageBubbleSize',
-        'renderMarkdown',
-        'defaultPostProcessing',
-        'postProcessingRules',
-        'prompting.oocDelimiters',
-      ]
-      const entries = await Promise.all(allKeys.map(async (k) => [k, await getSetting(k)]))
-      const map = Object.fromEntries(entries)
-      setVisibility(Object.fromEntries(VISIBILITY_KEYS.map((k) => [k, map[k]])))
-      setOrder({
-        assistantButtonOrder: map.assistantButtonOrder,
-        userButtonOrder: map.userButtonOrder,
-      })
-      setChatFontFamily(map.chatFontFamily || 'system')
-      setChatFontSize(map.chatFontSize || 'sm')
-      setMessageBubbleSize(map.messageBubbleSize || 'normal')
-      setRenderMarkdown(map.renderMarkdown !== false)
-      setPostProcessingEnabled(map.defaultPostProcessing !== false)
-      if (
-        map.postProcessingRules &&
-        Array.isArray(map.postProcessingRules) &&
-        map.postProcessingRules.length
-      ) {
-        setGlobalPPRules(map.postProcessingRules)
-      }
-      setOocDelimiters(map['prompting.oocDelimiters'] || null)
-    }
-    load()
-
-    const VIS_SET = new Set(VISIBILITY_KEYS)
-    function handler(e) {
-      const key = e.detail?.key
-      if (!key) return
-      if (VIS_SET.has(key)) {
-        getSetting(key).then((v) => setVisibility((prev) => ({ ...prev, [key]: v })))
-      }
-      if (key === 'assistantButtonOrder' || key === 'userButtonOrder') {
-        getSetting(key).then((v) => setOrder((prev) => ({ ...prev, [key]: v })))
-      }
-      if (key === 'chatFontFamily') setChatFontFamily(e.detail.value || 'system')
-      if (key === 'chatFontSize') setChatFontSize(e.detail.value || 'sm')
-      if (key === 'messageBubbleSize') setMessageBubbleSize(e.detail.value || 'normal')
-      if (key === 'renderMarkdown') setRenderMarkdown(e.detail.value !== false)
-      if (key === 'defaultPostProcessing') setPostProcessingEnabled(e.detail.value !== false)
-      if (key === 'postProcessingRules') {
-        const v = e.detail.value
-        if (v && Array.isArray(v) && v.length) setGlobalPPRules(v)
-      }
-      if (key === 'prompting.oocDelimiters') setOocDelimiters(e.detail.value || null)
-    }
-    window.addEventListener('settings-changed', handler)
-    return () => window.removeEventListener('settings-changed', handler)
-  }, [])
 
   const activeRules = useMemo(() => {
     const charEnabled = character ? character.postProcessing !== false : undefined
