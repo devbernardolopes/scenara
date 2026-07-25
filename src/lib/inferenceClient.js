@@ -166,3 +166,11 @@ export function deleteTtsModel(modelKey) {
 export function previewTtsModel(modelKey, voice, text) {
   return run('tts-preview', {}, { modelKey, voice, text }, { timeout: 30000 })
 }
+
+export function speakTts(modelKey, text, voice, backend) {
+  return run('tts-speak', { text }, { modelKey, voice, backend }, { timeout: 300000 })
+}
+
+export function cancelTtsTask() {
+  return run('tts-cancel', {}, {}, { timeout: 5000 })
+}

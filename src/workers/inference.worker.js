@@ -246,6 +246,7 @@ async function handleTitleGeneration(pipe, payload, options, modelKey) {
 // ── Kitten TTS ───────────────────────────────────────────────────────────────
 
 const TTS_SAMPLE_RATE = 24000
+let ttsCancelled = false
 
 const KITTEN_VOICE_ALIASES = {
   Bella: 'expr-voice-2-f',
@@ -871,6 +872,67 @@ async function previewTtsVoice(modelKey, voiceName, text) {
   }
 }
 
+async function speakTtsFull(modelKey, text, voiceName) {
+  ttsCancelled = false
+  const entry = kittenSessions.get(modelKey)
+  if (!entry) throw new Error('Model not loaded')
+  if (!entry.voices || entry.voices.size === 0) throw new Error('Voices not loaded')
+
+  const displayVoice = voiceName || 'Leo'
+  const internalVoice = KITTEN_VOICE_ALIASES[displayVoice] || displayVoice
+  const speedPrior = KITTEN_SPEED_PRIORS[internalVoice] ?? 1.0
+  const effectiveSpeed = speedPrior
+
+  const inputText = (text || '').toString()
+  if (!inputText.trim()) throw new Error('Empty text')
+  const chunks = chunkTtsText(preprocessTtsText(inputText))
+
+  const allAudio = []
+  for (const chunk of chunks) {
+    if (ttsCancelled) throw new Error('Cancelled')
+    const { ids } = await phonemizeAndTokenize(chunk)
+    const inputIds = new BigInt64Array(ids.map((n) => BigInt(n)))
+
+    const embeddings = entry.voices.get(internalVoice)
+    if (!embeddings || embeddings.length === 0) {
+      throw new Error(`Voice "${displayVoice}" not found`)
+    }
+    const refId = Math.min(ids.length, embeddings.length - 1)
+    const styleEmbedding = embeddings[refId]
+
+    const feeds = {
+      input_ids: new ort.Tensor('int64', inputIds, [1, ids.length]),
+      style: new ort.Tensor('float32', styleEmbedding, [1, styleEmbedding.length]),
+      speed: new ort.Tensor('float32', new Float32Array([effectiveSpeed]), [1]),
+    }
+
+    const results = await entry.session.run(feeds)
+    const outputName = entry.session.outputNames[0]
+    const outputTensor = results[outputName]
+    let audio = new Float32Array(outputTensor.data)
+    if (audio.length > 5000) audio = audio.slice(0, audio.length - 5000)
+    allAudio.push(audio)
+  }
+
+  if (ttsCancelled) throw new Error('Cancelled')
+
+  const totalLen = allAudio.reduce((sum, a) => sum + a.length, 0)
+  const merged = new Float32Array(totalLen)
+  let offset = 0
+  for (const a of allAudio) {
+    merged.set(a, offset)
+    offset += a.length
+  }
+
+  const wavBuf = encodeWav(merged, TTS_SAMPLE_RATE)
+  return {
+    modelKey,
+    audio: wavBuf,
+    sampleRate: TTS_SAMPLE_RATE,
+    duration: merged.length / TTS_SAMPLE_RATE,
+  }
+}
+
 const TTS_TASK_HANDLERS = {
   'tts-check-cache': (payload, options, modelKey) => checkTtsCache(modelKey),
   'tts-download': (payload, options, modelKey, callId) => downloadTtsModel(modelKey, callId),
@@ -880,6 +942,12 @@ const TTS_TASK_HANDLERS = {
   'tts-delete': (payload, options, modelKey) => deleteTtsModel(modelKey),
   'tts-preview': (payload, options, modelKey) =>
     previewTtsVoice(modelKey, options?.voice, options?.text),
+  'tts-speak': (payload, options, modelKey) =>
+    speakTtsFull(modelKey, payload?.text, options?.voice),
+  'tts-cancel': () => {
+    ttsCancelled = true
+    return { success: true }
+  },
 }
 
 // ── Message dispatch ─────────────────────────────────────────────────────────

@@ -18,6 +18,7 @@ import {
   GitBranch,
   RefreshCw,
   Play,
+  Square,
   Terminal,
   MoreHorizontal,
   ChevronLeft,
@@ -33,6 +34,7 @@ import {
 import Avatar from '../shared/Avatar'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { CodeBlocksMarkdown } from './CodeBlockWrapper'
+import { speak, stop, subscribe, getPlaybackState } from '../../lib/ttsPlayback'
 
 const DEFAULT_ASSISTANT_ORDER = [
   'delete',
@@ -182,7 +184,6 @@ function MessageBubble({
   onRegenerate,
   onDeleteAllSlots,
   onDeleteFromHere,
-  onSpeak,
   generating,
   requestFailed,
   errorText,
@@ -234,6 +235,7 @@ function MessageBubble({
     oocDelimiters,
   } = chatSettings || {}
   const [elapsedMs, setElapsedMs] = useState(null)
+  const [playbackState, setPlaybackState] = useState(getPlaybackState)
 
   useEffect(() => {
     if (!streaming) return
@@ -252,6 +254,10 @@ function MessageBubble({
     }
   }, [streaming, message.id])
 
+  useEffect(() => {
+    return subscribe(setPlaybackState)
+  }, [])
+
   const activeRules = useMemo(() => {
     const charEnabled = character ? character.postProcessing !== false : undefined
     const enabled = charEnabled !== undefined ? charEnabled : postProcessingEnabled !== false
@@ -264,6 +270,7 @@ function MessageBubble({
 
   const isUser = role === 'user'
   const isSystem = role === 'system'
+  const isSpeakingThis = playbackState.speakingMessageId === message.id
   const displayContent = renderContent(
     streaming && streamingContent != null ? streamingContent : message.content,
   )
@@ -537,7 +544,16 @@ function MessageBubble({
       case 'regenerate':
         return () => onRegenerate?.(message.id)
       case 'speak':
-        return () => onSpeak?.(message.id)
+        return () => {
+          if (isSpeakingThis) {
+            stop()
+          } else {
+            speak(message.id, message.content, {
+              character,
+              oocDelimiters,
+            })
+          }
+        }
       case 'prompt':
         return handleShowPrompt
       case 'requestDetails':
@@ -802,10 +818,16 @@ function MessageBubble({
                                       ) : (
                                         <EyeOff className="w-4 h-4" />
                                       )
+                                    ) : key === 'speak' && isSpeakingThis ? (
+                                      <Square className="w-4 h-4" />
                                     ) : (
                                       <Icon className="w-4 h-4" />
                                     )}
-                                    <span>{t(def.labelKey)}</span>
+                                    <span>
+                                      {key === 'speak' && isSpeakingThis
+                                        ? t('stop')
+                                        : t(def.labelKey)}
+                                    </span>
                                   </span>
                                   {isToggle && (
                                     <div

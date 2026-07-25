@@ -1042,7 +1042,6 @@ function ChatView() {
   }
 
   const handleDeleteRequest = useCallback((id) => setConfirmDeleteId(id), [])
-  const handleSpeak = useCallback(() => {}, [])
 
   function withoutFailedMessages(msgs) {
     const ids = failedIdsRef.current
@@ -2510,7 +2509,6 @@ function ChatView() {
                         onEdit={handleEditMessage}
                         onFork={handleForkMessage}
                         onRegenerate={handleRegenerate}
-                        onSpeak={handleSpeak}
                         generating={blockingGenerating}
                         requestFailed={isFailedSlot}
                         errorText={errorText}
