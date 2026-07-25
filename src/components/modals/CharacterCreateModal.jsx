@@ -13,6 +13,7 @@ import { estimateTokens } from '../../services/tokenEstimator'
 import { getWritingInstruction } from '../../services/writingInstructions'
 import { getPersona } from '../../services/personas'
 import CloseButton from '../shared/CloseButton'
+import { useModalScrollPosition } from '../../hooks/useModalScrollPosition'
 import SaveButton from '../shared/SaveButton'
 import CharacterSidebar from './character/CharacterSidebar'
 import CharacterSection from './character/CharacterSection'
@@ -238,6 +239,9 @@ function CharacterCreateModal({ character: existing, initialData }) {
   const isEditing = Boolean(existing)
   const isImport = Boolean(initialData)
   const characterId = existing?.id || null
+  const { scrollRef, onScroll } = useModalScrollPosition(
+    characterId ? `characterCreate.${characterId}` : 'characterCreate.new',
+  )
 
   const [initial, setInitial] = useState(() =>
     isImport ? buildInitialForm(initialData) : buildInitialForm(existing),
@@ -566,7 +570,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
           onSelect={handleSectionChange}
           highlights={sectionHighlights}
         />
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto px-6 py-4">
           <ActivePanel form={form} onChange={handleChange} characterId={characterId} />
         </div>
       </div>

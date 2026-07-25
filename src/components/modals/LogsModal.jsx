@@ -8,6 +8,7 @@ import { getLogs, deleteLogs, clearLogs, exportLogs } from '../../services/logs'
 import { getAllThreads } from '../../services/threads'
 import { getUIState, setUIState } from '../../services/uiState'
 import CloseButton from '../shared/CloseButton'
+import { useModalScrollPosition } from '../../hooks/useModalScrollPosition'
 import { Search, Trash2, Download, ScrollText, ChevronDown } from '../../lib/icons'
 
 const FILTERS_KEY = 'logsModal.filters'
@@ -41,6 +42,7 @@ function LogsModal() {
   const { t } = useTranslation(['common', 'logs'])
   const { openModal, closeModal } = useModal()
   const { confirm } = useConfirm()
+  const { scrollRef, onScroll } = useModalScrollPosition('logs')
   const [logs, setLogs] = useState([])
   const [threads, setThreads] = useState([])
   const [selectedIds, setSelectedIds] = useState(new Set())
@@ -255,7 +257,7 @@ function LogsModal() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-4 min-h-0">
+      <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto px-6 py-4 min-h-0">
         {logs.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-tertiary gap-2">
             <ScrollText className="w-8 h-8" />

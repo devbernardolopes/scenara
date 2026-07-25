@@ -5,6 +5,7 @@ import { useConfirm } from '../../../lib/confirm'
 import { showToast } from '../../../lib/toast'
 import { downloadJson } from '../../../lib/download'
 import CloseButton from '../../shared/CloseButton'
+import { useModalScrollPosition } from '../../../hooks/useModalScrollPosition'
 import ListEntryCard from '../../shared/ListEntryCard'
 import { SortableList, SortableItem } from '../../shared/SortableList'
 import { Plus, Upload } from '../../../lib/icons'
@@ -45,6 +46,7 @@ function ListManagementModal({ config }) {
   const { t } = useTranslation('settings')
   const { openModal, closeModal } = useModal()
   const { confirm } = useConfirm()
+  const { scrollRef, onScroll } = useModalScrollPosition(`list.${config.entityKey}`)
 
   const entityKey = config.entityKey
   const titleKey = config.titleKey || `${entityKey}.title`
@@ -177,7 +179,7 @@ function ListManagementModal({ config }) {
         <h2 className="text-xl font-semibold text-text">{t(titleKey)}</h2>
         <CloseButton onClick={closeModal} />
       </div>
-      <div className="flex-1 overflow-y-auto px-6 py-4">
+      <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto px-6 py-4">
         <div className="space-y-4">
           <div className="flex items-center gap-2 flex-wrap">
             {config.canCreate !== false && (

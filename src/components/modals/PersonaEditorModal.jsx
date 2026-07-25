@@ -9,6 +9,7 @@ import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../services/tokenEstimator'
 import Avatar from '../shared/Avatar'
 import { Plus, X } from '../../lib/icons'
+import { useModalScrollPosition } from '../../hooks/useModalScrollPosition'
 
 function formatDataSize(byteLen) {
   if (byteLen < 1024) return `${byteLen} B`
@@ -20,6 +21,7 @@ function PersonaEditorModal() {
   const { t } = useTranslation('characterCreation')
   const { closeModal, openModal } = useModal()
   const { confirm } = useConfirm()
+  const { scrollRef, onScroll } = useModalScrollPosition('personaEditor')
   const [personas, setPersonas] = useState([])
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({
@@ -217,7 +219,7 @@ function PersonaEditorModal() {
         <CloseButton onClick={closeModal} />
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 pt-4">
+      <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto p-6 pt-4">
         {personas.length === 0 ? (
           <p className="text-sm text-secondary py-8 text-center">{t('noPersonas')}</p>
         ) : (

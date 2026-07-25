@@ -90,6 +90,11 @@ export async function exportDatabase(selection) {
     }
   }
 
+  const scrollEntries = await db.uiState.where('key').startsWith('scroll.').toArray()
+  if (scrollEntries.length > 0) {
+    data.scrollPositions = Object.fromEntries(scrollEntries.map((e) => [e.key.slice(7), e.value]))
+  }
+
   const threadIds = new Set(selection.threadIds || [])
 
   if (selection.characterIds?.size > 0) {
@@ -293,6 +298,13 @@ export async function importDatabase(data) {
           key: 'discovery.searchQuery',
           value: data.discoveryView.searchQuery,
         })
+      }
+    }
+
+    if (data.scrollPositions && typeof data.scrollPositions === 'object') {
+      await db.uiState.where('key').startsWith('scroll.').delete()
+      for (const [subKey, value] of Object.entries(data.scrollPositions)) {
+        await db.uiState.add({ key: `scroll.${subKey}`, value })
       }
     }
   })

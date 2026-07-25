@@ -12,6 +12,7 @@ import {
 import { getUIState, setUIState } from '../../services/uiState'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import CloseButton from '../shared/CloseButton'
+import { useModalScrollPosition } from '../../hooks/useModalScrollPosition'
 import { Plus, Search, X, ArrowUpDown } from '../../lib/icons'
 
 const SORT_OPTIONS = ['name', 'createdAt']
@@ -20,6 +21,7 @@ function TagManagementModal() {
   const { t } = useTranslation('common')
   const { closeModal } = useModal()
   const { confirm } = useConfirm()
+  const { scrollRef, onScroll } = useModalScrollPosition('tags')
   const [tags, setTags] = useState([])
   const [loading, setLoading] = useState(true)
   const [inputValue, setInputValue] = useState('')
@@ -181,7 +183,7 @@ function TagManagementModal() {
         <CloseButton onClick={closeModal} />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-4">
+      <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto px-6 py-4">
         <div className="space-y-4">
           <form onSubmit={handleSubmit} className="flex items-center gap-2">
             <div className="relative flex-1">

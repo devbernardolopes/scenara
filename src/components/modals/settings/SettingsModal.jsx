@@ -12,6 +12,7 @@ import ApiSettingsPanel from './ApiSettingsPanel'
 import DatabaseSettingsPanel from './DatabaseSettingsPanel'
 import PostProcessingRulesPanel from './PostProcessingRulesPanel'
 import CloseButton from '../../shared/CloseButton'
+import { useModalScrollPosition } from '../../../hooks/useModalScrollPosition'
 import pkg from '../../../../package.json'
 
 function SettingsModal() {
@@ -22,6 +23,7 @@ function SettingsModal() {
     'modal.settings.category',
     CATEGORIES[0]?.id,
   )
+  const { scrollRef, onScroll } = useModalScrollPosition(`settings.${activeCategory}`)
 
   const filtered = SETTINGS.filter((s) => s.category === activeCategory)
 
@@ -161,7 +163,7 @@ function SettingsModal() {
           onSelect={setActiveCategory}
         />
 
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto px-6 py-4">
           {activeCategory === 'api' ? (
             <ApiSettingsPanel />
           ) : activeCategory === 'database' ? (
