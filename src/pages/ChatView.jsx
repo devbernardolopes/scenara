@@ -691,24 +691,9 @@ function ChatView() {
   useEffect(() => {
     function handleMessagesChanged(e) {
       if (Number(e.detail?.threadId) !== Number(threadId)) return
-      if (generatingRef.current && isLocalStreamerRef.current) return
+      if (generatingRef.current) return
       getMessagesByThread(threadId).then((msgs) => {
-        const fresh = dedupeMessages(msgs)
-        if (!generatingRef.current) {
-          setMessages(fresh)
-          return
-        }
-        setMessages((prev) => {
-          const prevMap = new Map(prev.map((m) => [m.id, m]))
-          return fresh.map((m) => {
-            const prevMsg = prevMap.get(m.id)
-            if (!prevMsg) return m
-            if (prevMsg.id === streamingMsgIdRef.current) {
-              return { ...m, content: prevMsg.content }
-            }
-            return m
-          })
-        })
+        setMessages(dedupeMessages(msgs))
       })
     }
     window.addEventListener('messages-changed', handleMessagesChanged)
@@ -962,9 +947,18 @@ function ChatView() {
         } else {
           visibleIds.forEach((msgId) => markMessageRead(msgId, threadId))
         }
-        setMessages((prev) =>
-          prev.map((m) => (visibleIds.includes(m.id) ? { ...m, isUnread: false } : m)),
-        )
+        const idSet = new Set(visibleIds)
+        setMessages((prev) => {
+          let changed = false
+          const next = prev.map((m) => {
+            if (idSet.has(m.id) && m.isUnread) {
+              changed = true
+              return { ...m, isUnread: false }
+            }
+            return m
+          })
+          return changed ? next : prev
+        })
       }
     }
 
@@ -1298,9 +1292,21 @@ function ChatView() {
         try {
           if (showMarker && triggerLastCreatedAt != null) {
             markerId = await createAutoTitleMarker(threadId, triggerLastCreatedAt)
-            const updated = await getMessagesByThread(threadId)
             if (Number(currentThreadIdRef.current) === Number(threadId)) {
-              setMessages(dedupeMessages(updated))
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: markerId,
+                  threadId: Number(threadId),
+                  role: 'system',
+                  content: '',
+                  personaId: null,
+                  isOOC: false,
+                  isAutoTitleMarker: true,
+                  createdAt: new Date(new Date(triggerLastCreatedAt).getTime() + 1),
+                  summarizedAt: null,
+                },
+              ])
             }
           }
           await apiQueue.enqueue({
@@ -1329,9 +1335,8 @@ function ChatView() {
           }
           if (markerId != null) {
             await deleteMessage(markerId)
-            const updated = await getMessagesByThread(threadId)
             if (Number(currentThreadIdRef.current) === Number(threadId)) {
-              setMessages(dedupeMessages(updated))
+              setMessages((prev) => prev.filter((m) => m.id !== markerId))
             }
           }
         } finally {
@@ -1362,9 +1367,8 @@ function ChatView() {
 
           const cancelledMarkerId = await cancelPendingSummarizationAndClearMarker(threadId)
           if (cancelledMarkerId) {
-            const updated = await getMessagesByThread(threadId)
             if (Number(currentThreadIdRef.current) === Number(threadId)) {
-              setMessages(dedupeMessages(updated))
+              setMessages((prev) => prev.filter((m) => m.id !== cancelledMarkerId))
             }
           }
 
@@ -1375,9 +1379,21 @@ function ChatView() {
                 unsummarizedMessages[unsummarizedMessages.length - 1].createdAt
               summaryMarkerId = await createSummaryMarker(threadId, anchorCreatedAt)
               registerPendingMarker(threadId, summaryMarkerId)
-              const updated = await getMessagesByThread(threadId)
               if (Number(currentThreadIdRef.current) === Number(threadId)) {
-                setMessages(dedupeMessages(updated))
+                setMessages((prev) => [
+                  ...prev,
+                  {
+                    id: summaryMarkerId,
+                    threadId: Number(threadId),
+                    role: 'system',
+                    content: '',
+                    personaId: null,
+                    isOOC: false,
+                    isSummaryMarker: true,
+                    createdAt: new Date(new Date(anchorCreatedAt).getTime() + 1),
+                    summarizedAt: null,
+                  },
+                ])
               }
             }
             const summary = await apiQueue.enqueue({
@@ -1407,9 +1423,8 @@ function ChatView() {
             }
             if (summaryMarkerId != null) {
               await deleteMessage(summaryMarkerId)
-              const updated = await getMessagesByThread(threadId)
               if (Number(currentThreadIdRef.current) === Number(threadId)) {
-                setMessages(dedupeMessages(updated))
+                setMessages((prev) => prev.filter((m) => m.id !== summaryMarkerId))
               }
             }
           } finally {
