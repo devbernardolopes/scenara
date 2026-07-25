@@ -265,6 +265,10 @@ function findDelimitedRanges(text) {
     while (i < text.length) {
       const start = text.indexOf(open, i)
       if (start === -1) break
+      if (open === "'" && start > 0 && /[a-zA-Z0-9]/.test(text[start - 1])) {
+        i = start + 1
+        continue
+      }
       const end = text.indexOf(close, start + 1)
       if (end === -1) break
       ranges.push([start, end + 1])
