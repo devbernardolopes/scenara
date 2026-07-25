@@ -752,6 +752,10 @@ function MessageBubble({
                           ) : (
                             <EyeOff className="w-3.5 h-3.5" />
                           )
+                        ) : key === 'speak' && isSpeakingLoading ? (
+                          <Loader className="w-3.5 h-3.5 animate-spin" />
+                        ) : key === 'speak' && isSpeakingPlaying ? (
+                          <Square className="w-3.5 h-3.5" />
                         ) : (
                           <Icon className="w-3.5 h-3.5" />
                         )}
@@ -798,7 +802,7 @@ function MessageBubble({
                                   key={key}
                                   type="button"
                                   onClick={() => {
-                                    if (!isToggle) {
+                                    if (!isToggle && key !== 'speak') {
                                       getButtonHandler(key)()
                                       setOverflowOpen(false)
                                     } else {
