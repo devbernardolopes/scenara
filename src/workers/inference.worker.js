@@ -671,6 +671,7 @@ async function checkTtsCache(modelKey) {
   return {
     modelKey,
     cached,
+    loaded: kittenSessions.has(modelKey),
     fileCount: keys.length,
     expectedFiles: config.files.length,
     storageInfo,

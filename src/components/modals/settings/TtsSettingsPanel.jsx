@@ -199,7 +199,7 @@ function TtsSettingsPanel() {
           const result = await checkTtsCache(model.key)
           if (cancelled) return
           states[model.key] = {
-            status: result.cached ? 'downloaded' : 'not-downloaded',
+            status: result.loaded ? 'loaded' : result.cached ? 'downloaded' : 'not-downloaded',
           }
           if (result.storageInfo) setStorageInfo(result.storageInfo)
         } catch {

@@ -59,7 +59,6 @@ export function stop() {
 
   if (currentAudio) {
     currentAudio.pause()
-    currentAudio.src = ''
     currentAudio = null
   }
   cancelTtsTask().catch(() => {})
@@ -168,7 +167,7 @@ async function speakKitten(messageId, text, modelKey, voice, backend) {
 
     await audio.play()
   } catch (err) {
-    if (err?.message === 'Cancelled') {
+    if (err?.message === 'Cancelled' || activeMessageId !== myId) {
       if (activeMessageId === myId) resetState()
       return
     }

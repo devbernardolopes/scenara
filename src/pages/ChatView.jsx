@@ -69,6 +69,7 @@ import { setBaseTitle } from '../services/titleManager'
 import { getMemoryIdForMarker } from '../services/threadMemories'
 import { estimateTokens } from '../services/tokenEstimator'
 import { ChatSettingsProvider } from '../hooks/useChatSettings'
+import { stop as stopTts, getPlaybackState } from '../lib/ttsPlayback'
 import {
   isAwayFromThread,
   addUnread,
@@ -379,6 +380,7 @@ function ChatView() {
 
     if (prevId && Number(prevId) !== Number(threadId)) {
       generatingRef.current = false
+      stopTts()
     }
 
     scrollStickyCleanupRef.current?.()
@@ -395,6 +397,10 @@ function ChatView() {
       loadData()
     })
   }, [threadId])
+
+  useEffect(() => {
+    return () => stopTts()
+  }, [])
 
   useEffect(() => {
     if (!pendingRecovery || generatingRef.current) return
@@ -1576,6 +1582,7 @@ function ChatView() {
   }
 
   const handleBundleNavigate = useCallback(async (messageId, slotIndex) => {
+    if (getPlaybackState().speakingMessageId === messageId) stopTts()
     const msg = messagesRef.current.find((m) => m.id === messageId)
     const entries = parseBundleEntries(msg?.bundleMessages)
     if (!entries || slotIndex < 0 || slotIndex >= entries.length) return
@@ -1993,6 +2000,7 @@ function ChatView() {
   }
 
   async function handleEditMessage(id, content) {
+    if (getPlaybackState().speakingMessageId === id) stopTts()
     const trimMsgs = await getSetting('prompting.trimMessages')
     let finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
     const msg = messagesRef.current.find((m) => m.id === id)
@@ -2034,6 +2042,7 @@ function ChatView() {
 
   async function handleDeleteMessage(id) {
     setConfirmDeleteId(null)
+    if (getPlaybackState().speakingMessageId === id) stopTts()
     const msg = messagesRef.current.find((m) => m.id === id)
     const entries = parseBundleEntries(msg?.bundleMessages)
     if (entries && entries.length > 1) {
@@ -2096,6 +2105,7 @@ function ChatView() {
       variant: 'danger',
     })
     if (!ok) return
+    if (getPlaybackState().speakingMessageId === id) stopTts()
     const delMsg = messagesRef.current.find((m) => m.id === id)
     await deleteMessage(id)
     setActiveSlotIndices((prev) => {
@@ -2134,6 +2144,7 @@ function ChatView() {
     const idx = messagesRef.current.findIndex((m) => m.id === id)
     const deletedIds =
       idx === -1 ? new Set() : new Set(messagesRef.current.slice(idx).map((m) => m.id))
+    if (deletedIds.has(getPlaybackState().speakingMessageId)) stopTts()
 
     const thr = await getThread(threadId)
     let postSummDeletedCount = 0
