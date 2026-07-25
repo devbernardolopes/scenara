@@ -43,7 +43,7 @@ export const CATEGORIES = [
   { id: 'api', labelKey: 'settings:categories.api' },
   { id: 'prompting', labelKey: 'settings:categories.prompting' },
   { id: 'defaults', labelKey: 'settings:categories.defaults' },
-  // { id: 'tts', labelKey: 'settings:categories.tts' }, // hidden until TTS is implemented
+  { id: 'tts', labelKey: 'settings:categories.tts' },
   { id: 'postProcessing', labelKey: 'settings:categories.postProcessing' },
   { id: 'database', labelKey: 'settings:categories.database' },
 ]
