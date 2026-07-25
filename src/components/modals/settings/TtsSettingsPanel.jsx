@@ -307,16 +307,36 @@ function TtsSettingsPanel() {
   const handleLoad = useCallback(
     (modelKey) =>
       withActionLock(async () => {
-        setModelStates((prev) => ({
-          ...prev,
-          [modelKey]: { ...prev[modelKey], status: 'downloading', progress: 0 },
-        }))
+        const currentlyLoaded = KITTEN_TTS_MODELS.find(
+          (m) => m.key !== modelKey && modelStates[m.key]?.status === 'loaded',
+        )
+        if (currentlyLoaded) {
+          try {
+            await unloadTtsModel(currentlyLoaded.key)
+          } catch {
+            /* ignore — may already be gone */
+          }
+        }
+
+        setModelStates((prev) => {
+          const next = { ...prev }
+          if (currentlyLoaded) {
+            next[currentlyLoaded.key] = {
+              ...next[currentlyLoaded.key],
+              status: 'downloaded',
+            }
+          }
+          next[modelKey] = { ...next[modelKey], status: 'downloading', progress: 0 }
+          return next
+        })
+
         try {
           await loadTtsModel(modelKey, backend)
           setModelStates((prev) => ({
             ...prev,
             [modelKey]: { ...prev[modelKey], status: 'loaded' },
           }))
+          await saveProvider(modelKey)
         } catch (err) {
           showToast(err.message || 'Load failed', { type: 'error' })
           setModelStates((prev) => ({
@@ -325,7 +345,7 @@ function TtsSettingsPanel() {
           }))
         }
       })(),
-    [backend, withActionLock],
+    [backend, modelStates, withActionLock, saveProvider],
   )
 
   const handleUnload = useCallback(
@@ -337,11 +357,12 @@ function TtsSettingsPanel() {
             ...prev,
             [modelKey]: { ...prev[modelKey], status: 'downloaded' },
           }))
+          await saveProvider('browser')
         } catch (err) {
           showToast(err.message || 'Unload failed', { type: 'error' })
         }
       })(),
-    [withActionLock],
+    [withActionLock, saveProvider],
   )
 
   const handleDelete = useCallback(
@@ -369,11 +390,11 @@ function TtsSettingsPanel() {
   )
 
   const handleKittenPreview = useCallback(async () => {
-    const loadedModel = KITTEN_TTS_MODELS.find((m) => modelStates[m.key]?.status === 'loaded')
-    if (!loadedModel) return
+    if (!activeProvider || activeProvider === 'browser') return
+    if (modelStates[activeProvider]?.status !== 'loaded') return
     setPreviewing(true)
     try {
-      const result = await previewTtsModel(loadedModel.key, kittenVoice)
+      const result = await previewTtsModel(activeProvider, kittenVoice)
       if (result?.audio) {
         const blob = new Blob([result.audio], { type: 'audio/wav' })
         const url = URL.createObjectURL(blob)
@@ -386,7 +407,7 @@ function TtsSettingsPanel() {
     } finally {
       setPreviewing(false)
     }
-  }, [modelStates, kittenVoice])
+  }, [activeProvider, modelStates, kittenVoice])
 
   return (
     <div className="space-y-8">
@@ -543,7 +564,8 @@ function TtsSettingsPanel() {
             disabled={
               previewing ||
               actionDisabled ||
-              !KITTEN_TTS_MODELS.some((m) => modelStates[m.key]?.status === 'loaded')
+              activeProvider === 'browser' ||
+              modelStates[activeProvider]?.status !== 'loaded'
             }
             className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md bg-surface-secondary text-text hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
@@ -571,31 +593,6 @@ function TtsSettingsPanel() {
               />
             ))}
           </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              const loaded = KITTEN_TTS_MODELS.some((m) => modelStates[m.key]?.status === 'loaded')
-              if (loaded) {
-                const loadedModel = KITTEN_TTS_MODELS.find(
-                  (m) => modelStates[m.key]?.status === 'loaded',
-                )
-                saveProvider(loadedModel.key)
-              } else {
-                const downloaded = KITTEN_TTS_MODELS.find(
-                  (m) => modelStates[m.key]?.status === 'downloaded',
-                )
-                if (downloaded) saveProvider(downloaded.key)
-              }
-            }}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md transition-colors ${
-              KITTEN_TTS_MODELS.some((m) => m.key === activeProvider)
-                ? 'bg-primary text-on-primary'
-                : 'bg-surface-secondary text-text hover:bg-surface-hover'
-            }`}
-          >
-            {KITTEN_TTS_MODELS.some((m) => m.key === activeProvider) ? 'Active' : 'Set as active'}
-          </button>
         </div>
       </CollapsibleSection>
     </div>
