@@ -95,6 +95,11 @@ export async function exportDatabase(selection) {
     data.scrollPositions = Object.fromEntries(scrollEntries.map((e) => [e.key.slice(7), e.value]))
   }
 
+  const lastThreadId = await getUIState('lastThreadId')
+  if (lastThreadId != null) {
+    data.lastThreadId = lastThreadId
+  }
+
   const threadIds = new Set(selection.threadIds || [])
 
   if (selection.characterIds?.size > 0) {
@@ -118,6 +123,17 @@ export async function exportDatabase(selection) {
 
     const allTm = await db.threadMemories.toArray()
     data.threadMemories = allTm.filter((tm) => threadIds.has(tm.threadId))
+
+    const chatInputEntries = await db.uiState.where('key').startsWith('chatInput.').toArray()
+    const relevantChatInputs = chatInputEntries.filter((e) => {
+      const tid = Number(e.key.slice('chatInput.'.length))
+      return threadIds.has(tid)
+    })
+    if (relevantChatInputs.length > 0) {
+      data.chatInputs = Object.fromEntries(
+        relevantChatInputs.map((e) => [e.key.slice('chatInput.'.length), e.value]),
+      )
+    }
   }
 
   return data
@@ -305,6 +321,18 @@ export async function importDatabase(data) {
       await db.uiState.where('key').startsWith('scroll.').delete()
       for (const [subKey, value] of Object.entries(data.scrollPositions)) {
         await db.uiState.add({ key: `scroll.${subKey}`, value })
+      }
+    }
+
+    if (data.lastThreadId != null) {
+      await db.uiState.where('key').equals('lastThreadId').delete()
+      await db.uiState.add({ key: 'lastThreadId', value: data.lastThreadId })
+    }
+
+    if (data.chatInputs && typeof data.chatInputs === 'object') {
+      await db.uiState.where('key').startsWith('chatInput.').delete()
+      for (const [tid, value] of Object.entries(data.chatInputs)) {
+        await db.uiState.add({ key: `chatInput.${tid}`, value })
       }
     }
   })
