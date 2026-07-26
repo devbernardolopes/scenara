@@ -16,7 +16,7 @@ function handleCodeCopy(codeContent) {
 
 function CodeBlockWrapperBase({ collapsed, onToggle, codeText, children }) {
   return (
-    <div className="relative group">
+    <div className="relative group flow-root">
       <pre
         className={`bg-code border border-border rounded-md my-2 overflow-x-auto max-w-full break-words pr-16 transition-all duration-150 ${
           collapsed ? 'max-h-12 overflow-y-hidden whitespace-pre p-2' : 'whitespace-pre-wrap p-3'
