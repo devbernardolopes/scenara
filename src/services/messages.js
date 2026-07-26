@@ -120,6 +120,7 @@ export async function deleteMessage(id) {
   const msg = await db.messages.get(Number(id))
   const threadId = msg?.threadId
   const isReal = msg && !msg.isSummaryMarker && !msg.isAutoTitleMarker
+  const wasUnread = msg?.isUnread === true
   await db.messages.delete(Number(id))
   if (threadId != null) {
     if (isReal) {
@@ -128,10 +129,17 @@ export async function deleteMessage(id) {
         .equals(Number(threadId))
         .modify((t) => {
           t.messageCount = Math.max(0, (t.messageCount || 0) - 1)
+          if (wasUnread) {
+            t.unreadCount = Math.max(0, (t.unreadCount || 0) - 1)
+          }
         })
     }
     await updateThreadTimestamp(threadId)
     window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId } }))
+    if (wasUnread) {
+      window.dispatchEvent(new CustomEvent('threads-changed'))
+      window.dispatchEvent(new CustomEvent('unread-changed'))
+    }
   }
 }
 
@@ -141,31 +149,46 @@ export async function deleteMessagesFrom(id) {
   const allInThread = await db.messages.where('threadId').equals(msg.threadId).sortBy('createdAt')
   const idx = allInThread.findIndex((m) => m.id === msg.id)
   if (idx === -1) return
-  const toDelete = allInThread
-    .slice(idx)
+  const toDeleteAll = allInThread.slice(idx)
+  const toDelete = toDeleteAll
     .filter((m) => !m.isSummaryMarker && !m.isAutoTitleMarker)
     .map((m) => m.id)
   if (toDelete.length === 0) return
+  const unreadCount = toDeleteAll.filter((m) => m.isUnread).length
   await db.messages.bulkDelete(toDelete)
   await db.threads
     .where('id')
     .equals(Number(msg.threadId))
     .modify((t) => {
       t.messageCount = Math.max(0, (t.messageCount || 0) - toDelete.length)
+      if (unreadCount > 0) {
+        t.unreadCount = Math.max(0, (t.unreadCount || 0) - unreadCount)
+      }
     })
   await updateThreadTimestamp(msg.threadId)
   window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId: msg.threadId } }))
+  if (unreadCount > 0) {
+    window.dispatchEvent(new CustomEvent('threads-changed'))
+    window.dispatchEvent(new CustomEvent('unread-changed'))
+  }
 }
 
 export async function deleteMessagesByThread(threadId) {
+  const thread = await db.threads.get(Number(threadId))
+  const hadUnread = (thread?.unreadCount || 0) > 0
   const result = await db.messages.where('threadId').equals(Number(threadId)).delete()
   await db.threads
     .where('id')
     .equals(Number(threadId))
     .modify((t) => {
       t.messageCount = 0
+      t.unreadCount = 0
     })
   window.dispatchEvent(new CustomEvent('messages-changed', { detail: { threadId } }))
+  if (hadUnread) {
+    window.dispatchEvent(new CustomEvent('threads-changed'))
+    window.dispatchEvent(new CustomEvent('unread-changed'))
+  }
   return result
 }
 
