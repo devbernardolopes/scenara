@@ -1593,6 +1593,7 @@ function ChatView() {
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setGenerating(false)
       }
+      await maybeAutoTTS(threadId, sendMessageId, sendOutcome)
       await runPostGenerationTasks({
         threadId,
         outcome: sendOutcome,
@@ -1600,7 +1601,6 @@ function ChatView() {
         includeSummarization: true,
         currentPersona,
       })
-      await maybeAutoTTS(threadId, sendMessageId, sendOutcome)
     }
   }
 
@@ -2012,6 +2012,7 @@ function ChatView() {
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         setGenerating(false)
       }
+      await maybeAutoTTS(threadId, messageId, outcome)
       await runPostGenerationTasks({
         threadId,
         outcome,
@@ -2019,7 +2020,6 @@ function ChatView() {
         includeSummarization: true,
         currentPersona,
       })
-      await maybeAutoTTS(threadId, messageId, outcome)
     }
   }
 
