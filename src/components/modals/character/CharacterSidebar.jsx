@@ -11,6 +11,7 @@ const SECTIONS = [
   { id: 'director', labelKey: 'sectionDirector' },
   { id: 'lorebooks', labelKey: 'sectionLorebooks' },
   { id: 'tags', labelKey: 'sectionTags' },
+  { id: 'metadata', labelKey: 'sectionMetadata' },
   { id: '3d', labelKey: 'section3d' },
   { id: 'sfx', labelKey: 'sectionSfx' },
   { id: 'fullData', labelKey: 'sectionFullData' },

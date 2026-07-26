@@ -4,6 +4,9 @@ function buildFullDataMarkdown(form, writingInstructionText) {
   blocks.push('# Character')
   if (form.name?.trim()) blocks.push(`**Name:** ${form.name.trim()}`)
   if (form.tagline?.trim()) blocks.push(`**Tagline:** ${form.tagline.trim()}`)
+  if (form.creator?.trim()) blocks.push(`**Creator:** ${form.creator.trim()}`)
+  if (form.characterVersion?.trim())
+    blocks.push(`**Character Version:** ${form.characterVersion.trim()}`)
   if (form.systemPrompt?.trim()) blocks.push(`**SYSTEM Prompt:**\n\n${form.systemPrompt.trim()}`)
   if (form.prompt?.trim()) blocks.push(`**Character Prompt:**\n\n${form.prompt.trim()}`)
   if (form.personality?.trim()) blocks.push(`**Personality:**\n\n${form.personality.trim()}`)
@@ -13,6 +16,7 @@ function buildFullDataMarkdown(form, writingInstructionText) {
     blocks.push(`**One-time only Extra Prompt:**\n\n${form.extraPrompt.trim()}`)
   if (writingInstructionText?.trim())
     blocks.push(`**Writing Instruction:**\n\n${writingInstructionText.trim()}`)
+  if (form.creatorNotes?.trim()) blocks.push(`**Creator Notes:**\n\n${form.creatorNotes.trim()}`)
 
   const initialMessages = (form.initialMessages || []).filter((m) => m.content?.trim())
   if (initialMessages.length > 0) {

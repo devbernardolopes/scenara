@@ -27,6 +27,7 @@ import DirectorSection from './character/DirectorSection'
 import TagsSection from './character/TagsSection'
 import ScenarioSection from './character/ScenarioSection'
 import LorebooksSection from './character/LorebooksSection'
+import MetadataSection from './character/MetadataSection'
 import FullDataSection from './character/FullDataSection'
 import { buildFullDataMarkdown } from './character/fullDataMarkdown'
 
@@ -99,6 +100,9 @@ const INITIAL_FORM = {
   apiProfileDirectorId: null,
   tags: [],
   lorebookIds: [],
+  creator: '',
+  characterVersion: '',
+  creatorNotes: '',
   lastSection: null,
 }
 
@@ -227,6 +231,7 @@ const SECTION_COMPONENTS = {
   director: DirectorSection,
   lorebooks: LorebooksSection,
   tags: TagsSection,
+  metadata: MetadataSection,
   '3d': PlaceholderSection,
   sfx: PlaceholderSection,
   fullData: FullDataSection,
@@ -418,6 +423,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
       initialMessages: (form.initialMessages || []).some((m) => m.content?.trim()),
       exampleMessages: (form.exampleMessages || []).some((m) => m.content?.trim()),
       tags: (form.tags || []).length > 0,
+      metadata: form.creator?.trim() || form.characterVersion?.trim() || form.creatorNotes?.trim(),
       lorebooks: (form.lorebookIds || []).length > 0,
       scenarios: (form.scenarios || []).length > 0,
       postProcessing: ppEnabledDiff || ppOverrideDiff || ppRulesDiff,
@@ -553,6 +559,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
             { id: 'director', labelKey: 'sectionDirector' },
             { id: 'lorebooks', labelKey: 'sectionLorebooks' },
             { id: 'tags', labelKey: 'sectionTags' },
+            { id: 'metadata', labelKey: 'sectionMetadata' },
             { id: '3d', labelKey: 'section3d' },
             { id: 'sfx', labelKey: 'sectionSfx' },
             { id: 'fullData', labelKey: 'sectionFullData' },
