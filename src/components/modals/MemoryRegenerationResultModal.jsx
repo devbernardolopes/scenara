@@ -85,12 +85,16 @@ function MemoryRegenerationResultModal({ threadId, entry, systemContent, userCon
   }, [closeModal, confirm, t])
 
   useEffect(() => {
+    if (error) {
+      setCloseGuard(null)
+      return
+    }
     setCloseGuard(() => {
       void attemptClose()
       return false
     })
     return () => setCloseGuard(null)
-  }, [attemptClose, setCloseGuard])
+  }, [attemptClose, setCloseGuard, error])
 
   function handleRegenerate() {
     abortRef.current?.abort()
@@ -121,7 +125,8 @@ function MemoryRegenerationResultModal({ threadId, entry, systemContent, userCon
     closeModal()
   }
 
-  const canAct = finished && result.trim().length > 0 && !error
+  const canRegenerate = finished && !loading
+  const canAccept = finished && result.trim().length > 0 && !error
 
   return (
     <ModalShell
@@ -139,7 +144,7 @@ function MemoryRegenerationResultModal({ threadId, entry, systemContent, userCon
           <button
             type="button"
             onClick={handleRegenerate}
-            disabled={!canAct}
+            disabled={!canRegenerate}
             className="min-h-[44px] px-4 text-sm btn-primary disabled:opacity-60"
           >
             {t('memoryRegeneration.regenerate')}
@@ -147,7 +152,7 @@ function MemoryRegenerationResultModal({ threadId, entry, systemContent, userCon
           <button
             type="button"
             onClick={handleAccept}
-            disabled={!canAct}
+            disabled={!canAccept}
             className="min-h-[44px] px-4 text-sm btn-primary disabled:opacity-60"
           >
             {t('memoryRegeneration.accept')}

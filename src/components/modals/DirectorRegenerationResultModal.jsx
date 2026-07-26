@@ -95,12 +95,16 @@ function DirectorRegenerationResultModal({
   }, [closeModal, confirm, t])
 
   useEffect(() => {
+    if (error) {
+      setCloseGuard(null)
+      return
+    }
     setCloseGuard(() => {
       void attemptClose()
       return false
     })
     return () => setCloseGuard(null)
-  }, [attemptClose, setCloseGuard])
+  }, [attemptClose, setCloseGuard, error])
 
   function handleRegenerate() {
     abortRef.current?.abort()
@@ -141,7 +145,8 @@ function DirectorRegenerationResultModal({
     }
   }
 
-  const canAct = finished && result.trim().length > 0 && !error
+  const canRegenerate = finished && !loading
+  const canAccept = finished && result.trim().length > 0 && !error
 
   return (
     <ModalShell
@@ -159,7 +164,7 @@ function DirectorRegenerationResultModal({
           <button
             type="button"
             onClick={handleRegenerate}
-            disabled={!canAct}
+            disabled={!canRegenerate}
             className="min-h-[44px] px-4 text-sm btn-primary disabled:opacity-60"
           >
             {t('memoryRegeneration.regenerate')}
@@ -167,7 +172,7 @@ function DirectorRegenerationResultModal({
           <button
             type="button"
             onClick={handleAccept}
-            disabled={!canAct}
+            disabled={!canAccept}
             className="min-h-[44px] px-4 text-sm btn-primary disabled:opacity-60"
           >
             {t('directorRegenerationResult.accept')}
