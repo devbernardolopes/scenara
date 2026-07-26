@@ -179,11 +179,34 @@ export async function buildSummarizationPayload({
 
   const memorySection = memoryText ? memoryText : ''
 
-  // Prepend the character prompt (when the per-character override is enabled)
-  // to the start of the transcript, preceded by the Character Prompt section
-  // header if configured — mirroring how the memory section is assembled above.
-  // The active scenario is appended right after the character prompt, but only
-  // when the character prompt is injected (i.e. the override is on).
+  // Resolve scenario and global context outside the addCharacterPrompt guard
+  // so they are injected into summarization payloads based on their own
+  // lifetime settings, independent of whether the character prompt is included.
+  const globalContextRaw = resolveGlobalContextInjection(character, {
+    isFirstMessage: false,
+    lastSummarizationAt: effectiveLastSummarizationAt,
+  })
+  const resolvedGlobalContext = globalContextRaw ? replaceVarsWithDesc(globalContextRaw) : ''
+
+  const scenarioText = resolveScenarioInjection(character, {
+    isFirstMessage: false,
+    lastSummarizationAt: effectiveLastSummarizationAt,
+    activeScenario: thread?.activeScenario || null,
+  })
+  const resolvedScenario = scenarioText ? replaceVarsWithDesc(scenarioText) : ''
+
+  // Build the standalone context section (scenario + global context) that is
+  // always included when either has content — regardless of addCharacterPrompt.
+  let contextSection = ''
+  const contextParts = []
+  if (resolvedGlobalContext) contextParts.push(resolvedGlobalContext)
+  if (resolvedScenario) contextParts.push(resolvedScenario)
+  if (contextParts.length > 0) contextSection = contextParts.join('\n\n')
+
+  // When Add Character Prompt is enabled, prepend the character prompt and
+  // personality to the context section, preceded by the Character Prompt
+  // section header if configured. The scenario and global context are appended
+  // after the prompt/personality but before persona injection.
   let charPromptSection = ''
   if (character?.addCharacterPrompt) {
     const prompt = replaceVarsWithDesc(character?.prompt || '')
@@ -193,20 +216,9 @@ export async function buildSummarizationPayload({
       const personality = replaceVarsWithDesc(character?.personality || '')
       if (personality) parts.push(personality)
 
-      const globalContextRaw = resolveGlobalContextInjection(character, {
-        isFirstMessage: false,
-        lastSummarizationAt: effectiveLastSummarizationAt,
-      })
-      if (globalContextRaw) parts.push(replaceVarsWithDesc(globalContextRaw))
-
       let combined = parts.join('\n\n')
 
-      const scenarioText = resolveScenarioInjection(character, {
-        isFirstMessage: false,
-        lastSummarizationAt: effectiveLastSummarizationAt,
-        activeScenario: thread?.activeScenario || null,
-      })
-      const resolvedScenario = scenarioText ? replaceVarsWithDesc(scenarioText) : ''
+      if (resolvedGlobalContext) combined = `${combined}\n\n${resolvedGlobalContext}`
       if (resolvedScenario) combined = `${combined}\n\n${resolvedScenario}`
 
       if (personaInjection) combined = `${combined}\n\n${personaInjection}`
@@ -214,6 +226,12 @@ export async function buildSummarizationPayload({
         ? `${replaceVarsWithDesc(charPromptHeader)}\n\n${combined}`
         : combined
     }
+  }
+
+  // When addCharacterPrompt is false but scenario/global context have content,
+  // inject them standalone (without the character prompt/personality wrapping).
+  if (!charPromptSection && contextSection) {
+    charPromptSection = contextSection
   }
 
   const transcriptSection = messagesHeader
