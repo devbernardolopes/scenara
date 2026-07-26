@@ -186,18 +186,18 @@ export async function buildSummarizationPayload({
   // when the character prompt is injected (i.e. the override is on).
   let charPromptSection = ''
   if (character?.addCharacterPrompt) {
-    const prompt = replaceVarsIn(character?.prompt || '')
+    const prompt = replaceVarsWithDesc(character?.prompt || '')
     if (prompt) {
       const parts = [prompt]
 
-      const personality = replaceVarsIn(character?.personality || '')
+      const personality = replaceVarsWithDesc(character?.personality || '')
       if (personality) parts.push(personality)
 
       const globalContextRaw = resolveGlobalContextInjection(character, {
         isFirstMessage: false,
         lastSummarizationAt: effectiveLastSummarizationAt,
       })
-      if (globalContextRaw) parts.push(replaceVarsIn(globalContextRaw))
+      if (globalContextRaw) parts.push(replaceVarsWithDesc(globalContextRaw))
 
       let combined = parts.join('\n\n')
 
@@ -206,18 +206,18 @@ export async function buildSummarizationPayload({
         lastSummarizationAt: effectiveLastSummarizationAt,
         activeScenario: thread?.activeScenario || null,
       })
-      const resolvedScenario = scenarioText ? replaceVarsIn(scenarioText) : ''
+      const resolvedScenario = scenarioText ? replaceVarsWithDesc(scenarioText) : ''
       if (resolvedScenario) combined = `${combined}\n\n${resolvedScenario}`
 
       if (personaInjection) combined = `${combined}\n\n${personaInjection}`
       charPromptSection = charPromptHeader
-        ? `${replaceVarsIn(charPromptHeader)}\n\n${combined}`
+        ? `${replaceVarsWithDesc(charPromptHeader)}\n\n${combined}`
         : combined
     }
   }
 
   const transcriptSection = messagesHeader
-    ? `${replaceVarsIn(messagesHeader)}\n\n${transcript}`
+    ? `${replaceVarsWithDesc(messagesHeader)}\n\n${transcript}`
     : transcript
 
   // Character prompt is placed at the very top of the payload, before any
@@ -226,11 +226,11 @@ export async function buildSummarizationPayload({
     .filter(Boolean)
     .join('\n\n')
 
-  systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, fullContent)
+  systemContent = replaceVarsWithDesc(systemContent).replace(/{{transcript}}/gi, fullContent)
 
   const payload = [{ role: 'system', content: systemContent }]
   if (userContent) {
-    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/gi, fullContent)
+    userContent = replaceVarsWithDesc(userContent).replace(/{{transcript}}/gi, fullContent)
     payload.push({ role: 'user', content: userContent })
   } else {
     payload.push({ role: 'user', content: fullContent })
