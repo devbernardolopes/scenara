@@ -33,6 +33,15 @@ function isEmpty(value) {
   return false
 }
 
+function cleanText(text) {
+  if (typeof text !== 'string') return text
+  return text
+    .split('\n')
+    .map((line) => line.trimEnd())
+    .join('\n')
+    .replace(/\n+$/, '')
+}
+
 function isPngBuffer(uint8) {
   return PNG_SIGNATURE.every((byte, i) => uint8[i] === byte)
 }
@@ -161,13 +170,13 @@ function parseMesExample(mesExample) {
   if (isEmpty(mesExample)) return []
   return mesExample
     .split('<START>')
-    .map((segment) => segment.trim())
+    .map((segment) => cleanText(segment).trim())
     .filter(Boolean)
     .map((content) => ({ id: crypto.randomUUID(), content }))
 }
 
 function stripStartTag(text) {
-  return text.replaceAll('<START>', '').trim()
+  return cleanText(text.replaceAll('<START>', ''))
 }
 
 function buildInitialMessages(firstMes, alternateGreetings) {
@@ -191,7 +200,7 @@ function buildScenarios(scenario) {
     {
       id: crypto.randomUUID(),
       name: '',
-      content: scenario,
+      content: cleanText(scenario),
       lifetime: 'firstSummary',
       active: true,
     },
@@ -203,15 +212,15 @@ export function mapV2ToScenara(cardJson) {
   const result = {}
 
   if (!isEmpty(data.name)) result.name = data.name
-  if (!isEmpty(data.description)) result.prompt = data.description
-  if (!isEmpty(data.personality)) result.personality = data.personality
-  if (!isEmpty(data.system_prompt)) result.systemPrompt = data.system_prompt
+  if (!isEmpty(data.description)) result.prompt = cleanText(data.description)
+  if (!isEmpty(data.personality)) result.personality = cleanText(data.personality)
+  if (!isEmpty(data.system_prompt)) result.systemPrompt = cleanText(data.system_prompt)
   if (!isEmpty(data.post_history_instructions))
-    result.postHistoryInstructions = data.post_history_instructions
+    result.postHistoryInstructions = cleanText(data.post_history_instructions)
   if (!isEmpty(data.avatar)) result.avatar = data.avatar
   if (!isEmpty(data.creator)) result.creator = data.creator
   if (!isEmpty(data.character_version)) result.characterVersion = data.character_version
-  if (!isEmpty(data.creator_notes)) result.creatorNotes = data.creator_notes
+  if (!isEmpty(data.creator_notes)) result.creatorNotes = cleanText(data.creator_notes)
 
   const initialMessages = buildInitialMessages(data.first_mes, data.alternate_greetings)
   if (initialMessages.length > 0) result.initialMessages = initialMessages
@@ -233,8 +242,8 @@ export function mapV1ToScenara(json) {
   const result = {}
 
   if (!isEmpty(json.name)) result.name = json.name
-  if (!isEmpty(json.description)) result.prompt = json.description
-  if (!isEmpty(json.personality)) result.personality = json.personality
+  if (!isEmpty(json.description)) result.prompt = cleanText(json.description)
+  if (!isEmpty(json.personality)) result.personality = cleanText(json.personality)
 
   const initialMessages = buildInitialMessages(json.first_mes, null)
   if (initialMessages.length > 0) result.initialMessages = initialMessages
