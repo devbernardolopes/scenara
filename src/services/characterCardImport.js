@@ -188,7 +188,7 @@ function buildScenarios(scenario) {
       id: crypto.randomUUID(),
       name: '',
       content: scenario,
-      lifetime: 'always',
+      lifetime: 'firstSummary',
       active: true,
     },
   ]

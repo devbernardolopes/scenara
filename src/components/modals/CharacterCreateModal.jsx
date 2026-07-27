@@ -132,9 +132,7 @@ const DEFAULTS_MAP = {
   'prompting.personaInjectionPlacement': 'personaInjectionPlacement',
   'prompting.personaInjectionMessageRole': 'personaInjectionMessageRole',
   'prompting.firstMessageRole': 'firstMessageRole',
-  'prompting.firstMessagePrompt': 'firstMessagePrompt',
   'prompting.continueRole': 'continueRole',
-  'prompting.continuePrompt': 'continuePrompt',
 }
 
 const OVERRIDE_FIELDS = [
