@@ -3,7 +3,7 @@ import { useConfirm } from '../../../lib/confirm'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../../services/tokenEstimator'
-import { Plus, Trash2, Edit3 } from '../../../lib/icons'
+import { Plus, Trash2, BrainCog, Copy, X } from '../../../lib/icons'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
@@ -58,67 +58,101 @@ function InitialMessagesSection({ form, onChange, characterId }) {
     )
   }
 
-  if (messages.length === 0) {
-    return (
-      <div className="space-y-4">
-        <p className="text-sm text-tertiary text-center py-8">{t('noInitialMessages')}</p>
-        <AddButton onClick={handleAdd} label={t('addInitialMessage')} />
-      </div>
-    )
+  function handleDuplicate(msg) {
+    const clone = {
+      ...msg,
+      id: crypto.randomUUID(),
+    }
+    onChange('initialMessages', [...messages, clone])
+  }
+
+  function handleClear(msg, e) {
+    e.stopPropagation()
+    handleContentChange(msg.id, '')
   }
 
   return (
     <div className="space-y-4">
-      {messages.map((msg, idx) => (
-        <div key={msg.id} className="rounded-md shadow-surface-sm">
-          <CollapsibleSection
-            label={`${t('initialMessageLabel')} #${idx + 1}`}
-            summary={
-              msg.content ? (
-                <>
-                  {t('common:tokenCount', { count: estimateTokens(msg.content) })}
-                  <span className="ml-2">
-                    {t('chat:words', { count: countWords(msg.content) })}
-                  </span>
-                </>
-              ) : null
-            }
-            hasContent={!!msg.content}
-            storageKey={characterId ? `charSection.initialMsg.${characterId}.${msg.id}` : undefined}
-            defaultExpanded={!msg.content}
-          >
-            <div className="relative mt-2">
-              <AutoResizeTextarea
-                className={`${inputClass} resize-none pr-10`}
-                value={msg.content}
-                onChange={(e) => handleContentChange(msg.id, e.target.value)}
-                placeholder={t('initialMessagePlaceholder')}
-                extraHeight={8}
-              />
-              <button
-                type="button"
-                onClick={(e) => handleDelete(msg, e)}
-                className="absolute top-2 right-2 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-delete text-on-delete hover:bg-delete-hover transition-colors"
-                aria-label={t('deleteInitialMessage')}
-                title={t('deleteInitialMessage')}
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => {}}
-                className="absolute top-12 right-2 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-primary-subtle text-primary hover:bg-primary-hover transition-colors"
-                aria-label={t('generateInitialMessage')}
-                title={t('generateInitialMessage')}
-              >
-                <Edit3 className="w-4 h-4" />
-              </button>
-            </div>
-          </CollapsibleSection>
-        </div>
-      ))}
-
       <AddButton onClick={handleAdd} label={t('addInitialMessage')} />
+
+      {messages.length === 0 ? (
+        <p className="text-sm text-tertiary text-center py-8">{t('noInitialMessages')}</p>
+      ) : (
+        messages.map((msg, idx) => (
+          <div key={msg.id} className="rounded-md shadow-surface-sm">
+            <CollapsibleSection
+              label={`${t('initialMessageLabel')} #${idx + 1}`}
+              storageKey={
+                characterId ? `charSection.initialMsg.${characterId}.${msg.id}` : undefined
+              }
+              defaultExpanded={!msg.content}
+              headerExtra={
+                <button
+                  type="button"
+                  onClick={(e) => handleDelete(msg, e)}
+                  className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded-md bg-delete text-on-delete hover:bg-delete-hover transition-colors"
+                  aria-label={t('deleteInitialMessage')}
+                  title={t('deleteInitialMessage')}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              }
+              summary={
+                msg.content ? (
+                  <>
+                    {t('common:tokenCount', { count: estimateTokens(msg.content) })}
+                    <span className="ml-2">
+                      {t('chat:words', { count: countWords(msg.content) })}
+                    </span>
+                  </>
+                ) : null
+              }
+              hasContent={!!msg.content}
+            >
+              <div className="relative mt-2">
+                <AutoResizeTextarea
+                  className={`${inputClass} resize-none pr-12 min-h-[128px]`}
+                  value={msg.content}
+                  onChange={(e) => handleContentChange(msg.id, e.target.value)}
+                  placeholder={t('initialMessagePlaceholder')}
+                  extraHeight={8}
+                />
+                <div className="absolute top-2 right-2 flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => handleClear(msg, e)}
+                    disabled={!msg.content?.trim()}
+                    className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-surface text-secondary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label={t('clearScenario')}
+                    title={t('clearScenario')}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {}}
+                    className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-surface text-secondary hover:bg-surface-hover transition-colors"
+                    aria-label={t('generateScenario')}
+                    title={t('generateScenario')}
+                  >
+                    <BrainCog className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDuplicate(msg)}
+                    disabled={!msg.content?.trim()}
+                    className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-surface text-secondary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label={t('duplicateScenario')}
+                    title={t('duplicateScenario')}
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </CollapsibleSection>
+          </div>
+        ))
+      )}
     </div>
   )
 }
