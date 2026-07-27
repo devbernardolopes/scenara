@@ -193,6 +193,7 @@ function TtsSettingsPanel() {
   const [hasWebGPU] = useState(() => typeof navigator !== 'undefined' && !!navigator.gpu)
   const [loadedBackend, setLoadedBackend] = useState(null)
   const [previewPhase, setPreviewPhase] = useState('idle')
+  const [browserPreviewPhase, setBrowserPreviewPhase] = useState('idle')
   const previewAudioRef = useRef(null)
 
   const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)
@@ -302,6 +303,9 @@ function TtsSettingsPanel() {
         previewAudioRef.current.pause()
         previewAudioRef.current = null
       }
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel()
+      }
     }
   }, [])
 
@@ -347,6 +351,13 @@ function TtsSettingsPanel() {
 
   const handleBrowserPreview = useCallback(() => {
     if (!window.speechSynthesis) return
+
+    if (browserPreviewPhase === 'playing') {
+      window.speechSynthesis.cancel()
+      setBrowserPreviewPhase('idle')
+      return
+    }
+
     window.speechSynthesis.cancel()
     const utt = new SpeechSynthesisUtterance(t('tts.browser.previewText'))
     const voice = browserVoices.find((v) => v.name === browserVoice)
@@ -354,8 +365,19 @@ function TtsSettingsPanel() {
     utt.rate = browserRate
     utt.pitch = browserPitch
     utt.volume = browserVolume
+    setBrowserPreviewPhase('playing')
+    utt.onend = () => setBrowserPreviewPhase('idle')
+    utt.onerror = () => setBrowserPreviewPhase('idle')
     window.speechSynthesis.speak(utt)
-  }, [browserVoice, browserVoices, browserRate, browserPitch, browserVolume, t])
+  }, [
+    browserVoice,
+    browserVoices,
+    browserRate,
+    browserPitch,
+    browserVolume,
+    browserPreviewPhase,
+    t,
+  ])
 
   const withActionLock = useCallback(
     (fn) => async () => {
@@ -611,11 +633,17 @@ function TtsSettingsPanel() {
           <button
             type="button"
             onClick={handleBrowserPreview}
-            disabled={!browserVoice || browserVoices.length === 0}
+            disabled={
+              browserPreviewPhase === 'idle' && (!browserVoice || browserVoices.length === 0)
+            }
             className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md bg-surface-secondary text-text hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            <Volume2 className="w-3.5 h-3.5" />
-            {t('tts.browser.preview')}
+            {browserPreviewPhase === 'playing' ? (
+              <Square className="w-3.5 h-3.5" />
+            ) : (
+              <Volume2 className="w-3.5 h-3.5" />
+            )}
+            {browserPreviewPhase === 'playing' ? t('chat:stop') : t('tts.browser.preview')}
           </button>
 
           <button
