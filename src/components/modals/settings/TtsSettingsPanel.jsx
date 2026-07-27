@@ -459,7 +459,7 @@ function TtsSettingsPanel() {
           showToast(err.message || 'Load failed', { type: 'error' })
           setModelStates((prev) => ({
             ...prev,
-            [modelKey]: { ...prev[modelKey], status: 'error' },
+            [modelKey]: { ...prev[modelKey], status: 'downloaded' },
           }))
         }
       })(),
