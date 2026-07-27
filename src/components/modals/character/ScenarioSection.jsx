@@ -60,16 +60,12 @@ function AddButton({ onClick, label }) {
   )
 }
 
-function ScenarioSection({ form, onChange }) {
+function ScenarioSection({ form, onChange, characterId }) {
   const { t } = useTranslation('characterCreation')
   const { confirm } = useConfirm()
   const scenarios = form.scenarios || []
   const [globalLifetime, setGlobalLifetime] = useState(() => {
     return scenarios[0]?.lifetime || 'firstSummary'
-  })
-  const [expandedId, setExpandedId] = useState(() => {
-    const firstEmpty = scenarios.find((s) => !s.content)
-    return firstEmpty?.id || null
   })
 
   function handleAdd() {
@@ -80,7 +76,6 @@ function ScenarioSection({ form, onChange }) {
       active: scenarios.length === 0,
     }
     onChange('scenarios', [...scenarios, next])
-    setExpandedId(next.id)
   }
 
   function handleContentChange(id, content) {
@@ -146,7 +141,6 @@ function ScenarioSection({ form, onChange }) {
       active: !hasActive ? true : false,
     }
     onChange('scenarios', [...scenarios, clone])
-    setExpandedId(clone.id)
   }
 
   function handleClear(scenario, e) {
@@ -215,8 +209,10 @@ function ScenarioSection({ form, onChange }) {
           <div key={scenario.id} className="rounded-md shadow-surface-sm">
             <CollapsibleSection
               label={scenario.name?.trim() || `${t('scenarioLabel')} #${idx + 1}`}
-              open={expandedId === scenario.id}
-              onOpenChange={(isOpen) => setExpandedId(isOpen ? scenario.id : null)}
+              storageKey={
+                characterId ? `charSection.scenario.${characterId}.${scenario.id}` : undefined
+              }
+              defaultExpanded={!scenario.content}
               headerExtra={
                 <>
                   <button
