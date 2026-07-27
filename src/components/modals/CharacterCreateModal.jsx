@@ -381,7 +381,9 @@ function CharacterCreateModal({ character: existing, initialData }) {
     getAllTags().then(async (existing) => {
       const nameToId = new Map(existing.map((t) => [t.name.toLowerCase(), t.id]))
       const resolved = []
-      for (const name of tags) {
+      for (const rawName of tags) {
+        const name = rawName.trim()
+        if (!name) continue
         const id = nameToId.get(name.toLowerCase())
         if (id) {
           resolved.push(id)
