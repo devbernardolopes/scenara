@@ -133,15 +133,24 @@ function ChatTitle({ title, chatTitleMarquee, onDoubleClick }) {
 
   useLayoutEffect(() => {
     const el = wrapperRef.current
-    if (el && chatTitleMarquee) {
+    if (!el || !chatTitleMarquee) {
+      setOverflows(false)
+      return
+    }
+
+    function check() {
       const overflows = el.scrollWidth > el.clientWidth
       if (overflows) {
         el.style.setProperty('--marquee-distance', `-${el.scrollWidth - el.clientWidth}px`)
       }
       setOverflows(overflows)
-    } else {
-      setOverflows(false)
     }
+
+    check()
+
+    const ro = new ResizeObserver(check)
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [title, chatTitleMarquee])
 
   if (!chatTitleMarquee) {

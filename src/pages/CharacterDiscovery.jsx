@@ -135,15 +135,24 @@ function CharacterNameCell({ name, characterCardMarquee }) {
 
   useLayoutEffect(() => {
     const el = wrapperRef.current
-    if (el && characterCardMarquee) {
+    if (!el || !characterCardMarquee) {
+      setOverflows(false)
+      return
+    }
+
+    function check() {
       const overflows = el.scrollWidth > el.clientWidth
       if (overflows) {
         el.style.setProperty('--marquee-distance', `-${el.scrollWidth - el.clientWidth}px`)
       }
       setOverflows(overflows)
-    } else {
-      setOverflows(false)
     }
+
+    check()
+
+    const ro = new ResizeObserver(check)
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [name, characterCardMarquee])
 
   if (!characterCardMarquee) {
