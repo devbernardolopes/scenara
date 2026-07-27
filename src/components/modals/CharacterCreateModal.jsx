@@ -357,7 +357,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
   ])
 
   useEffect(() => {
-    if (isEditing || isImport) return
+    if (isEditing) return
     const keys = Object.keys(DEFAULTS_MAP)
     Promise.all(keys.map((k) => getSetting(k))).then((values) => {
       const patches = {}
