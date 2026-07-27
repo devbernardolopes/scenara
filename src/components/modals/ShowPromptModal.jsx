@@ -73,9 +73,9 @@ function ShowPromptModal({
             <span>{formatTokenCount(totalTokens)}</span>
           </div>
           {model && (
-            <div className="flex items-center gap-2 text-text">
+            <div className="flex items-center gap-2 text-text min-w-0">
               <span className="font-medium">{t('model')}:</span>
-              <span className="text-secondary">{model}</span>
+              <span className="text-secondary break-all">{model}</span>
             </div>
           )}
           {paramEntries.length > 0 && (

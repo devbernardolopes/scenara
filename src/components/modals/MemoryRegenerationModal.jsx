@@ -193,9 +193,9 @@ function MemoryRegenerationModal({ threadId, entry }) {
             <span>{formatTokenCount(totalTokens)}</span>
           </div>
           {profile?.model && (
-            <div className="flex items-center gap-2 text-text">
+            <div className="flex items-center gap-2 text-text min-w-0">
               <span className="font-medium">{t('model')}:</span>
-              <span className="text-secondary">{profile.model}</span>
+              <span className="text-secondary break-all">{profile.model}</span>
             </div>
           )}
           {paramEntries.length > 0 && (
