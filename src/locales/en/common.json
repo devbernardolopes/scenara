@@ -46,7 +46,8 @@
     "colorNone": "None",
     "characterNameWithId": "{{name}}",
     "pin": "Pin",
-    "unpin": "Unpin"
+    "unpin": "Unpin",
+    "importUnsupportedFile": "Unsupported file type. Please use a .json or .png file."
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",
@@ -312,5 +313,8 @@
     "errorUnsupported": "Unsupported URL. Please use a Chub.ai character URL.",
     "errorNotFound": "Character not found. Please check the URL and try again.",
     "errorGeneric": "Failed to fetch character. Please try again later."
+  },
+  "shell": {
+    "dropCharacterFile": "Drop character file to import"
   }
 }
