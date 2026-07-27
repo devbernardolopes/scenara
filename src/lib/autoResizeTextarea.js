@@ -28,8 +28,8 @@ export function autoResize(el, options = {}) {
   }
 
   const prevScrollTop = el.scrollTop
-  const newHeight = el.scrollHeight + 1 + extraHeight
-  el.style.height = newHeight + 'px'
+  el.style.height = 'auto'
+  el.style.height = el.scrollHeight + 1 + extraHeight + 'px'
 
   if (adjustScroll && scrollEl && caretY != null && range) {
     const savedCaretY = caretY
