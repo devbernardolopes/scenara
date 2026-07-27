@@ -153,21 +153,26 @@ export default async function handler(req, res) {
   }
 
   try {
-    let card = null
+    const [pngResult, apiResult] = await Promise.allSettled([
+      fetchPngCard(parts.creator, parts.name),
+      fetchApiCard(parts.creator, parts.name),
+    ])
 
-    try {
-      card = await fetchPngCard(parts.creator, parts.name)
-    } catch {}
+    const pngCard = pngResult.status === 'fulfilled' ? pngResult.value : null
+    const apiCard = apiResult.status === 'fulfilled' ? apiResult.value : null
 
-    if (!card) {
-      try {
-        card = await fetchApiCard(parts.creator, parts.name)
-      } catch {}
-    }
+    let card = pngCard || apiCard
 
     if (!card) {
       res.status(404).json({ error: 'Character not found on Chub.ai' })
       return
+    }
+
+    if (pngCard && apiCard) {
+      const apiAvatar = apiCard.data?.avatar
+      if (apiAvatar && /^https?:\/\//.test(apiAvatar)) {
+        card.data.avatar = apiAvatar
+      }
     }
 
     res.setHeader('Content-Type', 'application/json')
