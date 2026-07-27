@@ -51,6 +51,7 @@ import ProgressModal from './components/modals/ProgressModal'
 import ImportSourceModal from './components/modals/ImportSourceModal'
 import LogsModal from './components/modals/LogsModal'
 import LogDetailsModal from './components/modals/LogDetailsModal'
+import UrlImportModal from './components/modals/UrlImportModal'
 
 const SettingsModal = lazy(() => import('./components/modals/settings/SettingsModal'))
 const ImageViewerModal = lazy(() => import('./components/modals/ImageViewerModal'))
@@ -100,6 +101,7 @@ registerModal('scenarioSelector', ScenarioSelectorModal)
 registerModal('importSource', ImportSourceModal)
 registerModal('logs', LogsModal)
 registerModal('logDetails', LogDetailsModal)
+registerModal('urlImport', UrlImportModal)
 
 // Global log capture (no per-call wiring needed).
 // Toast logs are captured centrally inside ToastProvider.addToast so that

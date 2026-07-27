@@ -76,10 +76,7 @@ function Sidebar({ open, onClose }) {
 
   function handleImportUrl() {
     setShowImportMenu(false)
-    const url = window.prompt(t('sidebar.importUrlPrompt'))
-    if (url) {
-      showToast(t('sidebar.importUrlComingSoon'), { type: 'info' })
-    }
+    openModal('urlImport')
   }
 
   function handleImportFile() {

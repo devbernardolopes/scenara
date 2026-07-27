@@ -303,5 +303,14 @@
   },
   "localInference": {
     "placeholder": "Local inference settings will be available here."
+  },
+  "urlImport": {
+    "title": "Import from URL",
+    "placeholder": "https://chub.ai/characters/creator/character-name",
+    "importing": "Fetching character…",
+    "import": "Import",
+    "errorUnsupported": "Unsupported URL. Please use a Chub.ai character URL.",
+    "errorNotFound": "Character not found. Please check the URL and try again.",
+    "errorGeneric": "Failed to fetch character. Please try again later."
   }
 }

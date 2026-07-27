@@ -24,5 +24,5 @@ export default [
     files: sharedFiles,
     languageOptions: { globals: { ...globals.browser } },
   },
-  { ignores: ['dist/', 'node_modules/'] },
+  { ignores: ['dist/', 'node_modules/', 'api/'] },
 ]
