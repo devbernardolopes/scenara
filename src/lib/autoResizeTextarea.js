@@ -28,14 +28,21 @@ export function autoResize(el, options = {}) {
   }
 
   const prevScrollTop = el.scrollTop
-  el.style.height = 'auto'
-  el.style.height = el.scrollHeight + 1 + extraHeight + 'px'
+  const newHeight = el.scrollHeight + 1 + extraHeight
+  el.style.height = newHeight + 'px'
 
   if (adjustScroll && scrollEl && caretY != null && range) {
-    const afterRect = range.getBoundingClientRect()
-    const delta = afterRect.top - caretY
-    if (delta) scrollEl.scrollTop = scrollTopBefore + delta
+    const savedCaretY = caretY
+    const savedScrollTop = scrollTopBefore
+    requestAnimationFrame(() => {
+      const afterRect = range.getBoundingClientRect()
+      const delta = afterRect.top - savedCaretY
+      if (delta) scrollEl.scrollTop = savedScrollTop + delta
+    })
   } else if (el.scrollTop !== prevScrollTop) {
-    el.scrollTop = prevScrollTop
+    const savedPrev = prevScrollTop
+    requestAnimationFrame(() => {
+      if (el.scrollTop !== savedPrev) el.scrollTop = savedPrev
+    })
   }
 }
