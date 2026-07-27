@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useConfirm } from '../../../lib/confirm'
 import { showToast } from '../../../lib/toast'
@@ -16,7 +16,7 @@ import {
 } from '../../../lib/inferenceClient'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import SettingSlider from './controls/SettingSlider'
-import { Download, Trash2, Play, Volume2, Loader, HardDrive } from '../../../lib/icons'
+import { Download, Trash2, Play, Volume2, Loader, HardDrive, Square } from '../../../lib/icons'
 
 function formatBytes(bytes) {
   if (!bytes || bytes === 0) return '0 B'
@@ -191,8 +191,9 @@ function TtsSettingsPanel() {
   const [storageInfo, setStorageInfo] = useState(null)
   const [actionDisabled, setActionDisabled] = useState(false)
   const [hasWebGPU] = useState(() => typeof navigator !== 'undefined' && !!navigator.gpu)
-  const [previewing, setPreviewing] = useState(false)
   const [loadedBackend, setLoadedBackend] = useState(null)
+  const [previewPhase, setPreviewPhase] = useState('idle')
+  const previewAudioRef = useRef(null)
 
   const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)
 
@@ -293,6 +294,15 @@ function TtsSettingsPanel() {
       })
     })
     return unsubscribe
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause()
+        previewAudioRef.current = null
+      }
+    }
   }, [])
 
   const saveProvider = useCallback(async (val) => {
@@ -479,22 +489,44 @@ function TtsSettingsPanel() {
   const handleKittenPreview = useCallback(async () => {
     if (!activeProvider || activeProvider === 'browser') return
     if (modelStates[activeProvider]?.status !== 'loaded') return
-    setPreviewing(true)
+
+    if (previewPhase === 'playing') {
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause()
+        previewAudioRef.current = null
+      }
+      setPreviewPhase('idle')
+      return
+    }
+
+    setPreviewPhase('loading')
     try {
       const result = await previewTtsModel(activeProvider, kittenVoice, undefined, kittenSpeed)
       if (result?.audio) {
         const blob = new Blob([result.audio], { type: 'audio/wav' })
         const url = URL.createObjectURL(blob)
         const audio = new Audio(url)
-        audio.onended = () => URL.revokeObjectURL(url)
+        previewAudioRef.current = audio
+        setPreviewPhase('playing')
+        audio.onended = () => {
+          URL.revokeObjectURL(url)
+          previewAudioRef.current = null
+          setPreviewPhase('idle')
+        }
+        audio.onerror = () => {
+          URL.revokeObjectURL(url)
+          previewAudioRef.current = null
+          setPreviewPhase('idle')
+        }
         await audio.play()
+      } else {
+        setPreviewPhase('idle')
       }
     } catch (err) {
       showToast(err.message || 'Preview failed', { type: 'error' })
-    } finally {
-      setPreviewing(false)
+      setPreviewPhase('idle')
     }
-  }, [activeProvider, modelStates, kittenVoice, kittenSpeed])
+  }, [activeProvider, modelStates, kittenVoice, kittenSpeed, previewPhase])
 
   return (
     <div className="space-y-8">
@@ -725,19 +757,21 @@ function TtsSettingsPanel() {
             type="button"
             onClick={handleKittenPreview}
             disabled={
-              previewing ||
-              actionDisabled ||
-              activeProvider === 'browser' ||
-              modelStates[activeProvider]?.status !== 'loaded'
+              (previewPhase === 'loading' || previewPhase === 'idle') &&
+              (actionDisabled ||
+                activeProvider === 'browser' ||
+                modelStates[activeProvider]?.status !== 'loaded')
             }
             className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md bg-surface-secondary text-text hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {previewing ? (
+            {previewPhase === 'loading' ? (
               <Loader className="w-3.5 h-3.5 animate-spin" />
+            ) : previewPhase === 'playing' ? (
+              <Square className="w-3.5 h-3.5" />
             ) : (
               <Volume2 className="w-3.5 h-3.5" />
             )}
-            {t('tts.kitten.actions.preview')}
+            {previewPhase === 'playing' ? t('chat:stop') : t('tts.kitten.actions.preview')}
           </button>
 
           {/* Model cards */}
