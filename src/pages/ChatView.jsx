@@ -420,9 +420,11 @@ function ChatView() {
   }, [thread?.title])
 
   useEffect(() => {
+    let seq = 0
     function handleThreadsChanged() {
+      const mySeq = ++seq
       getThread(threadId).then((thr) => {
-        if (thr) setThread(thr)
+        if (thr && mySeq === seq) setThread(thr)
       })
     }
     window.addEventListener('threads-changed', handleThreadsChanged)
