@@ -166,15 +166,19 @@ function parseMesExample(mesExample) {
     .map((content) => ({ id: crypto.randomUUID(), content }))
 }
 
+function stripStartTag(text) {
+  return text.replaceAll('<START>', '').trim()
+}
+
 function buildInitialMessages(firstMes, alternateGreetings) {
   const messages = []
   if (!isEmpty(firstMes)) {
-    messages.push({ id: crypto.randomUUID(), content: firstMes })
+    messages.push({ id: crypto.randomUUID(), content: stripStartTag(firstMes) })
   }
   if (Array.isArray(alternateGreetings)) {
     for (const greeting of alternateGreetings) {
       if (!isEmpty(greeting)) {
-        messages.push({ id: crypto.randomUUID(), content: greeting })
+        messages.push({ id: crypto.randomUUID(), content: stripStartTag(greeting) })
       }
     }
   }
