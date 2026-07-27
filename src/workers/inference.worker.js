@@ -718,10 +718,12 @@ async function downloadTtsModel(modelKey, callId) {
     if (!response.ok) throw new Error(`Failed to download ${file}: ${response.status}`)
     const reader = response.body.getReader()
     const chunks = []
+    let fileBytes = 0
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
       chunks.push(value)
+      fileBytes += value.byteLength
       loadedBytes += value.byteLength
       progressCb({
         status: 'progress',
@@ -732,7 +734,7 @@ async function downloadTtsModel(modelKey, callId) {
         total: totalBytes,
       })
     }
-    const arrayBuffer = new Uint8Array(loadedBytes)
+    const arrayBuffer = new Uint8Array(fileBytes)
     let offset = 0
     for (const chunk of chunks) {
       arrayBuffer.set(chunk, offset)
