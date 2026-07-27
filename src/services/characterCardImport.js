@@ -292,7 +292,7 @@ async function lorebookMatchesExisting(existingLorebook, incomingLorebook, incom
   return true
 }
 
-export async function handleCharacterBook(characterBook) {
+export async function handleCharacterBook(characterBook, characterName) {
   if (!characterBook || typeof characterBook !== 'object') return null
   if (!Array.isArray(characterBook.entries) || characterBook.entries.length === 0) return null
 
@@ -301,6 +301,11 @@ export async function handleCharacterBook(characterBook) {
 
   const { lorebook, entries } = mapped
   lorebook.isGlobal = false
+
+  const needsName = !lorebook.name || lorebook.name === 'Imported Lorebook'
+  if (needsName) {
+    lorebook.name = `${characterName || 'Character'} Lorebook`
+  }
 
   const allExisting = await getAllLorebooks()
   for (const existing of allExisting) {
@@ -338,7 +343,7 @@ export async function importCharacterCard(input) {
 
   const characterBook = format === 'v2' ? json.data?.character_book : null
   if (characterBook) {
-    const lorebookId = await handleCharacterBook(characterBook)
+    const lorebookId = await handleCharacterBook(characterBook, mapped.name)
     if (lorebookId) {
       mapped.lorebookIds = [lorebookId]
     }
