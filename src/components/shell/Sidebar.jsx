@@ -427,7 +427,7 @@ function Sidebar({ open, onClose }) {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".json,application/json"
+            accept=".json,.png,application/json,image/png"
             className="hidden"
             onChange={handleFileSelected}
           />

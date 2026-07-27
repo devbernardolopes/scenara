@@ -2,6 +2,7 @@ import db from '../db'
 import { showToast } from '../lib/toast'
 import i18n from '../lib/i18n'
 import { deleteUIStateByKeyPrefix } from './uiState'
+import { importCharacterCard } from './characterCardImport'
 
 const SEED_CHARACTERS = [
   {
@@ -203,20 +204,16 @@ export async function exportCharacter(id) {
 export function importCharacterFromFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
-        const data = JSON.parse(e.target.result)
-        if (!data.name) {
-          reject(new Error(i18n.t('common:toast.import.invalidFormat')))
-          return
-        }
-        resolve(data)
+        const result = await importCharacterCard(e.target.result)
+        resolve(result.data)
       } catch {
         reject(new Error(i18n.t('common:toast.import.invalidFormat')))
       }
     }
     reader.onerror = () => reject(new Error(i18n.t('common:toast.import.fileError')))
-    reader.readAsText(file)
+    reader.readAsArrayBuffer(file)
   })
 }
 
