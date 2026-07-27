@@ -64,6 +64,9 @@ function ScenarioSection({ form, onChange }) {
   const { t } = useTranslation('characterCreation')
   const { confirm } = useConfirm()
   const scenarios = form.scenarios || []
+  const [globalLifetime, setGlobalLifetime] = useState(() => {
+    return scenarios[0]?.lifetime || 'firstSummary'
+  })
   const [expandedId, setExpandedId] = useState(() => {
     const firstEmpty = scenarios.find((s) => !s.content)
     return firstEmpty?.id || null
@@ -181,7 +184,7 @@ function ScenarioSection({ form, onChange }) {
         <label className="text-sm text-text shrink-0">{t('scenarioLifetime')}</label>
         <LifetimeButtonGroup
           options={LIFETIME_OPTIONS}
-          value={scenarios[0]?.lifetime || 'firstSummary'}
+          value={globalLifetime}
           disabled={!hasAnyContent}
           onChange={async (value) => {
             // Section-level default: applies to every existing scenario and is
@@ -194,6 +197,7 @@ function ScenarioSection({ form, onChange }) {
               variant: 'warning',
             })
             if (!ok) return
+            setGlobalLifetime(value)
             onChange(
               'scenarios',
               scenarios.map((s) => ({ ...s, lifetime: value })),
