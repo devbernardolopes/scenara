@@ -69,6 +69,7 @@ export const GROUPS = [
   },
   { key: 'interface', labelKey: 'settings:groups.interface' },
   { key: 'chat', labelKey: 'settings:groups.chat' },
+  { key: 'extra', labelKey: 'settings:groups.extra' },
 ]
 
 export const SETTINGS = [
@@ -1493,6 +1494,7 @@ export const SETTINGS = [
   {
     key: 'prompting.personaInjectionTemplate',
     category: 'prompting',
+    group: 'extra',
     type: 'textarea',
     default: 'Current User Persona:\n\n- Name: {{name}}.\n- Description: {{description}}.',
     props: { rows: 6, collapsible: true, summary: 'tokens' },
@@ -1502,6 +1504,7 @@ export const SETTINGS = [
   {
     key: 'prompting.trimMessages',
     category: 'prompting',
+    group: 'extra',
     type: 'toggle',
     default: true,
     labelKey: 'settings:prompting.trimMessages.label',
@@ -1510,6 +1513,7 @@ export const SETTINGS = [
   {
     key: 'prompting.trimWhitespaces',
     category: 'prompting',
+    group: 'extra',
     type: 'toggle',
     default: true,
     labelKey: 'settings:prompting.trimWhitespaces.label',
@@ -1518,6 +1522,7 @@ export const SETTINGS = [
   {
     key: 'prompting.keepCodeBlocks',
     category: 'prompting',
+    group: 'extra',
     type: 'select',
     options: ['always', 'never', '1', '2', '3', '4', '5'],
     optionLabels: {

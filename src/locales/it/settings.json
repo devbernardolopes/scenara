@@ -61,7 +61,8 @@
     "localInference": "Inferenza locale",
     "localInferenceAdvanced": "Avanzate",
     "interface": "Interface",
-    "chat": "Chat"
+    "chat": "Chat",
+    "extra": "Extra"
   },
   "appearance": {
     "theme": {

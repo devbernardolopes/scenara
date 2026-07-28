@@ -156,7 +156,8 @@
     "localInference": "Local Inference",
     "localInferenceAdvanced": "Advanced",
     "interface": "Interface",
-    "chat": "Chat"
+    "chat": "Chat",
+    "extra": "Extra"
   },
   "appearance": {
     "theme": {
