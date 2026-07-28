@@ -907,15 +907,6 @@ export const SETTINGS = [
     dependsOn: { key: 'defaultMemory', value: 'never', not: true },
   },
   {
-    key: 'defaultAddCharacterPrompt',
-    category: 'defaults',
-    type: 'toggle',
-    default: false,
-    labelKey: 'settings:defaults.addCharacterPrompt.label',
-    descKey: 'settings:defaults.addCharacterPrompt.desc',
-    dependsOn: { key: 'defaultMemory', value: 'never', not: true },
-  },
-  {
     key: 'defaultFirstMessage',
     category: 'defaults',
     type: 'toggle',
@@ -1152,7 +1143,7 @@ export const SETTINGS = [
     group: 'summarization',
     type: 'textarea',
     default:
-      'You are an expert memory compressor for a roleplay conversation.\n\nYour task is to create a concise, factual update to the ongoing memory based on the chat history provided.\n\nRules:\n- Start from the previous memory (if any) and integrate only new key information.\n- Extract and condense important facts: character actions, decisions, relationship changes, locations, important objects, emotional states, and plot progression.\n- Use a neutral, matter-of-fact, third-person style.\n- Be concise: Maximum 2 short paragraphs, under 192 tokens total.\n- Never include quoted dialogue, inner thoughts, speculation, or invented details.\n- Do not add closure or continue the scene.\n- Eliminate any duplicate information already in the previous memory.\n- Output ONLY the updated memory text. No explanations or labels.\n\n{{transcript}}',
+      'You are an expert memory compressor for a roleplay conversation.\n\nYour task is to create a concise, factual update to the ongoing memory based on the chat history provided.\n\nRules:\n- Start from the previous memory (if any) and integrate only new key information.\n- Extract and condense important facts: character actions, decisions, relationship changes, locations, important objects, emotional states, and plot progression.\n- Use a neutral, matter-of-fact, third-person style.\n- Be concise: Maximum 2 short paragraphs, under 192 tokens total.\n- Never include quoted dialogue, inner thoughts, speculation, or invented details.\n- Do not add closure or continue the scene.\n- Eliminate any duplicate information already in the previous memory.\n- Output ONLY the updated memory text. No explanations or labels.\n\n{{character_prompt}}\n\n{{memory}}\n\n{{transcript}}',
     props: { rows: 6, collapsible: true, summary: 'tokens' },
     labelKey: 'settings:prompting.summarizationSystem.label',
     descKey: 'settings:prompting.summarizationSystem.desc',

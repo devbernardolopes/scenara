@@ -102,7 +102,6 @@
     "static": "Estático"
   },
   "memorySlots": "Slots de Memória",
-  "addCharacterPrompt": "Añadir Prompt del Personaje",
   "messagesToKeepDesc": "Quantas das mensagens mais recentes que fizerem parte da última solicitação de resumo ainda serão passadas para as requisições de API de um chat até o próximo evento de resumo.",
   "memorySlotsDesc": "Quantas entradas de memória (slots) o chat terá por nível de memória.",
   "summarizationSystemInstructions": "Instrucciones del sistema para resumen",

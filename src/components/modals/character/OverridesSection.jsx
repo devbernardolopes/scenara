@@ -72,7 +72,6 @@ const OVERRIDE_DEFAULTS_MAP = [
   ['messagesToKeep', 'defaultMessagesToKeep'],
   ['messageRollover', 'defaultMessageRollover'],
   ['memorySlots', 'defaultMemorySlots'],
-  ['addCharacterPrompt', 'defaultAddCharacterPrompt'],
   ['firstMessage', 'defaultFirstMessage'],
   ['userPersonaPrefix', 'defaultUserPersonaPrefix'],
   ['includeOOC', 'defaultIncludeOOC'],
@@ -344,12 +343,6 @@ function OverridesSection({ form, onChange, characterId }) {
           />
           <span className="text-sm text-text font-medium w-14 text-right">{form.memorySlots}</span>
         </div>
-
-        <ToggleRow
-          label={t('addCharacterPrompt')}
-          checked={form.addCharacterPrompt}
-          onChange={(v) => onChange('addCharacterPrompt', v)}
-        />
       </div>
 
       <div className={`ml-7 space-y-4 ${disabledCls(form.memory === 'never')}`}>

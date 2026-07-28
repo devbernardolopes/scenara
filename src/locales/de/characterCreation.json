@@ -102,7 +102,6 @@
     "static": "Statisch"
   },
   "memorySlots": "Erinnerungs-Slots",
-  "addCharacterPrompt": "Charakter-Prompt hinzufügen",
   "messagesToKeepDesc": "Anzahl der jüngsten Nachrichten, die im Kontext gehalten werden, bevor ältere zusammengefasst werden.",
   "memorySlotsDesc": "Anzahl der Erinnerungs-Slots, die für langfristigen Kontext reserviert werden.",
   "summarizationSystemInstructions": "System-Anweisungen für Zusammenfassung",

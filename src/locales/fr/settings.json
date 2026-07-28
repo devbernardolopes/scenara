@@ -973,10 +973,6 @@
       "label": "Emplacements de mémoire",
       "desc": "Nombre d’entrées de mémoire (emplacements) par niveau de mémoire que la discussion aura."
     },
-    "addCharacterPrompt": {
-      "label": "Ajouter un prompt de personnage",
-      "desc": "État par défaut pour préfixer le prompt du personnage au transcript envoyé à l’API de résumé lors de la création d’un nouveau personnage."
-    },
     "firstMessage": {
       "label": "Premier message",
       "desc": "État par défaut du bouton du premier message."

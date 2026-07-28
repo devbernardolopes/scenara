@@ -137,27 +137,23 @@ export async function buildSummarizationPayload({
     replaceVarsWithDesc,
   })
 
-  // When Add Character Prompt is enabled and persona injection is set to
-  // "always" + "end of system prompt", mirror the chat payload by injecting the
-  // persona template just after the character prompt (outside the transcript).
+  // Resolve persona injection for summarization when configured for end-of-system-prompt placement.
   let personaInjection = ''
-  if (character?.addCharacterPrompt) {
-    const personaTiming =
-      character?.personaInjectionTiming || (await getSetting('prompting.personaInjectionTiming'))
-    const personaPlacement =
-      character?.personaInjectionPlacement ||
-      (await getSetting('prompting.personaInjectionPlacement'))
-    const personaTemplate = await getSetting('prompting.personaInjectionTemplate')
-    if (personaTiming === 'always' && personaTemplate && personaPlacement === 'endOfSystemPrompt') {
-      personaInjection = replacePersonaTemplate(personaTemplate, {
-        charName,
-        personaName,
-        currentPersonaName,
-        currentPersona,
-        chatPersona,
-        defaultPersona,
-      })
-    }
+  const personaTiming =
+    character?.personaInjectionTiming || (await getSetting('prompting.personaInjectionTiming'))
+  const personaPlacement =
+    character?.personaInjectionPlacement ||
+    (await getSetting('prompting.personaInjectionPlacement'))
+  const personaTemplate = await getSetting('prompting.personaInjectionTemplate')
+  if (personaTiming === 'always' && personaTemplate && personaPlacement === 'endOfSystemPrompt') {
+    personaInjection = replacePersonaTemplate(personaTemplate, {
+      charName,
+      personaName,
+      currentPersonaName,
+      currentPersona,
+      chatPersona,
+      defaultPersona,
+    })
   }
 
   let systemContent = character?.summarizationSystemInstructions
@@ -179,9 +175,8 @@ export async function buildSummarizationPayload({
 
   const memorySection = memoryText ? memoryText : ''
 
-  // Resolve scenario and global context outside the addCharacterPrompt guard
-  // so they are injected into summarization payloads based on their own
-  // lifetime settings, independent of whether the character prompt is included.
+  // Resolve scenario and global context so they are available for the
+  // character prompt section, independent of whether a prompt exists.
   const globalContextRaw = resolveGlobalContextInjection(character, {
     isFirstMessage: false,
     lastSummarizationAt: effectiveLastSummarizationAt,
@@ -195,42 +190,32 @@ export async function buildSummarizationPayload({
   })
   const resolvedScenario = scenarioText ? replaceVarsWithDesc(scenarioText) : ''
 
-  // Build the standalone context section (scenario + global context) that is
-  // always included when either has content — regardless of addCharacterPrompt.
+  // Build the standalone context section (scenario + global context).
   let contextSection = ''
   const contextParts = []
   if (resolvedGlobalContext) contextParts.push(resolvedGlobalContext)
   if (resolvedScenario) contextParts.push(resolvedScenario)
   if (contextParts.length > 0) contextSection = contextParts.join('\n\n')
 
-  // When Add Character Prompt is enabled, prepend the character prompt and
-  // personality to the context section, preceded by the Character Prompt
-  // section header if configured. The scenario and global context are appended
-  // after the prompt/personality but before persona injection.
+  // Build the character prompt section (user decides inclusion via {{character_prompt}}).
   let charPromptSection = ''
-  if (character?.addCharacterPrompt) {
-    const prompt = replaceVarsWithDesc(character?.prompt || '')
-    if (prompt) {
-      const parts = [prompt]
+  const prompt = replaceVarsWithDesc(character?.prompt || '')
+  if (prompt) {
+    const parts = [prompt]
 
-      const personality = replaceVarsWithDesc(character?.personality || '')
-      if (personality) parts.push(personality)
+    const personality = replaceVarsWithDesc(character?.personality || '')
+    if (personality) parts.push(personality)
 
-      let combined = parts.join('\n\n')
+    let combined = parts.join('\n\n')
 
-      if (resolvedGlobalContext) combined = `${combined}\n\n${resolvedGlobalContext}`
-      if (resolvedScenario) combined = `${combined}\n\n${resolvedScenario}`
+    if (resolvedGlobalContext) combined = `${combined}\n\n${resolvedGlobalContext}`
+    if (resolvedScenario) combined = `${combined}\n\n${resolvedScenario}`
 
-      if (personaInjection) combined = `${combined}\n\n${personaInjection}`
-      charPromptSection = charPromptHeader
-        ? `${replaceVarsWithDesc(charPromptHeader)}\n\n${combined}`
-        : combined
-    }
-  }
-
-  // When addCharacterPrompt is false but scenario/global context have content,
-  // inject them standalone (without the character prompt/personality wrapping).
-  if (!charPromptSection && contextSection) {
+    if (personaInjection) combined = `${combined}\n\n${personaInjection}`
+    charPromptSection = charPromptHeader
+      ? `${replaceVarsWithDesc(charPromptHeader)}\n\n${combined}`
+      : combined
+  } else if (contextSection) {
     charPromptSection = contextSection
   }
 
@@ -238,20 +223,21 @@ export async function buildSummarizationPayload({
     ? `${replaceVarsWithDesc(messagesHeader)}\n\n${transcript}`
     : transcript
 
-  // Character prompt is placed at the very top of the payload, before any
-  // memory injection, when the per-character override is enabled.
-  const fullContent = [charPromptSection, memorySection, transcriptSection]
-    .filter(Boolean)
-    .join('\n\n')
+  const replaceTemplates = (text) =>
+    replaceVarsWithDesc(text)
+      .replace(/{{transcript}}/gi, transcriptSection)
+      .replace(/{{memory}}/gi, memorySection)
+      .replace(/{{character_prompt}}/gi, charPromptSection)
 
-  systemContent = replaceVarsWithDesc(systemContent).replace(/{{transcript}}/gi, fullContent)
+  systemContent = replaceTemplates(systemContent)
 
   const payload = [{ role: 'system', content: systemContent }]
   if (userContent) {
-    userContent = replaceVarsWithDesc(userContent).replace(/{{transcript}}/gi, fullContent)
+    userContent = replaceTemplates(userContent)
     payload.push({ role: 'user', content: userContent })
   } else {
-    payload.push({ role: 'user', content: fullContent })
+    const fallbackParts = [charPromptSection, memorySection, transcriptSection].filter(Boolean)
+    payload.push({ role: 'user', content: fallbackParts.join('\n\n') })
   }
 
   return payload

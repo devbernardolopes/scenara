@@ -102,7 +102,6 @@
     "static": "Statique"
   },
   "memorySlots": "Emplacements de mémoire",
-  "addCharacterPrompt": "Ajouter un prompt de personnage",
   "messagesToKeepDesc": "Nombre de messages récents conservés dans le contexte avant que les plus anciens ne soient résumés.",
   "memorySlotsDesc": "Nombre d’emplacements de mémoire réservés pour le contexte à long terme.",
   "summarizationSystemInstructions": "Instructions système de résumé",

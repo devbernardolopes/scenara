@@ -973,10 +973,6 @@
       "label": "Slot di memoria",
       "desc": "Numero di voci di memoria (slot) per livello di memoria che la chat avrà."
     },
-    "addCharacterPrompt": {
-      "label": "Aggiungi prompt del personaggio",
-      "desc": "Stato predefinito per anteporre il prompt del personaggio al transcript inviato all’API di riepilogo alla creazione di un nuovo personaggio."
-    },
     "firstMessage": {
       "label": "Primo messaggio",
       "desc": "Stato predefinito dell’interruttore del primo messaggio."

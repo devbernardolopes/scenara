@@ -102,7 +102,6 @@
     "static": "Statico"
   },
   "memorySlots": "Slot di memoria",
-  "addCharacterPrompt": "Aggiungi prompt del personaggio",
   "messagesToKeepDesc": "Numero di messaggi recenti mantenuti nel contesto prima che i più vecchi vengano riepilogati.",
   "memorySlotsDesc": "Numero di voci di memoria (slot) per livello di memoria che la chat avrà.",
   "summarizationSystemInstructions": "Istruzioni di sistema per riepilogo",
