@@ -178,6 +178,21 @@ export default async function handler(req, res) {
       if ((!pngGreetings || pngGreetings.length === 0) && apiGreetings?.length > 0) {
         card.data.alternate_greetings = apiGreetings
       }
+      const textFields = [
+        'description',
+        'personality',
+        'first_mes',
+        'mes_example',
+        'scenario',
+        'system_prompt',
+        'post_history_instructions',
+        'creator_notes',
+      ]
+      for (const field of textFields) {
+        if ((apiCard.data?.[field]?.length || 0) > (card.data?.[field]?.length || 0)) {
+          card.data[field] = apiCard.data[field]
+        }
+      }
     }
 
     res.setHeader('Content-Type', 'application/json')
