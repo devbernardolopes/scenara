@@ -102,7 +102,7 @@ async function fetchApiCard(creator, name) {
     data: {
       name: def.name,
       description: def.description ?? json.node?.description ?? '',
-      personality: def.personality || def.tavern_personality || '',
+      personality: def.personality ?? def.tavern_personality ?? '',
       scenario: def.scenario ?? '',
       first_mes: def.first_message ?? '',
       mes_example: def.example_dialogs ?? '',
