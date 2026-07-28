@@ -289,6 +289,17 @@ export async function forkThread(id, messageId) {
         threadId: newId,
       })),
     )
+  } else {
+    // No memories copied — clear the legacy `memory` field so the migration
+    // in buildInjectedMemory doesn't create a phantom threadMemory entry.
+    await db.threads
+      .where('id')
+      .equals(newId)
+      .modify((t) => {
+        t.memory = null
+        t.lastSummarizationAt = null
+        t.keptConsumedCount = 0
+      })
   }
 
   const allPrompts = await db.promptHistory.where('threadId').equals(Number(id)).sortBy('createdAt')
