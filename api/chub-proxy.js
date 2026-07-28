@@ -173,6 +173,11 @@ export default async function handler(req, res) {
       if (apiAvatar && /^https?:\/\//.test(apiAvatar)) {
         card.data.avatar = apiAvatar
       }
+      const pngGreetings = card.data?.alternate_greetings
+      const apiGreetings = apiCard.data?.alternate_greetings
+      if ((!pngGreetings || pngGreetings.length === 0) && apiGreetings?.length > 0) {
+        card.data.alternate_greetings = apiGreetings
+      }
     }
 
     res.setHeader('Content-Type', 'application/json')
