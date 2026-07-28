@@ -8,6 +8,7 @@
     "personas": "Personas",
     "writingInstructions": "Schreibanweisungen",
     "connectionProfiles": "Verbindungsprofile",
+    "cloudServices": "Cloud Services",
     "inChatShortcuts": "Chat-Verknüpfungen",
     "lorebooks": "Lorebooks",
     "promptBank": "Prompt Bank",
@@ -45,7 +46,23 @@
     "colorNone": "Keine",
     "characterNameWithId": "{{name}}",
     "pin": "Anheften",
-    "unpin": "Lösen"
+    "unpin": "Lösen",
+    "importUnsupportedFile": "Unsupported file type. Please use a .json or .png file.",
+    "filterStatus": "Nach Nachrichtenstatus filtern",
+    "filterStatusAll": "Alle Nachrichten",
+    "filterStatusUnread": "Nur ungelesene",
+    "filterPinnedShow": "Angeheftete anzeigen",
+    "filterPinnedHide": "Angeheftete ausblenden",
+    "filterPinnedShowLabel": "Anzeigen",
+    "filterPinnedHideLabel": "Ausblenden",
+    "filterLockedShow": "Gesperrte anzeigen",
+    "filterLockedHide": "Gesperrte ausblenden",
+    "filterLockedShowLabel": "Anzeigen",
+    "filterLockedHideLabel": "Ausblenden",
+    "filterColor": "Nach Farbe filtern",
+    "filterColorAll": "Alle Farben",
+    "filterColorNone": "Keine Farbe",
+    "filterClear": "Filter zurücksetzen"
   },
   "topbar": {
     "toggleSidebar": "Seitenleiste umschalten",
@@ -214,6 +231,17 @@
       "exportedMultiple": "{{count}} lorebooks exported",
       "imported": "{{count}} lorebooks imported"
     },
+    "cloudService": {
+      "created": "{{name}} created",
+      "updated": "{{name}} updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} cloud services deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} cloud services duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} cloud services exported",
+      "imported": "{{count}} cloud services imported"
+    },
     "promptBank": {
       "created": "{{name}} created",
       "updated": "{{name}} updated",
@@ -291,5 +319,17 @@
   },
   "localInference": {
     "placeholder": "Lokale Inferenzeinstellungen werden hier verfügbar sein."
+  },
+  "urlImport": {
+    "title": "Import from URL",
+    "placeholder": "https://chub.ai/characters/creator/character-name",
+    "importing": "Fetching character…",
+    "import": "Import",
+    "errorUnsupported": "Unsupported URL. Please use a Chub.ai character URL.",
+    "errorNotFound": "Character not found. Please check the URL and try again.",
+    "errorGeneric": "Failed to fetch character. Please try again later."
+  },
+  "shell": {
+    "dropCharacterFile": "Drop character file to import"
   }
 }

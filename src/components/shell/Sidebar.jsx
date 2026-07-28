@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -45,6 +45,9 @@ import {
 import { getGeneratingThreads } from '../../services/generatingState'
 import * as apiQueue from '../../services/apiQueue'
 import { useUnread } from '../../hooks/useUnread'
+import { usePersistedState } from '../../hooks/usePersistedState'
+import { COLOR_SLOTS } from '../../config/colorPalettes'
+import ThreadFilters from './ThreadFilters'
 
 function Sidebar({ open, onClose }) {
   const { t } = useTranslation('common')
@@ -67,6 +70,12 @@ function Sidebar({ open, onClose }) {
   const [unreadBadges, setUnreadBadges] = useState(true)
   const [sidebarNavLayout, setSidebarNavLayout] = useState('vertical')
   const [messageCounts, setMessageCounts] = useState(new Map())
+  const [threadFilters, setThreadFilters] = usePersistedState('sidebarFilters', {
+    status: 'all',
+    showPinned: true,
+    showLocked: true,
+    colors: [],
+  })
   const fileInputRef = useRef(null)
   useUnread()
 
@@ -216,6 +225,23 @@ function Sidebar({ open, onClose }) {
     window.addEventListener('settings-changed', onSettingsChanged)
     return () => window.removeEventListener('settings-changed', onSettingsChanged)
   }, [])
+
+  const { pinned, regular } = useMemo(() => {
+    const filtered = threads.filter((t) => {
+      if (threadFilters.status === 'unread' && !(t.unreadCount || 0)) return false
+      if (!threadFilters.showPinned && t.isFavorite) return false
+      if (!threadFilters.showLocked && t.isLocked) return false
+      if (threadFilters.colors.length > 0) {
+        const colorKey = t.colorSlot >= 0 ? COLOR_SLOTS[t.colorSlot] : 'none'
+        if (!threadFilters.colors.includes(colorKey)) return false
+      }
+      return true
+    })
+    return {
+      pinned: filtered.filter((t) => t.isFavorite),
+      regular: filtered.filter((t) => !t.isFavorite),
+    }
+  }, [threads, threadFilters])
 
   function handleEditTitle(thread) {
     openModal('editThreadTitle', { thread })
@@ -430,40 +456,76 @@ function Sidebar({ open, onClose }) {
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">
-          {threads.length === 0 ? (
-            <p className="text-xs text-tertiary px-3">{t('sidebar.newChat')}</p>
-          ) : (
-            threads.map((thread) => {
-              const character = characters[thread.characterId]
-              const isActive = String(thread.id) === threadId
-              return (
-                <ThreadCard
-                  key={thread.id}
-                  thread={thread}
-                  character={character}
-                  personaMap={personaMap}
-                  theme={theme}
-                  messageCount={messageCounts.get(thread.id) || 0}
-                  isActive={isActive}
-                  unreadBadges={unreadBadges}
-                  generating={generatingSet.has(thread.id)}
-                  queueCount={queueCounts[thread.id] || 0}
-                  threadCardMarquee={threadCardMarquee}
-                  selected={selectedIds.has(thread.id)}
-                  onClose={onClose}
-                  onEditTitle={handleEditTitle}
-                  onEditCharacter={handleEditCharacter}
-                  onDuplicate={handleDuplicate}
-                  onTogglePin={handleToggleFavorite}
-                  onToggleLock={handleToggleLock}
-                  onToggleSelect={toggleSelect}
-                  onToggleColorPicker={handleColorPickerToggle}
-                  onDelete={handleDelete}
-                />
-              )
-            })
+        <div className="flex-1 flex flex-col min-h-0">
+          <ThreadFilters filters={threadFilters} onFilterChange={setThreadFilters} theme={theme} />
+          {pinned.length > 0 && (
+            <div className="max-h-[40vh] overflow-y-auto px-3 py-2 space-y-2 border-b border-border-light">
+              {pinned.map((thread) => {
+                const character = characters[thread.characterId]
+                const isActive = String(thread.id) === threadId
+                return (
+                  <ThreadCard
+                    key={thread.id}
+                    thread={thread}
+                    character={character}
+                    personaMap={personaMap}
+                    theme={theme}
+                    messageCount={messageCounts.get(thread.id) || 0}
+                    isActive={isActive}
+                    unreadBadges={unreadBadges}
+                    generating={generatingSet.has(thread.id)}
+                    queueCount={queueCounts[thread.id] || 0}
+                    threadCardMarquee={threadCardMarquee}
+                    selected={selectedIds.has(thread.id)}
+                    onClose={onClose}
+                    onEditTitle={handleEditTitle}
+                    onEditCharacter={handleEditCharacter}
+                    onDuplicate={handleDuplicate}
+                    onTogglePin={handleToggleFavorite}
+                    onToggleLock={handleToggleLock}
+                    onToggleSelect={toggleSelect}
+                    onToggleColorPicker={handleColorPickerToggle}
+                    onDelete={handleDelete}
+                  />
+                )
+              })}
+            </div>
           )}
+          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">
+            {regular.length === 0 && pinned.length === 0 ? (
+              <p className="text-xs text-tertiary px-3">{t('sidebar.newChat')}</p>
+            ) : (
+              regular.map((thread) => {
+                const character = characters[thread.characterId]
+                const isActive = String(thread.id) === threadId
+                return (
+                  <ThreadCard
+                    key={thread.id}
+                    thread={thread}
+                    character={character}
+                    personaMap={personaMap}
+                    theme={theme}
+                    messageCount={messageCounts.get(thread.id) || 0}
+                    isActive={isActive}
+                    unreadBadges={unreadBadges}
+                    generating={generatingSet.has(thread.id)}
+                    queueCount={queueCounts[thread.id] || 0}
+                    threadCardMarquee={threadCardMarquee}
+                    selected={selectedIds.has(thread.id)}
+                    onClose={onClose}
+                    onEditTitle={handleEditTitle}
+                    onEditCharacter={handleEditCharacter}
+                    onDuplicate={handleDuplicate}
+                    onTogglePin={handleToggleFavorite}
+                    onToggleLock={handleToggleLock}
+                    onToggleSelect={toggleSelect}
+                    onToggleColorPicker={handleColorPickerToggle}
+                    onDelete={handleDelete}
+                  />
+                )
+              })
+            )}
+          </div>
         </div>
 
         {selectedIds.size > 0 && (

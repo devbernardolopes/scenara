@@ -90,6 +90,11 @@ export async function exportDatabase(selection) {
     }
   }
 
+  const sidebarFilters = await getUIState('sidebarFilters')
+  if (sidebarFilters != null) {
+    data.sidebarFilters = sidebarFilters
+  }
+
   const scrollEntries = await db.uiState.where('key').startsWith('scroll.').toArray()
   if (scrollEntries.length > 0) {
     data.scrollPositions = Object.fromEntries(scrollEntries.map((e) => [e.key.slice(7), e.value]))
@@ -315,6 +320,11 @@ export async function importDatabase(data) {
           value: data.discoveryView.searchQuery,
         })
       }
+    }
+
+    if (data.sidebarFilters && typeof data.sidebarFilters === 'object') {
+      await db.uiState.where('key').equals('sidebarFilters').delete()
+      await db.uiState.add({ key: 'sidebarFilters', value: data.sidebarFilters })
     }
 
     if (data.scrollPositions && typeof data.scrollPositions === 'object') {

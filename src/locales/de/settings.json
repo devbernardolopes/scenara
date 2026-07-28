@@ -24,6 +24,10 @@
       "label": "Nachbearbeitung aktivieren",
       "desc": "Nachbearbeitungs-Stil für alle Nachrichten global aktivieren oder deaktivieren."
     },
+    "injectQuotes": {
+      "label": "Inject Quotes in User Dialogue",
+      "desc": "Wrap unformatted segments of user messages in straight double quotes when sending messages in a chat."
+    },
     "override": "Globale Regeln überschreiben",
     "label": "Bezeichnung (optional)",
     "opening": "Öffnende(s) Zeichen",
@@ -45,6 +49,97 @@
     "resetConfirmTitle": "Reset to defaults?",
     "resetConfirmMessage": "This will replace all rules with the built-in defaults. This cannot be undone.",
     "resetOverrideConfirmMessage": "This will reset the character's rules to match the ones currently set in Settings. This cannot be undone."
+  },
+  "tts": {
+    "panelDesc": "Configure text-to-speech engine, voice, and model settings.",
+    "activeProvider": {
+      "label": "Active Provider",
+      "desc": "Select which text-to-speech engine to use for speech output."
+    },
+    "browser": {
+      "title": "Browser (Built-in)",
+      "desc": "Uses your operating system's built-in speech synthesis. No download required.",
+      "voice": {
+        "label": "Voice",
+        "desc": "Select a voice for browser speech synthesis."
+      },
+      "noVoices": "No voices available. Your browser may still be loading voices.",
+      "preview": "Preview",
+      "previewText": "Hello! This is a preview of the selected voice.",
+      "rate": {
+        "label": "Speech Rate",
+        "desc": "How fast the voice speaks. 1 is normal speed."
+      },
+      "pitch": {
+        "label": "Pitch",
+        "desc": "How high or low the voice sounds. 1 is normal pitch."
+      },
+      "volume": {
+        "label": "Volume",
+        "desc": "Loudness of the voice. 1 is full volume."
+      }
+    },
+    "kitten": {
+      "title": "Kitten TTS",
+      "desc": "High-quality local text-to-speech. Download a model to get started.",
+      "backend": {
+        "label": "Backend",
+        "desc": "Hardware acceleration for model inference.",
+        "auto": "Auto",
+        "wasm": "WASM",
+        "webgpu": "WebGPU"
+      },
+      "voice": {
+        "label": "Voice",
+        "desc": "Select a voice for Kitten TTS."
+      },
+      "status": {
+        "not-downloaded": "Not downloaded",
+        "downloading": "Downloading…",
+        "loading": "Loading…",
+        "downloaded": "Downloaded",
+        "loaded": "Loaded",
+        "error": "Error"
+      },
+      "actions": {
+        "download": "Download",
+        "downloading": "Downloading…",
+        "loading": "Loading…",
+        "load": "Load",
+        "unload": "Unload",
+        "delete": "Delete",
+        "preview": "Preview"
+      },
+      "models": {
+        "mini": {
+          "label": "Mini",
+          "desc": "80M params — Highest quality, best for production."
+        },
+        "micro": {
+          "label": "Micro",
+          "desc": "40M params — Balanced quality and speed."
+        },
+        "nanoFp32": {
+          "label": "Nano (FP32)",
+          "desc": "15M params — Fast, good for real-time."
+        },
+        "nanoInt8": {
+          "label": "Nano (INT8)",
+          "desc": "15M params — Smallest, quantized for mobile."
+        }
+      },
+      "storageUsed": "{{used}} of {{quota}} used",
+      "storageUnknown": "Storage usage unknown",
+      "iosWarning": "The WASM phonemizer may hang on iOS Safari.",
+      "confirmDeleteTitle": "Delete model?",
+      "confirmDeleteMessage": "This will remove the downloaded model files. You can re-download them later.",
+      "webgpuUnavailable": "WebGPU is not available in this browser.",
+      "backendLocked": "Unload the model first to change backend.",
+      "speed": {
+        "label": "Speech Speed",
+        "desc": "How fast the voice speaks. 1 is normal speed."
+      }
+    }
   },
   "groups": {
     "autoTitle": "Auto-Title",
@@ -115,7 +210,7 @@
     },
     "showHomeButton": {
       "label": "Startschaltfläche anzeigen",
-      "desc": "Zeigt auf kleinen Bildschirmen eine Schaltfläche „Start\u201C an, wenn man sich nicht in der Entdeckung befindet."
+      "desc": "Zeigt auf kleinen Bildschirmen eine Schaltfläche „Start“ an, wenn man sich nicht in der Entdeckung befindet."
     },
     "showLastChatButton": {
       "label": "Letzte-Chat-Schaltfläche anzeigen",
@@ -1008,6 +1103,8 @@
       "extra": "Extra",
       "logs": "Logs",
       "logsDescription": "Alle Protokolle",
+      "cloudServices": "Cloud Services",
+      "cloudServicesDescription": "All cloud service configurations",
       "lorebooks": "Lorebooks",
       "lorebooksDisabled": "Not yet implemented",
       "tags": "Tags",
@@ -1022,7 +1119,19 @@
       "exporting": "Exporting…",
       "exported": "Exported.",
       "close": "Close",
-      "notAvailable": "N/A"
+      "notAvailable": "N/A",
+      "destinationTitle": "Export Destination",
+      "passphrase": "Passphrase (optional)",
+      "passphrasePlaceholder": "Enter a passphrase to encrypt",
+      "passphraseDesc": "Leave empty for unencrypted export",
+      "encryptedExported": "Exported and encrypted.",
+      "toFile": "To File",
+      "toFileDesc": "Download as a local JSON file",
+      "toGist": "To Gist",
+      "toGistDesc": "Create or update a secret GitHub Gist",
+      "toGistUnavailable": "Configure a GitHub Gist service in Cloud Services first",
+      "gistExported": "Exported to GitHub Gist.",
+      "gistExportFailed": "Failed to export to Gist"
     },
     "importModal": {
       "title": "Import Database",
@@ -1033,16 +1142,30 @@
       "restart": "Restart",
       "close": "Close",
       "importSourceTitle": "Import Database",
+      "passphrase": "Passphrase",
+      "passphrasePlaceholder": "Enter passphrase for encrypted import",
+      "passphraseDesc": "Only needed for encrypted exports",
+      "encryptedNoPassphrase": "This file is encrypted. Enter a passphrase to import.",
+      "decryptFailed": "Decryption failed. Check your passphrase.",
       "fromFile": "From File",
       "fromFileDesc": "Select a JSON file from your device",
       "fromUrl": "From URL",
       "fromUrlDesc": "Fetch a JSON file from a direct download link",
+      "fromGist": "From Gist",
+      "fromGistDesc": "Import from a previously exported GitHub Gist",
+      "gistUrlLabel": "Gist URL or ID",
+      "gistUrlPlaceholder": "https://gist.github.com/user/abc123def456...",
+      "gistUrlInvalid": "Please enter a valid Gist URL or 32-character Gist ID",
+      "gistUrlDesc": "Paste a gist URL or ID. If you exported via Gist on this device, it will use the stored reference automatically.",
       "urlLabel": "File URL",
       "urlPlaceholder": "https://example.com/scenara-export.json",
       "urlInvalid": "Please enter a valid URL",
       "fetching": "Downloading…",
       "fetchFailed": "Failed to download file from URL",
-      "invalidFormat": "The file does not appear to be a valid Scenara export."
+      "invalidFormat": "The file does not appear to be a valid Scenara export.",
+      "noGistService": "No GitHub Gist service configured.",
+      "noGistExport": "No Gist export found. Export to Gist first.",
+      "gistFetchFailed": "Failed to fetch from Gist"
     }
   },
   "inChatShortcut": {
@@ -1271,6 +1394,58 @@
       "invalidFormat": "Invalid file format.",
       "fileError": "Could not read file.",
       "importSuccess": "Imported {{count}} prompt(s)"
+    }
+  },
+  "cloudService": {
+    "title": "Cloud Services",
+    "noItems": "No cloud services configured yet. Add one to enable avatar uploads and data export.",
+    "createService": "Add Service",
+    "importService": "Import",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "confirmDelete": {
+      "title": "Delete Service",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} cloud services?"
+    },
+    "types": {
+      "catbox": {
+        "name": "Catbox",
+        "desc": "Image hosting with albums. Upload avatars and manage them in a Scenara album."
+      },
+      "githubGist": {
+        "name": "GitHub Gist",
+        "desc": "Store database exports as secret GitHub Gists."
+      }
+    },
+    "credentials": {
+      "userhash": "User Hash",
+      "githubToken": "Personal Access Token"
+    },
+    "form": {
+      "title": "Add Cloud Service",
+      "editTitle": "Edit Cloud Service",
+      "name": "Name",
+      "namePlaceholder": "e.g. My Catbox Account",
+      "serviceType": "Service",
+      "baseUrl": "Base URL",
+      "baseUrlPlaceholder": "Leave empty for default",
+      "credentialPlaceholder": "Enter your {{field}}"
+    },
+    "import": {
+      "invalidFormat": "The file does not appear to be a valid cloud service export.",
+      "fileError": "Failed to read the file."
     }
   },
   "versionLabel": "Version",

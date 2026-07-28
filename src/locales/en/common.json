@@ -47,7 +47,22 @@
     "characterNameWithId": "{{name}}",
     "pin": "Pin",
     "unpin": "Unpin",
-    "importUnsupportedFile": "Unsupported file type. Please use a .json or .png file."
+    "importUnsupportedFile": "Unsupported file type. Please use a .json or .png file.",
+    "filterStatus": "Filter by message status",
+    "filterStatusAll": "All messages",
+    "filterStatusUnread": "Unread only",
+    "filterPinnedShow": "Show pinned",
+    "filterPinnedHide": "Hide pinned",
+    "filterPinnedShowLabel": "Show",
+    "filterPinnedHideLabel": "Hide",
+    "filterLockedShow": "Show locked",
+    "filterLockedHide": "Hide locked",
+    "filterLockedShowLabel": "Show",
+    "filterLockedHideLabel": "Hide",
+    "filterColor": "Filter by color",
+    "filterColorAll": "All colors",
+    "filterColorNone": "No color",
+    "filterClear": "Clear filters"
   },
   "topbar": {
     "toggleSidebar": "Toggle sidebar",
