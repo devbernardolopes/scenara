@@ -258,12 +258,17 @@ export async function forkThread(id, messageId) {
   const allMessages = await db.messages.where('threadId').equals(Number(id)).sortBy('createdAt')
   const msgIdx = allMessages.findIndex((m) => m.id === Number(messageId))
   if (msgIdx === -1) throw new Error('Message not found')
+  const forkCreatedAt = allMessages[msgIdx].createdAt
   const messagesToCopy = allMessages.slice(0, msgIdx + 1)
   if (messagesToCopy.length > 0) {
     await db.messages.bulkAdd(
       messagesToCopy.map(({ id: _id, ...rest }) => ({
         ...rest,
         threadId: newId,
+        summarizedAt:
+          rest.summarizedAt && new Date(rest.summarizedAt) > new Date(forkCreatedAt)
+            ? null
+            : rest.summarizedAt,
       })),
     )
     const realCount = messagesToCopy.filter(
@@ -279,8 +284,7 @@ export async function forkThread(id, messageId) {
 
   const memories = await db.threadMemories.where('threadId').equals(Number(id)).toArray()
   const memoriesToCopy = memories.filter(
-    (entry) =>
-      !entry.createdAt || new Date(entry.createdAt) <= new Date(allMessages[msgIdx].createdAt),
+    (entry) => !entry.createdAt || new Date(entry.createdAt) <= new Date(forkCreatedAt),
   )
   if (memoriesToCopy.length > 0) {
     await db.threadMemories.bulkAdd(
@@ -289,18 +293,39 @@ export async function forkThread(id, messageId) {
         threadId: newId,
       })),
     )
-  } else {
-    // No memories copied — clear the legacy `memory` field so the migration
-    // in buildInjectedMemory doesn't create a phantom threadMemory entry.
-    await db.threads
-      .where('id')
-      .equals(newId)
-      .modify((t) => {
-        t.memory = null
-        t.lastSummarizationAt = null
-        t.keptConsumedCount = 0
-      })
   }
+
+  // Restore exact fork-point summarization state on the new thread.
+  const fixedMessages = messagesToCopy.map((m) => ({
+    ...m,
+    summarizedAt:
+      m.summarizedAt && new Date(m.summarizedAt) > new Date(forkCreatedAt) ? null : m.summarizedAt,
+  }))
+
+  const lastSummarized = fixedMessages
+    .filter((m) => m.summarizedAt)
+    .sort((a, b) => new Date(b.summarizedAt) - new Date(a.summarizedAt))[0]
+  const correctLastSummarizationAt = lastSummarized?.summarizedAt || null
+
+  const correctKeptConsumedCount = correctLastSummarizationAt
+    ? fixedMessages.filter(
+        (m) => m.role === 'user' && new Date(m.createdAt) > new Date(correctLastSummarizationAt),
+      ).length
+    : 0
+
+  const sortedMemories = [...memoriesToCopy].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  )
+  const correctMemory = sortedMemories[0]?.content || null
+
+  await db.threads
+    .where('id')
+    .equals(newId)
+    .modify((t) => {
+      t.memory = correctMemory
+      t.lastSummarizationAt = correctLastSummarizationAt
+      t.keptConsumedCount = correctKeptConsumedCount
+    })
 
   const allPrompts = await db.promptHistory.where('threadId').equals(Number(id)).sortBy('createdAt')
   const copiedUserCount = messagesToCopy.filter((m) => m.role === 'user').length
