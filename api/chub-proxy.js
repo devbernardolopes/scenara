@@ -180,7 +180,6 @@ export default async function handler(req, res) {
       }
       const textFields = [
         'description',
-        'personality',
         'first_mes',
         'mes_example',
         'scenario',
