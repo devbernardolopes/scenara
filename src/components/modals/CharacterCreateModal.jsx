@@ -471,7 +471,10 @@ function CharacterCreateModal({ character: existing, initialData }) {
   }, [isDirty, setCloseGuard, activeModal])
 
   function handleChange(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }))
+    setForm((prev) => {
+      if (prev[field] === value) return prev
+      return { ...prev, [field]: value }
+    })
   }
 
   function handleSectionChange(section) {

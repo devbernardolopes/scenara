@@ -319,10 +319,10 @@ function ProfileFormModal({ profile }) {
   }
 
   function updateParam(paramKey, value) {
-    setForm((prev) => ({
-      ...prev,
-      params: { ...prev.params, [paramKey]: value },
-    }))
+    setForm((prev) => {
+      if (prev.params[paramKey] === value) return prev
+      return { ...prev, params: { ...prev.params, [paramKey]: value } }
+    })
   }
 
   function toggleParamDisabled(paramKey) {
