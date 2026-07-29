@@ -1518,6 +1518,15 @@ export const SETTINGS = [
     descKey: 'settings:prompting.trimWhitespaces.desc',
   },
   {
+    key: 'prompting.trimWhitespacesAi',
+    category: 'prompting',
+    group: 'extra',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:prompting.trimWhitespacesAi.label',
+    descKey: 'settings:prompting.trimWhitespacesAi.desc',
+  },
+  {
     key: 'prompting.keepCodeBlocks',
     category: 'prompting',
     group: 'extra',

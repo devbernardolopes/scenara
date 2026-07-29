@@ -8,7 +8,7 @@ import {
 } from './chatApi'
 import { getWritingInstruction } from './writingInstructions'
 import { getSetting } from './settings'
-import { trimLeadingTrailingNewlines } from './messages'
+import { trimLeadingTrailingNewlines, trimWhitespace } from './messages'
 import * as apiQueue from './apiQueue'
 import i18n from '../lib/i18n'
 import { showToast } from '../lib/toast'
@@ -175,7 +175,9 @@ export async function generateChatResponse({
   }
 
   const trimMsgs = await getSetting('prompting.trimMessages')
+  const trimWsAi = await getSetting('prompting.trimWhitespacesAi')
   let finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
+  if (trimWsAi) finalContent = trimWhitespace(finalContent)
 
   if (directorConfig) {
     try {
@@ -241,6 +243,7 @@ export async function generateChatResponse({
           directorResponseData = reviewedResult.response
           if (directorConfig.outputDirectorResponse) {
             finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
+            if (trimWsAi) finalContent = trimWhitespace(finalContent)
             responseData = reviewedResult.response
           }
           promptData = JSON.stringify({

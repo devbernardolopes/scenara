@@ -833,6 +833,10 @@
       "label": "Trim Whitespaces",
       "desc": "Remove leading and trailing whitespace from USER messages after they are sent."
     },
+    "trimWhitespacesAi": {
+      "label": "Trim Whitespaces (AI)",
+      "desc": "Remove leading and trailing whitespace from AI responses after they are received."
+    },
     "keepCodeBlocks": {
       "label": "Keep Code Blocks",
       "desc": "Strip fenced code blocks (``` and ~~~) from message content before sending to the API. Options control how many recent messages keep their code blocks intact.",
