@@ -746,6 +746,7 @@ function ProfileFormModal({ profile }) {
             {paramDefs.map((param) => {
               const isToggleable = TOGGLEABLE_PARAM_KEYS.has(param.key)
               const isDisabled = isToggleable && !!form.disabledParams[param.key]
+              const descPath = param.descKey?.replace('settings:', '')
               return (
                 <div key={param.key}>
                   <div className="flex items-center justify-between mb-1">
@@ -761,6 +762,7 @@ function ProfileFormModal({ profile }) {
                       />
                     )}
                   </div>
+                  {descPath && <p className="text-xs text-secondary mt-0.5 mb-2">{t(descPath)}</p>}
                   {param.type === 'range' && (
                     <SettingSlider
                       value={form.params[param.key] ?? param.default ?? param.min ?? 0}
