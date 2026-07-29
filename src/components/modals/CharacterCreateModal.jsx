@@ -443,6 +443,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
         if (Array.isArray(currentVal)) {
           return JSON.stringify(currentVal) !== JSON.stringify(defaultVal)
         }
+        if (currentVal === '' && defaultVal === '') return false
         return currentVal !== defaultVal
       })
     }
