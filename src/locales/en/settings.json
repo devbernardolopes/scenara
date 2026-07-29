@@ -647,7 +647,7 @@
       "frequencyPenalty": "Reduces repetition by penalizing tokens that have already appeared in the text.",
       "presencePenalty": "Discourages the model from repeating topics by penalizing tokens that have already appeared.",
       "stream": "Stream tokens as they are generated instead of waiting for the full response.",
-      "stop": "Custom stop sequences that signal the model to stop generating.",
+      "stop": "Custom stop sequences that signal the model to stop generating. Supports {{char}}, {{user}}, and {{name}} template variables.",
       "native": {
         "maxLength": "Maximum number of tokens the model can generate in a single response (Native API).",
         "maxContextLength": "Maximum context length for the prompt including generated tokens.",

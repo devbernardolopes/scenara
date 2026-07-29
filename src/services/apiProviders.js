@@ -311,7 +311,6 @@ export const PROVIDERS = [
         key: 'stop',
         label: 'Stop Strings',
         type: 'string-list',
-        method: 'openai-compatible',
         descKey: 'settings:api.params.stop',
       },
       // Native-only generation params

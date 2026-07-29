@@ -1,4 +1,5 @@
 import { getSetting } from './settings'
+import { replaceVars } from './chatApi'
 
 const HORDE_BASE_URL = 'https://aihorde.net/api/v2'
 const CLIENT_AGENT = 'scenara:1.0:contact'
@@ -182,6 +183,7 @@ export async function sendHordeNativeCompletion({
   onTiming,
   threadId = null,
   kind = null,
+  stopSequences = null,
 }) {
   if (!prompt) {
     return { content: '', response: null }
@@ -191,6 +193,10 @@ export async function sendHordeNativeCompletion({
   const baseUrl = profile?.baseUrl?.replace(/\/+$/, '') || HORDE_BASE_URL
   const generationParams = getHordeNativeParams(profile)
   const requestOptions = getHordeNativeRequestOptions(profile)
+
+  if (stopSequences?.length) {
+    generationParams.stop_sequence = stopSequences
+  }
 
   const body = {
     prompt,
@@ -339,6 +345,14 @@ export async function sendHordeNativeChatCompletion({
     personaName,
   })
 
+  const stop = profile?.params?.stop
+  let stopSequences = null
+  if (Array.isArray(stop) && stop.length > 0) {
+    stopSequences = stop.map((s) =>
+      replaceVars(s, { charName, personaName, currentPersonaName: personaName }),
+    )
+  }
+
   return sendHordeNativeCompletion({
     prompt,
     profile,
@@ -350,5 +364,6 @@ export async function sendHordeNativeChatCompletion({
     onTiming,
     threadId,
     kind,
+    stopSequences,
   })
 }
