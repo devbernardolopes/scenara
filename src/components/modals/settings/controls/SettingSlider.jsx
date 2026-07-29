@@ -49,8 +49,10 @@ function SettingSlider({
       return
     }
     const final = clampValue(parsed, min, max)
-    onChange(final)
     setEditing(false)
+    if (final !== value) {
+      onChange(final)
+    }
   }
 
   function cancelEdit() {
