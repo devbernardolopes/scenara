@@ -245,6 +245,10 @@ function Sidebar({ open, onClose }) {
 
   const visibleThreads = useMemo(() => [...pinned, ...regular], [pinned, regular])
 
+  useEffect(() => {
+    setSelectedIds(new Set())
+  }, [threadFilters])
+
   function handleEditTitle(thread) {
     openModal('editThreadTitle', { thread })
   }
