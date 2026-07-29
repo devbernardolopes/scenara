@@ -8,7 +8,7 @@ import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import Label from '../shared/Label'
 import Avatar from '../shared/Avatar'
-import { Plus, X, Edit3 } from '../../lib/icons'
+import { Plus, X, Edit3, Cloud } from '../../lib/icons'
 import DragHandle from '../shared/DragHandle'
 import { SortableList, SortableItem } from '../shared/SortableList'
 import { estimateTokens } from '../../services/tokenEstimator'
@@ -18,6 +18,9 @@ import {
   deleteEntry,
   updateEntryOrder,
 } from '../../services/lorebookEntries'
+import { showToast } from '../../lib/toast'
+import { getCatboxService, catboxUploadAvatar } from '../../services/cloudServices'
+import { validateUploadSize } from '../../services/catbox'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
@@ -82,6 +85,22 @@ function LorebookFormModal({ lorebook }) {
   const [saving, setSaving] = useState(false)
   const fileRef = useRef(null)
   const savePendingRef = useRef(false)
+  const [catboxService, setCatboxService] = useState(null)
+  const [converting, setConverting] = useState(false)
+  const catboxAbortRef = useRef(null)
+
+  useEffect(() => {
+    return () => {
+      catboxAbortRef.current?.abort()
+    }
+  }, [])
+
+  useEffect(() => {
+    getCatboxService().then(setCatboxService)
+    const handler = () => getCatboxService().then(setCatboxService)
+    window.addEventListener('cloudServices-changed', handler)
+    return () => window.removeEventListener('cloudServices-changed', handler)
+  }, [])
 
   const isDirty = Object.keys(initial).some((key) => form[key] !== initial[key])
 
@@ -127,6 +146,51 @@ function LorebookFormModal({ lorebook }) {
       }
     }
     reader.readAsDataURL(file)
+  }
+
+  async function handleConvertToCatbox() {
+    if (!catboxService) {
+      showToast(t('characterCreation:catboxNoService'), { type: 'warning' })
+      return
+    }
+    const validation = validateUploadSize(form.avatar)
+    if (!validation.ok) {
+      const isGif = form.avatar.includes('image/gif')
+      showToast(
+        t('characterCreation:catboxSizeLimit', {
+          limit: validation.limitMB,
+          type: isGif ? 'GIF' : 'image',
+        }),
+        { type: 'error' },
+      )
+      return
+    }
+    catboxAbortRef.current?.abort()
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 60000)
+    catboxAbortRef.current = controller
+    setConverting(true)
+    try {
+      const url = await catboxUploadAvatar(catboxService, form.avatar, {
+        signal: controller.signal,
+      })
+      setForm((prev) => ({ ...prev, avatar: url }))
+      showToast(t('characterCreation:catboxConvertSuccess'), { type: 'success' })
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        showToast(t('characterCreation:catboxConvertError', { error: 'Timed out' }), {
+          type: 'error',
+        })
+      } else {
+        showToast(t('characterCreation:catboxConvertError', { error: err.message }), {
+          type: 'error',
+        })
+      }
+    } finally {
+      clearTimeout(timeoutId)
+      catboxAbortRef.current = null
+      setConverting(false)
+    }
   }
 
   async function saveLorebook() {
@@ -301,6 +365,19 @@ function LorebookFormModal({ lorebook }) {
               className="hidden"
             />
           </div>
+          {form.avatar.startsWith('data:') && catboxService && (
+            <button
+              type="button"
+              onClick={handleConvertToCatbox}
+              disabled={converting}
+              className="flex items-center gap-1.5 mt-1.5 text-xs text-accent hover:underline disabled:opacity-50"
+            >
+              <Cloud className="w-3 h-3" />
+              {converting
+                ? t('characterCreation:convertingToCatbox')
+                : t('characterCreation:convertToCatbox')}
+            </button>
+          )}
         </div>
 
         <CollapsibleSection
