@@ -243,6 +243,8 @@ function Sidebar({ open, onClose }) {
     }
   }, [threads, threadFilters])
 
+  const visibleThreads = useMemo(() => [...pinned, ...regular], [pinned, regular])
+
   function handleEditTitle(thread) {
     openModal('editThreadTitle', { thread })
   }
@@ -331,11 +333,22 @@ function Sidebar({ open, onClose }) {
   }
 
   function toggleSelectAll() {
-    const selectable = threads.filter((t) => !t.isLocked)
-    if (selectedIds.size === selectable.length) {
-      setSelectedIds(new Set())
+    const visibleSelectable = visibleThreads.filter((t) => !t.isLocked)
+    const allSelected =
+      visibleSelectable.length > 0 && visibleSelectable.every((t) => selectedIds.has(t.id))
+    if (allSelected) {
+      const idsToRemove = new Set(visibleSelectable.map((t) => t.id))
+      setSelectedIds((prev) => {
+        const next = new Set(prev)
+        idsToRemove.forEach((id) => next.delete(id))
+        return next
+      })
     } else {
-      setSelectedIds(new Set(selectable.map((t) => t.id)))
+      setSelectedIds((prev) => {
+        const next = new Set(prev)
+        visibleSelectable.forEach((t) => next.add(t.id))
+        return next
+      })
     }
   }
 
@@ -376,10 +389,13 @@ function Sidebar({ open, onClose }) {
           <div className="flex items-center gap-1">
             {threads.length > 0 &&
               (() => {
-                const selectableCount = threads.filter((t) => !t.isLocked).length
-                const selectedCount = selectedIds.size
-                const allSelected = selectableCount > 0 && selectedCount === selectableCount
-                const someSelected = selectedCount > 0 && !allSelected
+                const visibleSelectable = visibleThreads.filter((t) => !t.isLocked)
+                const selectedVisibleCount = visibleSelectable.filter((t) =>
+                  selectedIds.has(t.id),
+                ).length
+                const allSelected =
+                  visibleSelectable.length > 0 && selectedVisibleCount === visibleSelectable.length
+                const someSelected = selectedVisibleCount > 0 && !allSelected
                 const selectAllLabel = allSelected
                   ? t('sidebar.deselectAll')
                   : t('sidebar.selectAll')
