@@ -85,11 +85,14 @@ function PostProcessingSection({ form, onChange, onDiffChange }) {
 
   function handleOverrideChange(value) {
     onChange('postProcessingOverride', value)
-    if (value && (!form.postProcessingRules || form.postProcessingRules.length === 0)) {
-      onChange(
-        'postProcessingRules',
-        globalRules.map((r) => ({ ...r })),
-      )
+    if (value) {
+      if (!form.postProcessingRules || form.postProcessingRules.length === 0) {
+        onChange(
+          'postProcessingRules',
+          globalRules.map((r) => ({ ...r })),
+        )
+      }
+      onChange('injectQuotes', globalInjectQuotes)
     }
   }
 

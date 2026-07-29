@@ -163,6 +163,8 @@ function OverridesSection({ form, onChange, characterId }) {
       OVERRIDE_DEFAULTS_MAP.map(([, defaultsKey]) => getSetting(defaultsKey)),
     )
     OVERRIDE_DEFAULTS_MAP.forEach(([field], i) => onChange(field, values[i]))
+    onChange('firstMessagePrompt', '')
+    onChange('continuePrompt', '')
   }
 
   return (
