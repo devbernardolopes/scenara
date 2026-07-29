@@ -743,6 +743,62 @@ function ChatView() {
   }, [])
 
   useEffect(() => {
+    function checkVisibleUnread() {
+      const container = scrollRef.current
+      if (!container) return
+
+      const unreadElements = container.querySelectorAll('[data-message-id][data-unread="true"]')
+      if (unreadElements.length === 0) return
+
+      const containerRect = container.getBoundingClientRect()
+      const visibleIds = []
+
+      unreadElements.forEach((el) => {
+        const rect = el.getBoundingClientRect()
+        if (rect.top < containerRect.bottom && rect.bottom > containerRect.top) {
+          const msgId = Number(el.dataset.messageId)
+          if (msgId) visibleIds.push(msgId)
+        }
+      })
+
+      if (visibleIds.length === 0) return
+
+      if (visibleIds.length === unreadElements.length) {
+        clearUnread(threadId)
+      } else {
+        visibleIds.forEach((msgId) => markMessageRead(msgId, threadId))
+      }
+
+      const idSet = new Set(visibleIds)
+      setMessages((prev) => {
+        let changed = false
+        const next = prev.map((m) => {
+          if (idSet.has(m.id) && m.isUnread) {
+            changed = true
+            return { ...m, isUnread: false }
+          }
+          return m
+        })
+        return changed ? next : prev
+      })
+    }
+
+    function handleVisibilityFocus() {
+      if (document.visibilityState === 'visible' && document.hasFocus()) {
+        checkVisibleUnread()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityFocus)
+    window.addEventListener('focus', handleVisibilityFocus)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityFocus)
+      window.removeEventListener('focus', handleVisibilityFocus)
+    }
+  }, [threadId, setMessages])
+
+  useEffect(() => {
     handleSendRef.current = handleSend
   })
 
