@@ -206,8 +206,6 @@ function OverridesSection({ form, onChange, characterId }) {
         </CollapsibleSection>
       </div>
 
-      <hr className="border-border" />
-
       <div className="space-y-2">
         <span className="text-sm text-text">{t('memory')}</span>
         <SettingSelect
@@ -342,8 +340,6 @@ function OverridesSection({ form, onChange, characterId }) {
         </CollapsibleSection>
       </div>
 
-      <hr className="border-border" />
-
       <div className="flex items-center justify-between gap-3 min-h-[44px]">
         <span className="text-sm text-text">{t('firstMessage')}</span>
         <SettingToggle value={form.firstMessage} onChange={(v) => onChange('firstMessage', v)} />
@@ -369,8 +365,6 @@ function OverridesSection({ form, onChange, characterId }) {
           onChange={(v) => onChange('removeMarkdownImages', v)}
         />
       </div>
-
-      <hr className="border-border" />
 
       <div className="space-y-2">
         <span className="text-sm text-text">{t('systemAvatarScale')}</span>
@@ -399,13 +393,7 @@ function OverridesSection({ form, onChange, characterId }) {
         />
       </div>
 
-      <hr className="border-border" />
-
       <div className="space-y-4">
-        <p className="text-xs text-tertiary uppercase tracking-wider font-medium">
-          {t('writingInjectionTiming')}
-        </p>
-
         <div className="space-y-2">
           <span className="text-sm text-text">{t('writingInjectionTiming')}</span>
           <SettingSelect
@@ -443,13 +431,7 @@ function OverridesSection({ form, onChange, characterId }) {
         </div>
       </div>
 
-      <hr className="border-border" />
-
       <div className="space-y-4">
-        <p className="text-xs text-tertiary uppercase tracking-wider font-medium">
-          {t('personaInjectionTiming')}
-        </p>
-
         <div className="space-y-2">
           <span className="text-sm text-text">{t('personaInjectionTiming')}</span>
           <SettingSelect
@@ -488,13 +470,7 @@ function OverridesSection({ form, onChange, characterId }) {
         </div>
       </div>
 
-      <hr className="border-border" />
-
       <div className="space-y-4">
-        <p className="text-xs text-tertiary uppercase tracking-wider font-medium">
-          {t('promptOverrides')}
-        </p>
-
         <div className="space-y-2">
           <span className="text-sm text-text">{t('firstMessageRole')}</span>
           <SettingSelect
