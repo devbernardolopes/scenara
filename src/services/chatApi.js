@@ -325,9 +325,6 @@ export async function buildMessagesPayload({
     systemParts.push(loreBlocks.afterChar)
   }
 
-  const extraPrompt = replaceVarsIn(character?.extraPrompt)
-  if (isFirstMessage && extraPrompt) systemParts.push(extraPrompt)
-
   const personaTiming = character?.personaInjectionTiming || settings.personaInjectionTiming
   const personaPlacement =
     character?.personaInjectionPlacement || settings.personaInjectionPlacement
@@ -351,6 +348,9 @@ export async function buildMessagesPayload({
         : wiContent,
     )
   }
+
+  const extraPrompt = replaceVarsIn(character?.extraPrompt)
+  if (isFirstMessage && extraPrompt) systemParts.push(extraPrompt)
 
   const result = [{ role: 'system', content: systemParts.join('\n\n') }]
   const entryTypes = ['system']
