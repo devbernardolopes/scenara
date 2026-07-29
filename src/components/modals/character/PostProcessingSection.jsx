@@ -122,6 +122,7 @@ function PostProcessingSection({ form, onChange, onDiffChange }) {
             rules={form.postProcessingRules || []}
             onChange={(rules) => onChange('postProcessingRules', rules)}
             resetToRules={globalRules}
+            onReset={() => onChange('injectQuotes', globalInjectQuotes)}
           />
         </div>
       )}
