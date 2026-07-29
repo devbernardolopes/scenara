@@ -50,7 +50,15 @@ export function replaceVars(text, { charName, personaName, currentPersonaName })
 //   {{description_default}}-> the global default user persona (defaultPersonaId setting)
 export function replacePersonaTemplate(
   text,
-  { charName, personaName, currentPersonaName, currentPersona, chatPersona, defaultPersona },
+  {
+    charName,
+    personaName,
+    currentPersonaName,
+    currentPersona,
+    chatPersona,
+    defaultPersona,
+    personasHistory = '',
+  },
 ) {
   if (!text) return text
   const resolved = replaceVars(text, { charName, personaName, currentPersonaName })
@@ -61,6 +69,7 @@ export function replacePersonaTemplate(
     .replace(/{{description}}/gi, desc)
     .replace(/{{description_chat}}/gi, descChat)
     .replace(/{{description_default}}/gi, descDefault)
+    .replace(/{{personas_history}}/gi, personasHistory)
 }
 
 // Strips the configured OOC delimiters from message content when the
@@ -283,6 +292,19 @@ export async function buildMessagesPayload({
 
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
 
+  const usedPersonaIds = [...new Set(messages.map((m) => m.personaId).filter(Boolean))]
+  const personaHistoryEntries = usedPersonaIds
+    .map((id) => personaMap?.[id])
+    .filter(Boolean)
+    .map((p) => {
+      const base = `- ${p.name}`
+      return p.description ? `${base}: ${p.description}` : base
+    })
+  const personasHistory =
+    personaHistoryEntries.length > 0
+      ? `Personas in this conversation:\n${personaHistoryEntries.join('\n')}`
+      : ''
+
   const replaceVarsWithDesc = (text) =>
     replacePersonaTemplate(text, {
       charName,
@@ -291,6 +313,7 @@ export async function buildMessagesPayload({
       currentPersona,
       chatPersona,
       defaultPersona,
+      personasHistory,
     })
 
   const prefixAssistant = await getSetting('prompting.prefixAssistantRole')
@@ -329,9 +352,14 @@ export async function buildMessagesPayload({
   const personaTiming = character?.personaInjectionTiming || settings.personaInjectionTiming
   const personaPlacement =
     character?.personaInjectionPlacement || settings.personaInjectionPlacement
-  const personaTemplate = replaceVarsWithDesc(settings.personaInjectionTemplate)
+  const rawPersonaTemplate = settings.personaInjectionTemplate
+  const personaTemplate = replaceVarsWithDesc(rawPersonaTemplate)
   if (personaTiming !== 'never' && personaTemplate && personaPlacement === 'endOfSystemPrompt') {
-    systemParts.push(personaTemplate)
+    let injected = personaTemplate
+    if (usedPersonaIds.length > 1 && !rawPersonaTemplate.includes('{{personas_history}}')) {
+      injected += '\n\n' + personasHistory
+    }
+    systemParts.push(injected)
   }
 
   const writingTiming = character?.writingInjectionTiming || settings.writingInjectionTiming
@@ -447,7 +475,11 @@ export async function buildMessagesPayload({
   const personaEndOfMessages =
     personaTiming !== 'never' && personaTemplate && personaPlacement === 'endOfMessages'
   if (personaEndOfMessages) {
-    result.push({ role: personaInjectionMessageRole, content: personaTemplate })
+    let content = personaTemplate
+    if (usedPersonaIds.length > 1 && !rawPersonaTemplate.includes('{{personas_history}}')) {
+      content += '\n\n' + personasHistory
+    }
+    result.push({ role: personaInjectionMessageRole, content })
     entryTypes.push('persona')
   }
 
