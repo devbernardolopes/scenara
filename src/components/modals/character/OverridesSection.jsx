@@ -52,10 +52,16 @@ const PERSONA_MESSAGE_ROLE_OPTION_LABELS = {
   assistant: 'settings:defaults.personaInjectionMessageRoleOptions.assistant',
 }
 
-const PROMPT_ROLE_OPTION_LABELS = {
-  system: 'settings:prompting.roleOptions.system',
-  assistant: 'settings:prompting.roleOptions.assistant',
-  user: 'settings:prompting.roleOptions.user',
+const FIRST_MESSAGE_ROLE_OPTION_LABELS = {
+  system: 'settings:prompting.firstMessageRoleOptions.system',
+  assistant: 'settings:prompting.firstMessageRoleOptions.assistant',
+  user: 'settings:prompting.firstMessageRoleOptions.user',
+}
+
+const CONTINUE_ROLE_OPTION_LABELS = {
+  system: 'settings:prompting.continueRoleOptions.system',
+  assistant: 'settings:prompting.continueRoleOptions.assistant',
+  user: 'settings:prompting.continueRoleOptions.user',
 }
 
 const ROLLOVER_BUTTONS = [
@@ -494,7 +500,7 @@ function OverridesSection({ form, onChange, characterId }) {
           <SettingSelect
             value={form.firstMessageRole}
             options={['system', 'assistant', 'user']}
-            optionLabels={PROMPT_ROLE_OPTION_LABELS}
+            optionLabels={FIRST_MESSAGE_ROLE_OPTION_LABELS}
             onChange={(v) => onChange('firstMessageRole', v)}
           />
         </div>
@@ -526,7 +532,7 @@ function OverridesSection({ form, onChange, characterId }) {
           <SettingSelect
             value={form.continueRole}
             options={['system', 'assistant', 'user']}
-            optionLabels={PROMPT_ROLE_OPTION_LABELS}
+            optionLabels={CONTINUE_ROLE_OPTION_LABELS}
             onChange={(v) => onChange('continueRole', v)}
           />
         </div>
