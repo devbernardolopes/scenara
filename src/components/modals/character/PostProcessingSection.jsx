@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getSetting, getPostProcessingRules } from '../../../services/settings'
 import PostProcessingRuleEditor from '../../shared/PostProcessingRuleEditor'
+import { useConfirm } from '../../../lib/confirm'
+import { RefreshCw } from '../../../lib/icons'
 
 function ToggleRow({ label, checked, onChange, disabled }) {
   return (
@@ -47,6 +49,7 @@ function rulesDiffer(a, b) {
 
 function PostProcessingSection({ form, onChange, onDiffChange }) {
   const { t } = useTranslation('characterCreation')
+  const { confirm } = useConfirm()
   const [globalRules, setGlobalRules] = useState([])
   const [globalEnabled, setGlobalEnabled] = useState(true)
   const [globalInjectQuotes, setGlobalInjectQuotes] = useState(true)
@@ -96,8 +99,33 @@ function PostProcessingSection({ form, onChange, onDiffChange }) {
     }
   }
 
+  async function handleReset() {
+    const ok = await confirm({
+      title: t('resetConfirmTitle'),
+      message: t('resetConfirmMessage'),
+      confirmLabel: t('reset'),
+      cancelLabel: t('common:cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
+    onChange('postProcessing', globalEnabled)
+    onChange('postProcessingOverride', false)
+    onChange('injectQuotes', globalInjectQuotes)
+    onChange('postProcessingRules', [])
+  }
+
   return (
     <div className="space-y-5">
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleReset}
+          className="min-h-[44px] px-4 py-2 rounded-md text-sm font-medium border border-border bg-surface text-secondary hover:bg-surface-hover inline-flex items-center gap-2"
+        >
+          <RefreshCw className="w-4 h-4" />
+          {t('reset')}
+        </button>
+      </div>
       <ToggleRow
         label={t('postProcessingEnable')}
         checked={form.postProcessing}
