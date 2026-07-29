@@ -1,5 +1,5 @@
 import { PROVIDERS, getBaseUrl, getDefaultBaseUrl } from './apiProviders'
-import { getSetting } from './settings'
+import { getSetting, normalizeSectionHeader } from './settings'
 import { getThread } from './threads'
 import { getWritingInstruction } from './writingInstructions'
 import { buildInjectedMemory } from './threadMemories'
@@ -344,9 +344,10 @@ export async function buildMessagesPayload({
     writingPlacement === 'endOfSystemPrompt'
   ) {
     const wiContent = replaceVarsIn(writingInstruction.content)
+    const wiHeader = settings.writingInstructionHeader
     systemParts.push(
-      settings.writingInstructionHeader
-        ? `${replaceVarsIn(settings.writingInstructionHeader)}\n\n${wiContent}`
+      wiHeader.value
+        ? `${replaceVarsIn(wiHeader.value)}${wiHeader.enabled ? '\n\n' : '\n'}${wiContent}`
         : wiContent,
     )
   }
@@ -432,10 +433,11 @@ export async function buildMessagesPayload({
     writingPlacement === 'endOfMessages'
   if (writingEndOfMessages) {
     const wiContent = replaceVarsIn(writingInstruction.content)
+    const wiH = settings.writingInstructionHeader
     result.push({
       role: writingMessageRole,
-      content: settings.writingInstructionHeader
-        ? `${replaceVarsIn(settings.writingInstructionHeader)}\n\n${wiContent}`
+      content: wiH.value
+        ? `${replaceVarsIn(wiH.value)}${wiH.enabled ? '\n\n' : '\n'}${wiContent}`
         : wiContent,
     })
     entryTypes.push('writing')
@@ -676,9 +678,9 @@ export async function buildOOCMessagesPayload({
     replaceVarsIn,
   })
   if (promptBlock) {
-    const charPromptHeader = oocSettings.characterPromptHeader
-    if (charPromptHeader) {
-      systemParts.push(replaceVarsIn(charPromptHeader) + '\n\n' + promptBlock)
+    const cph = oocSettings.characterPromptHeader
+    if (cph.value) {
+      systemParts.push(replaceVarsIn(cph.value) + (cph.enabled ? '\n\n' : '\n') + promptBlock)
     } else {
       systemParts.push(promptBlock)
     }
@@ -700,9 +702,9 @@ export async function buildOOCMessagesPayload({
   }
 
   if (transcriptWithVars && !systemHasTranscript) {
-    const messagesHeader = oocSettings.messagesHeader
-    if (messagesHeader) {
-      systemParts.push(replaceVarsIn(messagesHeader) + '\n\n' + transcriptWithVars)
+    const mh = oocSettings.messagesHeader
+    if (mh.value) {
+      systemParts.push(replaceVarsIn(mh.value) + (mh.enabled ? '\n\n' : '\n') + transcriptWithVars)
     } else {
       systemParts.push(transcriptWithVars)
     }
@@ -830,10 +832,12 @@ export async function buildChatRequestPayload({
   if (isOOC) {
     const oocSystemInstructions = await getSetting('prompting.oocSystem')
     const oocUserInstructions = await getSetting('prompting.oocUser')
-    const characterPromptHeader = await getSetting(
-      'prompting.apiRequestSectionHeaders.characterPrompt',
+    const characterPromptHeader = normalizeSectionHeader(
+      await getSetting('prompting.apiRequestSectionHeaders.characterPrompt'),
     )
-    const messagesHeader = await getSetting('prompting.apiRequestSectionHeaders.messages')
+    const messagesHeader = normalizeSectionHeader(
+      await getSetting('prompting.apiRequestSectionHeaders.messages'),
+    )
     const systemRolePrefix = await getSetting('prompting.systemRolePrefix')
     const assistantRolePrefix = await getSetting('prompting.assistantRolePrefix')
     const userRolePrefix = await getSetting('prompting.userRolePrefix')
@@ -895,8 +899,8 @@ export async function buildChatRequestPayload({
       writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
       writingPlacement: await getSetting('prompting.writingPlacement'),
       writingMessageRole: await getSetting('prompting.writingMessageRole'),
-      writingInstructionHeader: await getSetting(
-        'prompting.apiRequestSectionHeaders.writingInstruction',
+      writingInstructionHeader: normalizeSectionHeader(
+        await getSetting('prompting.apiRequestSectionHeaders.writingInstruction'),
       ),
       personaInjectionTiming: await getSetting('prompting.personaInjectionTiming'),
       personaInjectionPlacement: await getSetting('prompting.personaInjectionPlacement'),

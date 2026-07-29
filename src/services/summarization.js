@@ -15,7 +15,7 @@ import {
 } from './threadMemories'
 import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
 import { getEffectiveProfileFor } from './connectionProfiles'
-import { getSetting } from './settings'
+import { getSetting, normalizeSectionHeader } from './settings'
 import { getPersona, getAllPersonas } from './personas'
 import { estimateTokens } from './tokenEstimator'
 import {
@@ -169,9 +169,12 @@ export async function buildSummarizationPayload({
     userContent = await getSetting('prompting.summarizationUser')
   }
 
-  const messagesHeader = (await getSetting('prompting.apiRequestSectionHeaders.messages')) || ''
-  const charPromptHeader =
-    (await getSetting('prompting.apiRequestSectionHeaders.characterPrompt')) || ''
+  const messagesHeader = normalizeSectionHeader(
+    await getSetting('prompting.apiRequestSectionHeaders.messages'),
+  )
+  const charPromptHeader = normalizeSectionHeader(
+    await getSetting('prompting.apiRequestSectionHeaders.characterPrompt'),
+  )
 
   const memorySection = memoryText ? memoryText : ''
 
@@ -212,15 +215,15 @@ export async function buildSummarizationPayload({
     if (resolvedScenario) combined = `${combined}\n\n${resolvedScenario}`
 
     if (personaInjection) combined = `${combined}\n\n${personaInjection}`
-    charPromptSection = charPromptHeader
-      ? `${replaceVarsWithDesc(charPromptHeader)}\n\n${combined}`
+    charPromptSection = charPromptHeader.value
+      ? `${replaceVarsWithDesc(charPromptHeader.value)}${charPromptHeader.enabled ? '\n\n' : '\n'}${combined}`
       : combined
   } else if (contextSection) {
     charPromptSection = contextSection
   }
 
-  const transcriptSection = messagesHeader
-    ? `${replaceVarsWithDesc(messagesHeader)}\n\n${transcript}`
+  const transcriptSection = messagesHeader.value
+    ? `${replaceVarsWithDesc(messagesHeader.value)}${messagesHeader.enabled ? '\n\n' : '\n'}${transcript}`
     : transcript
 
   const replaceTemplates = (text) =>

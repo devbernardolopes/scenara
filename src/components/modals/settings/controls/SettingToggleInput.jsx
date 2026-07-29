@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import SettingToggle from './SettingToggle'
 
-function SettingToggleInput({ value, onChange }) {
+function SettingToggleInput({ value, onChange, inline }) {
   const { t } = useTranslation('settings')
   const [enabled, setEnabled] = useState(false)
   const [text, setText] = useState('')
@@ -24,6 +24,21 @@ function SettingToggleInput({ value, onChange }) {
     const next = e.target.value
     setText(next)
     onChange({ enabled, value: next })
+  }
+
+  if (inline) {
+    return (
+      <div className="flex items-center gap-2 w-full">
+        <input
+          type="text"
+          value={text}
+          onChange={handleTextChange}
+          placeholder={t('prompting.toggleInputPlaceholder')}
+          className="flex-1 min-w-0 px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
+        />
+        <SettingToggle value={enabled} onChange={handleEnabledChange} />
+      </div>
+    )
   }
 
   return (

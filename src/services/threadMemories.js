@@ -1,5 +1,5 @@
 import db from '../db'
-import { getSetting } from './settings'
+import { getSetting, normalizeSectionHeader } from './settings'
 import { replaceVars, isMessageHidden } from './chatApi'
 import { getMessagesByThread, updateMessage, deleteMessage } from './messages'
 import { updateThread } from './threads'
@@ -17,8 +17,12 @@ export async function getThreadMemoriesAscending(threadId) {
 
 async function resolveMemoryContext({ character, thread } = {}) {
   const memorySlots = character?.memorySlots ?? (await getSetting('defaultMemorySlots')) ?? 3
-  const memoriesHeader = (await getSetting('prompting.apiRequestSectionHeaders.memories')) || ''
-  const memoryEntry = (await getSetting('prompting.apiRequestSectionHeaders.memoryEntry')) || ''
+  const memoriesHeader = normalizeSectionHeader(
+    await getSetting('prompting.apiRequestSectionHeaders.memories'),
+  )
+  const memoryEntry = normalizeSectionHeader(
+    await getSetting('prompting.apiRequestSectionHeaders.memoryEntry'),
+  )
 
   let charName = character?.name || ''
   let personaName = ''
@@ -49,12 +53,12 @@ function formatMemoryEntry(
   const level = Math.floor((seq - 1) / memorySlots) + 1
   const slot = ((seq - 1) % memorySlots) + 1
   const vars = { charName, personaName, currentPersonaName }
-  const entryHeader = memoryEntry
-    ? replaceVars(memoryEntry, vars)
+  const entryHeader = memoryEntry.value
+    ? replaceVars(memoryEntry.value, vars)
         .replace(/{{level}}/gi, String(level))
         .replace(/{{slot}}/gi, String(slot))
     : ''
-  return entryHeader ? `${entryHeader}\n\n${content}` : content
+  return entryHeader ? `${entryHeader}${memoryEntry.enabled ? '\n\n' : '\n'}${content}` : content
 }
 
 export async function buildInjectedMemory(character, thread, { beforeDate } = {}) {
@@ -103,7 +107,9 @@ export async function buildInjectedMemory(character, thread, { beforeDate } = {}
   )
 
   const body = blocks.join('\n\n')
-  return memoriesHeader ? `${memoriesHeader}\n\n${body}` : body
+  return memoriesHeader.value
+    ? `${memoriesHeader.value}${memoriesHeader.enabled ? '\n\n' : '\n'}${body}`
+    : body
 }
 
 export async function getLatestThreadMemory(threadId) {

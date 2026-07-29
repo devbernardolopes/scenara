@@ -1419,50 +1419,56 @@ export const SETTINGS = [
   {
     key: 'prompting.apiRequestSectionHeaders.characterPrompt',
     category: 'prompting',
-    type: 'text',
-    default: 'Main Prompt:',
+    type: 'toggleInput',
+    default: { enabled: true, value: 'Main Prompt:' },
     group: 'apiRequestSectionHeaders',
     labelKey: 'settings:prompting.apiRequestSectionHeaders.characterPrompt.label',
+    props: { inline: true },
   },
   {
     key: 'prompting.apiRequestSectionHeaders.writingInstruction',
     category: 'prompting',
-    type: 'text',
-    default: 'Writing Instructions:',
+    type: 'toggleInput',
+    default: { enabled: true, value: 'Writing Instructions:' },
     group: 'apiRequestSectionHeaders',
     labelKey: 'settings:prompting.apiRequestSectionHeaders.writingInstruction.label',
+    props: { inline: true },
   },
   {
     key: 'prompting.apiRequestSectionHeaders.messages',
     category: 'prompting',
-    type: 'text',
-    default: 'Recent Chat History (in order):',
+    type: 'toggleInput',
+    default: { enabled: true, value: 'Recent Chat History (in order):' },
     group: 'apiRequestSectionHeaders',
     labelKey: 'settings:prompting.apiRequestSectionHeaders.messages.label',
+    props: { inline: true },
   },
   {
     key: 'prompting.apiRequestSectionHeaders.memories',
     category: 'prompting',
-    type: 'text',
-    default: 'Previous Memory:',
+    type: 'toggleInput',
+    default: { enabled: true, value: 'Previous Memory:' },
     group: 'apiRequestSectionHeaders',
     labelKey: 'settings:prompting.apiRequestSectionHeaders.memories.label',
+    props: { inline: true },
   },
   {
     key: 'prompting.apiRequestSectionHeaders.memoryEntry',
     category: 'prompting',
-    type: 'text',
-    default: 'Memory Level {{level}} Entry {{slot}}:',
+    type: 'toggleInput',
+    default: { enabled: true, value: 'Memory Level {{level}} Entry {{slot}}:' },
     group: 'apiRequestSectionHeaders',
     labelKey: 'settings:prompting.apiRequestSectionHeaders.memoryEntry.label',
+    props: { inline: true },
   },
   {
     key: 'prompting.apiRequestSectionHeaders.loreContext',
     category: 'prompting',
-    type: 'text',
-    default: 'Lore:',
+    type: 'toggleInput',
+    default: { enabled: true, value: 'Lore:' },
     group: 'apiRequestSectionHeaders',
     labelKey: 'settings:prompting.apiRequestSectionHeaders.loreContext.label',
+    props: { inline: true },
   },
   {
     key: 'prompting.prefixAssistantRole',
@@ -1663,6 +1669,13 @@ const SETTINGS_KEY_MIGRATIONS = [
   { old: 'personaInjectionPlacement', fixed: 'prompting.personaInjectionPlacement' },
   { old: 'personaInjectionMessageRole', fixed: 'prompting.personaInjectionMessageRole' },
 ]
+
+export function normalizeSectionHeader(val) {
+  if (typeof val === 'string') return { enabled: true, value: val || '' }
+  if (val && typeof val === 'object')
+    return { enabled: val.enabled !== false, value: val.value ?? '' }
+  return { enabled: true, value: '' }
+}
 
 export async function migrateSettingsKeys() {
   for (const { old, fixed } of SETTINGS_KEY_MIGRATIONS) {
