@@ -8,7 +8,14 @@ import { getEffectiveProfileFor } from '../../services/connectionProfiles'
 import { updateThreadMemory } from '../../services/threadMemories'
 import { updateThread } from '../../services/threads'
 
-function MemoryRegenerationResultModal({ threadId, entry, systemContent, userContent }) {
+function MemoryRegenerationResultModal({
+  threadId,
+  entry,
+  systemContent,
+  userContent,
+  charName,
+  personaName,
+}) {
   const { t } = useTranslation(['chat', 'common'])
   const { closeModal, setCloseGuard } = useModal()
   const { confirm } = useConfirm()
@@ -42,6 +49,8 @@ function MemoryRegenerationResultModal({ threadId, entry, systemContent, userCon
             { role: 'user', content },
           ],
           signal: abortController.signal,
+          charName,
+          personaName,
           onToken: (partial) => {
             setResult(partial)
           },
@@ -59,7 +68,7 @@ function MemoryRegenerationResultModal({ threadId, entry, systemContent, userCon
         setLoading(false)
       }
     },
-    [systemContent, t],
+    [systemContent, t, charName, personaName],
   )
 
   useEffect(() => {

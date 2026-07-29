@@ -70,6 +70,7 @@ export const GROUPS = [
   { key: 'interface', labelKey: 'settings:groups.interface' },
   { key: 'chat', labelKey: 'settings:groups.chat' },
   { key: 'extra', labelKey: 'settings:groups.extra' },
+  { key: 'hordeNative', labelKey: 'settings:groups.hordeNative' },
 ]
 
 export const SETTINGS = [
@@ -1529,6 +1530,33 @@ export const SETTINGS = [
     default: 'always',
     labelKey: 'settings:prompting.keepCodeBlocks.label',
     descKey: 'settings:prompting.keepCodeBlocks.desc',
+  },
+  {
+    key: 'hordeNativePromptTemplate',
+    category: 'prompting',
+    group: 'hordeNative',
+    type: 'select',
+    default: 'simple-roleplay',
+    options: ['simple-roleplay', 'bracketed', 'chatml', 'custom'],
+    optionLabels: {
+      'simple-roleplay': 'settings:prompting.hordeNative.options.simpleRoleplay',
+      bracketed: 'settings:prompting.hordeNative.options.bracketed',
+      chatml: 'settings:prompting.hordeNative.options.chatml',
+      custom: 'settings:prompting.hordeNative.options.custom',
+    },
+    labelKey: 'settings:prompting.hordeNative.template.label',
+    descKey: 'settings:prompting.hordeNative.template.desc',
+  },
+  {
+    key: 'hordeNativePromptCustomTemplate',
+    category: 'prompting',
+    group: 'hordeNative',
+    type: 'textarea',
+    default: '',
+    props: { rows: 10, collapsible: true, summary: 'tokens' },
+    dependsOn: { key: 'hordeNativePromptTemplate', value: 'custom' },
+    labelKey: 'settings:prompting.hordeNative.customTemplate.label',
+    descKey: 'settings:prompting.hordeNative.customTemplate.desc',
   },
   // TTS settings — rendered by TtsSettingsPanel, not SettingRow
   {

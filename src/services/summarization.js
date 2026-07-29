@@ -365,12 +365,17 @@ export async function triggerSummarization({
   }
 
   let apiDurationMs = null
+  const charName = character?.name || ''
+  const personaName = currentPersona?.name || ''
+
   const sendResult = await sendChatCompletion({
     profile,
     messages: payload,
     signal,
     threadId: thread.id,
     kind: 'summarization',
+    charName,
+    personaName,
     onTiming: (ms) => {
       apiDurationMs = ms
     },

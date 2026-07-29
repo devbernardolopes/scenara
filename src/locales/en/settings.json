@@ -157,7 +157,8 @@
     "localInferenceAdvanced": "Advanced",
     "interface": "Interface",
     "chat": "Chat",
-    "extra": "Extra"
+    "extra": "Extra",
+    "hordeNative": "Horde Native"
   },
   "appearance": {
     "theme": {
@@ -646,7 +647,24 @@
       "frequencyPenalty": "Reduces repetition by penalizing tokens that have already appeared in the text.",
       "presencePenalty": "Discourages the model from repeating topics by penalizing tokens that have already appeared.",
       "stream": "Stream tokens as they are generated instead of waiting for the full response.",
-      "stop": "Custom stop sequences that signal the model to stop generating."
+      "stop": "Custom stop sequences that signal the model to stop generating.",
+      "native": {
+        "maxLength": "Maximum number of tokens the model can generate in a single response (Native API).",
+        "maxContextLength": "Maximum context length for the prompt including generated tokens.",
+        "repetitionPenalty": "Penalizes tokens based on their frequency in the prompt. Higher values reduce repetition.",
+        "topK": "Limits the number of highest-probability tokens considered at each step.",
+        "topA": "Top-A sampling: Limits tokens based on probability thresholds.",
+        "tfs": "Tail Free Sampling: Reduces the impact of less probable tokens.",
+        "typical": "Typical Sampling: Focuses on tokens with typical probability.",
+        "minP": "Minimum probability threshold for token consideration.",
+        "smoothingFactor": "Smoothing factor for quad-smoothing sampler.",
+        "samplerOrder": "Order of sampler application as comma-separated indices.",
+        "n": "Number of generations to produce per request.",
+        "trustedWorkers": "Only use trusted workers with a proven reliability record.",
+        "slowWorkers": "Allow slower workers to pick up the request.",
+        "allowDowngrade": "Allow the Horde to reduce context/token limits if needed.",
+        "disableBatching": "Disable batching of requests."
+      }
     }
   },
   "prompting": {
@@ -820,6 +838,22 @@
       "desc": "Strip fenced code blocks (``` and ~~~) from message content before sending to the API. Options control how many recent messages keep their code blocks intact.",
       "always": "Always",
       "never": "Never"
+    },
+    "hordeNative": {
+      "template": {
+        "label": "Horde Native Prompt Template",
+        "desc": "Choose the prompt format used when sending requests via the Horde Native API. This controls how messages are flattened into a single text prompt."
+      },
+      "customTemplate": {
+        "label": "Custom Prompt Template",
+        "desc": "Define your own prompt template. Use {{system}} for the system block, {{charName}} for the character name, {{personaName}} for the user name, and {{#history}}...{{/history}} to iterate over messages ({{speaker}}, {{content}}, {{role}} inside)."
+      },
+      "options": {
+        "simpleRoleplay": "Simple Roleplay",
+        "bracketed": "Bracketed System",
+        "chatml": "ChatML",
+        "custom": "Custom"
+      }
     },
     "toggleInputPlaceholder": "Enter value"
   },

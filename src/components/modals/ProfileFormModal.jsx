@@ -121,6 +121,9 @@ function resolveParams(profile) {
     if (provider.supportsLmStudioMethods && !merged.lmStudioMethod) {
       merged.lmStudioMethod = 'openai-compatible'
     }
+    if (provider.supportsHordeMethods && !profile && !merged.hordeMethod) {
+      merged.hordeMethod = 'native'
+    }
     if (provider.hasModelReasoning && profile.model && CEREBRAS_REASONING_MAP[profile.model]) {
       if (!('reasoning_effort' in merged)) {
         merged.reasoning_effort = CEREBRAS_REASONING_MAP[profile.model].default
@@ -157,6 +160,19 @@ function ProfileFormModal({ profile }) {
         'top_k',
         'frequency_penalty',
         'presence_penalty',
+        'max_length',
+        'max_context_length',
+        'repetition_penalty',
+        'top_a',
+        'tfs',
+        'typical',
+        'min_p',
+        'smoothing_factor',
+        'n',
+        'trusted_workers',
+        'slow_workers',
+        'allow_downgrade',
+        'disable_batching',
       ]),
     [],
   )
@@ -213,6 +229,9 @@ function ProfileFormModal({ profile }) {
         }
         if (selectedProvider.supportsLmStudioMethods && !merged.lmStudioMethod) {
           merged.lmStudioMethod = 'openai-compatible'
+        }
+        if (selectedProvider.supportsHordeMethods && !merged.hordeMethod) {
+          merged.hordeMethod = 'native'
         }
         return { ...prev, params: merged }
       })
@@ -743,52 +762,70 @@ function ProfileFormModal({ profile }) {
                 {t('api.profile.form.resetParams')}
               </button>
             </div>
-            {paramDefs.map((param) => {
-              const isToggleable = TOGGLEABLE_PARAM_KEYS.has(param.key)
-              const isDisabled = isToggleable && !!form.disabledParams[param.key]
-              const descPath = param.descKey?.replace('settings:', '')
-              return (
-                <div key={param.key}>
-                  <div className="flex items-center justify-between mb-1">
-                    <label
-                      className={`text-xs font-medium ${isDisabled ? 'text-tertiary' : 'text-secondary'}`}
-                    >
-                      {param.label || param.key}
-                    </label>
-                    {isToggleable && (
+            {paramDefs
+              .filter((param) => {
+                if (!selectedProvider?.supportsHordeMethods) return true
+                const method = param.method || 'all'
+                const activeMethod = form.params.hordeMethod || 'native'
+                if (method === 'all') return true
+                return method === activeMethod
+              })
+              .map((param) => {
+                const isToggleable = TOGGLEABLE_PARAM_KEYS.has(param.key)
+                const isDisabled = isToggleable && !!form.disabledParams[param.key]
+                const descPath = param.descKey?.replace('settings:', '')
+                return (
+                  <div key={param.key}>
+                    <div className="flex items-center justify-between mb-1">
+                      <label
+                        className={`text-xs font-medium ${isDisabled ? 'text-tertiary' : 'text-secondary'}`}
+                      >
+                        {param.label || param.key}
+                      </label>
+                      {isToggleable && (
+                        <SettingToggle
+                          value={!isDisabled}
+                          onChange={() => toggleParamDisabled(param.key)}
+                        />
+                      )}
+                    </div>
+                    {descPath && (
+                      <p className="text-xs text-secondary mt-0.5 mb-2">{t(descPath)}</p>
+                    )}
+                    {param.type === 'range' && (
+                      <SettingSlider
+                        value={form.params[param.key] ?? param.default ?? param.min ?? 0}
+                        onChange={(v) => updateParam(param.key, v)}
+                        min={param.min ?? 0}
+                        max={param.max ?? 100}
+                        step={param.step ?? 1}
+                        disabled={isDisabled}
+                      />
+                    )}
+                    {param.type === 'boolean' && (
                       <SettingToggle
-                        value={!isDisabled}
-                        onChange={() => toggleParamDisabled(param.key)}
+                        value={form.params[param.key] ?? param.default ?? false}
+                        onChange={(v) => updateParam(param.key, v)}
+                      />
+                    )}
+                    {param.type === 'string-list' && (
+                      <StringListInput
+                        value={form.params[param.key] ?? []}
+                        onChange={(v) => updateParam(param.key, v)}
+                        maxItems={param.maxItems}
+                      />
+                    )}
+                    {param.type === 'text' && (
+                      <input
+                        type="text"
+                        value={form.params[param.key] ?? param.default ?? ''}
+                        onChange={(e) => updateParam(param.key, e.target.value)}
+                        className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
                       />
                     )}
                   </div>
-                  {descPath && <p className="text-xs text-secondary mt-0.5 mb-2">{t(descPath)}</p>}
-                  {param.type === 'range' && (
-                    <SettingSlider
-                      value={form.params[param.key] ?? param.default ?? param.min ?? 0}
-                      onChange={(v) => updateParam(param.key, v)}
-                      min={param.min ?? 0}
-                      max={param.max ?? 100}
-                      step={param.step ?? 1}
-                      disabled={isDisabled}
-                    />
-                  )}
-                  {param.type === 'boolean' && (
-                    <SettingToggle
-                      value={form.params[param.key] ?? param.default ?? false}
-                      onChange={(v) => updateParam(param.key, v)}
-                    />
-                  )}
-                  {param.type === 'string-list' && (
-                    <StringListInput
-                      value={form.params[param.key] ?? []}
-                      onChange={(v) => updateParam(param.key, v)}
-                      maxItems={param.maxItems}
-                    />
-                  )}
-                </div>
-              )
-            })}
+                )
+              })}
           </div>
         )}
       </div>

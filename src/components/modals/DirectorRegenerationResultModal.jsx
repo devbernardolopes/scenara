@@ -16,6 +16,8 @@ function DirectorRegenerationResultModal({
   systemContent,
   userContent,
   outputDirectorResponse,
+  charName,
+  personaName,
 }) {
   const { t } = useTranslation('chat')
   const { closeModal, setCloseGuard } = useModal()
@@ -52,6 +54,8 @@ function DirectorRegenerationResultModal({
           profile,
           messages,
           signal: abortController.signal,
+          charName,
+          personaName,
           onToken: (partial) => {
             setResult(partial)
           },
@@ -69,7 +73,7 @@ function DirectorRegenerationResultModal({
         setLoading(false)
       }
     },
-    [t],
+    [t, charName, personaName],
   )
 
   useEffect(() => {

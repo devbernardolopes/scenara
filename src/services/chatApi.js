@@ -1,4 +1,5 @@
 import { PROVIDERS, getBaseUrl, getDefaultBaseUrl } from './apiProviders'
+import { sendHordeNativeChatCompletion } from './hordeNativeApi'
 import { getSetting, normalizeSectionHeader } from './settings'
 import { getThread } from './threads'
 import { getWritingInstruction } from './writingInstructions'
@@ -477,6 +478,8 @@ export async function buildMessagesPayload({
 
 export function getActiveParams(profile) {
   const providerDef = PROVIDERS.find((p) => p.id === profile.providerId)
+  const hordeMethod =
+    profile.providerId === 'ai-horde' ? profile.params?.hordeMethod || 'native' : null
   const deprecatedKeys = new Set(
     (providerDef?.params || []).filter((p) => p.deprecated).map((p) => p.key),
   )
@@ -486,14 +489,23 @@ export function getActiveParams(profile) {
       .map(([k]) => k),
   )
   const active = Object.fromEntries(
-    Object.entries(profile.params || {}).filter(
-      ([key]) => !deprecatedKeys.has(key) && key !== 'hordeMethod' && !disabledKeys.has(key),
-    ),
+    Object.entries(profile.params || {}).filter(([key]) => {
+      if (key === 'hordeMethod' || key === 'hordeMethodTemplate') return false
+      if (deprecatedKeys.has(key)) return false
+      if (disabledKeys.has(key)) return false
+      if (hordeMethod) {
+        const paramDef = providerDef?.params?.find((p) => p.key === key)
+        if (paramDef?.method && paramDef.method !== 'all' && paramDef.method !== hordeMethod) {
+          return false
+        }
+      }
+      return true
+    }),
   )
   // Always send penalty params with their effective value (0 when unset) so a
   // profile explicitly configured to zero still passes 0 to the API — unless the
   // user explicitly disabled them.
-  if (providerDef) {
+  if (providerDef && hordeMethod !== 'native') {
     for (const key of ['frequency_penalty', 'presence_penalty']) {
       if (
         !disabledKeys.has(key) &&
@@ -947,7 +959,30 @@ export async function sendChatCompletion({
   onTiming,
   threadId = null,
   kind = null,
+  charName,
+  personaName,
 }) {
+  const isHordeNative =
+    profile.providerId === 'ai-horde' &&
+    (profile.params?.hordeMethod || 'openai-compatible') === 'native'
+
+  if (isHordeNative) {
+    return sendHordeNativeChatCompletion({
+      profile,
+      messages,
+      signal,
+      charName,
+      personaName,
+      onToken,
+      onFinish,
+      onStreamingStarted,
+      onActivity,
+      onTiming,
+      threadId,
+      kind,
+    })
+  }
+
   let baseUrl = profile.baseUrl || null
   if (!baseUrl) {
     const rawUrl = await getBaseUrl(profile.providerId)

@@ -208,6 +208,8 @@ export async function triggerAutoTitle({
       signal,
       threadId: thread.id,
       kind: 'autoTitle',
+      charName,
+      personaName,
       onTiming: (ms) => {
         autoTitleDurationMs = ms
       },
@@ -255,6 +257,8 @@ export async function triggerAutoTitle({
           signal,
           threadId: thread.id,
           kind: 'director',
+          charName,
+          personaName,
           onTiming: (ms) => {
             directorDurationMs = ms
           },

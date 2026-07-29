@@ -100,6 +100,9 @@ export async function generateChatResponse({
 
   const directorConfig = !isOOC ? await getDirectorReviewConfig(character) : null
 
+  const charName = character?.name || ''
+  const personaName = chatPersona?.name || currentPersona?.name || ''
+
   const { payload, entryTypes, msgNumbers } = await buildChatRequestPayload({
     character,
     chatPersona,
@@ -146,6 +149,8 @@ export async function generateChatResponse({
     signal,
     threadId,
     kind: isOOC ? 'ooc' : 'chat',
+    charName,
+    personaName,
     onToken: directorConfig ? undefined : onToken,
     onFinish,
     onStreamingStarted: ctx?.markStreaming,
@@ -219,6 +224,8 @@ export async function generateChatResponse({
           signal,
           threadId,
           kind: 'director',
+          charName,
+          personaName,
           onToken,
           onFinish,
           onStreamingStarted: ctx?.markStreaming,
