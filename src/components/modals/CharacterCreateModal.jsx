@@ -34,6 +34,7 @@ import { buildFullDataMarkdown } from './character/fullDataMarkdown'
 const INITIAL_FORM = {
   name: '',
   displayName: '',
+  speakerName: '',
   avatar: '',
   tagline: '',
   prompt: '',

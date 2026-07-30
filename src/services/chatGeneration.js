@@ -102,6 +102,7 @@ export async function generateChatResponse({
 
   const charName = character?.name || ''
   const personaName = chatPersona?.name || currentPersona?.name || ''
+  const assistantSpeaker = character?.speakerName || charName
 
   const { payload, entryTypes, msgNumbers } = await buildChatRequestPayload({
     character,
@@ -151,6 +152,8 @@ export async function generateChatResponse({
     kind: isOOC ? 'ooc' : 'chat',
     charName,
     personaName,
+    assistantSpeaker,
+    personaMap,
     onToken: directorConfig ? undefined : onToken,
     onFinish,
     onStreamingStarted: ctx?.markStreaming,
@@ -228,6 +231,7 @@ export async function generateChatResponse({
           kind: 'director',
           charName,
           personaName,
+          assistantSpeaker,
           onToken,
           onFinish,
           onStreamingStarted: ctx?.markStreaming,

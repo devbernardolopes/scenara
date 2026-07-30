@@ -110,6 +110,7 @@ export async function triggerAutoTitle({
   ctx,
 }) {
   const charName = character.name || ''
+  const assistantSpeaker = character?.speakerName || charName
   let personaName = ''
   let chatPersona = currentPersona
   if (thread.personaId) {
@@ -210,6 +211,8 @@ export async function triggerAutoTitle({
       kind: 'autoTitle',
       charName,
       personaName,
+      assistantSpeaker,
+      personaMap,
       onTiming: (ms) => {
         autoTitleDurationMs = ms
       },
@@ -259,6 +262,7 @@ export async function triggerAutoTitle({
           kind: 'director',
           charName,
           personaName,
+          assistantSpeaker,
           onTiming: (ms) => {
             directorDurationMs = ms
           },

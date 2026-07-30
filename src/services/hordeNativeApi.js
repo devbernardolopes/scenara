@@ -46,7 +46,14 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms))
 }
 
-export function renderHordeNativePrompt({ messages, template, charName, personaName }) {
+export function renderHordeNativePrompt({
+  messages,
+  template,
+  charName,
+  personaName,
+  assistantSpeaker,
+  personaMap,
+}) {
   if (!messages || !Array.isArray(messages)) return ''
 
   const resolvedTemplate =
@@ -62,16 +69,22 @@ export function renderHordeNativePrompt({ messages, template, charName, personaN
     .filter(Boolean)
     .join('\n\n')
 
-  const history = historyEntries.map((m) => ({
-    content: m.content || '',
-    role: m.role || '',
-    speaker:
-      m.role === 'assistant'
-        ? charName || 'Assistant'
-        : m.role === 'user'
-          ? personaName || 'User'
-          : 'System',
-  }))
+  const history = historyEntries.map((m) => {
+    let speaker
+    if (m.role === 'assistant') {
+      speaker = assistantSpeaker || charName || 'Assistant'
+    } else if (m.role === 'user') {
+      const pName = m.personaId ? personaMap?.[m.personaId]?.name : null
+      speaker = pName || personaName || 'User'
+    } else {
+      speaker = 'System'
+    }
+    return {
+      content: m.content || '',
+      role: m.role || '',
+      speaker,
+    }
+  })
 
   let result = resolvedTemplate
 
@@ -318,6 +331,8 @@ export async function sendHordeNativeChatCompletion({
   signal,
   charName,
   personaName,
+  assistantSpeaker,
+  personaMap,
   onToken,
   onFinish,
   onStreamingStarted,
@@ -343,6 +358,8 @@ export async function sendHordeNativeChatCompletion({
     template: templateString,
     charName,
     personaName,
+    assistantSpeaker,
+    personaMap,
   })
 
   const stop = profile?.params?.stop

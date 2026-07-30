@@ -367,6 +367,7 @@ export async function triggerSummarization({
   let apiDurationMs = null
   const charName = character?.name || ''
   const personaName = currentPersona?.name || ''
+  const assistantSpeaker = character?.speakerName || charName
 
   const sendResult = await sendChatCompletion({
     profile,
@@ -376,6 +377,8 @@ export async function triggerSummarization({
     kind: 'summarization',
     charName,
     personaName,
+    assistantSpeaker,
+    personaMap,
     onTiming: (ms) => {
       apiDurationMs = ms
     },

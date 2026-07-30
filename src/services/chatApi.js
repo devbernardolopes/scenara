@@ -432,7 +432,7 @@ export async function buildMessagesPayload({
       } else if (msg.isOOC) {
         content = applyOOCDelimiters(content, oocDelimiters)
       }
-      result.push({ role: msg.role, content })
+      result.push({ role: msg.role, content, personaId: msg.personaId })
       entryTypes.push('chatMessage')
     }
 
@@ -993,6 +993,8 @@ export async function sendChatCompletion({
   kind = null,
   charName,
   personaName,
+  assistantSpeaker,
+  personaMap,
 }) {
   const isHordeNative =
     profile.providerId === 'ai-horde' &&
@@ -1005,6 +1007,8 @@ export async function sendChatCompletion({
       signal,
       charName,
       personaName,
+      assistantSpeaker,
+      personaMap,
       onToken,
       onFinish,
       onStreamingStarted,
