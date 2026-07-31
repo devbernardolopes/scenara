@@ -28,6 +28,8 @@ export const HORDE_PROMPT_TEMPLATES = {
 {{content}}<|im_end|>
 {{/history}}
 <|im_start|>assistant`,
+
+  metharme: `<|system|>{{system}}{{#history}}<|{{roleTag}}|>{{content}}{{/history}}<|model|>`,
 }
 
 function resolveSpeaker(msg, personaMap, personaName, assistantSpeaker, charName) {
@@ -163,10 +165,12 @@ export function renderHordeNativePrompt({
     } else {
       speaker = 'System'
     }
+    const roleTag = m.role === 'assistant' ? 'model' : m.role === 'user' ? 'user' : 'system'
     return {
       content: m.content || '',
       role: m.role || '',
       speaker,
+      roleTag,
     }
   })
 
@@ -178,7 +182,8 @@ export function renderHordeNativePrompt({
         block
           .replace(/\{\{speaker\}\}/g, msg.speaker)
           .replace(/\{\{content\}\}/g, msg.content)
-          .replace(/\{\{role\}\}/g, msg.role),
+          .replace(/\{\{role\}\}/g, msg.role)
+          .replace(/\{\{roleTag\}\}/g, msg.roleTag),
       )
       .join('')
   })
@@ -489,6 +494,13 @@ export async function sendHordeNativeChatCompletion({
     stopSequences = stop.map((s) =>
       replaceVars(s, { charName, personaName, currentPersonaName: personaName }),
     )
+  }
+
+  if (templateName === 'metharme') {
+    if (!stopSequences) stopSequences = []
+    if (!stopSequences.includes('<|user|>')) {
+      stopSequences.push('<|user|>')
+    }
   }
 
   return sendHordeNativeCompletion({

@@ -857,6 +857,7 @@
         "bracketed": "Bracketed System",
         "chatml": "ChatML",
         "mistralInstruct": "Mistral Instruct",
+        "metharme": "Metharme",
         "custom": "Custom"
       }
     },
