@@ -765,7 +765,8 @@ function ProfileFormModal({ profile }) {
                 const descPath = param.descKey?.replace('settings:', '')
                 return (
                   <div key={param.key}>
-                    <div className="flex items-center justify-between mb-1">
+                    {/* <div className="flex items-center justify-between mb-1"> */}
+                    <div className="flex items-center justify-normal gap-3 mb-1">
                       <label
                         className={`text-xs font-medium ${isDisabled ? 'text-tertiary' : 'text-secondary'}`}
                       >
