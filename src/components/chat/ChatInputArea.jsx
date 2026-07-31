@@ -674,7 +674,7 @@ function ChatInputArea({
                     ? personaColorMap[entry.personaId]
                     : null
                 const entryClass = entry.isCommand
-                  ? 'text-text bg-red-50 hover:bg-red-100'
+                  ? 'text-text bg-primary-subtle hover:bg-primary-subtle'
                   : entry.isOOC
                     ? 'text-ooc bg-ooc-subtle hover:bg-ooc-subtle'
                     : 'text-text hover:bg-surface-hover'
@@ -890,7 +890,7 @@ function ChatInputArea({
                           ? 'text-primary bg-primary-subtle shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]'
                           : ''
                         : isToggleable && isToggled
-                          ? 'text-on-primary bg-primary hover:bg-primary-hover ring-1 ring-primary-hover shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)]'
+                          ? 'btn-toggle-on'
                           : ''
                   const showBadge = key === 'memories' && unreadMemoryCount > 0
                   return (

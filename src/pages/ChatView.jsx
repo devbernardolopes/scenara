@@ -2667,7 +2667,7 @@ function ChatView() {
                 <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />
               )}
               {blockingQueued && (
-                <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-primary rounded-full shrink-0">
+                <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-on-primary bg-primary rounded-full shrink-0">
                   {queuedCount}
                 </span>
               )}
@@ -2892,7 +2892,7 @@ function ChatView() {
               <button
                 type="button"
                 onClick={scrollToBottom}
-                className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center btn-primary rounded-full shadow-surface-lg transition-all duration-200 relative"
+                className="sticky bottom-4 left-1/2 -translate-x-1/2 size-[44px] flex items-center justify-center bg-gradient-primary text-on-primary rounded-full shadow-surface-lg transition-all duration-200 relative"
                 aria-label={t('scrollToBottom')}
               >
                 <ChevronDown className="w-5 h-5" />
