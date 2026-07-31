@@ -116,6 +116,7 @@
   "firstMessage": "Erste Nachricht",
   "userPersonaPrefix": "Benutzer-Persona-Präfix",
   "includeOOC": "OOC einbeziehen",
+  "removeCodeBlocksFromStatusBlock": "Überflüssige Codeblöcke aus dem Statusblock entfernen",
   "removeMarkdownImages": "Markdown-Bildsyntax entfernen",
   "postProcessing": "Nachbearbeitung",
   "postProcessingEnable": "Nachbearbeitung aktivieren",

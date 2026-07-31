@@ -100,6 +100,7 @@
   "firstMessage": "Mensagem Inicial",
   "userPersonaPrefix": "Prefixo da Persona do Usuário",
   "includeOOC": "Incluir OOC",
+  "removeCodeBlocksFromStatusBlock": "Remover Blocos de Código Extras do Bloco de Status",
   "removeMarkdownImages": "Remover Sintaxe de Imagem Markdown",
   "postProcessing": "Pós-processamento",
   "postProcessingEnable": "Ativar Pós-processamento",

@@ -1036,6 +1036,10 @@
       "label": "Include OOC",
       "desc": "Default state for the include OOC toggle."
     },
+    "removeCodeBlocksFromStatusBlock": {
+      "label": "Remove Extra Code Blocks from Status Block",
+      "desc": "Strip leading and trailing code fences from the Status Block in chat bubbles. Visual only; the stored content is not changed."
+    },
     "removeMarkdownImages": {
       "label": "Remove Markdown Image Syntax",
       "desc": "Strip markdown image syntax (![]()) from message content before sending to the API."

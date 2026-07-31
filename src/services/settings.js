@@ -932,6 +932,14 @@ export const SETTINGS = [
     descKey: 'settings:defaults.includeOOC.desc',
   },
   {
+    key: 'defaultRemoveCodeBlocksFromStatusBlock',
+    category: 'defaults',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:defaults.removeCodeBlocksFromStatusBlock.label',
+    descKey: 'settings:defaults.removeCodeBlocksFromStatusBlock.desc',
+  },
+  {
     key: 'defaultRemoveMarkdownImages',
     category: 'defaults',
     type: 'toggle',

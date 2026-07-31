@@ -83,6 +83,7 @@ const OVERRIDE_DEFAULTS_MAP = [
   ['firstMessage', 'defaultFirstMessage'],
   ['userPersonaPrefix', 'defaultUserPersonaPrefix'],
   ['includeOOC', 'defaultIncludeOOC'],
+  ['removeCodeBlocksFromStatusBlock', 'defaultRemoveCodeBlocksFromStatusBlock'],
   ['removeMarkdownImages', 'defaultRemoveMarkdownImages'],
   ['systemAvatarScale', 'defaultSystemAvatarScale'],
   ['characterAvatarScale', 'defaultCharacterAvatarScale'],
@@ -357,6 +358,14 @@ function OverridesSection({ form, onChange, characterId }) {
       <div className="flex items-center justify-between gap-3 min-h-[44px]">
         <span className="text-sm text-text">{t('includeOOC')}</span>
         <SettingToggle value={form.includeOOC} onChange={(v) => onChange('includeOOC', v)} />
+      </div>
+
+      <div className="flex items-center justify-between gap-3 min-h-[44px]">
+        <span className="text-sm text-text">{t('removeCodeBlocksFromStatusBlock')}</span>
+        <SettingToggle
+          value={form.removeCodeBlocksFromStatusBlock}
+          onChange={(v) => onChange('removeCodeBlocksFromStatusBlock', v)}
+        />
       </div>
 
       <div className="flex items-center justify-between gap-3 min-h-[44px]">

@@ -116,6 +116,7 @@
   "firstMessage": "Premier message",
   "userPersonaPrefix": "Préfixe de persona utilisateur",
   "includeOOC": "Inclure HORS-PERS",
+  "removeCodeBlocksFromStatusBlock": "Supprimer les blocs de code supplémentaires du bloc de statut",
   "removeMarkdownImages": "Supprimer la syntaxe d'image Markdown",
   "postProcessing": "Post-traitement",
   "postProcessingEnable": "Activer le post-traitement",

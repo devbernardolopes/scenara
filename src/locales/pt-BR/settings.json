@@ -890,6 +890,10 @@
       "label": "Incluir OOC",
       "desc": "Estado padrão do alternador de inclusão de OOC."
     },
+    "removeCodeBlocksFromStatusBlock": {
+      "label": "Remover Blocos de Código Extras do Bloco de Status",
+      "desc": "Remove cercas de código iniciais e finais do Bloco de Status nas bolhas de chat. Apenas visual; o conteúdo armazenado não é alterado."
+    },
     "removeMarkdownImages": {
       "label": "Remover Sintaxe de Imagem Markdown",
       "desc": "Remove a sintaxe de imagem markdown (![]()) do conteúdo das mensagens antes de enviar à API."

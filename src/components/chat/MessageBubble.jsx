@@ -8,6 +8,7 @@ import { useOverflowButtons } from '../../hooks/useOverflowButtons'
 import { useChatSettings } from '../../hooks/useChatSettings'
 import { showToast } from '../../lib/toast'
 import { replaceVars, stripOOCDelimiters } from '../../services/chatApi'
+import { stripStatusBlockCodeFences } from '../../services/statusBlocks'
 import { getStreamingStartTime } from '../../services/generatingState'
 import { injectRuleTags, applyRulesToPlainText } from '../../lib/postProcessing'
 import {
@@ -328,6 +329,11 @@ function MessageBubble({
     personaName,
     currentPersonaName: currentPersonaName || personaName,
   })
+
+  const statusBlockRender =
+    character?.removeCodeBlocksFromStatusBlock === false
+      ? statusBlockDisplay
+      : stripStatusBlockCodeFences(statusBlockDisplay)
 
   const statusBlockVisible =
     !isUser &&
@@ -1051,7 +1057,7 @@ function MessageBubble({
                 <CodeBlockWrapper
                   collapsed={statusBlockCollapsed}
                   onToggle={() => onToggleStatusBlockCollapse?.(message.id, bundleIndex ?? 0)}
-                  codeText={statusBlockDisplay}
+                  codeText={statusBlockRender}
                   isStatusBlock
                   onEditStatusBlock={handleStartStatusBlockEdit}
                   statusBlockLabel={t('editStatusBlock')}
@@ -1063,7 +1069,7 @@ function MessageBubble({
                   regenerateStatusBlockLabel={t('regenerateStatusBlock')}
                   statusBlockDirectorFailed={statusBlockDirectorFailed}
                 >
-                  <code className="language-status-block">{statusBlockDisplay}</code>
+                  <code className="language-status-block">{statusBlockRender}</code>
                 </CodeBlockWrapper>
               </div>
             ) : (
@@ -1071,7 +1077,7 @@ function MessageBubble({
                 onDoubleClick={handleStartStatusBlockEdit}
                 className="mt-2 rounded-md border border-border bg-code p-3 text-sm whitespace-pre-wrap break-words cursor-text"
               >
-                {statusBlockDisplay}
+                {statusBlockRender}
               </div>
             ))}
         </div>
