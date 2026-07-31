@@ -196,6 +196,7 @@ function MessageBubble({
   onToggleCodeBlock,
   onToggleVisible,
   personaName,
+  currentPersonaName,
   statusBlock,
   statusBlockCollapsed,
   onEditStatusBlock,
@@ -319,13 +320,19 @@ function MessageBubble({
   const isSlotError = activeEntry?.isError === true
   const isSlotCancelled = activeEntry?.isCancelled === true
 
+  const statusBlockDisplay = replaceVars(statusBlock, {
+    charName: character?.name,
+    personaName,
+    currentPersonaName: currentPersonaName || personaName,
+  })
+
   const statusBlockVisible =
     !isUser &&
     !isSystem &&
     !message.isOOC &&
     !editing &&
     !requestFailed &&
-    (statusBlock || '').trim().length > 0
+    (statusBlockDisplay || '').trim().length > 0
 
   function isButtonDisabled(key) {
     if (streaming) return true
@@ -1028,7 +1035,7 @@ function MessageBubble({
                   onEditStatusBlock={handleStartStatusBlockEdit}
                   statusBlockLabel={t('editStatusBlock')}
                 >
-                  <code className="language-status-block">{statusBlock}</code>
+                  <code className="language-status-block">{statusBlockDisplay}</code>
                 </CodeBlockWrapper>
               </div>
             ) : (
@@ -1036,7 +1043,7 @@ function MessageBubble({
                 onDoubleClick={handleStartStatusBlockEdit}
                 className="mt-2 rounded-md border border-border bg-code p-3 text-sm whitespace-pre-wrap break-words cursor-text"
               >
-                {statusBlock}
+                {statusBlockDisplay}
               </div>
             ))}
         </div>

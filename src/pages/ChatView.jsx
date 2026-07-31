@@ -2693,6 +2693,10 @@ function ChatView() {
                     : (msg.apiDurationMs ?? null)
                   const slotStatusBlock = bundleEntry?.statusBlock || ''
                   const statusBlockCollapsed = bundleEntry?.statusBlockCollapsed === true
+                  const statusCurrentPersonaName =
+                    personaMap?.[selectedPersonaId]?.name ||
+                    personaMap?.[thread?.personaId]?.name ||
+                    ''
                   const isFailedSlot = bundleEntry?.isError === true
                   const errorText = isFailedSlot
                     ? bundleEntry.error || bundleEntry.content || ''
@@ -2737,6 +2741,7 @@ function ChatView() {
                         onToggleVisible={handleToggleVisible}
                         statusBlock={slotStatusBlock}
                         statusBlockCollapsed={statusBlockCollapsed}
+                        currentPersonaName={statusCurrentPersonaName}
                         onEditStatusBlock={handleEditStatusBlock}
                         onToggleStatusBlockCollapse={handleToggleStatusBlockCollapse}
                       />
