@@ -30,6 +30,80 @@ export const HORDE_PROMPT_TEMPLATES = {
 <|im_start|>assistant`,
 }
 
+function resolveSpeaker(msg, personaMap, personaName, assistantSpeaker, charName) {
+  if (msg.role === 'assistant') {
+    return assistantSpeaker || charName || 'Assistant'
+  }
+  if (msg.role === 'user') {
+    const pName = msg.personaId ? personaMap?.[msg.personaId]?.name : null
+    return pName || personaName || 'User'
+  }
+  return 'System'
+}
+
+export function renderMistralInstructPrompt({
+  messages,
+  charName,
+  personaName,
+  assistantSpeaker,
+  personaMap,
+}) {
+  if (!messages || !Array.isArray(messages)) return ''
+
+  const systemEntries = messages.filter((m) => m.role === 'system')
+  const historyEntries = messages.filter((m) => m.role !== 'system')
+
+  const systemBlock = systemEntries
+    .map((m) => m.content || '')
+    .filter(Boolean)
+    .join('\n\n')
+
+  const turns = historyEntries.map((m) => {
+    const speaker = resolveSpeaker(m, personaMap, personaName, assistantSpeaker, charName)
+    let content = m.content || ''
+    if (m.role === 'user') {
+      content = `${speaker}: ${content}`
+    }
+    return { content, role: m.role }
+  })
+
+  const merged = []
+  for (const turn of turns) {
+    const last = merged[merged.length - 1]
+    if (last && last.role === turn.role) {
+      last.content += '\n\n' + turn.content
+    } else {
+      merged.push({ content: turn.content, role: turn.role })
+    }
+  }
+
+  if (merged.length === 0) return ''
+
+  let result = ''
+
+  for (let i = 0; i < merged.length; i++) {
+    const turn = merged[i]
+    const isLast = i === merged.length - 1
+
+    if (turn.role === 'user') {
+      let content = turn.content
+      if (i === 0 && systemBlock) {
+        content = systemBlock + '\n\n' + content
+      }
+      if (i === 0) result += '<s>'
+      if (isLast) {
+        result += `[INST] ${content} [/INST]`
+      } else {
+        result += `[INST] ${content}[/INST]`
+      }
+    } else if (turn.role === 'assistant') {
+      result += turn.content + '</s>'
+    }
+  }
+
+  return result
+}
+
 function parseSamplerOrder(val) {
   if (Array.isArray(val)) return val
   if (typeof val === 'string') {
@@ -55,6 +129,16 @@ export function renderHordeNativePrompt({
   personaMap,
 }) {
   if (!messages || !Array.isArray(messages)) return ''
+
+  if (template === 'mistral-instruct') {
+    return renderMistralInstructPrompt({
+      messages,
+      charName,
+      personaName,
+      assistantSpeaker,
+      personaMap,
+    })
+  }
 
   const resolvedTemplate =
     template && template !== 'custom' && HORDE_PROMPT_TEMPLATES[template]
@@ -342,6 +426,43 @@ export async function sendHordeNativeChatCompletion({
   kind = null,
 }) {
   const templateName = (await getSetting('hordeNativePromptTemplate')) || 'simple-roleplay'
+
+  if (templateName === 'mistral-instruct') {
+    const prompt = renderMistralInstructPrompt({
+      messages,
+      charName,
+      personaName,
+      assistantSpeaker,
+      personaMap,
+    })
+
+    const stop = profile?.params?.stop
+    let stopSequences = null
+    if (Array.isArray(stop) && stop.length > 0) {
+      stopSequences = stop.map((s) =>
+        replaceVars(s, { charName, personaName, currentPersonaName: personaName }),
+      )
+    }
+    if (!stopSequences) stopSequences = []
+    if (!stopSequences.includes('</s>')) {
+      stopSequences.push('</s>')
+    }
+
+    return sendHordeNativeCompletion({
+      prompt,
+      profile,
+      signal,
+      onToken,
+      onFinish,
+      onStreamingStarted,
+      onActivity,
+      onTiming,
+      threadId,
+      kind,
+      stopSequences,
+    })
+  }
+
   let templateString = templateName
   if (templateName !== 'custom') {
     templateString =

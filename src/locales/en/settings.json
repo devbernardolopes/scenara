@@ -856,6 +856,7 @@
         "simpleRoleplay": "Simple Roleplay",
         "bracketed": "Bracketed System",
         "chatml": "ChatML",
+        "mistralInstruct": "Mistral Instruct",
         "custom": "Custom"
       }
     },

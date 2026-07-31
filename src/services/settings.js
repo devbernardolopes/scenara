@@ -1546,11 +1546,12 @@ export const SETTINGS = [
     group: 'hordeNative',
     type: 'select',
     default: 'simple-roleplay',
-    options: ['simple-roleplay', 'bracketed', 'chatml', 'custom'],
+    options: ['simple-roleplay', 'bracketed', 'chatml', 'mistral-instruct', 'custom'],
     optionLabels: {
       'simple-roleplay': 'settings:prompting.hordeNative.options.simpleRoleplay',
       bracketed: 'settings:prompting.hordeNative.options.bracketed',
       chatml: 'settings:prompting.hordeNative.options.chatml',
+      'mistral-instruct': 'settings:prompting.hordeNative.options.mistralInstruct',
       custom: 'settings:prompting.hordeNative.options.custom',
     },
     labelKey: 'settings:prompting.hordeNative.template.label',
