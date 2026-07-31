@@ -944,7 +944,7 @@ function MessageBubble({
         {/* Content */}
         <div
           onDoubleClick={
-            editing || bubbleBusy || requestFailed || !message.content?.trim()
+            editing || editingStatusBlock || bubbleBusy || requestFailed || !message.content?.trim()
               ? undefined
               : handleStartEdit
           }
