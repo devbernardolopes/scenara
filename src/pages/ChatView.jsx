@@ -1837,9 +1837,9 @@ function ChatView() {
 
       currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : chatPersona
 
-      const isFirstMessage =
-        currentMsgs.filter((m) => isRealMessage(m) && !isMessageHidden(m)).length === 0 &&
-        character?.firstMessage
+      const isThreadStart =
+        currentMsgs.filter((m) => isRealMessage(m) && !isMessageHidden(m)).length === 0
+      const isFirstMessage = isThreadStart && character?.firstMessage
 
       regenEntries = parseBundleEntries(msg.bundleMessages)
       if (!regenEntries) {
@@ -1919,6 +1919,7 @@ function ChatView() {
             currentPersona,
             currentMsgs,
             isFirstMessage,
+            isThreadStart,
             isOOC: isOOCRegen,
             threadId,
             personaMap,

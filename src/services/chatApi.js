@@ -228,7 +228,7 @@ export function appendMemoryToPayload(payload, memoryText, memoryHeader) {
 // would).
 function buildCharacterPromptBlock(
   character,
-  { isFirstMessage, lastSummarizationAt, activeScenario, replaceVarsIn },
+  { isScenarioFirstMessage, lastSummarizationAt, activeScenario, replaceVarsIn },
 ) {
   const prompt = replaceVarsIn(character?.prompt)
   if (!prompt) return ''
@@ -242,7 +242,7 @@ function buildCharacterPromptBlock(
   if (statusBlock) parts.push(statusBlock)
 
   const globalContextRaw = resolveGlobalContextInjection(character, {
-    isFirstMessage,
+    isFirstMessage: isScenarioFirstMessage,
     lastSummarizationAt,
   })
   if (globalContextRaw) parts.push(replaceVarsIn(globalContextRaw))
@@ -250,7 +250,7 @@ function buildCharacterPromptBlock(
   let block = parts.join('\n\n')
 
   const rawScenarioText = resolveScenarioInjection(character, {
-    isFirstMessage,
+    isFirstMessage: isScenarioFirstMessage,
     lastSummarizationAt,
     activeScenario,
   })
@@ -266,6 +266,7 @@ export async function buildMessagesPayload({
   currentPersona,
   messages,
   isFirstMessage,
+  isThreadStart,
   settings,
   writingInstruction,
   memoryText,
@@ -361,7 +362,7 @@ export async function buildMessagesPayload({
   }
 
   const promptBlock = buildCharacterPromptBlock(character, {
-    isFirstMessage,
+    isScenarioFirstMessage: isThreadStart ?? isFirstMessage,
     lastSummarizationAt,
     activeScenario,
     replaceVarsIn,
@@ -743,7 +744,7 @@ export async function buildOOCMessagesPayload({
   }
 
   const promptBlock = buildCharacterPromptBlock(character, {
-    isFirstMessage,
+    isScenarioFirstMessage: isFirstMessage,
     lastSummarizationAt,
     activeScenario,
     replaceVarsIn,
@@ -847,6 +848,7 @@ export async function buildChatRequestPayload({
   currentPersona,
   messages,
   isFirstMessage,
+  isThreadStart,
   isOOC,
   threadId,
   personaMap,
@@ -892,6 +894,16 @@ export async function buildChatRequestPayload({
   const latestThread = await getThread(threadId)
   const memoryText = await buildInjectedMemory(character, latestThread, { beforeDate })
 
+  // During regeneration, roll the thread's lastSummarizationAt back to the
+  // state at the regenerated message's position: a summary that happened after
+  // `beforeDate` must not suppress firstSummary-lifetime injections. Mirrors
+  // the per-message summarizedAt rollback above.
+  const rawLastSummarizationAt = latestThread?.lastSummarizationAt || null
+  const effectiveLastSummarizationAt =
+    beforeDate && rawLastSummarizationAt && new Date(rawLastSummarizationAt) > beforeDate
+      ? null
+      : rawLastSummarizationAt
+
   const loreBlocks = await getActiveLoreBlocks({
     character,
     messages: processedMessages,
@@ -935,7 +947,7 @@ export async function buildChatRequestPayload({
       personaMap,
       memoryText,
       memoryHeader: '',
-      lastSummarizationAt: latestThread?.lastSummarizationAt || null,
+      lastSummarizationAt: effectiveLastSummarizationAt,
       activeScenario: latestThread?.activeScenario || null,
       isFirstMessage,
       loreBlocks,
@@ -989,12 +1001,13 @@ export async function buildChatRequestPayload({
       currentPersona,
       messages: processedMessages,
       isFirstMessage,
+      isThreadStart,
       settings,
       writingInstruction,
       memoryText,
       memoryHeader: '',
       personaMap,
-      lastSummarizationAt: latestThread?.lastSummarizationAt || null,
+      lastSummarizationAt: effectiveLastSummarizationAt,
       activeScenario: latestThread?.activeScenario || null,
       loreBlocks,
     })
