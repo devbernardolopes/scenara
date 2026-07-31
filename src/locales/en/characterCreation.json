@@ -42,6 +42,8 @@
   "promptPlaceholder": "Describe the character's behavior, personality, and setting…",
   "personalityLabel": "Personality",
   "personalityPlaceholder": "Describe the character's core personality, traits, and quirks…",
+  "statusBlockLabel": "Status Block",
+  "statusBlockPlaceholder": "Describe the character's current status, situation, or state…",
   "globalContextLabel": "Global Context/Scenario",
   "globalContextPlaceholder": "Describe the overarching world, setting, or scenario the character exists in…",
   "systemPromptLabel": "SYSTEM Prompt",

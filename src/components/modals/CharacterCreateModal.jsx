@@ -39,6 +39,7 @@ const INITIAL_FORM = {
   tagline: '',
   prompt: '',
   personality: '',
+  statusBlock: '',
   globalContext: '',
   globalContextLifetime: 'always',
   systemPrompt: '',
@@ -414,6 +415,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
         form.writingInstruction ||
         form.prompt?.trim() ||
         form.personality?.trim() ||
+        form.statusBlock?.trim() ||
         form.globalContext?.trim() ||
         form.extraPrompt?.trim() ||
         form.postHistoryInstructions?.trim() ||

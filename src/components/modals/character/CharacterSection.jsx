@@ -291,6 +291,26 @@ function CharacterSection({ form, onChange, characterId }) {
       </CollapsibleSection>
 
       <CollapsibleSection
+        label={t('statusBlockLabel')}
+        summary={
+          form.statusBlock
+            ? t('common:tokenCount', { count: estimateTokens(form.statusBlock) })
+            : null
+        }
+        storageKey={characterId ? `charSection.statusBlock.${characterId}` : undefined}
+        defaultExpanded={false}
+        headerExtra={<PromptBankButton onSelect={(content) => onChange('statusBlock', content)} />}
+      >
+        <AutoResizeTextarea
+          className={`${inputClass} resize-none mt-2`}
+          value={form.statusBlock || ''}
+          onChange={(e) => onChange('statusBlock', e.target.value)}
+          placeholder={t('statusBlockPlaceholder')}
+          extraHeight={8}
+        />
+      </CollapsibleSection>
+
+      <CollapsibleSection
         label={t('globalContextLabel')}
         summary={
           form.globalContext
