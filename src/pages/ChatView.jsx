@@ -1220,7 +1220,6 @@ function ChatView() {
             {
               content: '',
               hidden: isOOC && character?.includeOOC === false,
-              statusBlock: !isOOC ? thread?.statusBlock || '' : undefined,
             },
           ]),
           createdAt: new Date(),
@@ -1318,6 +1317,7 @@ function ChatView() {
           apiDurationMs: result.apiDurationMs ?? null,
           createdAt: new Date().toISOString(),
           hidden: isOOC && character?.includeOOC === false,
+          statusBlock: !isOOC ? thread?.statusBlock || '' : undefined,
         }
         const successBundleJson = JSON.stringify([successEntry])
         await updateMessage(assistantMsgId, {
@@ -1937,7 +1937,6 @@ function ChatView() {
         promptData: null,
         createdAt: new Date().toISOString(),
         hidden: isOOCRegen && character?.includeOOC === false,
-        statusBlock: !isOOCRegen ? thread?.statusBlock || '' : undefined,
       })
       setStreamingSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
       setStreamingSlotIndex(threadId, slotIndex)
@@ -2084,6 +2083,7 @@ function ChatView() {
           finalEntries[slotIndex].apiDurationMs = result.apiDurationMs
           finalEntries[slotIndex].isError = false
           finalEntries[slotIndex].error = null
+          finalEntries[slotIndex].statusBlock = !isOOCRegen ? thread?.statusBlock || '' : undefined
         }
         await updateMessage(messageId, {
           bundleMessages: JSON.stringify(finalEntries),
