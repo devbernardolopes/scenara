@@ -298,6 +298,7 @@ function MessageBubble({
 
   const isMobile = useIsMobile()
   const hasMultipleSlots = bundleMessages?.length > 1
+  const bubbleBusy = streaming || statusBlockRegenerating
   useSwipe(bubbleRef, {
     onSwipeLeft: () => {
       if (!hasMultipleSlots) return
@@ -309,7 +310,7 @@ function MessageBubble({
       const newIdx = (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
       onBundleNavigate?.(message.id, newIdx)
     },
-    enabled: isMobile && hasMultipleSlots && !streaming,
+    enabled: isMobile && hasMultipleSlots && !bubbleBusy,
     threshold: 50,
   })
 
@@ -347,7 +348,7 @@ function MessageBubble({
   const statusBlockDirectorFailed = activeEntry?.statusBlockDirectorFailed === true
 
   function isButtonDisabled(key) {
-    if (streaming) return true
+    if (bubbleBusy) return true
     if (key === 'visible' && isSlotError) return true
     if (requestFailed) return !['delete', 'regenerate', 'deleteAll', 'deleteFromHere'].includes(key)
     if (key === 'deleteAll' && contentSlotCount <= 1) return true
@@ -458,7 +459,7 @@ function MessageBubble({
 
   function handleStartStatusBlockEdit(e) {
     e?.stopPropagation()
-    if (streaming || editing) return
+    if (bubbleBusy || editing) return
     setStatusBlockDraft(statusBlockDisplay)
     setEditingStatusBlock(true)
   }
@@ -751,14 +752,14 @@ function MessageBubble({
                           (bundleIndex - 1 + bundleMessages.length) % bundleMessages.length
                         onBundleNavigate?.(message.id, newIdx)
                       }}
-                      disabled={streaming}
+                      disabled={bubbleBusy}
                       className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                         isUser
                           ? `${userHoverBg} ${userMutedClass}`
                           : isOOC
                             ? 'hover:bg-black/10 text-ooc-muted hover:text-ooc'
                             : 'hover:bg-black/10 text-tertiary hover:text-text'
-                      } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''} ${isSlotHidden ? 'opacity-100' : ''}`}
+                      } ${bubbleBusy ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''} ${isSlotHidden ? 'opacity-100' : ''}`}
                       style={isUser ? userMutedStyle : undefined}
                       title={t('previousInitialMessage')}
                     >
@@ -776,14 +777,14 @@ function MessageBubble({
                         const newIdx = (bundleIndex + 1) % bundleMessages.length
                         onBundleNavigate?.(message.id, newIdx)
                       }}
-                      disabled={streaming}
+                      disabled={bubbleBusy}
                       className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded flex-shrink-0 ${
                         isUser
                           ? `${userHoverBg} ${userMutedClass}`
                           : isOOC
                             ? 'hover:bg-black/10 text-ooc-muted hover:text-ooc'
                             : 'hover:bg-black/10 text-tertiary hover:text-text'
-                      } ${streaming ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''} ${isSlotHidden ? 'opacity-100' : ''}`}
+                      } ${bubbleBusy ? 'opacity-30 pointer-events-none cursor-not-allowed' : ''} ${isSlotHidden ? 'opacity-100' : ''}`}
                       style={isUser ? userMutedStyle : undefined}
                       title={t('nextInitialMessage')}
                     >
@@ -943,7 +944,7 @@ function MessageBubble({
         {/* Content */}
         <div
           onDoubleClick={
-            editing || streaming || requestFailed || !message.content?.trim()
+            editing || bubbleBusy || requestFailed || !message.content?.trim()
               ? undefined
               : handleStartEdit
           }
