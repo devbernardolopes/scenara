@@ -144,6 +144,7 @@ export async function buildSummarizationPayload({
 
   let personaEndSystemPrompt = ''
   let personaEndCharacterPrompt = ''
+  let personaEndMessages = ''
   const personaTiming =
     character?.personaInjectionTiming || (await getSetting('prompting.personaInjectionTiming'))
   const personaPlacement =
@@ -164,6 +165,8 @@ export async function buildSummarizationPayload({
       personaEndSystemPrompt = injected
     } else if (personaPlacement === 'endOfCharacterPrompt') {
       personaEndCharacterPrompt = injected
+    } else if (personaPlacement === 'endOfMessages') {
+      personaEndMessages = injected
     }
   }
 
@@ -233,12 +236,17 @@ export async function buildSummarizationPayload({
       ? `${replaceVarsWithDesc(charPromptHeader.value)}${charPromptHeader.enabled ? '\n\n' : '\n'}${combined}`
       : combined
   } else if (contextSection) {
-    charPromptSection = contextSection
+    charPromptSection = personaEndCharacterPrompt
+      ? `${contextSection}\n\n${personaEndCharacterPrompt}`
+      : contextSection
+  } else if (personaEndCharacterPrompt) {
+    charPromptSection = personaEndCharacterPrompt
   }
 
-  const transcriptSection = messagesHeader.value
+  let transcriptSection = messagesHeader.value
     ? `${replaceVarsWithDesc(messagesHeader.value)}${messagesHeader.enabled ? '\n\n' : '\n'}${transcript}`
     : transcript
+  if (personaEndMessages) transcriptSection = `${transcriptSection}\n\n${personaEndMessages}`
 
   const statusBlockSection = replaceVarsWithDesc(
     getEffectiveStatusBlock(character, thread?.statusBlock),
@@ -251,11 +259,18 @@ export async function buildSummarizationPayload({
       .replace(/{{character_prompt}}/gi, charPromptSection)
       .replace(/{{status_block}}/gi, statusBlockSection)
 
-  systemContent = replaceTemplates(systemContent)
-
   if (personaEndSystemPrompt) {
-    systemContent = `${systemContent}\n\n${personaEndSystemPrompt}`
+    if (/\{\{character_prompt\}\}/i.test(systemContent)) {
+      systemContent = systemContent.replace(
+        /\{\{character_prompt\}\}/gi,
+        `${personaEndSystemPrompt}\n\n{{character_prompt}}`,
+      )
+    } else {
+      systemContent = `${systemContent}\n\n${personaEndSystemPrompt}`
+    }
   }
+
+  systemContent = replaceTemplates(systemContent)
 
   const payload = [{ role: 'system', content: systemContent }]
   if (userContent) {
