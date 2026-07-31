@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
@@ -26,7 +26,7 @@ import SettingSlider from './settings/controls/SettingSlider'
 import SettingToggle from './settings/controls/SettingToggle'
 import { RefreshCw } from '../../lib/icons'
 
-function StringListInput({ value, onChange, maxItems }) {
+function StringListInput({ value, onChange, maxItems, id }) {
   const { t } = useTranslation('settings')
   const [input, setInput] = useState('')
   const items = Array.isArray(value) ? value : []
@@ -82,6 +82,7 @@ function StringListInput({ value, onChange, maxItems }) {
       <div className="flex gap-1.5">
         <input
           type="text"
+          id={id}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -149,6 +150,7 @@ function ProfileFormModal({ profile }) {
   const { promptSave } = useSaveConfirm()
   const { confirm } = useConfirm()
   const editing = Boolean(profile)
+  const formId = useId()
 
   const TOGGLEABLE_PARAM_KEYS = useMemo(
     () =>
@@ -495,8 +497,11 @@ function ProfileFormModal({ profile }) {
     >
       <div className="space-y-4">
         <div>
-          <Label required>{t('api.profile.form.name')}</Label>
+          <Label required htmlFor={formId + '-name'}>
+            {t('api.profile.form.name')}
+          </Label>
           <input
+            id={formId + '-name'}
             className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
             value={form.name}
             onChange={update('name')}
@@ -506,8 +511,11 @@ function ProfileFormModal({ profile }) {
         </div>
 
         <div>
-          <Label required>{t('api.profile.form.provider')}</Label>
+          <Label required htmlFor={formId + '-provider'}>
+            {t('api.profile.form.provider')}
+          </Label>
           <select
+            id={formId + '-provider'}
             value={form.providerId}
             onChange={(e) => {
               const nextProvider = e.target.value
@@ -551,8 +559,9 @@ function ProfileFormModal({ profile }) {
 
         {selectedProvider && (
           <div>
-            <Label>{t('api.profile.form.baseUrl')}</Label>
+            <Label htmlFor={formId + '-baseurl'}>{t('api.profile.form.baseUrl')}</Label>
             <input
+              id={formId + '-baseurl'}
               type="url"
               value={form.baseUrl}
               onChange={(e) => setForm((prev) => ({ ...prev, baseUrl: e.target.value }))}
@@ -564,13 +573,17 @@ function ProfileFormModal({ profile }) {
 
         {selectedProvider && selectedProvider.needsKey && (
           <div>
-            <label className="block text-sm font-medium text-text mb-1">
+            <label
+              className="block text-sm font-medium text-text mb-1"
+              htmlFor={formId + '-apikey'}
+            >
               {t('api.profile.form.apiKey')}
             </label>
             {keys.length === 0 ? (
               <p className="text-xs text-tertiary">{t('api.profile.form.noKeys')}</p>
             ) : (
               <select
+                id={formId + '-apikey'}
                 value={form.keyId || ''}
                 onChange={(e) => setForm((prev) => ({ ...prev, keyId: e.target.value || null }))}
                 className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm"
@@ -588,10 +601,11 @@ function ProfileFormModal({ profile }) {
 
         {selectedProvider?.supportsHordeMethods && (
           <div>
-            <label className="block text-sm font-medium text-text mb-1">
+            <label className="block text-sm font-medium text-text mb-1" htmlFor={formId + '-horde'}>
               {t('api.profile.form.hordeMethod')}
             </label>
             <select
+              id={formId + '-horde'}
               value={form.params.hordeMethod || 'native'}
               onChange={(e) => updateParam('hordeMethod', e.target.value)}
               className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm"
@@ -604,9 +618,9 @@ function ProfileFormModal({ profile }) {
 
         {selectedProvider?.supportsLmStudioMethods && (
           <div>
-            <label className="block text-sm font-medium text-text mb-1.5">
+            <span className="block text-sm font-medium text-text mb-1.5">
               {t('api.profile.form.lmStudioMethod')}
-            </label>
+            </span>
             <div className="flex flex-wrap gap-1.5">
               {[
                 { key: 'openai-compatible', labelKey: 'api.profile.form.lmStudioMethodOpenAI' },
@@ -640,11 +654,12 @@ function ProfileFormModal({ profile }) {
 
         {selectedProvider && (
           <div>
-            <label className="block text-sm font-medium text-text mb-1">
+            <label className="block text-sm font-medium text-text mb-1" htmlFor={formId + '-model'}>
               {t('api.profile.form.model')}
             </label>
             {selectedProvider.hasModelEndpoint ? (
               <ModelSelect
+                id={formId + '-model'}
                 providerId={selectedProvider.id}
                 value={form.model}
                 onChange={(v) => setForm((prev) => ({ ...prev, model: v }))}
@@ -658,6 +673,7 @@ function ProfileFormModal({ profile }) {
               />
             ) : (
               <input
+                id={formId + '-model'}
                 type="text"
                 value={form.model || ''}
                 onChange={(e) => setForm((prev) => ({ ...prev, model: e.target.value }))}
@@ -673,9 +689,9 @@ function ProfileFormModal({ profile }) {
             <p className="text-sm font-medium text-text">{t('api.profile.form.reasoning')}</p>
             {supportsReasoning && (
               <div>
-                <label className="block text-xs font-medium text-secondary mb-1.5">
+                <span className="block text-xs font-medium text-secondary mb-1.5">
                   {t('api.profile.form.reasoningEffort')}
-                </label>
+                </span>
                 <div className="flex flex-wrap gap-1.5">
                   {REASONING_EFFORT_OPTIONS.map((opt) => {
                     const active = (form.params.reasoning_effort || 'none') === opt
@@ -699,9 +715,9 @@ function ProfileFormModal({ profile }) {
             )}
             {showCerebrasReasoning && (
               <div>
-                <label className="block text-xs font-medium text-secondary mb-1.5">
+                <span className="block text-xs font-medium text-secondary mb-1.5">
                   {t('api.profile.form.reasoningEffort')}
-                </label>
+                </span>
                 <div className="flex flex-wrap gap-1.5">
                   {cerebrasReasoning.options.map((opt) => {
                     const active =
@@ -726,10 +742,14 @@ function ProfileFormModal({ profile }) {
             )}
             {supportsIncludeReasoning && (
               <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-secondary">
+                <label
+                  className="text-xs font-medium text-secondary"
+                  htmlFor={formId + '-includeReasoning'}
+                >
                   {t('api.profile.form.includeReasoning')}
                 </label>
                 <SettingToggle
+                  id={formId + '-includeReasoning'}
                   value={form.params.include_reasoning ?? false}
                   onChange={(v) => updateParam('include_reasoning', v)}
                 />
@@ -768,6 +788,7 @@ function ProfileFormModal({ profile }) {
                     <div className="flex items-center justify-between mb-1">
                       <label
                         className={`text-xs font-medium ${isDisabled ? 'text-tertiary' : 'text-secondary'}`}
+                        htmlFor={formId + '-param-' + param.key}
                       >
                         {param.label || param.key}
                       </label>
@@ -783,6 +804,7 @@ function ProfileFormModal({ profile }) {
                     )}
                     {param.type === 'range' && (
                       <SettingSlider
+                        id={formId + '-param-' + param.key}
                         value={form.params[param.key] ?? param.default ?? param.min ?? 0}
                         onChange={(v) => updateParam(param.key, v)}
                         min={param.min ?? 0}
@@ -793,12 +815,14 @@ function ProfileFormModal({ profile }) {
                     )}
                     {param.type === 'boolean' && (
                       <SettingToggle
+                        id={formId + '-param-' + param.key}
                         value={form.params[param.key] ?? param.default ?? false}
                         onChange={(v) => updateParam(param.key, v)}
                       />
                     )}
                     {param.type === 'string-list' && (
                       <StringListInput
+                        id={formId + '-param-' + param.key}
                         value={form.params[param.key] ?? []}
                         onChange={(v) => updateParam(param.key, v)}
                         maxItems={param.maxItems}
@@ -806,6 +830,7 @@ function ProfileFormModal({ profile }) {
                     )}
                     {param.type === 'text' && (
                       <input
+                        id={formId + '-param-' + param.key}
                         type="text"
                         value={form.params[param.key] ?? param.default ?? ''}
                         onChange={(e) => updateParam(param.key, e.target.value)}

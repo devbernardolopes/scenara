@@ -19,6 +19,7 @@ function SettingSlider({
   formatValue,
   disabled,
   label,
+  id,
 }) {
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
@@ -74,6 +75,7 @@ function SettingSlider({
     <div className="flex items-center gap-3 min-h-[44px]">
       <input
         type="range"
+        id={id}
         min={min}
         max={max}
         step={step}

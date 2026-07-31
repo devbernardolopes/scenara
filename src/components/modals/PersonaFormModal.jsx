@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
@@ -59,6 +59,7 @@ function PersonaFormModal({ persona }) {
   const { theme } = useTheme()
   const { promptSave } = useSaveConfirm()
   const editing = Boolean(persona)
+  const formId = useId()
 
   const initial = useMemo(
     () => ({
@@ -202,9 +203,12 @@ function PersonaFormModal({ persona }) {
     >
       <div className="space-y-4">
         <div>
-          <Label required>{t('persona.form.inChatName')}</Label>
+          <Label required htmlFor={formId + '-name'}>
+            {t('persona.form.inChatName')}
+          </Label>
           <div className="relative">
             <input
+              id={formId + '-name'}
               className={`${inputClass} pr-20`}
               value={form.name}
               onChange={update('name')}
@@ -218,10 +222,11 @@ function PersonaFormModal({ persona }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text mb-1">
+          <label className="block text-sm font-medium text-text mb-1" htmlFor={formId + '-title'}>
             {t('persona.form.displayName')}
           </label>
           <input
+            id={formId + '-title'}
             className={inputClass}
             value={form.title}
             onChange={update('title')}
@@ -230,7 +235,7 @@ function PersonaFormModal({ persona }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text mb-1">
+          <label className="block text-sm font-medium text-text mb-1" htmlFor={formId + '-avatar'}>
             {t('persona.form.avatarLabel')}
           </label>
           <div className="flex items-center gap-2">
@@ -245,6 +250,7 @@ function PersonaFormModal({ persona }) {
             <div className="relative flex-1">
               {form.avatar.startsWith('data:') ? (
                 <input
+                  id={formId + '-avatar'}
                   className={`${inputClass} pr-10`}
                   value={t('persona.form.avatarImageData', {
                     size: formatDataSize(form.avatar.length),
@@ -253,6 +259,7 @@ function PersonaFormModal({ persona }) {
                 />
               ) : (
                 <input
+                  id={formId + '-avatar'}
                   className={`${inputClass} pr-10`}
                   value={form.avatar}
                   onChange={update('avatar')}
@@ -317,9 +324,9 @@ function PersonaFormModal({ persona }) {
         </CollapsibleSection>
 
         <div>
-          <label className="block text-sm font-medium text-text mb-2">
+          <span className="block text-sm font-medium text-text mb-2">
             {t('persona.form.colorLabel')}
-          </label>
+          </span>
           <ColorPicker
             value={form.color}
             onChange={(c) => {

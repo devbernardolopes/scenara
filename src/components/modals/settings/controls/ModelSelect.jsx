@@ -43,6 +43,7 @@ function ModelDropdown({
   favModels,
   onToggleFav,
   selectLabel,
+  id,
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -68,6 +69,7 @@ function ModelDropdown({
     <div ref={ref} className="relative">
       <button
         type="button"
+        id={id}
         onClick={() => setOpen(!open)}
         className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm text-left flex items-start gap-2"
       >
@@ -236,6 +238,7 @@ function ModelSelect({
   onCancelFetch,
   onRefresh,
   cooldownRemaining,
+  id,
 }) {
   const { t } = useTranslation('settings')
   const [countdown, setCountdown] = useState(0)
@@ -441,6 +444,7 @@ function ModelSelect({
         favModels={favModels}
         onToggleFav={handleToggleFav}
         selectLabel={t('api.selectModel')}
+        id={id}
       />
 
       {filterSection}

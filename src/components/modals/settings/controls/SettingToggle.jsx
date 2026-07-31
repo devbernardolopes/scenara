@@ -1,9 +1,10 @@
-function SettingToggle({ value, onChange }) {
+function SettingToggle({ value, onChange, id }) {
   return (
     <div className="flex items-center min-h-[44px]">
       <button
         role="switch"
         aria-checked={!!value}
+        id={id}
         onClick={() => onChange(!value)}
         className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ${
           value ? 'bg-primary' : 'bg-toggle-off'
