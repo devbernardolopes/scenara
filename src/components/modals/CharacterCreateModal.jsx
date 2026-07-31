@@ -71,6 +71,9 @@ const INITIAL_FORM = {
   directorRegularChatSystemInstructions: '',
   directorRegularChatInstructions: '',
   directorRegularChatOutputDirectorResponse: true,
+  directorRegularChatStatusBlockEnabled: false,
+  directorRegularChatStatusBlockSystemInstructions: '',
+  directorRegularChatStatusBlockInstructions: '',
   directorOOCEnabled: false,
   directorOOCInstructions: '',
   firstMessage: true,
@@ -180,6 +183,14 @@ const DIRECTOR_GROUP_FIELDS = [
     instructionsKey: 'directorRegularChatSystemInstructions',
   },
   { enabledKey: 'directorRegularChatEnabled', instructionsKey: 'directorRegularChatInstructions' },
+  {
+    enabledKey: 'directorRegularChatStatusBlockEnabled',
+    instructionsKey: 'directorRegularChatStatusBlockSystemInstructions',
+  },
+  {
+    enabledKey: 'directorRegularChatStatusBlockEnabled',
+    instructionsKey: 'directorRegularChatStatusBlockInstructions',
+  },
   { enabledKey: 'directorOOCEnabled', instructionsKey: 'directorOOCInstructions' },
 ]
 
