@@ -420,6 +420,10 @@ export function clearPendingMarker(threadId) {
   pendingMarkers.delete(Number(threadId))
 }
 
+export function getPendingMarkerId(threadId) {
+  return pendingMarkers.get(Number(threadId)) ?? null
+}
+
 export async function cancelPendingSummarizationAndClearMarker(threadId) {
   const tid = Number(threadId)
 

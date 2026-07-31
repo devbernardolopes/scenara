@@ -87,6 +87,20 @@ export function isAutoTitleActive(threadId) {
   )
 }
 
+const pendingMarkers = new Map()
+
+export function registerPendingAutoTitleMarker(threadId, markerId) {
+  pendingMarkers.set(Number(threadId), markerId)
+}
+
+export function clearPendingAutoTitleMarker(threadId) {
+  pendingMarkers.delete(Number(threadId))
+}
+
+export function getPendingAutoTitleMarkerId(threadId) {
+  return pendingMarkers.get(Number(threadId)) ?? null
+}
+
 export async function shouldAutoTitle(thread, character, messages) {
   if (!character?.autoTitle) return false
   if (thread?.titleEdited) return false

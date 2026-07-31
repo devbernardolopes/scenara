@@ -53,6 +53,11 @@ import {
 } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import {
+  registerPendingAutoTitleMarker,
+  clearPendingAutoTitleMarker,
+  getPendingAutoTitleMarkerId,
+} from '../services/autoTitle'
+import {
   detectOrphanedMessages,
   cleanupSendOrphan,
   cleanupRegenerateOrphan,
@@ -64,6 +69,7 @@ import {
   cancelPendingSummarizationAndClearMarker,
   registerPendingMarker,
   clearPendingMarker,
+  getPendingMarkerId,
 } from '../services/summarization'
 import { setBaseTitle } from '../services/titleManager'
 import { getMemoryIdForMarker } from '../services/threadMemories'
@@ -858,16 +864,24 @@ function ChatView() {
     ])
     if (atMarker) {
       if (state.inflight.some((i) => i.threadId === tid && i.type === 'autoTitle')) {
-        pending.push({ type: 'autoTitle', status: 'active' })
+        pending.push({
+          type: 'autoTitle',
+          status: 'active',
+          markerId: getPendingAutoTitleMarkerId(tid),
+        })
       } else if (state.queue.some((q) => q.threadId === tid && q.type === 'autoTitle')) {
-        pending.push({ type: 'autoTitle', status: 'queued' })
+        pending.push({
+          type: 'autoTitle',
+          status: 'queued',
+          markerId: getPendingAutoTitleMarkerId(tid),
+        })
       }
     }
     if (summMarker) {
       if (state.inflight.some((i) => i.threadId === tid && i.type === 'summarization')) {
-        pending.push({ type: 'summarization', status: 'active' })
+        pending.push({ type: 'summarization', status: 'active', markerId: getPendingMarkerId(tid) })
       } else if (state.queue.some((q) => q.threadId === tid && q.type === 'summarization')) {
-        pending.push({ type: 'summarization', status: 'queued' })
+        pending.push({ type: 'summarization', status: 'queued', markerId: getPendingMarkerId(tid) })
       }
     }
     return pending
@@ -1406,6 +1420,7 @@ function ChatView() {
         try {
           if (showMarker && triggerLastCreatedAt != null) {
             markerId = await createAutoTitleMarker(threadId, triggerLastCreatedAt)
+            registerPendingAutoTitleMarker(threadId, markerId)
             if (Number(currentThreadIdRef.current) === Number(threadId)) {
               setMessages((prev) => [
                 ...prev,
@@ -1455,6 +1470,7 @@ function ChatView() {
           }
         } finally {
           setAutoTitling(false)
+          clearPendingAutoTitleMarker(threadId)
           if (showMarker) {
             setPendingMarkers((prev) => prev.filter((m) => m.type !== 'autoTitle'))
           }
@@ -2467,7 +2483,9 @@ function ChatView() {
                     while (nextIdx < messages.length && messages[nextIdx].isSummaryMarker) nextIdx++
                     const nextVisible = nextIdx >= messages.length || nextIdx >= visibleStartIndex
                     if (!isVisible || !nextVisible) return null
-                    const summPending = pendingMarkers.find((m) => m.type === 'summarization')
+                    const summPending = pendingMarkers.find(
+                      (m) => m.type === 'summarization' && m.markerId === msg.id,
+                    )
                     const summStatus = summPending?.status
                     return (
                       <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
@@ -2517,7 +2535,9 @@ function ChatView() {
                       nextIdx++
                     const nextVisible = nextIdx >= messages.length || nextIdx >= visibleStartIndex
                     if (!isVisible || !nextVisible) return null
-                    const autoTitlePending = pendingMarkers.find((m) => m.type === 'autoTitle')
+                    const autoTitlePending = pendingMarkers.find(
+                      (m) => m.type === 'autoTitle' && m.markerId === msg.id,
+                    )
                     const atStatus = autoTitlePending?.status
                     return (
                       <div key={msg.id} className="flex items-center gap-3 my-2 px-1">
