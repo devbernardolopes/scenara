@@ -57,6 +57,7 @@ export function applyDirectorTemplate(
     system_autotitle,
     user_autotitle,
     status_block,
+    memory,
   } = {},
 ) {
   if (!text) return text
@@ -70,6 +71,7 @@ export function applyDirectorTemplate(
     ['system_autotitle', system_autotitle],
     ['user_autotitle', user_autotitle],
     ['status_block', status_block],
+    ['memory', memory],
     ['char', char],
     ['user', user],
     ['name', name],

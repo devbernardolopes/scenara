@@ -4,6 +4,7 @@ import { replaceVars, sendChatCompletion } from './chatApi'
 import { getWritingInstruction } from './writingInstructions'
 import { getThread } from './threads'
 import { getEffectiveStatusBlock } from './statusBlocks'
+import { buildInjectedMemory } from './threadMemories'
 import * as apiQueue from './apiQueue'
 import i18n from '../lib/i18n'
 import { showToast } from '../lib/toast'
@@ -45,6 +46,7 @@ export async function runStatusBlockDirector({
   if (!config) return null
 
   const latestThread = await getThread(threadId)
+  const memoryText = await buildInjectedMemory(character, latestThread)
   const statusBlock = replaceVars(
     statusBlockOverride != null
       ? statusBlockOverride
@@ -74,6 +76,7 @@ export async function runStatusBlockDirector({
     message_user: messageUser || '',
     writingInstructions: writingInstructionContent,
     status_block: statusBlock,
+    memory: memoryText,
     char: charName,
     user: personaName,
     name: currentPersonaName,
