@@ -447,13 +447,13 @@ function MessageBubble({
   function handleStartStatusBlockEdit(e) {
     e?.stopPropagation()
     if (streaming || editing) return
-    setStatusBlockDraft(statusBlock)
+    setStatusBlockDraft(statusBlockDisplay)
     setEditingStatusBlock(true)
   }
 
   function handleSaveStatusBlockEdit() {
     const next = statusBlockDraft ?? ''
-    if (next !== statusBlock && onEditStatusBlock) {
+    if (next !== statusBlockDisplay && onEditStatusBlock) {
       onEditStatusBlock(message.id, bundleIndex ?? 0, next)
     }
     setEditingStatusBlock(false)
@@ -1030,7 +1030,7 @@ function MessageBubble({
                 <CodeBlockWrapper
                   collapsed={statusBlockCollapsed}
                   onToggle={() => onToggleStatusBlockCollapse?.(message.id, bundleIndex ?? 0)}
-                  codeText={statusBlock}
+                  codeText={statusBlockDisplay}
                   isStatusBlock
                   onEditStatusBlock={handleStartStatusBlockEdit}
                   statusBlockLabel={t('editStatusBlock')}
