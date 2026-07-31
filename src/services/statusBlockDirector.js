@@ -39,16 +39,22 @@ export async function runStatusBlockDirector({
   personaMap,
   signal,
   ctx,
+  statusBlock: statusBlockOverride,
 }) {
   const config = getStatusBlockDirectorConfig(character)
   if (!config) return null
 
   const latestThread = await getThread(threadId)
-  const statusBlock = replaceVars(getEffectiveStatusBlock(character, latestThread?.statusBlock), {
-    charName: character?.name || '',
-    personaName: chatPersona?.name || '',
-    currentPersonaName: currentPersona?.name || chatPersona?.name || '',
-  })
+  const statusBlock = replaceVars(
+    statusBlockOverride != null
+      ? statusBlockOverride
+      : getEffectiveStatusBlock(character, latestThread?.statusBlock),
+    {
+      charName: character?.name || '',
+      personaName: chatPersona?.name || '',
+      currentPersonaName: currentPersona?.name || chatPersona?.name || '',
+    },
+  )
   if (!statusBlock?.trim()) return null
 
   let writingInstructionContent = ''

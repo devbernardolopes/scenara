@@ -234,6 +234,7 @@ function ChatView() {
   const [character, setCharacter] = useState(null)
   const [personaMap, setPersonaMap] = useState({})
   const [selectedPersonaId, setSelectedPersonaId] = useState(null)
+  const [statusBlockRegenerating, setStatusBlockRegenerating] = useState(null)
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
@@ -1324,6 +1325,7 @@ function ChatView() {
           createdAt: new Date().toISOString(),
           hidden: isOOC && character?.includeOOC === false,
           statusBlock,
+          statusBlockUsed: !isOOC ? result.payloadStatusBlock || '' : undefined,
           statusBlockDirectorFailed: !isOOC
             ? result.statusBlockDirectorFailed || undefined
             : undefined,
@@ -2100,6 +2102,9 @@ function ChatView() {
           finalEntries[slotIndex].isError = false
           finalEntries[slotIndex].error = null
           finalEntries[slotIndex].statusBlock = statusBlock
+          finalEntries[slotIndex].statusBlockUsed = !isOOCRegen
+            ? result.payloadStatusBlock || ''
+            : undefined
           finalEntries[slotIndex].statusBlockDirectorFailed = !isOOCRegen
             ? result.statusBlockDirectorFailed || undefined
             : undefined
@@ -2257,65 +2262,71 @@ function ChatView() {
       } catch {}
     }
 
+    setStatusBlockRegenerating({ messageId, slotIndex })
     const sbAbortController = new AbortController()
 
-    let sbResult
     try {
-      sbResult = await apiQueue.enqueue({
-        threadId,
-        type: 'regenerate',
-        signal: sbAbortController.signal,
-        controller: sbAbortController,
-        execute: async (ctx) => {
-          return await runStatusBlockDirector({
-            character,
-            chatPersona,
-            currentPersona,
-            threadId,
-            message: entry.content || msg.content || '',
-            messageSystem,
-            messageUser,
-            personaMap,
-            signal: sbAbortController.signal,
-            ctx,
-          })
-        },
-      }).promise
-    } catch {
-      showToast(t('statusBlockDirectorFailed'), { type: 'warning' })
-      return
-    }
+      let sbResult
+      try {
+        sbResult = await apiQueue.enqueue({
+          threadId,
+          type: 'regenerate',
+          signal: sbAbortController.signal,
+          controller: sbAbortController,
+          execute: async (ctx) => {
+            return await runStatusBlockDirector({
+              character,
+              chatPersona,
+              currentPersona,
+              threadId,
+              message: entry.content || msg.content || '',
+              messageSystem,
+              messageUser,
+              personaMap,
+              signal: sbAbortController.signal,
+              ctx,
+              statusBlock: entry.statusBlockUsed || entry.statusBlock || thread?.statusBlock || '',
+            })
+          },
+        }).promise
+      } catch {
+        showToast(t('statusBlockDirectorFailed'), { type: 'warning' })
+        return
+      }
 
-    if (sbResult?.status === 'success' && sbResult.content?.trim()) {
-      const nextStatusBlock = sbResult.content
-      const currentEntries = parseBundleEntries(
-        messagesRef.current.find((m) => m.id === messageId)?.bundleMessages,
-      )
-      if (currentEntries && slotIndex >= 0 && slotIndex < currentEntries.length) {
-        currentEntries[slotIndex].statusBlock = nextStatusBlock
-        currentEntries[slotIndex].statusBlockDirectorFailed = false
-        const nextBundleJson = JSON.stringify(currentEntries)
-        await updateMessage(messageId, { bundleMessages: nextBundleJson })
-        setMessages((prev) =>
-          prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: nextBundleJson } : m)),
+      if (sbResult?.status === 'success' && sbResult.content?.trim()) {
+        const nextStatusBlock = sbResult.content
+        const currentEntries = parseBundleEntries(
+          messagesRef.current.find((m) => m.id === messageId)?.bundleMessages,
         )
-      }
-      await updateThread(threadId, { statusBlock: nextStatusBlock })
-      setThread((prev) => (prev ? { ...prev, statusBlock: nextStatusBlock } : prev))
-      showToast(t('statusBlockDirectorRegenerated'), { type: 'success' })
-    } else {
-      const currentEntries = parseBundleEntries(
-        messagesRef.current.find((m) => m.id === messageId)?.bundleMessages,
-      )
-      if (currentEntries && slotIndex >= 0 && slotIndex < currentEntries.length) {
-        currentEntries[slotIndex].statusBlockDirectorFailed = true
-        const nextBundleJson = JSON.stringify(currentEntries)
-        await updateMessage(messageId, { bundleMessages: nextBundleJson })
-        setMessages((prev) =>
-          prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: nextBundleJson } : m)),
+        if (currentEntries && slotIndex >= 0 && slotIndex < currentEntries.length) {
+          currentEntries[slotIndex].statusBlock = nextStatusBlock
+          currentEntries[slotIndex].statusBlockDirectorFailed = false
+          const nextBundleJson = JSON.stringify(currentEntries)
+          await updateMessage(messageId, { bundleMessages: nextBundleJson })
+          setMessages((prev) =>
+            prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: nextBundleJson } : m)),
+          )
+        }
+        await updateThread(threadId, { statusBlock: nextStatusBlock })
+        setThread((prev) => (prev ? { ...prev, statusBlock: nextStatusBlock } : prev))
+        showToast(t('statusBlockDirectorRegenerated'), { type: 'success' })
+      } else {
+        const currentEntries = parseBundleEntries(
+          messagesRef.current.find((m) => m.id === messageId)?.bundleMessages,
         )
+        if (currentEntries && slotIndex >= 0 && slotIndex < currentEntries.length) {
+          currentEntries[slotIndex].statusBlockDirectorFailed = true
+          const nextBundleJson = JSON.stringify(currentEntries)
+          await updateMessage(messageId, { bundleMessages: nextBundleJson })
+          setMessages((prev) =>
+            prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: nextBundleJson } : m)),
+          )
+        }
+        showToast(t('statusBlockDirectorFailed'), { type: 'warning' })
       }
-      showToast(t('statusBlockDirectorFailed'), { type: 'warning' })
+    } finally {
+      setStatusBlockRegenerating(null)
     }
   }
 
@@ -2865,6 +2876,10 @@ function ChatView() {
                         onEditStatusBlock={handleEditStatusBlock}
                         onToggleStatusBlockCollapse={handleToggleStatusBlockCollapse}
                         onRegenerateStatusBlock={handleRegenerateStatusBlock}
+                        statusBlockRegenerating={
+                          statusBlockRegenerating?.messageId === msg.id &&
+                          statusBlockRegenerating?.slotIndex === bundleIndex
+                        }
                       />
                     </div>
                   )

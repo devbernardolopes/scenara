@@ -202,6 +202,7 @@ function MessageBubble({
   onEditStatusBlock,
   onToggleStatusBlockCollapse,
   onRegenerateStatusBlock,
+  statusBlockRegenerating,
 }) {
   function renderContent(text) {
     let content = text
@@ -1025,8 +1026,12 @@ function MessageBubble({
             </div>
           )}
 
-          {statusBlockVisible &&
-            (editingStatusBlock ? (
+          {(statusBlockVisible || statusBlockRegenerating) &&
+            (statusBlockRegenerating ? (
+              <div className="mt-2 flex justify-center py-2">
+                <Loader className="w-4 h-4 animate-spin text-tertiary" />
+              </div>
+            ) : editingStatusBlock ? (
               <AutoResizeTextarea
                 ref={statusBlockEditRef}
                 value={statusBlockDraft}

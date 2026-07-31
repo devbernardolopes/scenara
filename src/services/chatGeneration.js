@@ -122,6 +122,11 @@ export async function generateChatResponse({
     beforeDate,
   })
 
+  const payloadStatusBlock = getEffectiveStatusBlock(
+    character,
+    (await getThread(threadId))?.statusBlock,
+  )
+
   const activeParams = getActiveParams(profile)
   const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs, { beforeDate })
   let directorReviewed = false
@@ -198,15 +203,11 @@ export async function generateChatResponse({
       const charName = character?.name || ''
       const userPersonaName = chatPersona?.name || ''
       const currentPersonaName = currentPersona?.name || userPersonaName
-      const latestThread = await getThread(threadId)
-      const statusBlock = replaceVars(
-        getEffectiveStatusBlock(character, latestThread?.statusBlock),
-        {
-          charName,
-          personaName: userPersonaName,
-          currentPersonaName,
-        },
-      )
+      const statusBlock = replaceVars(payloadStatusBlock, {
+        charName,
+        personaName: userPersonaName,
+        currentPersonaName,
+      })
       const templateVars = {
         message: content,
         message_response: content,
@@ -355,6 +356,7 @@ export async function generateChatResponse({
     apiDurationMs,
     directorReviewed,
     statusBlock: directedStatusBlock.trim() ? directedStatusBlock : undefined,
+    payloadStatusBlock,
     statusBlockDirectorDurationMs,
     statusBlockDirectorFailed,
     error: null,
