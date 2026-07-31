@@ -38,6 +38,7 @@ import { injectQuoteMarks } from '../lib/postProcessing'
 import { generateChatResponse, parseBundleEntries } from '../services/chatGeneration'
 import { isMessageHidden, stripOOCDelimiters } from '../services/chatApi'
 import { getEffectiveStatusBlock } from '../services/statusBlocks'
+import { runStatusBlockDirector } from '../services/statusBlockDirector'
 import * as apiQueue from '../services/apiQueue'
 import {
   getGeneratingThreads,
@@ -1310,6 +1311,11 @@ function ChatView() {
       }
 
       if (result.status === 'success') {
+        const statusBlock = !isOOC ? result.statusBlock || thread?.statusBlock || '' : undefined
+        if (statusBlock != null && result.statusBlock) {
+          await updateThread(threadId, { statusBlock })
+          setThread((prev) => (prev ? { ...prev, statusBlock } : prev))
+        }
         const successEntry = {
           content: result.content,
           promptData: result.promptData || null,
@@ -1317,7 +1323,7 @@ function ChatView() {
           apiDurationMs: result.apiDurationMs ?? null,
           createdAt: new Date().toISOString(),
           hidden: isOOC && character?.includeOOC === false,
-          statusBlock: !isOOC ? thread?.statusBlock || '' : undefined,
+          statusBlock,
         }
         const successBundleJson = JSON.stringify([successEntry])
         await updateMessage(assistantMsgId, {
@@ -2075,6 +2081,13 @@ function ChatView() {
       }
 
       if (result.status === 'success') {
+        const statusBlock = !isOOCRegen
+          ? result.statusBlock || thread?.statusBlock || ''
+          : undefined
+        if (statusBlock != null && result.statusBlock) {
+          await updateThread(threadId, { statusBlock })
+          setThread((prev) => (prev ? { ...prev, statusBlock } : prev))
+        }
         const finalEntries = regenEntries.map((e) => ({ ...e }))
         if (finalEntries[slotIndex]) {
           finalEntries[slotIndex].content = result.content
@@ -2083,7 +2096,7 @@ function ChatView() {
           finalEntries[slotIndex].apiDurationMs = result.apiDurationMs
           finalEntries[slotIndex].isError = false
           finalEntries[slotIndex].error = null
-          finalEntries[slotIndex].statusBlock = !isOOCRegen ? thread?.statusBlock || '' : undefined
+          finalEntries[slotIndex].statusBlock = statusBlock
         }
         await updateMessage(messageId, {
           bundleMessages: JSON.stringify(finalEntries),
@@ -2196,6 +2209,95 @@ function ChatView() {
         includeSummarization: true,
         currentPersona,
       })
+    }
+  }
+
+  async function handleRegenerateStatusBlock(messageId, slotIndex) {
+    if (generatingRef.current || isLocalStreamerRef.current) return
+
+    const msg = messagesRef.current.find((m) => m.id === messageId)
+    if (!msg || msg.isOOC) return
+
+    const ok = await confirm({
+      title: t('statusBlockDirectorConfirmTitle'),
+      message: t('statusBlockDirectorConfirmMessage'),
+      confirmLabel: t('regenerate'),
+      cancelLabel: t('cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
+
+    let chatPersona = null
+    if (thread?.personaId) {
+      chatPersona = await getPersona(thread.personaId)
+    }
+    const currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : chatPersona
+
+    const entries = parseBundleEntries(msg.bundleMessages)
+    const entry =
+      entries && slotIndex >= 0 && slotIndex < entries.length ? entries[slotIndex] : null
+    if (!entry) return
+
+    let messageSystem = ''
+    let messageUser = ''
+    if (entry?.promptData) {
+      try {
+        const parsed = JSON.parse(entry.promptData)
+        const payload = parsed?.payload
+        if (Array.isArray(payload)) {
+          messageSystem = payload.find((m) => m.role === 'system')?.content || ''
+          messageUser = payload.find((m) => m.role === 'user')?.content || ''
+        }
+      } catch {}
+    }
+
+    const sbAbortController = new AbortController()
+
+    let sbResult
+    try {
+      sbResult = await apiQueue.enqueue({
+        threadId,
+        type: 'regenerate',
+        signal: sbAbortController.signal,
+        controller: sbAbortController,
+        execute: async (ctx) => {
+          return await runStatusBlockDirector({
+            character,
+            chatPersona,
+            currentPersona,
+            threadId,
+            message: entry.content || msg.content || '',
+            messageSystem,
+            messageUser,
+            personaMap,
+            signal: sbAbortController.signal,
+            ctx,
+          })
+        },
+      }).promise
+    } catch {
+      showToast(t('statusBlockDirectorFailed'), { type: 'warning' })
+      return
+    }
+
+    if (sbResult?.status === 'success' && sbResult.content?.trim()) {
+      const nextStatusBlock = sbResult.content
+      const currentEntries = parseBundleEntries(
+        messagesRef.current.find((m) => m.id === messageId)?.bundleMessages,
+      )
+      if (currentEntries && slotIndex >= 0 && slotIndex < currentEntries.length) {
+        currentEntries[slotIndex].statusBlock = nextStatusBlock
+        const nextBundleJson = JSON.stringify(currentEntries)
+        await updateMessage(messageId, { bundleMessages: nextBundleJson })
+        setMessages((prev) =>
+          prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: nextBundleJson } : m)),
+        )
+      }
+      await updateThread(threadId, { statusBlock: nextStatusBlock })
+      setThread((prev) => (prev ? { ...prev, statusBlock: nextStatusBlock } : prev))
+      showToast(t('statusBlockDirectorRegenerated'), { type: 'success' })
+    } else {
+      showToast(t('statusBlockDirectorFailed'), { type: 'warning' })
     }
   }
 
@@ -2744,6 +2846,7 @@ function ChatView() {
                         currentPersonaName={statusCurrentPersonaName}
                         onEditStatusBlock={handleEditStatusBlock}
                         onToggleStatusBlockCollapse={handleToggleStatusBlockCollapse}
+                        onRegenerateStatusBlock={handleRegenerateStatusBlock}
                       />
                     </div>
                   )

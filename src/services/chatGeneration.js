@@ -11,6 +11,7 @@ import { getWritingInstruction } from './writingInstructions'
 import { getSetting } from './settings'
 import { getThread } from './threads'
 import { getEffectiveStatusBlock } from './statusBlocks'
+import { runStatusBlockDirector } from './statusBlockDirector'
 import { trimLeadingTrailingNewlines, trimWhitespace } from './messages'
 import * as apiQueue from './apiQueue'
 import i18n from '../lib/i18n'
@@ -317,6 +318,29 @@ export async function generateChatResponse({
     finalContent = stripOOCDelimiters(finalContent, oocDelimiters)
   }
 
+  let directedStatusBlock = ''
+  let statusBlockDirectorDurationMs = null
+  if (!isOOC) {
+    const sbResult = await runStatusBlockDirector({
+      character,
+      chatPersona,
+      currentPersona,
+      threadId,
+      message: finalContent,
+      messageSystem: payload.find((m) => m.role === 'system')?.content || '',
+      messageUser: payload.find((m) => m.role === 'user')?.content || '',
+      personaMap,
+      signal,
+      ctx,
+    })
+    if (sbResult?.status === 'success') {
+      directedStatusBlock = sbResult.content
+      statusBlockDirectorDurationMs = sbResult.apiDurationMs
+    } else if (sbResult?.status === 'error') {
+      showToast(i18n.t('chat:statusBlockDirectorFailed'), { type: 'warning' })
+    }
+  }
+
   return {
     status: 'success',
     content: finalContent,
@@ -324,6 +348,8 @@ export async function generateChatResponse({
     responseData,
     apiDurationMs,
     directorReviewed,
+    statusBlock: directedStatusBlock.trim() ? directedStatusBlock : undefined,
+    statusBlockDirectorDurationMs,
     error: null,
   }
 }

@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import rehypeRaw from 'rehype-raw'
-import { ChevronDown, ChevronUp, Copy, Edit3 } from '../../lib/icons'
+import { ChevronDown, ChevronUp, Copy, Edit3, RefreshCw } from '../../lib/icons'
 import { showToast } from '../../lib/toast'
 
 function handleCodeCopy(codeContent) {
@@ -22,6 +22,8 @@ function CodeBlockWrapperBase({
   isStatusBlock,
   onEditStatusBlock,
   statusBlockLabel,
+  onRegenerateStatusBlock,
+  regenerateStatusBlockLabel,
 }) {
   return (
     <div className="relative group flow-root">
@@ -51,6 +53,17 @@ function CodeBlockWrapperBase({
             aria-label={statusBlockLabel || 'Edit Status Block'}
           >
             <Edit3 className="w-4 h-4" />
+          </button>
+        )}
+
+        {isStatusBlock && onRegenerateStatusBlock && (
+          <button
+            onClick={onRegenerateStatusBlock}
+            className="p-1.5 rounded bg-delete-always text-on-delete-always hover:bg-delete-always-hover border border-border transition-all active:scale-95 focus:opacity-100"
+            title={regenerateStatusBlockLabel || 'Regenerate Status Block'}
+            aria-label={regenerateStatusBlockLabel || 'Regenerate Status Block'}
+          >
+            <RefreshCw className="w-4 h-4" />
           </button>
         )}
 

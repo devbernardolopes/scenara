@@ -201,6 +201,7 @@ function MessageBubble({
   statusBlockCollapsed,
   onEditStatusBlock,
   onToggleStatusBlockCollapse,
+  onRegenerateStatusBlock,
 }) {
   function renderContent(text) {
     let content = text
@@ -332,6 +333,14 @@ function MessageBubble({
     !message.isOOC &&
     !editing &&
     !requestFailed &&
+    (statusBlockDisplay || '').trim().length > 0
+
+  const statusBlockDirectorActive =
+    !message.isOOC &&
+    !!character?.directorEnabled &&
+    !!character?.directorRegularChatStatusBlockEnabled &&
+    !!character?.directorRegularChatStatusBlockSystemInstructions?.trim() &&
+    !!character?.directorRegularChatStatusBlockInstructions?.trim() &&
     (statusBlockDisplay || '').trim().length > 0
 
   function isButtonDisabled(key) {
@@ -471,6 +480,10 @@ function MessageBubble({
     if (e.key === 'Escape') {
       handleCancelStatusBlockEdit()
     }
+  }
+
+  function handleRegenerateStatusBlock() {
+    onRegenerateStatusBlock?.(message.id, bundleIndex ?? 0)
   }
 
   useEffect(() => {
@@ -1034,6 +1047,12 @@ function MessageBubble({
                   isStatusBlock
                   onEditStatusBlock={handleStartStatusBlockEdit}
                   statusBlockLabel={t('editStatusBlock')}
+                  onRegenerateStatusBlock={
+                    statusBlockDirectorActive && !streaming
+                      ? handleRegenerateStatusBlock
+                      : undefined
+                  }
+                  regenerateStatusBlockLabel={t('regenerateStatusBlock')}
                 >
                   <code className="language-status-block">{statusBlockDisplay}</code>
                 </CodeBlockWrapper>

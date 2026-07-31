@@ -234,6 +234,7 @@
   "directorLiteralSystem": "Messaggio di sistema della chiamata API",
   "directorLiteralUser": "Messaggio utente della chiamata API",
   "directorLiteralWriting": "Istruzioni di scrittura del personaggio",
+  "directorLiteralStatusBlock": "Blocco di stato corrente della chat",
   "directorLiteralChar": "Nome del personaggio",
   "directorLiteralUserPersona": "Nome in chat della persona predefinita",
   "directorLiteralName": "Nome in chat della persona attiva",

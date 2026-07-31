@@ -234,6 +234,7 @@
   "directorLiteralSystem": "Systemnachricht des API-Aufrufs",
   "directorLiteralUser": "Benutzernachricht des API-Aufrufs",
   "directorLiteralWriting": "Schreibanweisungen des Charakters",
+  "directorLiteralStatusBlock": "Aktueller Statusblock des Chats",
   "directorLiteralChar": "Charaktername",
   "directorLiteralUserPersona": "Chatname der Standard-Persona",
   "directorLiteralName": "Chatname der aktiven Persona",
