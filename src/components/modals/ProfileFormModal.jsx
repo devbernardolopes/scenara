@@ -653,19 +653,8 @@ function ProfileFormModal({ profile }) {
                 modelMeta={modelMeta}
                 fetching={fetching}
                 onCancelFetch={handleCancelFetch}
+                onRefresh={() => handleRefresh(selectedProvider.id)}
                 cooldownRemaining={getCooldownRemaining()}
-                refreshButton={
-                  fetching || getCooldownRemaining() > 0 ? null : (
-                    <button
-                      type="button"
-                      onClick={() => handleRefresh(selectedProvider.id)}
-                      className="w-full flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] text-sm text-secondary hover:bg-surface-hover border border-border rounded-md"
-                    >
-                      <RefreshCw className="w-4 h-4" />
-                      {t('api.refreshModels')}
-                    </button>
-                  )
-                }
               />
             ) : (
               <input

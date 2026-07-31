@@ -234,8 +234,8 @@ function ModelSelect({
   modelMeta = {},
   fetching,
   onCancelFetch,
+  onRefresh,
   cooldownRemaining,
-  refreshButton = null,
 }) {
   const { t } = useTranslation('settings')
   const [countdown, setCountdown] = useState(0)
@@ -396,19 +396,6 @@ function ModelSelect({
 
   return (
     <div className="space-y-2">
-      {refreshButton}
-
-      <ModelDropdown
-        models={processedModels}
-        modelNames={modelNames}
-        modelMeta={modelMeta}
-        value={value || ''}
-        onChange={onChange}
-        favModels={favModels}
-        onToggleFav={handleToggleFav}
-        selectLabel={t('api.selectModel')}
-      />
-
       {fetching ? (
         <div className="flex items-center justify-between px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary">
           <span className="flex items-center gap-2 text-sm text-secondary">
@@ -427,10 +414,34 @@ function ModelSelect({
           )}
         </div>
       ) : countdown > 0 ? (
-        <div className="flex items-center justify-center px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary">
-          <span className="text-sm text-tertiary">{t('api.cooldown', { seconds: countdown })}</span>
-        </div>
+        <button
+          type="button"
+          disabled
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] text-sm text-tertiary border border-border rounded-md bg-surface bg-surface-secondary cursor-not-allowed"
+        >
+          {t('api.cooldown', { seconds: countdown })}
+        </button>
+      ) : onRefresh ? (
+        <button
+          type="button"
+          onClick={onRefresh}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] text-sm text-secondary hover:bg-surface-hover border border-border rounded-md"
+        >
+          <RefreshCw className="w-4 h-4" />
+          {t('api.refreshModels')}
+        </button>
       ) : null}
+
+      <ModelDropdown
+        models={processedModels}
+        modelNames={modelNames}
+        modelMeta={modelMeta}
+        value={value || ''}
+        onChange={onChange}
+        favModels={favModels}
+        onToggleFav={handleToggleFav}
+        selectLabel={t('api.selectModel')}
+      />
 
       {filterSection}
     </div>
