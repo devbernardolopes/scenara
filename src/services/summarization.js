@@ -209,6 +209,9 @@ export async function buildSummarizationPayload({
     const personality = replaceVarsWithDesc(character?.personality || '')
     if (personality) parts.push(personality)
 
+    const statusBlock = replaceVarsWithDesc(character?.statusBlock || '')
+    if (statusBlock) parts.push(statusBlock)
+
     let combined = parts.join('\n\n')
 
     if (resolvedGlobalContext) combined = `${combined}\n\n${resolvedGlobalContext}`
@@ -226,11 +229,14 @@ export async function buildSummarizationPayload({
     ? `${replaceVarsWithDesc(messagesHeader.value)}${messagesHeader.enabled ? '\n\n' : '\n'}${transcript}`
     : transcript
 
+  const statusBlockSection = replaceVarsWithDesc(character?.statusBlock || '')
+
   const replaceTemplates = (text) =>
     replaceVarsWithDesc(text)
       .replace(/{{transcript}}/gi, transcriptSection)
       .replace(/{{memory}}/gi, memorySection)
       .replace(/{{character_prompt}}/gi, charPromptSection)
+      .replace(/{{status_block}}/gi, statusBlockSection)
 
   systemContent = replaceTemplates(systemContent)
 

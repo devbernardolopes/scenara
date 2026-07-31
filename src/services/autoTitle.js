@@ -172,14 +172,20 @@ export async function triggerAutoTitle({
     replaceVarsWithDesc,
   })
 
-  systemContent = replaceVarsIn(systemContent).replace(/{{transcript}}/gi, transcript)
+  const statusBlockResolved = replaceVarsWithDesc(character.statusBlock || '')
+
+  systemContent = replaceVarsIn(systemContent)
+    .replace(/{{transcript}}/gi, transcript)
+    .replace(/{{status_block}}/gi, statusBlockResolved)
 
   const payload = [{ role: 'system', content: systemContent }]
   const memoryText = await buildInjectedMemory(character, thread)
   const payloadWithMemory = appendMemoryToPayload(payload, memoryText, '')
 
   if (userContent) {
-    userContent = replaceVarsIn(userContent).replace(/{{transcript}}/gi, transcript)
+    userContent = replaceVarsIn(userContent)
+      .replace(/{{transcript}}/gi, transcript)
+      .replace(/{{status_block}}/gi, statusBlockResolved)
     payloadWithMemory.push({ role: 'user', content: userContent })
   } else {
     payloadWithMemory.push({ role: 'user', content: transcript })
@@ -244,6 +250,7 @@ export async function triggerAutoTitle({
         name: currentPersonaName,
         system_autotitle,
         user_autotitle,
+        status_block: statusBlockResolved,
       }
       const systemInstructions = applyDirectorTemplate(
         directorConfig.systemInstructions,

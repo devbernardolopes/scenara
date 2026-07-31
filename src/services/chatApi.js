@@ -220,11 +220,12 @@ export function appendMemoryToPayload(payload, memoryText, memoryHeader) {
 }
 
 // Assembles the character-prompt block for a request: the Character Prompt,
-// followed (in modal order) by Personality and Global Context/Scenario — each
-// separated by one blank line and only when non-empty — then the active
-// scenario appended last. All text is var-substituted by `replaceVarsIn`.
-// Returns '' when the Character Prompt itself is empty (so personality and
-// global context only inject wherever the Character Prompt would).
+// followed (in modal order) by Personality, Status Block and Global
+// Context/Scenario — each separated by one blank line and only when non-empty
+// — then the active scenario appended last. All text is var-substituted by
+// `replaceVarsIn`. Returns '' when the Character Prompt itself is empty (so
+// personality and global context only inject wherever the Character Prompt
+// would).
 function buildCharacterPromptBlock(
   character,
   { isFirstMessage, lastSummarizationAt, activeScenario, replaceVarsIn },
@@ -236,6 +237,9 @@ function buildCharacterPromptBlock(
 
   const personality = replaceVarsIn(character?.personality)
   if (personality) parts.push(personality)
+
+  const statusBlock = replaceVarsIn(character?.statusBlock)
+  if (statusBlock) parts.push(statusBlock)
 
   const globalContextRaw = resolveGlobalContextInjection(character, {
     isFirstMessage,
@@ -329,6 +333,13 @@ export async function buildMessagesPayload({
   const systemPrompt = replaceVarsIn(character?.systemPrompt)
   if (systemPrompt) {
     systemParts.push(systemPrompt)
+  }
+
+  // When the Character Prompt is empty, Status Block is placed right after the
+  // SYSTEM Prompt instead of inside the character-prompt block.
+  if (!character?.prompt?.trim()) {
+    const statusBlock = replaceVarsIn(character?.statusBlock)
+    if (statusBlock) systemParts.push(statusBlock)
   }
 
   if (loreBlocks.beforeChar) {
@@ -660,6 +671,7 @@ export async function buildOOCMessagesPayload({
   const personaName = chatPersona?.name || ''
   const currentPersonaName = currentPersona?.name || personaName
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
+  const statusBlockResolved = replaceVarsIn(character?.statusBlock || '')
 
   const defaultPersonaId = await getSetting('defaultPersonaId')
   const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
@@ -705,10 +717,16 @@ export async function buildOOCMessagesPayload({
   }
 
   if (oocSystemInstr) {
-    const sys = replaceVarsIn(oocSystemInstr)
+    const sys = replaceVarsIn(oocSystemInstr).replace(/{{status_block}}/gi, statusBlockResolved)
     systemParts.push(
       systemHasTranscript ? sys.replace(/{{transcript}}/gi, transcriptWithVars) : sys,
     )
+  }
+
+  // When the Character Prompt is empty, Status Block is placed right after the
+  // SYSTEM Prompt instead of inside the character-prompt block.
+  if (!character?.prompt?.trim() && statusBlockResolved) {
+    systemParts.push(statusBlockResolved)
   }
 
   if (loreBlocks.beforeChar) {
@@ -763,7 +781,7 @@ export async function buildOOCMessagesPayload({
 
   if (userMessage) {
     if (oocUserInstr) {
-      const base = replaceVarsIn(oocUserInstr)
+      const base = replaceVarsIn(oocUserInstr).replace(/{{status_block}}/gi, statusBlockResolved)
       const userHasTranscript = oocUserInstr.includes('{{transcript}}')
       let content = userHasTranscript ? base.replace(/{{transcript}}/gi, transcriptWithVars) : base
       if (content.includes('{{content}}')) {

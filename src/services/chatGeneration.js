@@ -3,6 +3,7 @@ import { getDirectorReviewConfig, buildDirectorMessages, applyDirectorTemplate }
 import {
   buildChatRequestPayload,
   getActiveParams,
+  replaceVars,
   sendChatCompletion,
   stripOOCDelimiters,
 } from './chatApi'
@@ -192,12 +193,18 @@ export async function generateChatResponse({
       const charName = character?.name || ''
       const userPersonaName = chatPersona?.name || ''
       const currentPersonaName = currentPersona?.name || userPersonaName
+      const statusBlock = replaceVars(character?.statusBlock || '', {
+        charName,
+        personaName: userPersonaName,
+        currentPersonaName,
+      })
       const templateVars = {
         message: content,
         message_response: content,
         message_system: payload.find((m) => m.role === 'system')?.content || '',
         message_user: payload.find((m) => m.role === 'user')?.content || '',
         writingInstructions: writingInstructionContent,
+        status_block: statusBlock,
         char: charName,
         user: userPersonaName,
         name: currentPersonaName,

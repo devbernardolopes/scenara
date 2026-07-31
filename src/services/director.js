@@ -56,6 +56,7 @@ export function applyDirectorTemplate(
     name,
     system_autotitle,
     user_autotitle,
+    status_block,
   } = {},
 ) {
   if (!text) return text
@@ -68,6 +69,7 @@ export function applyDirectorTemplate(
     ['writing_instructions', writingInstructions],
     ['system_autotitle', system_autotitle],
     ['user_autotitle', user_autotitle],
+    ['status_block', status_block],
     ['char', char],
     ['user', user],
     ['name', name],

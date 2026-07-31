@@ -326,6 +326,8 @@ function CharacterCreateModal({ character: existing, initialData }) {
 
       if (form.personality) total += estimateTokens(replaceVars(form.personality))
 
+      if (form.statusBlock) total += estimateTokens(replaceVars(form.statusBlock))
+
       if (form.globalContext) total += estimateTokens(replaceVars(form.globalContext))
 
       if (form.systemPrompt) total += estimateTokens(replaceVars(form.systemPrompt))
@@ -352,6 +354,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
   }, [
     form.prompt,
     form.personality,
+    form.statusBlock,
     form.globalContext,
     form.systemPrompt,
     form.postHistoryInstructions,
