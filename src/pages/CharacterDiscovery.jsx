@@ -386,6 +386,7 @@ function CharacterDiscovery() {
       title: new Date().toLocaleString(),
       personaId: personaId || null,
       initialMessages,
+      statusBlock: character.statusBlock || '',
     })
 
     let scenarioToUse = selectedScenario

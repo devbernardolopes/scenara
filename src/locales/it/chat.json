@@ -35,6 +35,7 @@
   "deleteFromHere": "Elimina da qui",
   "edit": "Modifica",
   "copy": "Copia",
+  "editStatusBlock": "Modifica blocco di stato",
   "fork": "Dirama",
   "forkConfirmTitle": "Dirama conversazione",
   "forkConfirmMessage": "Creare una nuova conversazione da questo messaggio e da tutti i precedenti?",

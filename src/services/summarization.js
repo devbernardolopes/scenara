@@ -15,6 +15,7 @@ import {
   getThreadMemoriesAscending,
 } from './threadMemories'
 import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
+import { getEffectiveStatusBlock } from './statusBlocks'
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { getSetting, normalizeSectionHeader } from './settings'
 import { getPersona, getAllPersonas } from './personas'
@@ -219,7 +220,7 @@ export async function buildSummarizationPayload({
     const personality = replaceVarsWithDesc(character?.personality || '')
     if (personality) parts.push(personality)
 
-    const statusBlock = replaceVarsWithDesc(character?.statusBlock || '')
+    const statusBlock = replaceVarsWithDesc(getEffectiveStatusBlock(character, thread?.statusBlock))
     if (statusBlock) parts.push(statusBlock)
 
     let combined = parts.join('\n\n')
@@ -239,7 +240,9 @@ export async function buildSummarizationPayload({
     ? `${replaceVarsWithDesc(messagesHeader.value)}${messagesHeader.enabled ? '\n\n' : '\n'}${transcript}`
     : transcript
 
-  const statusBlockSection = replaceVarsWithDesc(character?.statusBlock || '')
+  const statusBlockSection = replaceVarsWithDesc(
+    getEffectiveStatusBlock(character, thread?.statusBlock),
+  )
 
   const replaceTemplates = (text) =>
     replaceVarsWithDesc(text)

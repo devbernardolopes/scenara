@@ -11,6 +11,7 @@ import {
 import { getSetting } from './settings'
 import { getPersona } from './personas'
 import { updateThread } from './threads'
+import { getEffectiveStatusBlock } from './statusBlocks'
 import { trimLeadingTrailingNewlines } from './messages'
 import { buildInjectedMemory } from './threadMemories'
 import {
@@ -186,7 +187,9 @@ export async function triggerAutoTitle({
     replaceVarsWithDesc,
   })
 
-  const statusBlockResolved = replaceVarsWithDesc(character.statusBlock || '')
+  const statusBlockResolved = replaceVarsWithDesc(
+    getEffectiveStatusBlock(character, thread.statusBlock),
+  )
 
   systemContent = replaceVarsIn(systemContent)
     .replace(/{{transcript}}/gi, transcript)

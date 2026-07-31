@@ -37,7 +37,13 @@ export async function getNextThreadNumber() {
   })
 }
 
-export async function createThread({ characterId, personaId, title, initialMessages }) {
+export async function createThread({
+  characterId,
+  personaId,
+  title,
+  initialMessages,
+  statusBlock,
+}) {
   const now = new Date()
   const threadNumber = await getNextThreadNumber()
   const id = await db.threads.add({
@@ -45,6 +51,7 @@ export async function createThread({ characterId, personaId, title, initialMessa
     personaId: personaId || null,
     title: title || 'New Chat',
     initialMessages: initialMessages || null,
+    statusBlock: statusBlock || '',
     createdAt: now,
     updatedAt: now,
     isFavorite: false,
@@ -182,6 +189,7 @@ export async function duplicateThread(id) {
     memory: original.memory || null,
     lastSummarizationAt: original.lastSummarizationAt || null,
     activeScenario: original.activeScenario || null,
+    statusBlock: original.statusBlock ?? null,
     messageCount: 0,
   })
   const messages = await db.messages.where('threadId').equals(Number(id)).toArray()
@@ -252,6 +260,7 @@ export async function forkThread(id, messageId) {
     lastSummarizationAt: original.lastSummarizationAt || null,
     keptConsumedCount: original.keptConsumedCount || 0,
     activeScenario: original.activeScenario || null,
+    statusBlock: original.statusBlock ?? null,
     messageCount: 0,
   })
 

@@ -5,6 +5,7 @@ import { getThread } from './threads'
 import { getWritingInstruction } from './writingInstructions'
 import { buildInjectedMemory } from './threadMemories'
 import { resolveScenarioInjection, resolveGlobalContextInjection } from './scenarios'
+import { getEffectiveStatusBlock } from './statusBlocks'
 import { getPersona } from './personas'
 import { parseBundleEntries } from './chatGeneration'
 import { getActiveLoreBlocks } from './lorebookActivation'
@@ -248,7 +249,7 @@ export function appendMemoryToPayload(payload, memoryText, memoryHeader) {
 // would).
 function buildCharacterPromptBlock(
   character,
-  { isScenarioFirstMessage, lastSummarizationAt, activeScenario, replaceVarsIn },
+  { isScenarioFirstMessage, lastSummarizationAt, activeScenario, statusBlock, replaceVarsIn },
 ) {
   const prompt = replaceVarsIn(character?.prompt)
   if (!prompt) return ''
@@ -258,8 +259,8 @@ function buildCharacterPromptBlock(
   const personality = replaceVarsIn(character?.personality)
   if (personality) parts.push(personality)
 
-  const statusBlock = replaceVarsIn(character?.statusBlock)
-  if (statusBlock) parts.push(statusBlock)
+  const resolvedStatusBlock = replaceVarsIn(statusBlock)
+  if (resolvedStatusBlock) parts.push(resolvedStatusBlock)
 
   const globalContextRaw = resolveGlobalContextInjection(character, {
     isFirstMessage: isScenarioFirstMessage,
@@ -294,6 +295,7 @@ export async function buildMessagesPayload({
   personaMap,
   lastSummarizationAt = null,
   activeScenario = null,
+  statusBlock = null,
   loreBlocks = {
     beforeChar: '',
     afterChar: '',
@@ -349,8 +351,8 @@ export async function buildMessagesPayload({
   // When the Character Prompt is empty, Status Block is placed right after the
   // SYSTEM Prompt instead of inside the character-prompt block.
   if (!character?.prompt?.trim()) {
-    const statusBlock = replaceVarsIn(character?.statusBlock)
-    if (statusBlock) systemParts.push(statusBlock)
+    const resolvedStatusBlock = replaceVarsIn(statusBlock)
+    if (resolvedStatusBlock) systemParts.push(resolvedStatusBlock)
   }
 
   if (loreBlocks.beforeChar) {
@@ -375,6 +377,7 @@ export async function buildMessagesPayload({
     isScenarioFirstMessage: isThreadStart ?? isFirstMessage,
     lastSummarizationAt,
     activeScenario,
+    statusBlock,
     replaceVarsIn,
   })
   if (promptBlock) {
@@ -678,6 +681,7 @@ export async function buildOOCMessagesPayload({
   memoryHeader,
   lastSummarizationAt = null,
   activeScenario = null,
+  statusBlock = null,
   isFirstMessage = false,
   loreBlocks = {
     beforeChar: '',
@@ -691,7 +695,7 @@ export async function buildOOCMessagesPayload({
   const personaName = chatPersona?.name || ''
   const currentPersonaName = currentPersona?.name || personaName
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
-  const statusBlockResolved = replaceVarsIn(character?.statusBlock || '')
+  const statusBlockResolved = replaceVarsIn(statusBlock)
 
   const defaultPersonaId = await getSetting('defaultPersonaId')
   const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
@@ -763,6 +767,7 @@ export async function buildOOCMessagesPayload({
     isScenarioFirstMessage: isFirstMessage,
     lastSummarizationAt,
     activeScenario,
+    statusBlock,
     replaceVarsIn,
   })
   if (promptBlock) {
@@ -912,6 +917,7 @@ export async function buildChatRequestPayload({
 
   const latestThread = await getThread(threadId)
   const memoryText = await buildInjectedMemory(character, latestThread, { beforeDate })
+  const statusBlock = getEffectiveStatusBlock(character, latestThread?.statusBlock)
 
   // During regeneration, roll the thread's lastSummarizationAt back to the
   // state at the regenerated message's position: a summary that happened after
@@ -968,6 +974,7 @@ export async function buildChatRequestPayload({
       memoryHeader: '',
       lastSummarizationAt: effectiveLastSummarizationAt,
       activeScenario: latestThread?.activeScenario || null,
+      statusBlock,
       isFirstMessage,
       loreBlocks,
       oocSettings: {
@@ -1028,6 +1035,7 @@ export async function buildChatRequestPayload({
       personaMap,
       lastSummarizationAt: effectiveLastSummarizationAt,
       activeScenario: latestThread?.activeScenario || null,
+      statusBlock,
       loreBlocks,
     })
     payload = chatResult.payload

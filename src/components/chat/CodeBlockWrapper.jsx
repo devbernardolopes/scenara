@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import rehypeRaw from 'rehype-raw'
-import { ChevronDown, ChevronUp, Copy } from '../../lib/icons'
+import { ChevronDown, ChevronUp, Copy, Edit3 } from '../../lib/icons'
 import { showToast } from '../../lib/toast'
 
 function handleCodeCopy(codeContent) {
@@ -14,7 +14,15 @@ function handleCodeCopy(codeContent) {
     .catch(() => showToast('Failed to copy', { type: 'error' }))
 }
 
-function CodeBlockWrapperBase({ collapsed, onToggle, codeText, children }) {
+function CodeBlockWrapperBase({
+  collapsed,
+  onToggle,
+  codeText,
+  children,
+  isStatusBlock,
+  onEditStatusBlock,
+  statusBlockLabel,
+}) {
   return (
     <div className="relative group flow-root">
       <pre
@@ -34,6 +42,17 @@ function CodeBlockWrapperBase({ collapsed, onToggle, codeText, children }) {
         >
           {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
         </button>
+
+        {isStatusBlock && onEditStatusBlock && (
+          <button
+            onClick={onEditStatusBlock}
+            className="p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border transition-all active:scale-95 focus:opacity-100"
+            title={statusBlockLabel || 'Edit Status Block'}
+            aria-label={statusBlockLabel || 'Edit Status Block'}
+          >
+            <Edit3 className="w-4 h-4" />
+          </button>
+        )}
 
         {codeText && (
           <button

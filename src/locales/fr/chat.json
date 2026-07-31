@@ -35,6 +35,7 @@
   "deleteFromHere": "Supprimer à partir d’ici",
   "edit": "Modifier",
   "copy": "Copier",
+  "editStatusBlock": "Modifier le bloc de statut",
   "fork": "Bifurquer",
   "forkConfirmTitle": "Dupliquer la conversation",
   "forkConfirmMessage": "Créer une nouvelle conversation à partir de ce message et de tous les messages précédents ?",

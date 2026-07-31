@@ -9,6 +9,8 @@ import {
 } from './chatApi'
 import { getWritingInstruction } from './writingInstructions'
 import { getSetting } from './settings'
+import { getThread } from './threads'
+import { getEffectiveStatusBlock } from './statusBlocks'
 import { trimLeadingTrailingNewlines, trimWhitespace } from './messages'
 import * as apiQueue from './apiQueue'
 import i18n from '../lib/i18n'
@@ -195,11 +197,15 @@ export async function generateChatResponse({
       const charName = character?.name || ''
       const userPersonaName = chatPersona?.name || ''
       const currentPersonaName = currentPersona?.name || userPersonaName
-      const statusBlock = replaceVars(character?.statusBlock || '', {
-        charName,
-        personaName: userPersonaName,
-        currentPersonaName,
-      })
+      const latestThread = await getThread(threadId)
+      const statusBlock = replaceVars(
+        getEffectiveStatusBlock(character, latestThread?.statusBlock),
+        {
+          charName,
+          personaName: userPersonaName,
+          currentPersonaName,
+        },
+      )
       const templateVars = {
         message: content,
         message_response: content,

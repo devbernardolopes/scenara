@@ -37,6 +37,7 @@ import { getSetting } from '../services/settings'
 import { injectQuoteMarks } from '../lib/postProcessing'
 import { generateChatResponse, parseBundleEntries } from '../services/chatGeneration'
 import { isMessageHidden, stripOOCDelimiters } from '../services/chatApi'
+import { getEffectiveStatusBlock } from '../services/statusBlocks'
 import * as apiQueue from '../services/apiQueue'
 import {
   getGeneratingThreads,
@@ -324,6 +325,42 @@ function ChatView() {
       if (thr) {
         chr = await getCharacter(thr.characterId)
         setCharacter(chr)
+      }
+
+      // Lazy-init the per-chat Status Block snapshot for legacy threads
+      // (created before the field existed), then backfill the per-slot
+      // snapshot on eligible message entries that predate it.
+      if (thr && thr.statusBlock === undefined) {
+        const sb = getEffectiveStatusBlock(chr, thr.statusBlock)
+        await updateThread(threadId, { statusBlock: sb })
+        thr = { ...thr, statusBlock: sb }
+        setThread(thr)
+      }
+
+      const statusBlockForBackfill = thr?.statusBlock
+      const msgsToBackfill = msgs
+        .filter(
+          (m) => m.role === 'assistant' && !m.isOOC && !m.isSummaryMarker && !m.isAutoTitleMarker,
+        )
+        .map((m) => {
+          const entries = parseBundleEntries(m.bundleMessages)
+          if (!entries) return null
+          let changed = false
+          const next = entries.map((e) => {
+            if (e.statusBlock !== undefined) return e
+            changed = true
+            return { ...e, statusBlock: statusBlockForBackfill }
+          })
+          if (!changed) return null
+          return { id: m.id, bundleMessages: JSON.stringify(next) }
+        })
+        .filter(Boolean)
+      if (msgsToBackfill.length > 0) {
+        await Promise.all(
+          msgsToBackfill.map(({ id, bundleMessages }) => updateMessage(id, { bundleMessages })),
+        )
+        const refreshed = await getMessagesByThread(threadId)
+        setMessages(dedupeMessages(refreshed))
       }
       const chatProfileId = await getSetting('requestKind.chat.profileId')
       setNoChatProfile(!chatProfileId)
@@ -1180,7 +1217,11 @@ function ChatView() {
           content: '',
           isOOC,
           bundleMessages: JSON.stringify([
-            { content: '', hidden: isOOC && character?.includeOOC === false },
+            {
+              content: '',
+              hidden: isOOC && character?.includeOOC === false,
+              statusBlock: !isOOC ? thread?.statusBlock || '' : undefined,
+            },
           ]),
           createdAt: new Date(),
         },
@@ -1784,6 +1825,43 @@ function ChatView() {
     )
   }, [])
 
+  const handleToggleStatusBlockCollapse = useCallback(async (messageId, slotIndex) => {
+    const msg = messagesRef.current.find((m) => m.id === messageId)
+    if (!msg) return
+    const entries = parseBundleEntries(msg.bundleMessages)
+    if (!entries || slotIndex < 0 || slotIndex >= entries.length) return
+    const idx = Math.min(slotIndex, entries.length - 1)
+    const entry = { ...entries[idx] }
+    entry.statusBlockCollapsed = !entry.statusBlockCollapsed
+    entries[idx] = entry
+    const nextBundleJson = JSON.stringify(entries)
+    await updateMessage(messageId, { bundleMessages: nextBundleJson })
+    setMessages((prev) =>
+      prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: nextBundleJson } : m)),
+    )
+  }, [])
+
+  const handleEditStatusBlock = useCallback(
+    async (messageId, slotIndex, content) => {
+      const msg = messagesRef.current.find((m) => m.id === messageId)
+      if (!msg) return
+      const entries = parseBundleEntries(msg.bundleMessages)
+      if (!entries || slotIndex < 0 || slotIndex >= entries.length) return
+      const idx = Math.min(slotIndex, entries.length - 1)
+      const entry = { ...entries[idx] }
+      entry.statusBlock = content ?? ''
+      entries[idx] = entry
+      const nextBundleJson = JSON.stringify(entries)
+      await updateMessage(messageId, { bundleMessages: nextBundleJson })
+      setMessages((prev) =>
+        prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: nextBundleJson } : m)),
+      )
+      await updateThread(threadId, { statusBlock: content ?? '' })
+      setThread((prev) => (prev ? { ...prev, statusBlock: content ?? '' } : prev))
+    },
+    [threadId],
+  )
+
   async function handleRegenerate(messageId, skipConfirmation = false) {
     if (!skipConfirmation) {
       const regenConfirm = await getSetting('regenerationConfirmation')
@@ -1859,6 +1937,7 @@ function ChatView() {
         promptData: null,
         createdAt: new Date().toISOString(),
         hidden: isOOCRegen && character?.includeOOC === false,
+        statusBlock: !isOOCRegen ? thread?.statusBlock || '' : undefined,
       })
       setStreamingSlotIndices((prev) => ({ ...prev, [messageId]: slotIndex }))
       setStreamingSlotIndex(threadId, slotIndex)
@@ -2147,6 +2226,7 @@ function ChatView() {
       origin: 'edit',
       createdAt: new Date().toISOString(),
       hidden: msg.isOOC && character?.includeOOC === false,
+      statusBlock: !msg.isOOC ? thread?.statusBlock || '' : undefined,
     })
     await updateMessage(id, {
       bundleMessages: JSON.stringify(entries),
@@ -2611,6 +2691,8 @@ function ChatView() {
                   const slotApiDurationMs = entries
                     ? (bundleEntry?.apiDurationMs ?? null)
                     : (msg.apiDurationMs ?? null)
+                  const slotStatusBlock = bundleEntry?.statusBlock || ''
+                  const statusBlockCollapsed = bundleEntry?.statusBlockCollapsed === true
                   const isFailedSlot = bundleEntry?.isError === true
                   const errorText = isFailedSlot
                     ? bundleEntry.error || bundleEntry.content || ''
@@ -2653,6 +2735,10 @@ function ChatView() {
                         personaName={personaMap?.[thread?.personaId]?.name || ''}
                         onToggleCodeBlock={handleToggleCodeBlock}
                         onToggleVisible={handleToggleVisible}
+                        statusBlock={slotStatusBlock}
+                        statusBlockCollapsed={statusBlockCollapsed}
+                        onEditStatusBlock={handleEditStatusBlock}
+                        onToggleStatusBlockCollapse={handleToggleStatusBlockCollapse}
                       />
                     </div>
                   )

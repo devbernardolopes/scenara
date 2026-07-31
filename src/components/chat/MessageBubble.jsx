@@ -34,7 +34,7 @@ import {
 } from '../../lib/icons'
 import Avatar from '../shared/Avatar'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
-import { CodeBlocksMarkdown } from './CodeBlockWrapper'
+import { CodeBlocksMarkdown, CodeBlockWrapper } from './CodeBlockWrapper'
 import { speak, stop, subscribe, getPlaybackState } from '../../lib/ttsPlayback'
 
 const DEFAULT_ASSISTANT_ORDER = [
@@ -196,6 +196,10 @@ function MessageBubble({
   onToggleCodeBlock,
   onToggleVisible,
   personaName,
+  statusBlock,
+  statusBlockCollapsed,
+  onEditStatusBlock,
+  onToggleStatusBlockCollapse,
 }) {
   function renderContent(text) {
     let content = text
@@ -315,6 +319,14 @@ function MessageBubble({
   const isSlotError = activeEntry?.isError === true
   const isSlotCancelled = activeEntry?.isCancelled === true
 
+  const statusBlockVisible =
+    !isUser &&
+    !isSystem &&
+    !message.isOOC &&
+    !editing &&
+    !requestFailed &&
+    (statusBlock || '').trim().length > 0
+
   function isButtonDisabled(key) {
     if (streaming) return true
     if (key === 'visible' && isSlotError) return true
@@ -421,6 +433,39 @@ function MessageBubble({
     setEditWidth(null)
   }
 
+  const [editingStatusBlock, setEditingStatusBlock] = useState(false)
+  const [statusBlockDraft, setStatusBlockDraft] = useState('')
+  const statusBlockEditRef = useRef(null)
+
+  function handleStartStatusBlockEdit(e) {
+    e?.stopPropagation()
+    if (streaming || editing) return
+    setStatusBlockDraft(statusBlock)
+    setEditingStatusBlock(true)
+  }
+
+  function handleSaveStatusBlockEdit() {
+    const next = statusBlockDraft ?? ''
+    if (next !== statusBlock && onEditStatusBlock) {
+      onEditStatusBlock(message.id, bundleIndex ?? 0, next)
+    }
+    setEditingStatusBlock(false)
+  }
+
+  function handleCancelStatusBlockEdit() {
+    setEditingStatusBlock(false)
+  }
+
+  function handleStatusBlockEditKeyDown(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault()
+      handleSaveStatusBlockEdit()
+    }
+    if (e.key === 'Escape') {
+      handleCancelStatusBlockEdit()
+    }
+  }
+
   useEffect(() => {
     if (editing && editRef.current) {
       const ta = editRef.current
@@ -429,6 +474,15 @@ function MessageBubble({
       ta.setSelectionRange(len, len)
     }
   }, [editing])
+
+  useEffect(() => {
+    if (editingStatusBlock && statusBlockEditRef.current) {
+      const ta = statusBlockEditRef.current
+      ta.focus({ preventScroll: true })
+      const len = ta.value.length
+      ta.setSelectionRange(len, len)
+    }
+  }, [editingStatusBlock])
 
   function handleEditKeyDown(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -948,6 +1002,43 @@ function MessageBubble({
               )}
             </div>
           )}
+
+          {statusBlockVisible &&
+            (editingStatusBlock ? (
+              <AutoResizeTextarea
+                ref={statusBlockEditRef}
+                value={statusBlockDraft}
+                onChange={(e) => setStatusBlockDraft(e.target.value)}
+                onBlur={handleSaveStatusBlockEdit}
+                onKeyDown={handleStatusBlockEditKeyDown}
+                extraHeight={8}
+                className="mt-2 w-full resize-none rounded border whitespace-pre-wrap break-words px-3 py-2 text-sm focus:outline-none focus:ring-1 bg-surface text-text border-border focus:ring-primary/40"
+                style={{
+                  fontFamily: CHAT_FONTS[chatFontFamily],
+                  fontSize: CHAT_FONT_SIZES[chatFontSize],
+                }}
+              />
+            ) : renderMarkdown ? (
+              <div className="mt-2" onDoubleClick={handleStartStatusBlockEdit}>
+                <CodeBlockWrapper
+                  collapsed={statusBlockCollapsed}
+                  onToggle={() => onToggleStatusBlockCollapse?.(message.id, bundleIndex ?? 0)}
+                  codeText={statusBlock}
+                  isStatusBlock
+                  onEditStatusBlock={handleStartStatusBlockEdit}
+                  statusBlockLabel={t('editStatusBlock')}
+                >
+                  <code className="language-status-block">{statusBlock}</code>
+                </CodeBlockWrapper>
+              </div>
+            ) : (
+              <div
+                onDoubleClick={handleStartStatusBlockEdit}
+                className="mt-2 rounded-md border border-border bg-code p-3 text-sm whitespace-pre-wrap break-words cursor-text"
+              >
+                {statusBlock}
+              </div>
+            ))}
         </div>
 
         {/* Footer */}

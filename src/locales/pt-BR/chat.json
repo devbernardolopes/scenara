@@ -35,6 +35,7 @@
   "deleteFromHere": "Excluir a partir daqui",
   "edit": "Editar",
   "copy": "Copiar",
+  "editStatusBlock": "Editar bloco de status",
   "fork": "Bifurcar",
   "forkConfirmTitle": "Bifurcar Conversa",
   "forkConfirmMessage": "Criar uma nova conversa a partir desta mensagem e todas as anteriores?",

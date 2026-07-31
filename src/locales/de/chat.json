@@ -35,6 +35,7 @@
   "deleteFromHere": "Ab hier löschen",
   "edit": "Bearbeiten",
   "copy": "Kopieren",
+  "editStatusBlock": "Statusblock bearbeiten",
   "fork": "Abzweigen",
   "forkConfirmTitle": "Unterhaltung verzweigen",
   "forkConfirmMessage": "Eine neue Unterhaltung aus dieser und allen vorherigen Nachrichten erstellen?",

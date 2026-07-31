@@ -35,6 +35,7 @@
   "deleteFromHere": "Delete From Here",
   "edit": "Edit",
   "copy": "Copy",
+  "editStatusBlock": "Edit Status Block",
   "fork": "Fork",
   "forkConfirmTitle": "Fork Thread",
   "forkConfirmMessage": "Create a new thread from this message and all previous messages?",
