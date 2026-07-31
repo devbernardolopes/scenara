@@ -1917,7 +1917,11 @@ function ChatView() {
       currentMsgs = withoutFailedMessages(currentMsgs)
 
       const lastMsgBefore = currentMsgs[currentMsgs.length - 1]
-      const beforeDate = lastMsgBefore?.createdAt ? new Date(lastMsgBefore.createdAt) : null
+      const beforeDate = lastMsgBefore?.createdAt
+        ? new Date(lastMsgBefore.createdAt)
+        : msg?.createdAt
+          ? new Date(msg.createdAt)
+          : null
 
       let chatPersona = null
       if (thread?.personaId) {
