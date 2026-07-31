@@ -1001,7 +1001,7 @@ function ChatView() {
           })
         }
       },
-      { root: container, threshold: 0.3 },
+      { root: container, threshold: 0 },
     )
     unreadObserverRef.current = observer
 
@@ -1137,6 +1137,16 @@ function ChatView() {
   function withoutFailedMessages(msgs) {
     const ids = failedIdsRef.current
     return ids.size > 0 ? msgs.filter((m) => !ids.has(m.id)) : msgs
+  }
+
+  function isMessageBubbleInView(messageId) {
+    const container = scrollRef.current
+    if (!container || messageId == null) return false
+    const el = container.querySelector(`[data-message-id="${messageId}"]`)
+    if (!el) return false
+    const containerRect = container.getBoundingClientRect()
+    const rect = el.getBoundingClientRect()
+    return rect.top < containerRect.bottom && rect.bottom > containerRect.top
   }
 
   async function doChatRequest(
@@ -1386,8 +1396,11 @@ function ChatView() {
     if (outcome === 'aborted') return
 
     try {
-      const away = isAwayFromThread(threadId) || !isAtBottomRef.current
-      if (away) {
+      const awayFromThread = isAwayFromThread(threadId)
+      const away = awayFromThread || !isAtBottomRef.current
+      const notifyVisible =
+        !awayFromThread && notifyMessageId != null && isMessageBubbleInView(notifyMessageId)
+      if (away && !notifyVisible) {
         await addUnread(threadId, notifyMessageId)
         if (Number(currentThreadIdRef.current) === Number(threadId)) {
           setMessages((prev) =>
