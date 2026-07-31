@@ -1324,6 +1324,9 @@ function ChatView() {
           createdAt: new Date().toISOString(),
           hidden: isOOC && character?.includeOOC === false,
           statusBlock,
+          statusBlockDirectorFailed: !isOOC
+            ? result.statusBlockDirectorFailed || undefined
+            : undefined,
         }
         const successBundleJson = JSON.stringify([successEntry])
         await updateMessage(assistantMsgId, {
@@ -2097,6 +2100,9 @@ function ChatView() {
           finalEntries[slotIndex].isError = false
           finalEntries[slotIndex].error = null
           finalEntries[slotIndex].statusBlock = statusBlock
+          finalEntries[slotIndex].statusBlockDirectorFailed = !isOOCRegen
+            ? result.statusBlockDirectorFailed || undefined
+            : undefined
         }
         await updateMessage(messageId, {
           bundleMessages: JSON.stringify(finalEntries),
@@ -2287,6 +2293,7 @@ function ChatView() {
       )
       if (currentEntries && slotIndex >= 0 && slotIndex < currentEntries.length) {
         currentEntries[slotIndex].statusBlock = nextStatusBlock
+        currentEntries[slotIndex].statusBlockDirectorFailed = false
         const nextBundleJson = JSON.stringify(currentEntries)
         await updateMessage(messageId, { bundleMessages: nextBundleJson })
         setMessages((prev) =>
@@ -2297,6 +2304,17 @@ function ChatView() {
       setThread((prev) => (prev ? { ...prev, statusBlock: nextStatusBlock } : prev))
       showToast(t('statusBlockDirectorRegenerated'), { type: 'success' })
     } else {
+      const currentEntries = parseBundleEntries(
+        messagesRef.current.find((m) => m.id === messageId)?.bundleMessages,
+      )
+      if (currentEntries && slotIndex >= 0 && slotIndex < currentEntries.length) {
+        currentEntries[slotIndex].statusBlockDirectorFailed = true
+        const nextBundleJson = JSON.stringify(currentEntries)
+        await updateMessage(messageId, { bundleMessages: nextBundleJson })
+        setMessages((prev) =>
+          prev.map((m) => (m.id === messageId ? { ...m, bundleMessages: nextBundleJson } : m)),
+        )
+      }
       showToast(t('statusBlockDirectorFailed'), { type: 'warning' })
     }
   }

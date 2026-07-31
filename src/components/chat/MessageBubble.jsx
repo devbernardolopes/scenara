@@ -343,6 +343,8 @@ function MessageBubble({
     !!character?.directorRegularChatStatusBlockInstructions?.trim() &&
     (statusBlockDisplay || '').trim().length > 0
 
+  const statusBlockDirectorFailed = activeEntry?.statusBlockDirectorFailed === true
+
   function isButtonDisabled(key) {
     if (streaming) return true
     if (key === 'visible' && isSlotError) return true
@@ -1053,6 +1055,7 @@ function MessageBubble({
                       : undefined
                   }
                   regenerateStatusBlockLabel={t('regenerateStatusBlock')}
+                  statusBlockDirectorFailed={statusBlockDirectorFailed}
                 >
                   <code className="language-status-block">{statusBlockDisplay}</code>
                 </CodeBlockWrapper>

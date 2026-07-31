@@ -320,6 +320,7 @@ export async function generateChatResponse({
 
   let directedStatusBlock = ''
   let statusBlockDirectorDurationMs = null
+  let statusBlockDirectorFailed = false
   if (!isOOC) {
     const sbResult = await runStatusBlockDirector({
       character,
@@ -334,9 +335,14 @@ export async function generateChatResponse({
       ctx,
     })
     if (sbResult?.status === 'success') {
-      directedStatusBlock = sbResult.content
-      statusBlockDirectorDurationMs = sbResult.apiDurationMs
+      if (sbResult.content?.trim()) {
+        directedStatusBlock = sbResult.content
+        statusBlockDirectorDurationMs = sbResult.apiDurationMs
+      } else {
+        statusBlockDirectorFailed = true
+      }
     } else if (sbResult?.status === 'error') {
+      statusBlockDirectorFailed = true
       showToast(i18n.t('chat:statusBlockDirectorFailed'), { type: 'warning' })
     }
   }
@@ -350,6 +356,7 @@ export async function generateChatResponse({
     directorReviewed,
     statusBlock: directedStatusBlock.trim() ? directedStatusBlock : undefined,
     statusBlockDirectorDurationMs,
+    statusBlockDirectorFailed,
     error: null,
   }
 }

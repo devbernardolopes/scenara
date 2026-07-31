@@ -24,6 +24,7 @@ function CodeBlockWrapperBase({
   statusBlockLabel,
   onRegenerateStatusBlock,
   regenerateStatusBlockLabel,
+  statusBlockDirectorFailed,
 }) {
   return (
     <div className="relative group flow-root">
@@ -59,7 +60,11 @@ function CodeBlockWrapperBase({
         {isStatusBlock && onRegenerateStatusBlock && (
           <button
             onClick={onRegenerateStatusBlock}
-            className="p-1.5 rounded bg-delete-always text-on-delete-always hover:bg-delete-always-hover border border-border transition-all active:scale-95 focus:opacity-100"
+            className={`p-1.5 rounded border border-border transition-all active:scale-95 focus:opacity-100 ${
+              statusBlockDirectorFailed
+                ? 'bg-delete-always text-on-delete-always hover:bg-delete-always-hover'
+                : 'bg-surface/90 hover:bg-surface text-tertiary hover:text-text'
+            }`}
             title={regenerateStatusBlockLabel || 'Regenerate Status Block'}
             aria-label={regenerateStatusBlockLabel || 'Regenerate Status Block'}
           >
