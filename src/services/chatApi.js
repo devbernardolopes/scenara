@@ -72,6 +72,26 @@ export function replacePersonaTemplate(
     .replace(/{{personas_history}}/gi, personasHistory)
 }
 
+// Builds the {{personas_history}} block: the persona that started the chat
+// (chatPersona, from thread.personaId) always participates, even before it has
+// sent any messages — so the token resolves on the very first message and on
+// regeneration of it. Message-derived personas are appended and deduped by id.
+export function buildPersonasHistory(messages, { chatPersona, personaMap } = {}) {
+  const seen = new Set()
+  const entries = []
+  const push = (p) => {
+    if (!p) return
+    if (p.id != null && seen.has(p.id)) return
+    if (p.id != null) seen.add(p.id)
+    entries.push(p.description ? `- ${p.name}: ${p.description}` : `- ${p.name}`)
+  }
+  push(chatPersona)
+  for (const m of messages || []) {
+    push(m?.personaId ? personaMap?.[m.personaId] : null)
+  }
+  return entries.length > 0 ? `Personas in this conversation:\n${entries.join('\n')}` : ''
+}
+
 // Strips the configured OOC delimiters from message content when the
 // "Use OOC Delimiters" setting is enabled and at least one delimiter value is
 // non-empty. Removes a leading prefix and/or trailing suffix only when they
@@ -298,17 +318,7 @@ export async function buildMessagesPayload({
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
 
   const usedPersonaIds = [...new Set(messages.map((m) => m.personaId).filter(Boolean))]
-  const personaHistoryEntries = usedPersonaIds
-    .map((id) => personaMap?.[id])
-    .filter(Boolean)
-    .map((p) => {
-      const base = `- ${p.name}`
-      return p.description ? `${base}: ${p.description}` : base
-    })
-  const personasHistory =
-    personaHistoryEntries.length > 0
-      ? `Personas in this conversation:\n${personaHistoryEntries.join('\n')}`
-      : ''
+  const personasHistory = buildPersonasHistory(messages, { chatPersona, personaMap })
 
   const replaceVarsWithDesc = (text) =>
     replacePersonaTemplate(text, {
@@ -686,6 +696,8 @@ export async function buildOOCMessagesPayload({
   const defaultPersonaId = await getSetting('defaultPersonaId')
   const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
 
+  const personasHistory = buildPersonasHistory(messages, { chatPersona, personaMap })
+
   const replaceVarsWithDesc = (text) =>
     replacePersonaTemplate(text, {
       charName,
@@ -694,6 +706,7 @@ export async function buildOOCMessagesPayload({
       currentPersona,
       chatPersona,
       defaultPersona,
+      personasHistory,
     })
 
   const systemParts = []
@@ -727,7 +740,10 @@ export async function buildOOCMessagesPayload({
   }
 
   if (oocSystemInstr) {
-    const sys = replaceVarsIn(oocSystemInstr).replace(/{{status_block}}/gi, statusBlockResolved)
+    const sys = replaceVarsWithDesc(oocSystemInstr).replace(
+      /{{status_block}}/gi,
+      statusBlockResolved,
+    )
     systemParts.push(
       systemHasTranscript ? sys.replace(/{{transcript}}/gi, transcriptWithVars) : sys,
     )
@@ -791,7 +807,10 @@ export async function buildOOCMessagesPayload({
 
   if (userMessage) {
     if (oocUserInstr) {
-      const base = replaceVarsIn(oocUserInstr).replace(/{{status_block}}/gi, statusBlockResolved)
+      const base = replaceVarsWithDesc(oocUserInstr).replace(
+        /{{status_block}}/gi,
+        statusBlockResolved,
+      )
       const userHasTranscript = oocUserInstr.includes('{{transcript}}')
       let content = userHasTranscript ? base.replace(/{{transcript}}/gi, transcriptWithVars) : base
       if (content.includes('{{content}}')) {

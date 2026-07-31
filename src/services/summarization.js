@@ -3,6 +3,7 @@ import { getMessagesByThread, updateMessage, deleteMessage } from './messages'
 import { updateThread } from './threads'
 import {
   buildTranscript,
+  buildPersonasHistory,
   replaceVars,
   replacePersonaTemplate,
   sendChatCompletion,
@@ -114,6 +115,8 @@ export async function buildSummarizationPayload({
 
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
 
+  const personasHistory = buildPersonasHistory(processedMessages, { chatPersona, personaMap })
+
   const replaceVarsWithDesc = (text) =>
     replacePersonaTemplate(text, {
       charName,
@@ -122,6 +125,7 @@ export async function buildSummarizationPayload({
       currentPersona,
       chatPersona,
       defaultPersona,
+      personasHistory,
     })
 
   const userPersonaPrefixOverride = character?.userPersonaPrefix !== false
@@ -137,7 +141,6 @@ export async function buildSummarizationPayload({
     replaceVarsWithDesc,
   })
 
-  const personasHistory = ''
   let personaEndSystemPrompt = ''
   let personaEndCharacterPrompt = ''
   const personaTiming =
