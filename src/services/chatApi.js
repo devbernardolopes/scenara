@@ -346,6 +346,20 @@ export async function buildMessagesPayload({
     systemParts.push(loreBlocks.beforeChar)
   }
 
+  const personaTiming = character?.personaInjectionTiming || settings.personaInjectionTiming
+  const personaPlacement =
+    character?.personaInjectionPlacement || settings.personaInjectionPlacement
+  const rawPersonaTemplate = settings.personaInjectionTemplate
+  const personaTemplate = replaceVarsWithDesc(rawPersonaTemplate)
+
+  if (personaTiming !== 'never' && personaTemplate && personaPlacement === 'endOfSystemPrompt') {
+    let injected = personaTemplate
+    if (usedPersonaIds.length > 1 && !rawPersonaTemplate.includes('{{personas_history}}')) {
+      injected += '\n\n' + personasHistory
+    }
+    systemParts.push(injected)
+  }
+
   const promptBlock = buildCharacterPromptBlock(character, {
     isFirstMessage,
     lastSummarizationAt,
@@ -356,21 +370,16 @@ export async function buildMessagesPayload({
     systemParts.push(promptBlock)
   }
 
-  if (loreBlocks.afterChar) {
-    systemParts.push(loreBlocks.afterChar)
-  }
-
-  const personaTiming = character?.personaInjectionTiming || settings.personaInjectionTiming
-  const personaPlacement =
-    character?.personaInjectionPlacement || settings.personaInjectionPlacement
-  const rawPersonaTemplate = settings.personaInjectionTemplate
-  const personaTemplate = replaceVarsWithDesc(rawPersonaTemplate)
-  if (personaTiming !== 'never' && personaTemplate && personaPlacement === 'endOfSystemPrompt') {
+  if (personaTiming !== 'never' && personaTemplate && personaPlacement === 'endOfCharacterPrompt') {
     let injected = personaTemplate
     if (usedPersonaIds.length > 1 && !rawPersonaTemplate.includes('{{personas_history}}')) {
       injected += '\n\n' + personasHistory
     }
     systemParts.push(injected)
+  }
+
+  if (loreBlocks.afterChar) {
+    systemParts.push(loreBlocks.afterChar)
   }
 
   const writingTiming = character?.writingInjectionTiming || settings.writingInjectionTiming

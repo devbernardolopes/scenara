@@ -147,6 +147,7 @@
   },
   "personaInjectionPlacementOptions": {
     "endOfSystemPrompt": "Ende des System-Prompts",
+    "endOfCharacterPrompt": "Ende des Charakter-Prompts",
     "endOfMessages": "Ende der Nachrichten"
   },
   "personaInjectionMessageRoleOptions": {

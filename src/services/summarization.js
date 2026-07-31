@@ -137,23 +137,30 @@ export async function buildSummarizationPayload({
     replaceVarsWithDesc,
   })
 
-  // Resolve persona injection for summarization when configured for end-of-system-prompt placement.
-  let personaInjection = ''
+  const personasHistory = ''
+  let personaEndSystemPrompt = ''
+  let personaEndCharacterPrompt = ''
   const personaTiming =
     character?.personaInjectionTiming || (await getSetting('prompting.personaInjectionTiming'))
   const personaPlacement =
     character?.personaInjectionPlacement ||
     (await getSetting('prompting.personaInjectionPlacement'))
   const personaTemplate = await getSetting('prompting.personaInjectionTemplate')
-  if (personaTiming === 'always' && personaTemplate && personaPlacement === 'endOfSystemPrompt') {
-    personaInjection = replacePersonaTemplate(personaTemplate, {
+  if (personaTiming === 'always' && personaTemplate) {
+    let injected = replacePersonaTemplate(personaTemplate, {
       charName,
       personaName,
       currentPersonaName,
       currentPersona,
       chatPersona,
       defaultPersona,
+      personasHistory,
     })
+    if (personaPlacement === 'endOfSystemPrompt') {
+      personaEndSystemPrompt = injected
+    } else if (personaPlacement === 'endOfCharacterPrompt') {
+      personaEndCharacterPrompt = injected
+    }
   }
 
   let systemContent = character?.summarizationSystemInstructions
@@ -217,7 +224,7 @@ export async function buildSummarizationPayload({
     if (resolvedGlobalContext) combined = `${combined}\n\n${resolvedGlobalContext}`
     if (resolvedScenario) combined = `${combined}\n\n${resolvedScenario}`
 
-    if (personaInjection) combined = `${combined}\n\n${personaInjection}`
+    if (personaEndCharacterPrompt) combined = `${combined}\n\n${personaEndCharacterPrompt}`
     charPromptSection = charPromptHeader.value
       ? `${replaceVarsWithDesc(charPromptHeader.value)}${charPromptHeader.enabled ? '\n\n' : '\n'}${combined}`
       : combined
@@ -239,6 +246,10 @@ export async function buildSummarizationPayload({
       .replace(/{{status_block}}/gi, statusBlockSection)
 
   systemContent = replaceTemplates(systemContent)
+
+  if (personaEndSystemPrompt) {
+    systemContent = `${systemContent}\n\n${personaEndSystemPrompt}`
+  }
 
   const payload = [{ role: 'system', content: systemContent }]
   if (userContent) {

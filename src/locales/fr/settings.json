@@ -1054,6 +1054,7 @@
     },
     "personaInjectionPlacementOptions": {
       "endOfSystemPrompt": "Fin du prompt SYSTEM",
+      "endOfCharacterPrompt": "Fin du prompt du personnage",
       "endOfMessages": "Fin des messages"
     },
     "personaInjectionMessageRole": {

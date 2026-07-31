@@ -131,6 +131,7 @@
   },
   "personaInjectionPlacementOptions": {
     "endOfSystemPrompt": "Final do Prompt SYSTEM",
+    "endOfCharacterPrompt": "Final do Prompt do Personagem",
     "endOfMessages": "Final das Mensagens"
   },
   "personaInjectionMessageRoleOptions": {

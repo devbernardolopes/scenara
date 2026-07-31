@@ -1339,12 +1339,14 @@ export const SETTINGS = [
     category: 'defaults',
     type: 'select',
     default: 'endOfSystemPrompt',
-    options: ['endOfSystemPrompt', 'endOfMessages'],
+    options: ['endOfSystemPrompt', 'endOfCharacterPrompt', 'endOfMessages'],
     dependsOn: { key: 'prompting.personaInjectionTiming', value: 'always' },
     labelKey: 'settings:defaults.personaInjectionPlacement.label',
     descKey: 'settings:defaults.personaInjectionPlacement.desc',
     optionLabels: {
       endOfSystemPrompt: 'settings:defaults.personaInjectionPlacementOptions.endOfSystemPrompt',
+      endOfCharacterPrompt:
+        'settings:defaults.personaInjectionPlacementOptions.endOfCharacterPrompt',
       endOfMessages: 'settings:defaults.personaInjectionPlacementOptions.endOfMessages',
     },
   },

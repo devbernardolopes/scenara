@@ -44,6 +44,7 @@ const PERSONA_INJECTION_OPTION_LABELS = {
 
 const PERSONA_PLACEMENT_OPTION_LABELS = {
   endOfSystemPrompt: 'settings:defaults.personaInjectionPlacementOptions.endOfSystemPrompt',
+  endOfCharacterPrompt: 'settings:defaults.personaInjectionPlacementOptions.endOfCharacterPrompt',
   endOfMessages: 'settings:defaults.personaInjectionPlacementOptions.endOfMessages',
 }
 
@@ -446,7 +447,7 @@ function OverridesSection({ form, onChange, characterId }) {
           <span className="text-sm text-text">{t('personaInjectionPlacement')}</span>
           <SettingSelect
             value={form.personaInjectionPlacement}
-            options={['endOfSystemPrompt', 'endOfMessages']}
+            options={['endOfSystemPrompt', 'endOfCharacterPrompt', 'endOfMessages']}
             optionLabels={PERSONA_PLACEMENT_OPTION_LABELS}
             onChange={(v) => onChange('personaInjectionPlacement', v)}
             disabled={form.personaInjectionTiming === 'never'}
