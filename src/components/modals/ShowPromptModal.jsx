@@ -49,6 +49,8 @@ function ShowPromptModal({
   msgNumbers,
   messageFlags,
   directorReviewed,
+  loreActivated,
+  lorebooks,
   modalTitle,
 }) {
   const { t } = useTranslation('chat')
@@ -96,6 +98,32 @@ function ShowPromptModal({
               >
                 DIR
               </span>
+            </div>
+          )}
+          {loreActivated != null && (
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 text-text">
+                <span className="font-medium">{t('loreSection.title')}:</span>
+                {loreActivated.length === 0 && lorebooks?.length === 0 && (
+                  <span className="text-secondary">{t('loreSection.noLorebooks')}</span>
+                )}
+                {loreActivated.length === 0 && lorebooks?.length > 0 && (
+                  <span className="text-secondary">{t('loreSection.none')}</span>
+                )}
+              </div>
+              {loreActivated.length > 0 && (
+                <ul className="text-xs text-secondary space-y-1">
+                  {loreActivated.map((item, i) => (
+                    <li key={i}>
+                      {t('loreSection.entry', {
+                        entry: item.entry,
+                        lorebook: item.lorebook,
+                        position: item.position,
+                      })}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
         </div>

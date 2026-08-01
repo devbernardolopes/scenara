@@ -109,6 +109,12 @@
   "totalTokens": "Total des jetons",
   "model": "Modèle",
   "parameters": "Paramètres",
+  "loreSection": {
+    "title": "Lore",
+    "none": "Aucune entrée de lorebook activée",
+    "noLorebooks": "Aucun lorebook n'est lié à ce personnage ou défini comme global",
+    "entry": "{{entry}} · {{lorebook}} · {{position}}"
+  },
   "statusBar": {
     "editProfile": "Modifier le profil de connexion"
   },

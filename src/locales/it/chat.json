@@ -109,6 +109,12 @@
   "totalTokens": "Token totali",
   "model": "Modello",
   "parameters": "Parametri",
+  "loreSection": {
+    "title": "Lore",
+    "none": "Nessuna voce di lorebook attivata",
+    "noLorebooks": "Nessun lorebook è collegato a questo personaggio o impostato come globale",
+    "entry": "{{entry}} · {{lorebook}} · {{position}}"
+  },
   "statusBar": {
     "editProfile": "Modifica profilo di connessione"
   },

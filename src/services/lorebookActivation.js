@@ -168,11 +168,14 @@ export async function getActiveLoreBlocks({ character, messages }) {
       beforePrompt: '',
       afterPrompt: '',
       atDepth: new Map(),
+      lorebooks: [],
+      activated: [],
     }
   }
 
   const rollCache = new Map()
   const allActivated = []
+  const activatedMeta = []
 
   for (const lorebook of lorebooks) {
     const entries = await getEntriesForLorebook(lorebook.id)
@@ -181,10 +184,23 @@ export async function getActiveLoreBlocks({ character, messages }) {
     const activated = await activateEntries(lorebook, entries, buffer, character, rollCache)
     const trimmed = trimToTokenBudget(activated, lorebook.tokenBudget)
     allActivated.push(...trimmed)
+    for (const entry of trimmed) {
+      const position =
+        entry.position === 'at_depth'
+          ? `at_depth:${entry.depth ?? 0}`
+          : resolvePosition(entry.position)
+      activatedMeta.push({
+        lorebook: lorebook.name || '',
+        entry: entry.name || entry.keys?.[0] || `#${entry.id}`,
+        position,
+      })
+    }
   }
 
   const blocks = groupByPosition(allActivated)
   blocks.atDepth = joinAtDepth(blocks.atDepth)
+  blocks.lorebooks = lorebooks.map((lb) => lb.name || '')
+  blocks.activated = activatedMeta
 
   return blocks
 }

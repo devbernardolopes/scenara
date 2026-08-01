@@ -61,7 +61,7 @@ export function mapEntryFromST(entry) {
     insertionOrder: entry.insertion_order ?? entry.order ?? 100,
     depth: entry.depth ?? entry.extensions?.depth ?? null,
     probability,
-    caseSensitive: Boolean(entry.case_sensitive),
+    caseSensitive: false,
     excludeRecursion: Boolean(entry.excludeRecursion ?? entry.extensions?.excludeRecursion),
     characterFilter: charFilter,
     sourceMeta: entry.extensions?.chub

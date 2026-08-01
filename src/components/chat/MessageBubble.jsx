@@ -533,6 +533,8 @@ function MessageBubble({
       msgNumbers: slotPromptData.msgNumbers || null,
       messageFlags: slotPromptData.messageFlags || null,
       directorReviewed: slotPromptData.directorReviewed || false,
+      loreActivated: slotPromptData.loreActivated || null,
+      lorebooks: slotPromptData.lorebooks || null,
     })
   }
 

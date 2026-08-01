@@ -109,18 +109,19 @@ export async function generateChatResponse({
   const personaName = chatPersona?.name || currentPersona?.name || ''
   const assistantSpeaker = character?.speakerName || charName
 
-  const { payload, entryTypes, msgNumbers } = await buildChatRequestPayload({
-    character,
-    chatPersona,
-    currentPersona,
-    messages: currentMsgs,
-    isFirstMessage,
-    isThreadStart,
-    isOOC,
-    threadId,
-    personaMap,
-    beforeDate,
-  })
+  const { payload, entryTypes, msgNumbers, loreActivated, lorebooks } =
+    await buildChatRequestPayload({
+      character,
+      chatPersona,
+      currentPersona,
+      messages: currentMsgs,
+      isFirstMessage,
+      isThreadStart,
+      isOOC,
+      threadId,
+      personaMap,
+      beforeDate,
+    })
 
   const payloadStatusBlock = getEffectiveStatusBlock(
     character,
@@ -153,6 +154,8 @@ export async function generateChatResponse({
     directorResponse,
     directorResponseData,
     directorFailed,
+    loreActivated: loreActivated || [],
+    lorebooks: lorebooks || [],
   })
 
   const sendResult = await sendChatCompletion({

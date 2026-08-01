@@ -479,7 +479,7 @@ export async function buildMessagesPayload({
     }
   }
 
-  if (!isFirstMessage && loreBlocks.atDepth instanceof Map && loreBlocks.atDepth.size > 0) {
+  if (loreBlocks.atDepth instanceof Map && loreBlocks.atDepth.size > 0) {
     const depths = [...loreBlocks.atDepth.keys()].sort((a, b) => b - a)
     for (const depth of depths) {
       const text = loreBlocks.atDepth.get(depth)
@@ -1044,7 +1044,13 @@ export async function buildChatRequestPayload({
 
   const msgNumbers = buildMsgNumbersArray(isFirstMessage, apiMessages, messages, payload)
 
-  return { payload, entryTypes, msgNumbers }
+  return {
+    payload,
+    entryTypes,
+    msgNumbers,
+    loreActivated: loreBlocks.activated || [],
+    lorebooks: loreBlocks.lorebooks || [],
+  }
 }
 
 export async function sendChatCompletion({
