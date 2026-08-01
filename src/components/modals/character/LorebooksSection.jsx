@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useModal } from '../../../hooks/useModal'
 import { getAllLorebooks } from '../../../services/lorebooks'
 import { getUIState, setUIState } from '../../../services/uiState'
 import CollapsibleSection from '../../shared/CollapsibleSection'
@@ -10,6 +11,7 @@ const SORT_OPTIONS = ['name', 'createdAt']
 function LorebooksSection({ form, onChange }) {
   const { t } = useTranslation('characterCreation')
   const { t: tc } = useTranslation('common')
+  const { openModal } = useModal()
   const [allLorebooks, setAllLorebooks] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('name')
@@ -97,7 +99,14 @@ function LorebooksSection({ form, onChange }) {
               key={lb.id}
               className="inline-flex items-center gap-1 pl-3 pr-0.5 h-11 rounded-full border border-primary bg-primary-subtle text-primary text-sm"
             >
-              <span className="truncate max-w-[160px]">{lb.name}</span>
+              <button
+                type="button"
+                onClick={() => openModal('lorebookForm', { lorebook: lb })}
+                className="truncate max-w-[160px] text-left outline-none"
+                aria-label={t('lorebooksSectionOpenLorebook', { name: lb.name })}
+              >
+                {lb.name}
+              </button>
               <button
                 type="button"
                 onClick={() => removeLorebookById(lb.id)}
