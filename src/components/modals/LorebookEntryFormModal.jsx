@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
+import { useModalScrollPosition } from '../../hooks/useModalScrollPosition'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
@@ -118,6 +119,7 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
   const { closeModal, setCloseGuard } = useModal()
   const { promptSave } = useSaveConfirm()
   const editing = Boolean(entry)
+  const { scrollRef, onScroll } = useModalScrollPosition(`lorebookEntryForm.${entry?.id ?? 'new'}`)
 
   const initial = useMemo(
     () => ({
@@ -247,6 +249,8 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
     <ModalShell
       title={editing ? t('lorebook.entry.form.editTitle') : t('lorebook.entry.form.title')}
       onClose={isDirty ? handleCloseAttempt : closeModal}
+      scrollRef={scrollRef}
+      onScroll={onScroll}
       footer={
         <>
           <button
@@ -292,7 +296,7 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
         <CollapsibleSection
           label={t('lorebook.entry.form.content')}
           summary={form.content ? t('common:tokenCount', { count: contentTokenCount }) : null}
-          storageKey="lorebookEntryContent"
+          storageKey={`lorebookEntryForm.${entry?.id ?? 'new'}.content`}
           defaultExpanded={true}
         >
           <AutoResizeTextarea
@@ -317,7 +321,7 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
 
         <CollapsibleSection
           label={t('lorebook.entry.form.advanced')}
-          storageKey="lorebookEntryAdvanced"
+          storageKey={`lorebookEntryForm.${entry?.id ?? 'new'}.advanced`}
           defaultExpanded={false}
         >
           <div className="pt-2 space-y-4">
@@ -431,7 +435,7 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
 
         <CollapsibleSection
           label={t('lorebook.entry.form.characterFilter')}
-          storageKey="lorebookEntryCharacterFilter"
+          storageKey={`lorebookEntryForm.${entry?.id ?? 'new'}.characterFilter`}
           defaultExpanded={false}
         >
           <div className="pt-2 space-y-4">

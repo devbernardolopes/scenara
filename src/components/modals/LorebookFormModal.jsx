@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
+import { useModalScrollPosition } from '../../hooks/useModalScrollPosition'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
@@ -66,6 +67,7 @@ function LorebookFormModal({ lorebook }) {
   const { promptSave } = useSaveConfirm()
   const editing = Boolean(lorebook)
   const lorebookId = lorebook?.id || null
+  const { scrollRef, onScroll } = useModalScrollPosition(`lorebookForm.${lorebookId ?? 'new'}`)
 
   const initial = useMemo(
     () => ({
@@ -265,6 +267,8 @@ function LorebookFormModal({ lorebook }) {
     <ModalShell
       title={editing ? t('lorebook.form.editTitle') : t('lorebook.form.title')}
       onClose={isDirty ? handleCloseAttempt : closeModal}
+      scrollRef={scrollRef}
+      onScroll={onScroll}
       footer={
         <>
           <button
@@ -387,7 +391,7 @@ function LorebookFormModal({ lorebook }) {
               ? t('common:tokenCount', { count: estimateTokens(form.description) })
               : null
           }
-          storageKey="lorebookFormDescription"
+          storageKey={`lorebookForm.${lorebookId ?? 'new'}.description`}
           defaultExpanded={true}
         >
           <AutoResizeTextarea
@@ -401,7 +405,7 @@ function LorebookFormModal({ lorebook }) {
 
         <CollapsibleSection
           label={t('lorebook.form.globalSettings')}
-          storageKey="lorebookFormGlobalSettings"
+          storageKey={`lorebookForm.${lorebookId ?? 'new'}.globalSettings`}
           defaultExpanded={false}
         >
           <div className="pt-2 space-y-4">

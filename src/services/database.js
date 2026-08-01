@@ -100,6 +100,13 @@ export async function exportDatabase(selection) {
     data.scrollPositions = Object.fromEntries(scrollEntries.map((e) => [e.key.slice(7), e.value]))
   }
 
+  const collapsedEntries = await db.uiState.where('key').startsWith('collapsed.').toArray()
+  if (collapsedEntries.length > 0) {
+    data.collapsed = Object.fromEntries(
+      collapsedEntries.map((e) => [e.key.slice('collapsed.'.length), e.value]),
+    )
+  }
+
   const lastThreadId = await getUIState('lastThreadId')
   if (lastThreadId != null) {
     data.lastThreadId = lastThreadId
@@ -331,6 +338,13 @@ export async function importDatabase(data) {
       await db.uiState.where('key').startsWith('scroll.').delete()
       for (const [subKey, value] of Object.entries(data.scrollPositions)) {
         await db.uiState.add({ key: `scroll.${subKey}`, value })
+      }
+    }
+
+    if (data.collapsed && typeof data.collapsed === 'object') {
+      await db.uiState.where('key').startsWith('collapsed.').delete()
+      for (const [subKey, value] of Object.entries(data.collapsed)) {
+        await db.uiState.add({ key: `collapsed.${subKey}`, value })
       }
     }
 
