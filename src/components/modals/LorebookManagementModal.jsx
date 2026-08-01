@@ -29,7 +29,7 @@ function LorebookManagementModal() {
     formModal: 'lorebookForm',
     formProp: 'lorebook',
     getTitle: (l) => l.name,
-    getSubtitle: (l) => l.description || null,
+    getDescription: (l) => l.description || null,
     getBadges: (l) =>
       l.isGlobal ? (
         <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-primary-subtle text-primary">
