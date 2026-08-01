@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo, createPortal } from 'react'
 import { useOverflowButtons } from '../../hooks/useOverflowButtons'
 import { useSwipe } from '../../hooks/useSwipe'
 import { useIsMobile } from '../../hooks/useIsMobile'
@@ -932,7 +932,7 @@ function ChatInputArea({
                               window.innerWidth - rect.right,
                               window.innerWidth - menuMinWidth - 4,
                             ),
-                            zIndex: 9999,
+                            zIndex: 99999,
                           })
                         }
                         setOverflowOpen((prev) => !prev)
@@ -951,73 +951,74 @@ function ChatInputArea({
                         )}
                       </span>
                     </button>
-                    {overflowOpen && (
-                      <div
-                        ref={quickPanelRef}
-                        style={overflowMenuStyle}
-                        className="bg-glass border-glass rounded-lg shadow-surface-lg py-1 min-w-[220px] max-h-[60vh] overflow-y-auto"
-                      >
-                        <p className="px-3 py-1.5 text-xs font-medium text-tertiary uppercase tracking-wider">
-                          {t('moreOptions')}
-                        </p>
-                        {overflowKeys.map((key, idx) => {
-                          const def = CHAT_BUTTON_DEFS[key]
-                          if (!def) return null
-                          const Icon = def.icon
-                          const isToggleable = TOGGLEABLE_CHAT_BUTTONS.has(key)
-                          const isToggled = getToggleState(key)
-                          const prevGroup =
-                            idx > 0 ? CHAT_BUTTON_GROUP[overflowKeys[idx - 1]] : null
-                          const group = CHAT_BUTTON_GROUP[key]
-                          const groupStart = idx > 0 && group && group !== prevGroup
-                          const separatorClass = groupStart
-                            ? 'mt-1 pt-1 border-t border-border'
-                            : ''
-                          return (
-                            <button
-                              key={key}
-                              type="button"
-                              data-shortcuts-toggle={key === 'shortcuts' ? '' : undefined}
-                              onClick={() => {
-                                if (key === 'memories') {
-                                  openModal('memory', { threadId })
+                    {overflowOpen &&
+                      createPortal(
+                        <div
+                          ref={quickPanelRef}
+                          style={overflowMenuStyle}
+                          className="bg-glass border-glass rounded-lg shadow-surface-lg py-1 min-w-[220px] max-h-[60vh] overflow-y-auto"
+                        >
+                          <p className="px-3 py-1.5 text-xs font-medium text-tertiary uppercase tracking-wider">
+                            {t('moreOptions')}
+                          </p>
+                          {overflowKeys.map((key, idx) => {
+                            const def = CHAT_BUTTON_DEFS[key]
+                            if (!def) return null
+                            const Icon = def.icon
+                            const isToggleable = TOGGLEABLE_CHAT_BUTTONS.has(key)
+                            const isToggled = getToggleState(key)
+                            const prevGroup =
+                              idx > 0 ? CHAT_BUTTON_GROUP[overflowKeys[idx - 1]] : null
+                            const group = CHAT_BUTTON_GROUP[key]
+                            const groupStart = idx > 0 && group && group !== prevGroup
+                            const separatorClass = groupStart
+                              ? 'mt-1 pt-1 border-t border-border'
+                              : ''
+                            return (
+                              <button
+                                key={key}
+                                type="button"
+                                data-shortcuts-toggle={key === 'shortcuts' ? '' : undefined}
+                                onClick={() => {
+                                  if (key === 'memories') {
+                                    openModal('memory', { threadId })
+                                  } else {
+                                    toggleButton(key)
+                                  }
                                   setOverflowOpen(false)
-                                } else {
-                                  toggleButton(key)
-                                  if (!isToggleable && key !== 'stt') setOverflowOpen(false)
-                                }
-                              }}
-                              className={`w-full flex items-center justify-between px-3 py-2 text-sm min-h-[44px] ${
-                                isToggleable && isToggled
-                                  ? 'btn-primary'
-                                  : 'text-text hover:bg-surface-hover'
-                              } ${separatorClass}`}
-                            >
-                              <span className="flex items-center gap-2">
-                                <Icon className="w-4 h-4" />
-                                <span>{t(def.labelKey)}</span>
-                                {key === 'memories' && unreadMemoryCount > 0 && (
-                                  <span className="inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-badge-unread-text bg-badge-unread rounded-full leading-none">
-                                    {unreadMemoryCount > 9 ? '9+' : unreadMemoryCount}
-                                  </span>
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-sm min-h-[44px] ${
+                                  isToggleable && isToggled
+                                    ? 'btn-primary'
+                                    : 'text-text hover:bg-surface-hover'
+                                } ${separatorClass}`}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <Icon className="w-4 h-4" />
+                                  <span>{t(def.labelKey)}</span>
+                                  {key === 'memories' && unreadMemoryCount > 0 && (
+                                    <span className="inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-badge-unread-text bg-badge-unread rounded-full leading-none">
+                                      {unreadMemoryCount > 9 ? '9+' : unreadMemoryCount}
+                                    </span>
+                                  )}
+                                </span>
+                                {isToggleable && (
+                                  <div
+                                    className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
+                                      isToggled
+                                        ? 'bg-primary text-on-primary'
+                                        : 'bg-surface-secondary border border-border'
+                                    }`}
+                                  >
+                                    {isToggled && <Check className="w-3 h-3" />}
+                                  </div>
                                 )}
-                              </span>
-                              {isToggleable && (
-                                <div
-                                  className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
-                                    isToggled
-                                      ? 'bg-primary text-on-primary'
-                                      : 'bg-surface-secondary border border-border'
-                                  }`}
-                                >
-                                  {isToggled && <Check className="w-3 h-3" />}
-                                </div>
-                              )}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    )}
+                              </button>
+                            )
+                          })}
+                        </div>,
+                        document.body,
+                      )}
                   </div>
                 )}
               </div>

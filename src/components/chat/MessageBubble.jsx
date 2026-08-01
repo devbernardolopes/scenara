@@ -610,7 +610,7 @@ function MessageBubble({
         position: 'fixed',
         top: rect.top - 4,
         right: Math.min(window.innerWidth - rect.right, window.innerWidth - menuMinWidth - 4),
-        zIndex: 9999,
+        zIndex: 99999,
       })
     }
     setOverflowOpen((prev) => !prev)
@@ -890,12 +890,8 @@ function MessageBubble({
                                   key={key}
                                   type="button"
                                   onClick={() => {
-                                    if (!isToggle && key !== 'speak') {
-                                      getButtonHandler(key)()
-                                      setOverflowOpen(false)
-                                    } else {
-                                      getButtonHandler(key)()
-                                    }
+                                    getButtonHandler(key)()
+                                    setOverflowOpen(false)
                                   }}
                                   disabled={
                                     (key === 'prompt' && !slotPromptData) || isButtonDisabled(key)
