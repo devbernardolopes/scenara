@@ -1411,7 +1411,9 @@
     "confirmDelete": {
       "title": "Delete Lorebook",
       "message": "Are you sure you want to delete \"{{name}}\"?",
-      "messageMultiple": "Are you sure you want to delete {{count}} lorebooks?"
+      "messageMultiple": "Are you sure you want to delete {{count}} lorebooks?",
+      "linkedCharacters": "Dieses Lorebook wird von {{count}} Charakter verwendet:",
+      "linkedCharacters_other": "Dieses Lorebook wird von {{count}} Charakteren verwendet:"
     },
     "globalBadge": "Global",
     "form": {
