@@ -1021,8 +1021,8 @@
   },
   "samplingProfile": {
     "title": "Sampling Profiles",
-    "create": "Create Sampling Profile",
-    "import": "Import",
+    "createSamplingProfile": "Create Sampling Profile",
+    "importSamplingProfile": "Import",
     "noItems": "No sampling profiles yet. Create one to save a set of sampling parameters you can apply to any profile.",
     "paramCount": "{{count}} parameter",
     "paramCount_other": "{{count}} parameters",
@@ -1066,8 +1066,8 @@
   },
   "stopSequence": {
     "title": "Stop Sequence Sets",
-    "create": "Create Stop Sequence Set",
-    "import": "Import",
+    "createStopSequence": "Create Stop Sequence Set",
+    "importStopSequence": "Import",
     "noItems": "No stop sequence sets yet. Create one to save a set of stop strings you can apply to any profile.",
     "sequenceCount": "{{count}} stop sequence",
     "sequenceCount_other": "{{count}} stop sequences",

@@ -20,6 +20,8 @@ function StopSequenceManagementModal() {
 
   const config = {
     entityKey: 'stopSequence',
+    createLabelKey: 'stopSequence.createStopSequence',
+    importLabelKey: 'stopSequence.importStopSequence',
     changeEvent: 'stopSequences-changed',
     showImage: false,
     icon: Tags,

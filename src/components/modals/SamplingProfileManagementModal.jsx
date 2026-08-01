@@ -20,6 +20,8 @@ function SamplingProfileManagementModal() {
 
   const config = {
     entityKey: 'samplingProfile',
+    createLabelKey: 'samplingProfile.createSamplingProfile',
+    importLabelKey: 'samplingProfile.importSamplingProfile',
     changeEvent: 'samplingProfiles-changed',
     showImage: false,
     icon: SlidersHorizontal,
