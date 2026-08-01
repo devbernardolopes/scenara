@@ -179,7 +179,7 @@ function joinAtDepth(atDepthMap) {
   return result
 }
 
-export async function getActiveLoreBlocks({ character, messages }) {
+export async function getActiveLoreBlocks({ character, messages, scanMessages }) {
   const lorebooks = await getActiveLorebooksForCharacter(character)
   if (lorebooks.length === 0) {
     return {
@@ -201,7 +201,7 @@ export async function getActiveLoreBlocks({ character, messages }) {
   for (const lorebook of lorebooks) {
     const entries = await getEntriesForLorebook(lorebook.id)
     if (!entries.length) continue
-    const buffer = buildScanBuffer(messages, lorebook.scanDepth)
+    const buffer = buildScanBuffer(scanMessages || messages, lorebook.scanDepth)
     const activated = await activateEntries(lorebook, entries, buffer, character, rollCache)
     const deduped = dedupByContent(activated, seenContents)
     const trimmed = trimToTokenBudget(deduped, lorebook.tokenBudget)

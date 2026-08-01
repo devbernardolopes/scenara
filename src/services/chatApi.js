@@ -1018,9 +1018,14 @@ export async function buildChatRequestPayload({
       ? null
       : rawLastSummarizationAt
 
+  // Include hidden messages (e.g. invisible OOC) in the lorebook scan
+  // buffer so that their content can still trigger lorebook entries.
+  const scanMessages = effectiveMessages.filter((m) => !m?.isSummaryMarker && !m?.isAutoTitleMarker)
+
   const loreBlocks = await getActiveLoreBlocks({
     character,
     messages: processedMessages,
+    scanMessages,
   })
 
   let payload
