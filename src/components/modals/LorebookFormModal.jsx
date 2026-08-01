@@ -32,14 +32,17 @@ function formatDataSize(byteLen) {
   return `${(byteLen / (1024 * 1024)).toFixed(1)} MB`
 }
 
-function ToggleRow({ label, checked, onChange, disabled = false }) {
+function ToggleRow({ label, checked, onChange, disabled = false, description }) {
   return (
     <label
       className={`flex items-center justify-between gap-3 min-h-[44px] ${
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
       }`}
     >
-      <span className="text-sm text-text">{label}</span>
+      <span className="min-w-0">
+        <span className="block text-sm text-text">{label}</span>
+        {description && <span className="block text-xs text-secondary mt-0.5">{description}</span>}
+      </span>
       <button
         type="button"
         role="switch"
@@ -292,7 +295,11 @@ function LorebookFormModal({ lorebook }) {
     >
       <div className="space-y-4">
         <div>
-          <Label required highlight={Boolean(form.name.trim())}>
+          <Label
+            required
+            highlight={Boolean(form.name.trim())}
+            description={t('lorebook.form.nameDesc')}
+          >
             {t('lorebook.form.name')}
           </Label>
           <input
@@ -305,7 +312,7 @@ function LorebookFormModal({ lorebook }) {
         </div>
 
         <div>
-          <Label>{t('lorebook.form.avatar')}</Label>
+          <Label description={t('lorebook.form.avatarDesc')}>{t('lorebook.form.avatar')}</Label>
           <div className="flex items-center gap-2">
             <Avatar
               src={form.avatar}
@@ -394,8 +401,9 @@ function LorebookFormModal({ lorebook }) {
           storageKey={`lorebookForm.${lorebookId ?? 'new'}.description`}
           defaultExpanded={true}
         >
+          <p className="text-xs text-secondary pt-2 pb-1">{t('lorebook.form.descriptionDesc')}</p>
           <AutoResizeTextarea
-            className={`${inputClass} resize-none mt-2`}
+            className={`${inputClass} resize-none`}
             value={form.description}
             onChange={update('description')}
             placeholder={t('lorebook.form.descriptionPlaceholder')}
@@ -410,7 +418,9 @@ function LorebookFormModal({ lorebook }) {
         >
           <div className="pt-2 space-y-4">
             <div>
-              <Label>{t('lorebook.form.scanDepth')}</Label>
+              <Label description={t('lorebook.form.scanDepthDesc')}>
+                {t('lorebook.form.scanDepth')}
+              </Label>
               <input
                 type="number"
                 className={inputClass}
@@ -420,7 +430,9 @@ function LorebookFormModal({ lorebook }) {
               />
             </div>
             <div>
-              <Label>{t('lorebook.form.tokenBudget')}</Label>
+              <Label description={t('lorebook.form.tokenBudgetDesc')}>
+                {t('lorebook.form.tokenBudget')}
+              </Label>
               <input
                 type="number"
                 className={inputClass}
@@ -431,11 +443,13 @@ function LorebookFormModal({ lorebook }) {
             </div>
             <ToggleRow
               label={t('lorebook.form.recursiveScanning')}
+              description={t('lorebook.form.recursiveScanningDesc')}
               checked={form.recursiveScanning}
               onChange={(v) => setForm((prev) => ({ ...prev, recursiveScanning: v }))}
             />
             <ToggleRow
               label={t('lorebook.form.isGlobal')}
+              description={t('lorebook.form.isGlobalDesc')}
               checked={form.isGlobal}
               onChange={(v) => setForm((prev) => ({ ...prev, isGlobal: v }))}
             />

@@ -4,16 +4,29 @@ export default function Label({
   htmlFor,
   className = '',
   children,
+  description,
   ...rest
 }) {
-  return (
-    <label
-      htmlFor={htmlFor}
-      className={`block text-sm font-medium mb-1 ${highlight ? 'text-highlight' : 'text-text'} ${className}`}
-      {...rest}
-    >
+  const labelClass = `block text-sm font-medium ${highlight ? 'text-highlight' : 'text-text'} ${className}`
+  const content = (
+    <>
       {children}
       {required && <span className="text-error ml-0.5">*</span>}
-    </label>
+    </>
+  )
+  if (!description) {
+    return (
+      <label htmlFor={htmlFor} className={`${labelClass} mb-1`} {...rest}>
+        {content}
+      </label>
+    )
+  }
+  return (
+    <div className="mb-1">
+      <label htmlFor={htmlFor} className={labelClass} {...rest}>
+        {content}
+      </label>
+      <p className="text-xs text-secondary mt-0.5">{description}</p>
+    </div>
   )
 }

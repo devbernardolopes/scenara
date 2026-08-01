@@ -18,14 +18,17 @@ const inputClass =
 
 const SECONDARY_LOGIC_OPTIONS = ['none', 'andAny', 'andAll', 'notAny', 'notAll']
 
-function ToggleRow({ label, checked, onChange, disabled = false }) {
+function ToggleRow({ label, checked, onChange, disabled = false, description }) {
   return (
     <label
       className={`flex items-center justify-between gap-3 min-h-[44px] ${
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
       }`}
     >
-      <span className="text-sm text-text">{label}</span>
+      <span className="min-w-0">
+        <span className="block text-sm text-text">{label}</span>
+        {description && <span className="block text-xs text-secondary mt-0.5">{description}</span>}
+      </span>
       <button
         type="button"
         role="switch"
@@ -47,7 +50,7 @@ function ToggleRow({ label, checked, onChange, disabled = false }) {
   )
 }
 
-function TagInput({ label, value, onChange, placeholder, disabled = false }) {
+function TagInput({ label, value, onChange, placeholder, disabled = false, description }) {
   const [text, setText] = useState('')
   const inputRef = useRef(null)
 
@@ -71,7 +74,7 @@ function TagInput({ label, value, onChange, placeholder, disabled = false }) {
 
   return (
     <div>
-      <Label>{label}</Label>
+      <Label description={description}>{label}</Label>
       <div
         className={`flex flex-wrap items-center gap-1.5 min-h-[44px] px-2 py-1.5 border border-border rounded-md bg-surface focus-within:ring-2 focus-within:ring-primary ${
           disabled ? 'opacity-50' : ''
@@ -274,7 +277,11 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
     >
       <div className="space-y-4">
         <div>
-          <Label required highlight={Boolean(form.name.trim())}>
+          <Label
+            required
+            highlight={Boolean(form.name.trim())}
+            description={t('lorebook.entry.form.nameDesc')}
+          >
             {t('lorebook.entry.form.name')}
           </Label>
           <input
@@ -288,6 +295,7 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
 
         <TagInput
           label={t('lorebook.entry.form.keys')}
+          description={t('lorebook.entry.form.keysDesc')}
           value={form.keys}
           onChange={(v) => setField('keys', v)}
           placeholder={t('lorebook.entry.form.keysPlaceholder')}
@@ -299,8 +307,9 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
           storageKey={`lorebookEntryForm.${entry?.id ?? 'new'}.content`}
           defaultExpanded={true}
         >
+          <p className="text-xs text-secondary pt-2 pb-1">{t('lorebook.entry.form.contentDesc')}</p>
           <AutoResizeTextarea
-            className={`${inputClass} resize-none mt-2`}
+            className={`${inputClass} resize-none`}
             value={form.content}
             onChange={update('content')}
             placeholder={t('lorebook.entry.form.contentPlaceholder')}
@@ -310,11 +319,13 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
 
         <ToggleRow
           label={t('lorebook.entry.form.enabled')}
+          description={t('lorebook.entry.form.enabledDesc')}
           checked={form.enabled}
           onChange={(v) => setField('enabled', v)}
         />
         <ToggleRow
           label={t('lorebook.entry.form.constant')}
+          description={t('lorebook.entry.form.constantDesc')}
           checked={form.constant}
           onChange={(v) => setField('constant', v)}
         />
@@ -327,6 +338,7 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
           <div className="pt-2 space-y-4">
             <TagInput
               label={t('lorebook.entry.form.secondaryKeys')}
+              description={t('lorebook.entry.form.secondaryKeysDesc')}
               value={form.secondaryKeys}
               onChange={(v) => setField('secondaryKeys', v)}
               placeholder={t('lorebook.entry.form.secondaryKeysPlaceholder')}
@@ -334,7 +346,9 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
             />
 
             <div>
-              <Label>{t('lorebook.entry.form.secondaryLogic')}</Label>
+              <Label description={t('lorebook.entry.form.secondaryLogicDesc')}>
+                {t('lorebook.entry.form.secondaryLogic')}
+              </Label>
               <select
                 className={`${inputClass} min-h-[44px]`}
                 value={form.secondaryLogic ?? 'none'}
@@ -351,7 +365,9 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
             </div>
 
             <div>
-              <Label>{t('lorebook.entry.form.insertionOrder')}</Label>
+              <Label description={t('lorebook.entry.form.insertionOrderDesc')}>
+                {t('lorebook.entry.form.insertionOrder')}
+              </Label>
               <input
                 type="number"
                 className={inputClass}
@@ -361,7 +377,9 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
             </div>
 
             <div>
-              <Label>{t('lorebook.entry.form.position')}</Label>
+              <Label description={t('lorebook.entry.form.positionDesc')}>
+                {t('lorebook.entry.form.position')}
+              </Label>
               <select
                 className={`${inputClass} min-h-[44px]`}
                 value={form.position}
@@ -376,7 +394,10 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
             </div>
 
             <div>
-              <Label highlight={form.position === 'at_depth'}>
+              <Label
+                highlight={form.position === 'at_depth'}
+                description={t('lorebook.entry.form.depthDesc')}
+              >
                 {t('lorebook.entry.form.depth')}
               </Label>
               <input
@@ -390,7 +411,9 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
             </div>
 
             <div>
-              <Label>{t('lorebook.entry.form.probability')}</Label>
+              <Label description={t('lorebook.entry.form.probabilityDesc')}>
+                {t('lorebook.entry.form.probability')}
+              </Label>
               {form.probability == null ? (
                 <button
                   type="button"
@@ -422,11 +445,13 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
 
             <ToggleRow
               label={t('lorebook.entry.form.caseSensitive')}
+              description={t('lorebook.entry.form.caseSensitiveDesc')}
               checked={form.caseSensitive}
               onChange={(v) => setField('caseSensitive', v)}
             />
             <ToggleRow
               label={t('lorebook.entry.form.excludeRecursion')}
+              description={t('lorebook.entry.form.excludeRecursionDesc')}
               checked={form.excludeRecursion}
               onChange={(v) => setField('excludeRecursion', v)}
             />
@@ -438,9 +463,13 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
           storageKey={`lorebookEntryForm.${entry?.id ?? 'new'}.characterFilter`}
           defaultExpanded={false}
         >
-          <div className="pt-2 space-y-4">
+          <p className="text-xs text-secondary pt-2 pb-1">
+            {t('lorebook.entry.form.characterFilterDesc')}
+          </p>
+          <div className="pt-1 space-y-4">
             <ToggleRow
               label={t('lorebook.entry.form.characterFilterEnabled')}
+              description={t('lorebook.entry.form.characterFilterEnabledDesc')}
               checked={hasCharacterFilter}
               onChange={(v) =>
                 setField('characterFilter', v ? { isExclude: false, names: [], tags: [] } : null)
@@ -449,7 +478,9 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
             {hasCharacterFilter && (
               <div className="space-y-3">
                 <div>
-                  <Label>{t('lorebook.entry.form.characterFilterMode')}</Label>
+                  <Label description={t('lorebook.entry.form.characterFilterModeDesc')}>
+                    {t('lorebook.entry.form.characterFilterMode')}
+                  </Label>
                   <select
                     className={`${inputClass} min-h-[44px]`}
                     value={form.characterFilter.isExclude ? 'exclude' : 'include'}
@@ -470,6 +501,7 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
                 </div>
                 <TagInput
                   label={t('lorebook.entry.form.characterFilterNames')}
+                  description={t('lorebook.entry.form.characterFilterNamesDesc')}
                   value={form.characterFilter.names}
                   onChange={(v) =>
                     setField('characterFilter', { ...form.characterFilter, names: v })
