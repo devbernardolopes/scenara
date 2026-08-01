@@ -249,9 +249,11 @@ function LorebookFormModal({ lorebook }) {
   async function addEntry() {
     if (!lorebookId) {
       if (!form.name.trim()) return
-      await saveLorebook(false)
+      const id = await saveLorebook(false)
+      openModal('lorebookEntryForm', { lorebookId: id, entry: null })
+    } else {
+      openModal('lorebookEntryForm', { lorebookId, entry: null })
     }
-    openModal('lorebookEntryForm', { lorebookId, entry: null })
   }
 
   function openEntry(entry) {
@@ -262,6 +264,21 @@ function LorebookFormModal({ lorebook }) {
     if (entry.id == null) return
     await updateEntry(entry.id, { enabled: !entry.enabled })
     setEntries((prev) => prev.map((e) => (e.id === entry.id ? { ...e, enabled: !e.enabled } : e)))
+  }
+
+  async function handleDeleteEntry(entry) {
+    const ok = await confirm({
+      title: t('lorebook.form.confirmDeleteEntryTitle'),
+      message: t('lorebook.form.confirmDeleteEntry'),
+      confirmLabel: t('lorebook.form.deleteEntry'),
+      cancelLabel: t('cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
+    if (entry.id != null) {
+      await deleteEntry(entry.id)
+    }
+    setEntries((prev) => prev.filter((e) => e !== entry))
   }
 
   const addEntryRef = useRef(addEntry)
