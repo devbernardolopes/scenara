@@ -174,14 +174,16 @@ function CharacterPortraitImage({ src, alt }) {
   const online = useOnlineStatus()
   if (isExternalImageUrl(src) && !online) {
     return (
-      <span className="flex items-center justify-center w-full h-full text-4xl leading-none">
+      <span className="flex items-center justify-center w-full text-4xl leading-none">
+      {/* <span className="flex items-center justify-center w-full h-full text-4xl leading-none"> */}
         {'👤'}
       </span>
     )
   }
   if (!isViewableImage(src)) {
     return (
-      <span className="flex items-center justify-center w-full h-full text-4xl leading-none">
+      <span className="flex items-center justify-center w-full text-4xl leading-none">
+      {/* <span className="flex items-center justify-center w-full h-full text-4xl leading-none"> */}
         {src || '👤'}
       </span>
     )
