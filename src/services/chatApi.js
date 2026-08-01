@@ -44,6 +44,24 @@ export function replaceVars(text, { charName, personaName, currentPersonaName })
     .replace(/{{name}}/gi, currentPersonaName || personaName || '')
 }
 
+// Resolves {{char}}/{{user}}/{{name}} inside activated lorebook content blocks
+// before they are injected. The named slots are joined strings of entry
+// contents; atDepth is a Map of depth -> joined contents.
+function resolveLoreVars(loreBlocks, replaceVarsIn) {
+  if (!loreBlocks) return loreBlocks
+  return {
+    ...loreBlocks,
+    beforeChar: replaceVarsIn(loreBlocks.beforeChar),
+    afterChar: replaceVarsIn(loreBlocks.afterChar),
+    beforePrompt: replaceVarsIn(loreBlocks.beforePrompt),
+    afterPrompt: replaceVarsIn(loreBlocks.afterPrompt),
+    atDepth:
+      loreBlocks.atDepth instanceof Map
+        ? new Map([...loreBlocks.atDepth.entries()].map(([d, text]) => [d, replaceVarsIn(text)]))
+        : loreBlocks.atDepth,
+  }
+}
+
 // Prefixes a content block with its section header on its own line. When the
 // header's toggle is enabled the header is separated from the content by a
 // blank line; otherwise by a single newline.
@@ -327,6 +345,7 @@ export async function buildMessagesPayload({
   const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
 
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
+  loreBlocks = resolveLoreVars(loreBlocks, replaceVarsIn)
 
   const usedPersonaIds = [...new Set(messages.map((m) => m.personaId).filter(Boolean))]
   const personasHistory = buildPersonasHistory(messages, { chatPersona, personaMap })
@@ -740,6 +759,7 @@ export async function buildOOCMessagesPayload({
   const personaName = chatPersona?.name || ''
   const currentPersonaName = currentPersona?.name || personaName
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
+  loreBlocks = resolveLoreVars(loreBlocks, replaceVarsIn)
   const statusBlockResolved = replaceVarsIn(statusBlock)
 
   const defaultPersonaId = await getSetting('defaultPersonaId')
