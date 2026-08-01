@@ -44,6 +44,15 @@ export function replaceVars(text, { charName, personaName, currentPersonaName })
     .replace(/{{name}}/gi, currentPersonaName || personaName || '')
 }
 
+// Prefixes a content block with its section header on its own line. When the
+// header's toggle is enabled the header is separated from the content by a
+// blank line; otherwise by a single newline.
+function applySectionHeader(header, content, replaceVarsIn) {
+  if (!content || !header?.value) return content
+  const headerText = replaceVarsIn ? replaceVarsIn(header.value) : header.value
+  return `${headerText}${header.enabled ? '\n\n' : '\n'}${content}`
+}
+
 // Substitutes persona description tokens in addition to the base {{char}}/{{user}}/{{name}}
 // variables. Token semantics:
 //   {{description}}        -> the active user persona in the current chat (currentPersona)
@@ -356,7 +365,9 @@ export async function buildMessagesPayload({
   }
 
   if (loreBlocks.beforeChar) {
-    systemParts.push(loreBlocks.beforeChar)
+    systemParts.push(
+      applySectionHeader(settings.loreContextHeader, loreBlocks.beforeChar, replaceVarsIn),
+    )
   }
 
   const personaTiming = character?.personaInjectionTiming || settings.personaInjectionTiming
@@ -393,7 +404,9 @@ export async function buildMessagesPayload({
   }
 
   if (loreBlocks.afterChar) {
-    systemParts.push(loreBlocks.afterChar)
+    systemParts.push(
+      applySectionHeader(settings.loreContextHeader, loreBlocks.afterChar, replaceVarsIn),
+    )
   }
 
   const writingTiming = character?.writingInjectionTiming || settings.writingInjectionTiming
@@ -422,7 +435,14 @@ export async function buildMessagesPayload({
 
   if (isFirstMessage) {
     if (loreBlocks.beforePrompt) {
-      result.push({ role: 'user', content: loreBlocks.beforePrompt })
+      result.push({
+        role: 'user',
+        content: applySectionHeader(
+          settings.loreContextHeader,
+          loreBlocks.beforePrompt,
+          replaceVarsIn,
+        ),
+      })
       entryTypes.push('loreBeforePrompt')
     }
     const firstMessageContent = replaceVarsIn(settings.firstMessagePrompt)
@@ -439,7 +459,14 @@ export async function buildMessagesPayload({
       entryTypes.push('firstMessage')
     }
     if (loreBlocks.afterPrompt) {
-      result.push({ role: 'user', content: loreBlocks.afterPrompt })
+      result.push({
+        role: 'user',
+        content: applySectionHeader(
+          settings.loreContextHeader,
+          loreBlocks.afterPrompt,
+          replaceVarsIn,
+        ),
+      })
       entryTypes.push('loreAfterPrompt')
     }
   } else {
@@ -482,7 +509,11 @@ export async function buildMessagesPayload({
   if (loreBlocks.atDepth instanceof Map && loreBlocks.atDepth.size > 0) {
     const depths = [...loreBlocks.atDepth.keys()].sort((a, b) => b - a)
     for (const depth of depths) {
-      const text = loreBlocks.atDepth.get(depth)
+      const text = applySectionHeader(
+        settings.loreContextHeader,
+        loreBlocks.atDepth.get(depth),
+        replaceVarsIn,
+      )
       if (!text) continue
       const insertIdx = Math.max(1, result.length - depth)
       result.splice(insertIdx, 0, { role: 'system', content: text })
@@ -519,7 +550,14 @@ export async function buildMessagesPayload({
 
   if (!isFirstMessage) {
     if (loreBlocks.beforePrompt) {
-      result.push({ role: 'user', content: loreBlocks.beforePrompt })
+      result.push({
+        role: 'user',
+        content: applySectionHeader(
+          settings.loreContextHeader,
+          loreBlocks.beforePrompt,
+          replaceVarsIn,
+        ),
+      })
       entryTypes.push('loreBeforePrompt')
     }
     if (postHistoryInstructions) {
@@ -527,7 +565,14 @@ export async function buildMessagesPayload({
       entryTypes.push('postHistory')
     }
     if (loreBlocks.afterPrompt) {
-      result.push({ role: 'user', content: loreBlocks.afterPrompt })
+      result.push({
+        role: 'user',
+        content: applySectionHeader(
+          settings.loreContextHeader,
+          loreBlocks.afterPrompt,
+          replaceVarsIn,
+        ),
+      })
       entryTypes.push('loreAfterPrompt')
     }
   }
@@ -760,7 +805,9 @@ export async function buildOOCMessagesPayload({
   }
 
   if (loreBlocks.beforeChar) {
-    systemParts.push(loreBlocks.beforeChar)
+    systemParts.push(
+      applySectionHeader(oocSettings.loreContextHeader, loreBlocks.beforeChar, replaceVarsIn),
+    )
   }
 
   const promptBlock = buildCharacterPromptBlock(character, {
@@ -785,13 +832,19 @@ export async function buildOOCMessagesPayload({
       if (text) oocAfterChar.push(text)
     }
   }
-  const oocAfterCharJoined = oocAfterChar.filter(Boolean).join('\n\n')
-  if (oocAfterCharJoined) {
-    systemParts.push(oocAfterCharJoined)
+  const loreAfter = applySectionHeader(
+    oocSettings.loreContextHeader,
+    oocAfterChar.filter(Boolean).join('\n\n'),
+    replaceVarsIn,
+  )
+  if (loreAfter) {
+    systemParts.push(loreAfter)
   }
 
   if (loreBlocks.beforePrompt) {
-    systemParts.push(loreBlocks.beforePrompt)
+    systemParts.push(
+      applySectionHeader(oocSettings.loreContextHeader, loreBlocks.beforePrompt, replaceVarsIn),
+    )
   }
 
   if (transcriptWithVars && !systemHasTranscript) {
@@ -804,7 +857,9 @@ export async function buildOOCMessagesPayload({
   }
 
   if (loreBlocks.afterPrompt) {
-    systemParts.push(loreBlocks.afterPrompt)
+    systemParts.push(
+      applySectionHeader(oocSettings.loreContextHeader, loreBlocks.afterPrompt, replaceVarsIn),
+    )
   }
 
   const result = [{ role: 'system', content: systemParts.join('\n\n') }]
@@ -946,6 +1001,9 @@ export async function buildChatRequestPayload({
     const messagesHeader = normalizeSectionHeader(
       await getSetting('prompting.apiRequestSectionHeaders.messages'),
     )
+    const loreContextHeader = normalizeSectionHeader(
+      await getSetting('prompting.apiRequestSectionHeaders.loreContext'),
+    )
     const systemRolePrefix = await getSetting('prompting.systemRolePrefix')
     const assistantRolePrefix = await getSetting('prompting.assistantRolePrefix')
     const userRolePrefix = await getSetting('prompting.userRolePrefix')
@@ -982,6 +1040,7 @@ export async function buildChatRequestPayload({
         oocUserInstructions,
         characterPromptHeader,
         messagesHeader,
+        loreContextHeader,
         systemRolePrefix,
         assistantRolePrefix,
         userRolePrefix,
@@ -1010,6 +1069,9 @@ export async function buildChatRequestPayload({
       writingMessageRole: await getSetting('prompting.writingMessageRole'),
       writingInstructionHeader: normalizeSectionHeader(
         await getSetting('prompting.apiRequestSectionHeaders.writingInstruction'),
+      ),
+      loreContextHeader: normalizeSectionHeader(
+        await getSetting('prompting.apiRequestSectionHeaders.loreContext'),
       ),
       personaInjectionTiming: await getSetting('prompting.personaInjectionTiming'),
       personaInjectionPlacement: await getSetting('prompting.personaInjectionPlacement'),
