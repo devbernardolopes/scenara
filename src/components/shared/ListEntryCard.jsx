@@ -10,6 +10,7 @@ function ListEntryCard({
   item,
   title,
   subtitle,
+  description,
   badges = [],
   imageSrc,
   icon: Icon,
@@ -83,6 +84,7 @@ function ListEntryCard({
             {badges}
           </div>
           {subtitle ? <p className="text-xs text-secondary mt-0.5">{subtitle}</p> : null}
+          {description ? <p className="text-xs text-tertiary mt-0.5">{description}</p> : null}
         </div>
       </div>
 

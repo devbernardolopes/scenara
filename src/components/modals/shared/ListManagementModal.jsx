@@ -30,6 +30,7 @@ import { Plus, Upload } from '../../../lib/icons'
  *   noItemsKey:       string  — defaults to `${entityKey}.noItems`
  *   getTitle:         (item) => string
  *   getSubtitle:      (item) => string|null
+ *   getDescription:   (item) => string|null
  *   getImageSrc:      (item) => string|null
  *   getBadges:        (item) => ReactNode|null
  *   isDefault:        (item) => boolean
@@ -234,6 +235,7 @@ function ListManagementModal({ config }) {
                           item={item}
                           title={config.getTitle(item)}
                           subtitle={config.getSubtitle ? config.getSubtitle(item) : null}
+                          description={config.getDescription ? config.getDescription(item) : null}
                           badges={config.getBadges ? config.getBadges(item) : null}
                           imageSrc={config.showImage ? config.getImageSrc(item) : null}
                           icon={config.showImage ? null : config.icon}

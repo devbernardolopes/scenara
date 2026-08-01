@@ -30,6 +30,7 @@ function PersonaManagementModal() {
     formProp: 'persona',
     getTitle: (p) => p.name,
     getSubtitle: (p) => p.title || null,
+    getDescription: (p) => p.description || null,
     getImageSrc: (p) => p.avatar,
     getBadges: (p) =>
       p.isDefault ? (
