@@ -101,8 +101,7 @@ async function activateEntries(lorebook, entries, initialBuffer, character, roll
   return activated
 }
 
-function dedupByContent(entries) {
-  const seen = new Set()
+function dedupByContent(entries, seen) {
   return entries.filter((e) => {
     if (seen.has(e.content)) return false
     seen.add(e.content)
@@ -195,6 +194,7 @@ export async function getActiveLoreBlocks({ character, messages }) {
   }
 
   const rollCache = new Map()
+  const seenContents = new Set()
   const allActivated = []
   const activatedMeta = []
 
@@ -203,7 +203,7 @@ export async function getActiveLoreBlocks({ character, messages }) {
     if (!entries.length) continue
     const buffer = buildScanBuffer(messages, lorebook.scanDepth)
     const activated = await activateEntries(lorebook, entries, buffer, character, rollCache)
-    const deduped = dedupByContent(activated)
+    const deduped = dedupByContent(activated, seenContents)
     const trimmed = trimToTokenBudget(deduped, lorebook.tokenBudget)
     allActivated.push(...trimmed)
     for (const entry of trimmed) {
