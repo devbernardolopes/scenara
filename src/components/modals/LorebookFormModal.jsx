@@ -72,8 +72,8 @@ function LorebookFormModal({ lorebook }) {
   const { closeModal, setCloseGuard, openModal } = useModal()
   const { promptSave } = useSaveConfirm()
   const { confirm } = useConfirm()
-  const editing = Boolean(lorebook)
-  const lorebookId = lorebook?.id || null
+  const [editing, setEditing] = useState(Boolean(lorebook))
+  const [lorebookId, setLorebookId] = useState(lorebook?.id || null)
   const { scrollRef, onScroll } = useModalScrollPosition(`lorebookForm.${lorebookId ?? 'new'}`)
 
   const initial = useMemo(
@@ -202,7 +202,7 @@ function LorebookFormModal({ lorebook }) {
     }
   }
 
-  async function saveLorebook() {
+  async function saveLorebook(closeAfter = true) {
     setSaving(true)
     try {
       const payload = {
@@ -215,11 +215,18 @@ function LorebookFormModal({ lorebook }) {
         recursiveScanning: form.recursiveScanning,
         isGlobal: form.isGlobal,
       }
+      let id
       if (editing) {
-        await updateLorebook(lorebook.id, payload)
+        await updateLorebook(lorebookId, payload)
+        id = lorebookId
       } else {
-        await createLorebook(payload)
+        id = await createLorebook(payload)
+        setLorebookId(id)
+        setEditing(true)
       }
+      setEntries(await getEntriesForLorebook(id))
+      if (closeAfter) closeModal()
+      return id
     } finally {
       setSaving(false)
     }
@@ -227,25 +234,23 @@ function LorebookFormModal({ lorebook }) {
 
   async function handleSave() {
     if (!form.name.trim() || saving) return
-    await saveLorebook()
-    closeModal()
+    await saveLorebook(true)
   }
 
   async function handleCloseAttempt() {
     const result = await promptSave()
     if (result === 'save') {
-      await saveLorebook()
-      closeModal()
+      await saveLorebook(true)
     } else if (result === 'discard') {
       closeModal()
     }
   }
 
-  function openEntry(entry) {
-    openModal('lorebookEntryForm', { lorebookId, entry })
-  }
-
-  function addEntry() {
+  async function addEntry() {
+    if (!lorebookId) {
+      if (!form.name.trim()) return
+      await saveLorebook(false)
+    }
     openModal('lorebookEntryForm', { lorebookId, entry: null })
   }
 
@@ -561,7 +566,12 @@ function LorebookFormModal({ lorebook }) {
           <button
             type="button"
             onClick={() => addEntryRef.current()}
-            className="w-full mt-2 min-h-[44px] flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-md text-secondary hover:text-text hover:border-border-light transition-colors"
+            disabled={!editing && !form.name.trim()}
+            className={`w-full mt-2 min-h-[44px] flex items-center justify-center gap-2 border-2 border-dashed rounded-md transition-colors ${
+              !editing && !form.name.trim()
+                ? 'opacity-50 cursor-not-allowed'
+                : 'text-secondary hover:text-text hover:border-border-light border-border'
+            }`}
           >
             <Plus className="w-4 h-4" />
             <span className="text-sm">{t('lorebook.form.addEntry')}</span>
