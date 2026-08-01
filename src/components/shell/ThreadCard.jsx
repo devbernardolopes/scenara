@@ -75,7 +75,7 @@ const ThreadCard = forwardRef(function ThreadCard(
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex items-center justify-center h-full w-full min-h-0 leading-none text-3xl">
+            <div className="flex items-center justify-center h-full w-full min-h-0 overflow-hidden leading-none text-2xl">
               {character?.avatar || '👤'}
             </div>
           )}

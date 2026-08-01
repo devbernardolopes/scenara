@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../hooks/useModal'
 import { useOnlineStatus } from '../hooks/useOnlineStatus'
-import { isExternalImageUrl } from '../lib/image'
+import { isExternalImageUrl, isViewableImage } from '../lib/image'
 import { useConfirm } from '../lib/confirm'
 import {
   getAllCharacters,
@@ -176,6 +176,13 @@ function CharacterPortraitImage({ src, alt }) {
     return (
       <span className="flex items-center justify-center w-full h-full text-4xl leading-none">
         {'👤'}
+      </span>
+    )
+  }
+  if (!isViewableImage(src)) {
+    return (
+      <span className="flex items-center justify-center w-full h-full text-4xl leading-none">
+        {src || '👤'}
       </span>
     )
   }
