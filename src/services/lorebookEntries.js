@@ -32,7 +32,7 @@ export async function createEntry(lorebookId, data) {
     content: data.content ?? '',
     constant: data.constant ?? false,
     enabled: data.enabled ?? true,
-    position: data.position ?? 'before_char',
+    position: data.position ?? 'after_char',
     insertionOrder: data.insertionOrder ?? 100,
     depth: data.depth ?? null,
     probability: data.probability ?? null,

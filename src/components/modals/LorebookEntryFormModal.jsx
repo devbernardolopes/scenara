@@ -133,7 +133,7 @@ function LorebookEntryFormModal({ lorebookId, entry }) {
       content: entry?.content || '',
       constant: entry?.constant ?? false,
       enabled: entry?.enabled ?? true,
-      position: entry?.position || 'before_char',
+      position: entry?.position || 'after_char',
       insertionOrder: entry?.insertionOrder ?? 100,
       depth: entry?.depth ?? '',
       probability: entry?.probability ?? null,
