@@ -115,9 +115,21 @@ function trimToTokenBudget(entries, tokenBudget) {
   return kept
 }
 
+const POSITION_TO_SLOT = {
+  before_char: 'beforeChar',
+  after_char: 'afterChar',
+  after_example: 'afterChar',
+  before_prompt: 'beforePrompt',
+  after_prompt: 'afterPrompt',
+  at_depth: 'at_depth',
+  beforeChar: 'beforeChar',
+  afterChar: 'afterChar',
+  beforePrompt: 'beforePrompt',
+  afterPrompt: 'afterPrompt',
+}
+
 function resolvePosition(position) {
-  if (position === 'after_example') return 'after_char'
-  return position
+  return POSITION_TO_SLOT[position] || 'beforeChar'
 }
 
 function groupByPosition(entries) {

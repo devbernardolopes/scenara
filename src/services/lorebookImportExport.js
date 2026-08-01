@@ -16,8 +16,9 @@ const SECONDARY_LOGIC_REVERSE = {
   notAll: 3,
 }
 
-// Raw SillyTavern position enum values. We store these as opaque strings and
-// don't validate against Scenara prompt slots yet (that's Phase 2).
+// Raw SillyTavern position enum values, stored as-is. lorebookActivation.js
+// maps them onto Scenara's prompt slots (beforeChar/afterChar/...) at injection
+// time via resolvePosition.
 export const POSITION_OPTIONS = [
   'before_char',
   'after_char',
