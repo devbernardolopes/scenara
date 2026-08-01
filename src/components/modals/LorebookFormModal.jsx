@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useModalScrollPosition } from '../../hooks/useModalScrollPosition'
 import { useSaveConfirm } from '../../lib/saveConfirm'
+import { isViewableImage } from '../../lib/image'
 import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
@@ -319,7 +320,7 @@ function LorebookFormModal({ lorebook }) {
               size="2xl"
               className="shrink-0 cursor-pointer"
               onClick={() =>
-                form.avatar &&
+                isViewableImage(form.avatar) &&
                 openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })
               }
             />

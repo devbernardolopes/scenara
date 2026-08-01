@@ -7,6 +7,7 @@ import { useIsMobile } from '../../hooks/useIsMobile'
 import { useOverflowButtons } from '../../hooks/useOverflowButtons'
 import { useChatSettings } from '../../hooks/useChatSettings'
 import { showToast } from '../../lib/toast'
+import { isViewableImage } from '../../lib/image'
 import { replaceVars, stripOOCDelimiters } from '../../services/chatApi'
 import { stripStatusBlockCodeFences } from '../../services/statusBlocks'
 import { getStreamingStartTime } from '../../services/generatingState'
@@ -424,7 +425,8 @@ function MessageBubble({
   }
 
   function handleAvatarClick() {
-    if (avatarSrc) openModal('imageViewer', { src: avatarSrc, modalSize: 'fullscreen' })
+    if (isViewableImage(avatarSrc))
+      openModal('imageViewer', { src: avatarSrc, modalSize: 'fullscreen' })
   }
 
   function handleCopy() {

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
+import { isViewableImage } from '../../lib/image'
 import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
@@ -244,6 +245,7 @@ function PersonaFormModal({ persona }) {
               size="2xl"
               className="shrink-0 cursor-pointer"
               onClick={() =>
+                isViewableImage(form.avatar) &&
                 openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })
               }
             />

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
 import { showToast } from '../../lib/toast'
+import { isViewableImage } from '../../lib/image'
 import db from '../../db'
 import CloseButton from '../shared/CloseButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
@@ -203,7 +204,7 @@ function PersonaEditorModal() {
                   size="2xl"
                   className="shrink-0"
                   onClick={() =>
-                    form.avatar &&
+                    isViewableImage(form.avatar) &&
                     openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })
                   }
                 />
@@ -351,6 +352,7 @@ function PersonaEditorModal() {
                   src={p.avatar}
                   size="md"
                   onClick={() =>
+                    isViewableImage(p.avatar) &&
                     openModal('imageViewer', { src: p.avatar, modalSize: 'fullscreen' })
                   }
                 />

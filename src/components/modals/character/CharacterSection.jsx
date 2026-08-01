@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../../hooks/useModal'
 import { showToast } from '../../../lib/toast'
+import { isViewableImage } from '../../../lib/image'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import Label from '../../shared/Label'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
@@ -166,7 +167,10 @@ function CharacterSection({ form, onChange, characterId }) {
             src={form.avatar}
             size="2xl"
             className="shrink-0"
-            onClick={() => openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })}
+            onClick={() =>
+              isViewableImage(form.avatar) &&
+              openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })
+            }
           />
           <div className="relative flex-1">
             {form.avatar.startsWith('data:') ? (

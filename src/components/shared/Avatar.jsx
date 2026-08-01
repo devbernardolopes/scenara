@@ -32,7 +32,7 @@ function Avatar({ src, alt = '', size = 'md', className = '', onClick }) {
     )
   }
   return (
-    <span data-avatar className={cls}>
+    <span data-avatar className={`${cls} ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
       {src}
     </span>
   )
