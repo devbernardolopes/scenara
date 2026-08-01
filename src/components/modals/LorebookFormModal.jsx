@@ -254,19 +254,8 @@ function LorebookFormModal({ lorebook }) {
     openModal('lorebookEntryForm', { lorebookId, entry: null })
   }
 
-  async function handleDeleteEntry(entry) {
-    const ok = await confirm({
-      title: t('lorebook.form.confirmDeleteEntryTitle'),
-      message: t('lorebook.form.confirmDeleteEntry'),
-      confirmLabel: t('lorebook.form.deleteEntry'),
-      cancelLabel: t('cancel'),
-      variant: 'danger',
-    })
-    if (!ok) return
-    if (entry.id != null) {
-      await deleteEntry(entry.id)
-    }
-    setEntries((prev) => prev.filter((e) => e !== entry))
+  function openEntry(entry) {
+    openModal('lorebookEntryForm', { lorebookId, entry })
   }
 
   async function handleToggleActive(entry) {
