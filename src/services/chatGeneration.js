@@ -53,7 +53,6 @@ export function computeMessageFlags(entryTypes, msgNumbers, currentMsgs, { befor
         try {
           const entries = JSON.parse(dbMsg.bundleMessages)
           if (
-            dbMsg.role === 'assistant' &&
             Array.isArray(entries) &&
             entries.length > 0 &&
             entries.every((e) => e.origin === 'initial')

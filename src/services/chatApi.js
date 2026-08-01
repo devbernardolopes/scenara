@@ -917,7 +917,7 @@ export async function buildOOCMessagesPayload({
 
 // Mirrors buildMsgNumbersArray formerly defined in ChatView: maps each payload
 // entry back to the originating message number for prompt-data inspection.
-export function buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload) {
+export function buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, payload, isOOC) {
   let num = 0
   const numMap = new Map()
   for (const m of currentMsgs) {
@@ -927,6 +927,20 @@ export function buildMsgNumbersArray(isFirstMessage, apiMessages, currentMsgs, p
   }
   const numbers = [null]
   if (isFirstMessage) {
+    while (numbers.length < payload.length) {
+      numbers.push(null)
+    }
+  } else if (isOOC) {
+    // OOC payload entries are synthesized (SYSTEM from OOC instructions,
+    // USER from the last user OOC message) and do not correspond
+    // positionally to apiMessages. Map SYSTEM to null and USER to the
+    // last user message number.
+    let lastUserNum = null
+    for (const m of currentMsgs) {
+      if (m.isSummaryMarker || m.isAutoTitleMarker) continue
+      if (m.role === 'user') lastUserNum = numMap.get(m.id) || null
+    }
+    numbers.push(lastUserNum)
     while (numbers.length < payload.length) {
       numbers.push(null)
     }
@@ -1124,7 +1138,7 @@ export async function buildChatRequestPayload({
     entryTypes = chatResult.entryTypes
   }
 
-  const msgNumbers = buildMsgNumbersArray(isFirstMessage, apiMessages, messages, payload)
+  const msgNumbers = buildMsgNumbersArray(isFirstMessage, apiMessages, messages, payload, isOOC)
 
   return {
     payload,
