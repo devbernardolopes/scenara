@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useModalScrollPosition } from '../../hooks/useModalScrollPosition'
 import { useSaveConfirm } from '../../lib/saveConfirm'
+import { useConfirm } from '../../lib/confirm'
 import { isViewableImage } from '../../lib/image'
 import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
@@ -10,7 +11,7 @@ import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import Label from '../shared/Label'
 import Avatar from '../shared/Avatar'
-import { Plus, X, Edit3, Cloud } from '../../lib/icons'
+import { Plus, X, Zap, Square, Cloud } from '../../lib/icons'
 import DragHandle from '../shared/DragHandle'
 import { SortableList, SortableItem } from '../shared/SortableList'
 import { estimateTokens } from '../../services/tokenEstimator'
@@ -18,6 +19,7 @@ import { createLorebook, updateLorebook } from '../../services/lorebooks'
 import {
   getEntriesForLorebook,
   deleteEntry,
+  updateEntry,
   updateEntryOrder,
 } from '../../services/lorebookEntries'
 import { showToast } from '../../lib/toast'
@@ -69,6 +71,7 @@ function LorebookFormModal({ lorebook }) {
   const { t } = useTranslation('settings')
   const { closeModal, setCloseGuard, openModal } = useModal()
   const { promptSave } = useSaveConfirm()
+  const { confirm } = useConfirm()
   const editing = Boolean(lorebook)
   const lorebookId = lorebook?.id || null
   const { scrollRef, onScroll } = useModalScrollPosition(`lorebookForm.${lorebookId ?? 'new'}`)
@@ -247,10 +250,24 @@ function LorebookFormModal({ lorebook }) {
   }
 
   async function handleDeleteEntry(entry) {
+    const ok = await confirm({
+      title: t('lorebook.form.confirmDeleteEntryTitle'),
+      message: t('lorebook.form.confirmDeleteEntry'),
+      confirmLabel: t('lorebook.form.deleteEntry'),
+      cancelLabel: t('cancel'),
+      variant: 'danger',
+    })
+    if (!ok) return
     if (entry.id != null) {
       await deleteEntry(entry.id)
     }
     setEntries((prev) => prev.filter((e) => e !== entry))
+  }
+
+  async function handleToggleActive(entry) {
+    if (entry.id == null) return
+    await updateEntry(entry.id, { enabled: !entry.enabled })
+    setEntries((prev) => prev.map((e) => (e.id === entry.id ? { ...e, enabled: !e.enabled } : e)))
   }
 
   const addEntryRef = useRef(addEntry)
@@ -505,11 +522,25 @@ function LorebookFormModal({ lorebook }) {
                         )}
                         <button
                           type="button"
-                          onClick={() => openEntryRef.current(entry)}
-                          className="min-h-[36px] min-w-[36px] flex items-center justify-center text-secondary hover:text-text rounded-md hover:bg-surface-hover"
-                          aria-label={t('lorebook.form.editEntry')}
+                          role="switch"
+                          aria-checked={!!entry.enabled}
+                          aria-label={t('lorebook.form.entryActive')}
+                          title={t('lorebook.form.entryActive')}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleToggleActive(entry)
+                          }}
+                          className={`min-h-[36px] min-w-[36px] flex items-center justify-center rounded-md border transition-colors ${
+                            entry.enabled
+                              ? 'bg-primary text-on-primary border-primary'
+                              : 'bg-surface text-tertiary border-border hover:bg-surface-hover'
+                          }`}
                         >
-                          <Edit3 className="w-4 h-4" />
+                          {entry.enabled ? (
+                            <Zap className="w-4 h-4" />
+                          ) : (
+                            <Square className="w-4 h-4" />
+                          )}
                         </button>
                         <button
                           type="button"
