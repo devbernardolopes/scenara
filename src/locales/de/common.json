@@ -128,6 +128,7 @@
   "saving": "Wird gespeichert…",
   "save": "Save",
   "cancel": "Cancel",
+  "manage": "Manage",
   "confirm": "Bestätigen",
   "confirmDefaultMessage": "Bist du sicher?",
   "ok": "OK",
@@ -197,6 +198,28 @@
       "exported": "{{name}} exportiert",
       "exportedMultiple": "{{count}} Schreibanweisungen exportiert",
       "imported": "{{count}} Schreibanweisungen importiert"
+    },
+    "samplingProfile": {
+      "created": "Sampling profile created",
+      "updated": "Sampling profile updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} sampling profiles deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} sampling profiles duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} sampling profiles exported",
+      "imported": "{{count}} sampling profiles imported"
+    },
+    "stopSequence": {
+      "created": "Stop sequence set created",
+      "updated": "Stop sequence set updated",
+      "deleted": "{{name}} deleted",
+      "deletedMultiple": "{{count}} stop sequence sets deleted",
+      "duplicated": "{{name}} duplicated",
+      "duplicatedMultiple": "{{count}} stop sequence sets duplicated",
+      "exported": "{{name}} exported",
+      "exportedMultiple": "{{count}} stop sequence sets exported",
+      "imported": "{{count}} stop sequence sets imported"
     },
     "connectionProfile": {
       "created": "{{name}} erstellt",

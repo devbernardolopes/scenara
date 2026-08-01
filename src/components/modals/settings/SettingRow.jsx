@@ -12,6 +12,7 @@ import SettingAvatarPicker from './controls/SettingAvatarPicker'
 import SettingOocDelimiters from './controls/SettingOocDelimiters'
 import SettingToggleInput from './controls/SettingToggleInput'
 import NotificationSoundTestButton from './controls/NotificationSoundTestButton'
+import SettingManageEntities from './controls/SettingManageEntities'
 
 const CONTROL_MAP = {
   toggle: SettingToggle,
@@ -24,6 +25,7 @@ const CONTROL_MAP = {
   avatar: SettingAvatarPicker,
   oocDelimiters: SettingOocDelimiters,
   toggleInput: SettingToggleInput,
+  manageEntities: SettingManageEntities,
 }
 
 const TRAILING_MAP = {

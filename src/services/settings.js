@@ -1579,6 +1579,24 @@ export const SETTINGS = [
     labelKey: 'settings:prompting.hordeNative.customTemplate.label',
     descKey: 'settings:prompting.hordeNative.customTemplate.desc',
   },
+  {
+    key: 'hordeNativeSamplingProfiles',
+    category: 'prompting',
+    group: 'hordeNative',
+    type: 'manageEntities',
+    props: { modal: 'samplingProfileManagement' },
+    labelKey: 'settings:prompting.hordeNative.samplingProfiles.label',
+    descKey: 'settings:prompting.hordeNative.samplingProfiles.desc',
+  },
+  {
+    key: 'hordeNativeStopSequences',
+    category: 'prompting',
+    group: 'hordeNative',
+    type: 'manageEntities',
+    props: { modal: 'stopSequenceManagement' },
+    labelKey: 'settings:prompting.hordeNative.stopSequences.label',
+    descKey: 'settings:prompting.hordeNative.stopSequences.desc',
+  },
   // TTS settings — rendered by TtsSettingsPanel, not SettingRow
   {
     key: 'tts.provider',

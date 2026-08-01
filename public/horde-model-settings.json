@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "schemaVersion": 1,
+  "description": "Community-recommended generation settings for AI Horde Native models. Scenara fetches this manifest and surfaces one-click presets in the connection profile form.",
+  "models": [
+    {
+      "id": "SicariusSicariiStuff/Impish_Bloodmoon_12B",
+      "name": "Impish Bloodmoon 12B",
+      "homepage": "https://huggingface.co/SicariusSicariiStuff/Impish_Bloodmoon_12B",
+      "presets": [
+        {
+          "id": "roleplay",
+          "label": "Roleplay",
+          "description": "Recommended roleplay sampling settings for this model.",
+          "promptTemplate": "chatml",
+          "stopSequences": ["<|im_end|>", "<|im_start|>user"],
+          "params": {
+            "temperature": 1,
+            "top_p": 0.75,
+            "top_k": 20,
+            "top_a": 0,
+            "tfs": 1,
+            "typical": 1,
+            "min_p": 0.05,
+            "smoothing_factor": 0,
+            "repetition_penalty": 1,
+            "sampler_order": [6, 0, 1, 3, 4, 2, 5],
+            "max_length": 312,
+            "max_context_length": 8192,
+            "n": 1
+          }
+        },
+        {
+          "id": "assistant",
+          "label": "Assistant",
+          "description": "More deterministic sampling settings for assistant-style or OOC work.",
+          "promptTemplate": "chatml",
+          "stopSequences": ["<|im_end|>", "<|im_start|>user"],
+          "params": {
+            "temperature": 0.8,
+            "top_p": 0.9,
+            "top_k": 40,
+            "top_a": 0,
+            "tfs": 1,
+            "typical": 1,
+            "min_p": 0.05,
+            "smoothing_factor": 0,
+            "repetition_penalty": 1.05,
+            "sampler_order": [6, 0, 1, 3, 4, 2, 5],
+            "max_length": 512,
+            "max_context_length": 8192,
+            "n": 1
+          }
+        }
+      ]
+    }
+  ]
+}

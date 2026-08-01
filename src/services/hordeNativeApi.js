@@ -430,7 +430,9 @@ export async function sendHordeNativeChatCompletion({
   threadId = null,
   kind = null,
 }) {
-  const templateName = (await getSetting('hordeNativePromptTemplate')) || 'simple-roleplay'
+  const profileTemplate = profile?.promptTemplate || null
+  const templateName =
+    profileTemplate || (await getSetting('hordeNativePromptTemplate')) || 'simple-roleplay'
 
   if (templateName === 'mistral-instruct') {
     const prompt = renderMistralInstructPrompt({
@@ -473,7 +475,12 @@ export async function sendHordeNativeChatCompletion({
     templateString =
       HORDE_PROMPT_TEMPLATES[templateName] || HORDE_PROMPT_TEMPLATES['simple-roleplay']
   } else {
-    templateString = await getSetting('hordeNativePromptCustomTemplate')
+    templateString =
+      (profile?.promptTemplateCustom && profile.promptTemplateCustom.trim()
+        ? profile.promptTemplateCustom
+        : null) ||
+      (await getSetting('hordeNativePromptCustomTemplate')) ||
+      ''
     if (!templateString?.trim()) {
       templateString = HORDE_PROMPT_TEMPLATES['simple-roleplay']
     }

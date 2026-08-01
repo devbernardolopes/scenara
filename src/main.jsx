@@ -23,6 +23,10 @@ import WritingInstructionManagementModal from './components/modals/WritingInstru
 import WritingInstructionFormModal from './components/modals/WritingInstructionFormModal'
 import ProfileManagementModal from './components/modals/ProfileManagementModal'
 import ProfileFormModal from './components/modals/ProfileFormModal'
+import SamplingProfileManagementModal from './components/modals/SamplingProfileManagementModal'
+import SamplingProfileFormModal from './components/modals/SamplingProfileFormModal'
+import StopSequenceManagementModal from './components/modals/StopSequenceManagementModal'
+import StopSequenceFormModal from './components/modals/StopSequenceFormModal'
 import CloudServiceManagementModal from './components/modals/CloudServiceManagementModal'
 import CloudServiceFormModal from './components/modals/CloudServiceFormModal'
 import InChatShortcutManagementModal from './components/modals/InChatShortcutManagementModal'
@@ -70,6 +74,10 @@ registerModal('writingInstructionManagement', WritingInstructionManagementModal)
 registerModal('writingInstructionForm', WritingInstructionFormModal)
 registerModal('profileManagement', ProfileManagementModal)
 registerModal('profileForm', ProfileFormModal)
+registerModal('samplingProfileManagement', SamplingProfileManagementModal)
+registerModal('samplingProfileForm', SamplingProfileFormModal)
+registerModal('stopSequenceManagement', StopSequenceManagementModal)
+registerModal('stopSequenceForm', StopSequenceFormModal)
 registerModal('cloudServiceManagement', CloudServiceManagementModal)
 registerModal('cloudServiceForm', CloudServiceFormModal)
 registerModal('inChatShortcutManagement', InChatShortcutManagementModal)

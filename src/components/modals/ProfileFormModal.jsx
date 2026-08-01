@@ -21,93 +21,30 @@ import {
 } from '../../services/apiProviders'
 import { fetchModels, getCooldownRemaining } from '../../services/modelFetcher'
 import { createProfile, updateProfile } from '../../services/connectionProfiles'
+import { getAllSamplingProfiles } from '../../services/samplingProfiles'
+import { getAllStopSequences } from '../../services/stopSequences'
+import { filterParamsForProvider } from '../../services/samplingParams'
 import ModelSelect from './settings/controls/ModelSelect'
-import SettingSlider from './settings/controls/SettingSlider'
 import SettingToggle from './settings/controls/SettingToggle'
+import ParamEditor from './profile/ParamEditor'
+import RecommendedSettingsCard from './profile/RecommendedSettingsCard'
 import { RefreshCw } from '../../lib/icons'
-
-function StringListInput({ value, onChange, maxItems, id }) {
-  const { t } = useTranslation('settings')
-  const [input, setInput] = useState('')
-  const items = Array.isArray(value) ? value : []
-
-  function handleAdd() {
-    const raw = input.trim()
-    if (!raw) return
-    const parts = raw
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
-    if (parts.length === 0) return
-    const available = maxItems ? maxItems - items.length : Infinity
-    const toAdd = parts.slice(0, available)
-    if (toAdd.length === 0) return
-    onChange([...items, ...toAdd])
-    setInput('')
-  }
-
-  function handleRemove(idx) {
-    const next = items.filter((_, i) => i !== idx)
-    onChange(next)
-  }
-
-  function handleKeyDown(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleAdd()
-    }
-  }
-
-  const atLimit = maxItems && items.length >= maxItems
-
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex flex-wrap gap-1.5">
-        {items.map((item, idx) => (
-          <span
-            key={idx}
-            className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full bg-primary-subtle text-primary"
-          >
-            {item}
-            <button
-              type="button"
-              onClick={() => handleRemove(idx)}
-              className="hover:bg-delete-hover hover:text-on-delete rounded-sm px-0.5"
-            >
-              &times;
-            </button>
-          </span>
-        ))}
-      </div>
-      <div className="flex gap-1.5">
-        <input
-          type="text"
-          id={id}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          disabled={atLimit}
-          placeholder={atLimit ? t('api.profile.maxStopItems') : t('api.profile.addStopItem')}
-          className="flex-1 min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
-        />
-        <button
-          type="button"
-          onClick={handleAdd}
-          disabled={!input.trim() || atLimit}
-          className="min-h-[44px] px-3 text-sm btn-primary disabled:opacity-50"
-        >
-          {t('api.profile.add')}
-        </button>
-      </div>
-    </div>
-  )
-}
 
 const CEREBRAS_REASONING_MAP = {
   'gpt-oss-120b': { options: ['low', 'medium', 'high'], default: 'medium' },
   'zai-glm-4.7': { options: ['none'], default: 'none' },
   'gemma-4-31b': { options: ['none', 'low', 'medium', 'high'], default: 'none' },
 }
+
+const HORDE_TEMPLATE_OPTIONS = [
+  { key: '', labelKey: 'api.profile.form.promptTemplate.useGlobal' },
+  { key: 'simple-roleplay', labelKey: 'api.profile.form.promptTemplate.simpleRoleplay' },
+  { key: 'bracketed', labelKey: 'api.profile.form.promptTemplate.bracketed' },
+  { key: 'chatml', labelKey: 'api.profile.form.promptTemplate.chatml' },
+  { key: 'mistral-instruct', labelKey: 'api.profile.form.promptTemplate.mistralInstruct' },
+  { key: 'metharme', labelKey: 'api.profile.form.promptTemplate.metharme' },
+  { key: 'custom', labelKey: 'api.profile.form.promptTemplate.custom' },
+]
 
 function resolveParams(profile) {
   const base = profile?.params ? { ...profile.params } : {}
@@ -144,9 +81,60 @@ function sortParams(obj) {
     }, {})
 }
 
+function ApplyPresetSection({
+  titleKey,
+  options,
+  selected,
+  onSelect,
+  onApply,
+  onManage,
+  emptyKey,
+  selectPlaceholderKey,
+  t,
+}) {
+  return (
+    <div className="pt-2 border-t border-border">
+      <div className="flex items-center justify-between mb-1.5">
+        <p className="text-sm font-medium text-text">{t(titleKey)}</p>
+        <button
+          type="button"
+          onClick={onManage}
+          className="min-h-[44px] px-2 text-xs text-accent hover:underline"
+        >
+          {t('api.profile.form.managePresets')}
+        </button>
+      </div>
+      <div className="flex gap-2">
+        <select
+          value={selected}
+          onChange={(e) => onSelect(e.target.value)}
+          disabled={options.length === 0}
+          className="flex-1 min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm"
+        >
+          <option value="">{t(selectPlaceholderKey)}</option>
+          {options.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.name}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          disabled={!selected}
+          onClick={onApply}
+          className="min-h-[44px] px-4 text-sm btn-primary disabled:opacity-50"
+        >
+          {t('api.profile.form.apply')}
+        </button>
+      </div>
+      {options.length === 0 && <p className="text-xs text-tertiary mt-1.5">{t(emptyKey)}</p>}
+    </div>
+  )
+}
+
 function ProfileFormModal({ profile }) {
   const { t } = useTranslation('settings')
-  const { closeModal, setCloseGuard } = useModal()
+  const { openModal, closeModal, setCloseGuard } = useModal()
   const { promptSave } = useSaveConfirm()
   const { confirm } = useConfirm()
   const editing = Boolean(profile)
@@ -188,6 +176,8 @@ function ProfileFormModal({ profile }) {
       params: resolveParams(profile),
       disabledParams: profile?.disabledParams ? { ...profile.disabledParams } : {},
       baseUrl: profile?.baseUrl || getDefaultBaseUrl(profile?.providerId) || '',
+      promptTemplate: profile?.promptTemplate || '',
+      promptTemplateCustom: profile?.promptTemplateCustom || '',
     }),
     [],
   )
@@ -205,6 +195,11 @@ function ProfileFormModal({ profile }) {
 
   const [providerKeyCounts, setProviderKeyCounts] = useState({})
 
+  const [samplingProfiles, setSamplingProfiles] = useState([])
+  const [stopSets, setStopSets] = useState([])
+  const [selSamplingProfile, setSelSamplingProfile] = useState('')
+  const [selStopSet, setSelStopSet] = useState('')
+
   const selectedProvider = PROVIDERS.find((p) => p.id === form.providerId)
   const paramDefs = selectedProvider?.params || []
 
@@ -219,6 +214,10 @@ function ProfileFormModal({ profile }) {
 
   const cerebrasReasoning = isCerebras ? CEREBRAS_REASONING_MAP[form.model] || null : null
   const showCerebrasReasoning = Boolean(cerebrasReasoning)
+
+  const hordeMethod =
+    form.providerId === 'ai-horde' ? form.params.hordeMethod || 'native' : undefined
+  const isHordeNative = selectedProvider?.supportsHordeMethods && hordeMethod === 'native'
 
   useEffect(() => {
     if (selectedProvider) {
@@ -289,8 +288,25 @@ function ProfileFormModal({ profile }) {
     }
   }, [])
 
-  const hordeMethod =
-    form.providerId === 'ai-horde' ? form.params.hordeMethod || 'native' : undefined
+  useEffect(() => {
+    let cancelled = false
+    getAllSamplingProfiles().then((list) => {
+      if (!cancelled) setSamplingProfiles(list)
+    })
+    getAllStopSequences().then((list) => {
+      if (!cancelled) setStopSets(list)
+    })
+    const onSampling = () =>
+      getAllSamplingProfiles().then((l) => !cancelled && setSamplingProfiles(l))
+    const onStop = () => getAllStopSequences().then((l) => !cancelled && setStopSets(l))
+    window.addEventListener('samplingProfiles-changed', onSampling)
+    window.addEventListener('stopSequences-changed', onStop)
+    return () => {
+      cancelled = true
+      window.removeEventListener('samplingProfiles-changed', onSampling)
+      window.removeEventListener('stopSequences-changed', onStop)
+    }
+  }, [])
 
   useEffect(() => {
     if (form.providerId) {
@@ -346,6 +362,10 @@ function ProfileFormModal({ profile }) {
     })
   }
 
+  function mergeParams(extra) {
+    setForm((prev) => ({ ...prev, params: { ...prev.params, ...extra } }))
+  }
+
   function toggleParamDisabled(paramKey) {
     setForm((prev) => {
       const next = { ...prev.disabledParams }
@@ -356,6 +376,33 @@ function ProfileFormModal({ profile }) {
       }
       return { ...prev, disabledParams: next }
     })
+  }
+
+  function handleApplyRecommendationParams(params) {
+    mergeParams(params)
+  }
+
+  function handleApplyRecommendationTemplate(template) {
+    setForm((prev) => ({ ...prev, promptTemplate: template }))
+  }
+
+  function handleApplyRecommendationStop(stopSequences) {
+    mergeParams({ stop: stopSequences })
+  }
+
+  function handleApplySamplingProfile() {
+    const p = samplingProfiles.find((x) => x.id === selSamplingProfile)
+    if (!p) return
+    const activeMethod = selectedProvider?.supportsHordeMethods
+      ? form.params.hordeMethod || 'native'
+      : undefined
+    mergeParams(filterParamsForProvider(p.params, form.providerId, activeMethod))
+  }
+
+  function handleApplyStopSet() {
+    const s = stopSets.find((x) => x.id === selStopSet)
+    if (!s) return
+    mergeParams({ stop: s.sequences })
   }
 
   async function saveProfile() {
@@ -369,6 +416,8 @@ function ProfileFormModal({ profile }) {
         params: { ...form.params },
         disabledParams: { ...form.disabledParams },
         baseUrl: form.baseUrl || null,
+        promptTemplate: form.promptTemplate || null,
+        promptTemplateCustom: form.promptTemplateCustom || '',
       }
       if (editing) {
         await updateProfile(profile.id, data)
@@ -540,7 +589,11 @@ function ProfileFormModal({ profile }) {
                 params: {},
                 disabledParams: {},
                 baseUrl: getDefaultBaseUrl(nextProvider) || '',
+                promptTemplate: '',
+                promptTemplateCustom: '',
               }))
+              setSelSamplingProfile('')
+              setSelStopSet('')
             }}
             className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm"
           >
@@ -616,6 +669,44 @@ function ProfileFormModal({ profile }) {
           </div>
         )}
 
+        {isHordeNative && (
+          <div>
+            <span className="block text-sm font-medium text-text mb-1.5">
+              {t('api.profile.form.promptTemplate.title')}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {HORDE_TEMPLATE_OPTIONS.map((opt) => {
+                const isActive = (form.promptTemplate || '') === opt.key
+                return (
+                  <button
+                    key={opt.key || 'use-global'}
+                    type="button"
+                    onClick={() => setForm((prev) => ({ ...prev, promptTemplate: opt.key }))}
+                    className={`min-h-[44px] px-3 py-2 text-sm rounded-md border transition-colors ${
+                      isActive
+                        ? 'bg-primary text-on-primary border-primary'
+                        : 'bg-surface text-secondary border-border hover:bg-surface-hover'
+                    }`}
+                  >
+                    {t(opt.labelKey)}
+                  </button>
+                )
+              })}
+            </div>
+            {form.promptTemplate === 'custom' && (
+              <textarea
+                value={form.promptTemplateCustom}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, promptTemplateCustom: e.target.value }))
+                }
+                rows={6}
+                placeholder={t('api.profile.form.promptTemplate.customPlaceholder')}
+                className="w-full mt-2 px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
+              />
+            )}
+          </div>
+        )}
+
         {selectedProvider?.supportsLmStudioMethods && (
           <div>
             <span className="block text-sm font-medium text-text mb-1.5">
@@ -682,6 +773,15 @@ function ProfileFormModal({ profile }) {
               />
             )}
           </div>
+        )}
+
+        {isHordeNative && form.model && (
+          <RecommendedSettingsCard
+            modelId={form.model}
+            onApplyParams={handleApplyRecommendationParams}
+            onApplyTemplate={handleApplyRecommendationTemplate}
+            onApplyStop={handleApplyRecommendationStop}
+          />
         )}
 
         {(showReasoningControls || showCerebrasReasoning) && (
@@ -771,76 +871,47 @@ function ProfileFormModal({ profile }) {
                 {t('api.profile.form.resetParams')}
               </button>
             </div>
-            {paramDefs
-              .filter((param) => {
-                if (!selectedProvider?.supportsHordeMethods) return true
-                const method = param.method || 'all'
-                const activeMethod = form.params.hordeMethod || 'native'
-                if (method === 'all') return true
-                return method === activeMethod
-              })
-              .map((param) => {
-                const isToggleable = TOGGLEABLE_PARAM_KEYS.has(param.key)
-                const isDisabled = isToggleable && !!form.disabledParams[param.key]
-                const descPath = param.descKey?.replace('settings:', '')
-                return (
-                  <div key={param.key}>
-                    <div className="flex items-center justify-between mb-1">
-                      <label
-                        className={`text-xs font-medium ${isDisabled ? 'text-tertiary' : 'text-secondary'}`}
-                        htmlFor={formId + '-param-' + param.key}
-                      >
-                        {param.label || param.key}
-                      </label>
-                      {isToggleable && (
-                        <SettingToggle
-                          value={!isDisabled}
-                          onChange={() => toggleParamDisabled(param.key)}
-                        />
-                      )}
-                    </div>
-                    {descPath && (
-                      <p className="text-xs text-secondary mt-0.5 mb-2">{t(descPath)}</p>
-                    )}
-                    {param.type === 'range' && (
-                      <SettingSlider
-                        id={formId + '-param-' + param.key}
-                        value={form.params[param.key] ?? param.default ?? param.min ?? 0}
-                        onChange={(v) => updateParam(param.key, v)}
-                        min={param.min ?? 0}
-                        max={param.max ?? 100}
-                        step={param.step ?? 1}
-                        disabled={isDisabled}
-                      />
-                    )}
-                    {param.type === 'boolean' && (
-                      <SettingToggle
-                        id={formId + '-param-' + param.key}
-                        value={form.params[param.key] ?? param.default ?? false}
-                        onChange={(v) => updateParam(param.key, v)}
-                      />
-                    )}
-                    {param.type === 'string-list' && (
-                      <StringListInput
-                        id={formId + '-param-' + param.key}
-                        value={form.params[param.key] ?? []}
-                        onChange={(v) => updateParam(param.key, v)}
-                        maxItems={param.maxItems}
-                      />
-                    )}
-                    {param.type === 'text' && (
-                      <input
-                        id={formId + '-param-' + param.key}
-                        type="text"
-                        value={form.params[param.key] ?? param.default ?? ''}
-                        onChange={(e) => updateParam(param.key, e.target.value)}
-                        className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
-                      />
-                    )}
-                  </div>
-                )
-              })}
+            <div className="space-y-4">
+              <ParamEditor
+                paramDefs={paramDefs}
+                values={form.params}
+                disabledParams={form.disabledParams}
+                toggleableKeys={TOGGLEABLE_PARAM_KEYS}
+                formId={formId}
+                activeMethod={selectedProvider?.supportsHordeMethods ? hordeMethod : undefined}
+                onChange={updateParam}
+                onToggleDisabled={toggleParamDisabled}
+                t={t}
+              />
+            </div>
           </div>
+        )}
+
+        {selectedProvider && (
+          <>
+            <ApplyPresetSection
+              titleKey="api.profile.form.samplingProfiles"
+              options={samplingProfiles}
+              selected={selSamplingProfile}
+              onSelect={setSelSamplingProfile}
+              onApply={handleApplySamplingProfile}
+              onManage={() => openModal('samplingProfileManagement')}
+              emptyKey="api.profile.form.noSamplingProfiles"
+              selectPlaceholderKey="api.profile.form.selectSamplingProfile"
+              t={t}
+            />
+            <ApplyPresetSection
+              titleKey="api.profile.form.stopSequences"
+              options={stopSets}
+              selected={selStopSet}
+              onSelect={setSelStopSet}
+              onApply={handleApplyStopSet}
+              onManage={() => openModal('stopSequenceManagement')}
+              emptyKey="api.profile.form.noStopSequences"
+              selectPlaceholderKey="api.profile.form.selectStopSequence"
+              t={t}
+            />
+          </>
         )}
       </div>
     </ModalShell>

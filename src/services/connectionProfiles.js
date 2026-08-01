@@ -79,6 +79,8 @@ export async function createProfile(data) {
     model: data.model || null,
     params: data.params || {},
     baseUrl: data.baseUrl || null,
+    promptTemplate: data.promptTemplate || null,
+    promptTemplateCustom: data.promptTemplateCustom || '',
     createdAt: now,
     updatedAt: now,
   })
@@ -129,6 +131,8 @@ export async function duplicateProfile(id) {
     model: original.model,
     params: { ...original.params },
     baseUrl: original.baseUrl || null,
+    promptTemplate: original.promptTemplate || null,
+    promptTemplateCustom: original.promptTemplateCustom || '',
     createdAt: now,
     updatedAt: now,
   })
@@ -185,6 +189,8 @@ export async function exportProfile(id) {
     model: profile.model || null,
     params: profile.params || {},
     baseUrl: profile.baseUrl || null,
+    promptTemplate: profile.promptTemplate || null,
+    promptTemplateCustom: profile.promptTemplateCustom || '',
   }
 }
 
@@ -214,6 +220,8 @@ export async function importProfiles(items) {
       model: item.model || null,
       params: item.params || {},
       baseUrl: item.baseUrl || null,
+      promptTemplate: item.promptTemplate || null,
+      promptTemplateCustom: item.promptTemplateCustom || '',
       createdAt: now,
       updatedAt: now,
     })
@@ -278,6 +286,8 @@ export async function getEffectiveProfileFor(requestKind, character) {
     params: { ...profile.params },
     baseUrl: profile.baseUrl || null,
     disabledParams: { ...(profile.disabledParams || {}) },
+    promptTemplate: profile.promptTemplate || null,
+    promptTemplateCustom: profile.promptTemplateCustom || '',
   }
 }
 
@@ -318,6 +328,9 @@ export async function migrateFromOldSettings() {
     keyId: activeKey?.id || null,
     model: model || null,
     params: {},
+    baseUrl: null,
+    promptTemplate: null,
+    promptTemplateCustom: '',
     createdAt: now,
     updatedAt: now,
   })

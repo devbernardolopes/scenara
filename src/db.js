@@ -450,4 +450,29 @@ db.version(30).stores({
   cloudServices: '++id, name, createdAt',
 })
 
+// v31: user-saved sampling profiles and stop-sequence sets
+db.version(31).stores({
+  threads:
+    '++id, title, characterId, personaId, updatedAt, isFavorite, isLocked, threadNumber, activeShortcutSetId, activeScenario',
+  characters:
+    '++id, name, displayName, speakerName, createdAt, updatedAt, characterNumber, *tags, *lorebookIds',
+  personas: '++id, name, title, createdAt, isDefault',
+  settings: '++id, key',
+  uiState: '++id, key',
+  messages: '++id, threadId, role, personaId, createdAt, summarizedAt',
+  writingInstructions: '++id, name, createdAt',
+  connectionProfiles: '++id, name, createdAt',
+  inChatShortcuts: '++id, name, createdAt, order',
+  lorebooks: '++id, name, createdAt, avatar, isGlobal',
+  lorebookEntries: '++id, lorebookId, order, enabled, createdAt, updatedAt',
+  promptHistory: '++id, threadId, createdAt, isOOC',
+  promptBank: '++id, name, kind, createdAt',
+  tags: '++id, &name, createdAt',
+  threadMemories: '++id, threadId, createdAt',
+  logs: '++id, type, threadId, createdAt, level',
+  cloudServices: '++id, name, createdAt',
+  samplingProfiles: '++id, name, createdAt',
+  stopSequences: '++id, name, createdAt',
+})
+
 export default db

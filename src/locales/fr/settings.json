@@ -157,7 +157,8 @@
     "localInferenceAdvanced": "Avancé",
     "interface": "Interface",
     "chat": "Chat",
-    "extra": "Extra"
+    "extra": "Extra",
+    "hordeNative": "Horde Native"
   },
   "appearance": {
     "theme": {
@@ -557,7 +558,36 @@
         "lmStudioMethodAnthropic": "Compatible Anthropic",
         "comingSoon": "Bientôt disponible",
         "baseUrl": "URL de base",
-        "baseUrlPlaceholder": "Laisser vide pour la valeur par défaut"
+        "baseUrlPlaceholder": "Laisser vide pour la valeur par défaut",
+        "promptTemplate": {
+          "title": "Horde Native Prompt Template",
+          "useGlobal": "Use Global",
+          "simpleRoleplay": "Simple Roleplay",
+          "bracketed": "Bracketed System",
+          "chatml": "ChatML",
+          "mistralInstruct": "Mistral Instruct",
+          "metharme": "Metharme",
+          "custom": "Custom",
+          "customPlaceholder": "Define your own prompt template. Use {{system}} for the system block, {{charName}} for the character name, {{personaName}} for the user name, and {{#history}}...{{/history}} to iterate over messages ({{speaker}}, {{content}}, {{role}} inside)."
+        },
+        "recommended": {
+          "title": "Recommended Settings",
+          "loading": "Loading recommended settings…",
+          "none": "No recommended settings available for this model yet.",
+          "refresh": "Refresh",
+          "source": "Source",
+          "applyParams": "Apply params ({{count}})",
+          "applyTemplate": "Apply template",
+          "applyStop": "Apply stops ({{count}})"
+        },
+        "samplingProfiles": "Apply Sampling Profile",
+        "noSamplingProfiles": "No sampling profiles yet. Create them in Settings.",
+        "selectSamplingProfile": "Select a sampling profile…",
+        "stopSequences": "Apply Stop Sequence Set",
+        "noStopSequences": "No stop sequence sets yet. Create them in Settings.",
+        "selectStopSequence": "Select a stop sequence set…",
+        "managePresets": "Manage",
+        "apply": "Apply"
       },
       "add": "Ajouter",
       "maxStopItems": "Limite atteinte",
@@ -635,6 +665,34 @@
       "lmStudio": {
         "name": "LM Studio",
         "desc": "Run models locally on your machine"
+      }
+    },
+    "params": {
+      "maxCompletionTokens": "Maximum number of tokens the model can generate in a single response.",
+      "maxTokens": "Maximum number of tokens the model can generate in a single response.",
+      "temperature": "Controls randomness in output. Higher values produce more creative responses, lower values produce more focused responses.",
+      "topP": "Nucleus sampling threshold. Alternative to temperature, considers tokens with top_p cumulative probability.",
+      "topK": "Limits the number of highest-probability tokens considered at each step.",
+      "frequencyPenalty": "Reduces repetition by penalizing tokens that have already appeared in the text.",
+      "presencePenalty": "Discourages the model from repeating topics by penalizing tokens that have already appeared.",
+      "stream": "Stream tokens as they are generated instead of waiting for the full response.",
+      "stop": "Custom stop sequences that signal the model to stop generating. Supports {{char}}, {{user}}, and {{name}} template variables.",
+      "native": {
+        "maxLength": "Maximum number of tokens the model can generate in a single response (Native API).",
+        "maxContextLength": "Maximum context length for the prompt including generated tokens.",
+        "repetitionPenalty": "Penalizes tokens based on their frequency in the prompt. Higher values reduce repetition.",
+        "topK": "Limits the number of highest-probability tokens considered at each step.",
+        "topA": "Top-A sampling: Limits tokens based on probability thresholds.",
+        "tfs": "Tail Free Sampling: Reduces the impact of less probable tokens.",
+        "typical": "Typical Sampling: Focuses on tokens with typical probability.",
+        "minP": "Minimum probability threshold for token consideration.",
+        "smoothingFactor": "Smoothing factor for quad-smoothing sampler.",
+        "samplerOrder": "Order of sampler application as comma-separated indices.",
+        "n": "Number of generations to produce per request.",
+        "trustedWorkers": "Only use trusted workers with a proven reliability record.",
+        "slowWorkers": "Allow slower workers to pick up the request.",
+        "allowDowngrade": "Allow the Horde to reduce context/token limits if needed.",
+        "disableBatching": "Disable batching of requests."
       }
     }
   },
@@ -804,11 +862,41 @@
       "label": "Rogner les espaces",
       "desc": "Supprime les espaces initiaux et finaux des messages USER après envoi."
     },
+    "trimWhitespacesAi": {
+      "label": "Trim Whitespaces (AI)",
+      "desc": "Remove leading and trailing whitespace from AI responses after they are received."
+    },
     "keepCodeBlocks": {
       "label": "Conserver les blocs de code",
       "desc": "Retire les blocs de code délimités (``` et ~~~) du contenu du message avant l’envoi à l’API.",
       "always": "Toujours",
       "never": "Jamais"
+    },
+    "hordeNative": {
+      "template": {
+        "label": "Horde Native Prompt Template",
+        "desc": "Choose the prompt format used when sending requests via the Horde Native API. This controls how messages are flattened into a single text prompt."
+      },
+      "customTemplate": {
+        "label": "Custom Prompt Template",
+        "desc": "Define your own prompt template. Use {{system}} for the system block, {{charName}} for the character name, {{personaName}} for the user name, and {{#history}}...{{/history}} to iterate over messages ({{speaker}}, {{content}}, {{role}} inside)."
+      },
+      "samplingProfiles": {
+        "label": "Sampling Profiles",
+        "desc": "Create and manage named sets of sampling parameters you can apply to any connection profile."
+      },
+      "stopSequences": {
+        "label": "Stop Sequence Sets",
+        "desc": "Create and manage named sets of stop strings you can apply to any connection profile."
+      },
+      "options": {
+        "simpleRoleplay": "Simple Roleplay",
+        "bracketed": "Bracketed System",
+        "chatml": "ChatML",
+        "mistralInstruct": "Mistral Instruct",
+        "metharme": "Metharme",
+        "custom": "Custom"
+      }
     },
     "toggleInputPlaceholder": "Saisir une valeur"
   },
@@ -931,6 +1019,89 @@
       "importSuccess": "{{count}} instruction(s) d’écriture importée(s)"
     }
   },
+  "samplingProfile": {
+    "title": "Sampling Profiles",
+    "create": "Create Sampling Profile",
+    "import": {
+      "invalidFormat": "Invalid file format.",
+      "fileError": "Could not read file."
+    },
+    "noItems": "No sampling profiles yet. Create one to save a set of sampling parameters you can apply to any profile.",
+    "paramCount": "{{count}} parameter",
+    "paramCount_other": "{{count}} parameters",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "confirmDelete": {
+      "title": "Delete Sampling Profile",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} sampling profiles?"
+    },
+    "form": {
+      "title": "Create Sampling Profile",
+      "editTitle": "Edit Sampling Profile",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Creative, Fast draft",
+      "paramsLabel": "Parameters",
+      "paramsHint": "Each key must match a sampling parameter name of the target provider. Only supported keys are applied when you use this profile.",
+      "keyPlaceholder": "Param key (e.g. temperature)",
+      "valuePlaceholder": "Value",
+      "addParam": "Add parameter",
+      "removeParam": "Remove parameter",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    }
+  },
+  "stopSequence": {
+    "title": "Stop Sequence Sets",
+    "create": "Create Stop Sequence Set",
+    "import": {
+      "invalidFormat": "Invalid file format.",
+      "fileError": "Could not read file."
+    },
+    "noItems": "No stop sequence sets yet. Create one to save a set of stop strings you can apply to any profile.",
+    "sequenceCount": "{{count}} stop sequence",
+    "sequenceCount_other": "{{count}} stop sequences",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "export": "Export"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "delete": "Delete ({{count}})",
+      "duplicate": "Duplicate ({{count}})",
+      "export": "Export ({{count}})",
+      "clear": "Clear"
+    },
+    "confirmDelete": {
+      "title": "Delete Stop Sequence Set",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "messageMultiple": "Are you sure you want to delete {{count}} stop sequence sets?"
+    },
+    "form": {
+      "title": "Create Stop Sequence Set",
+      "editTitle": "Edit Stop Sequence Set",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. ChatML stops",
+      "sequencesLabel": "Stop Sequences",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    }
+  },
   "defaults": {
     "autoTitle": {
       "label": "Titre auto",
@@ -984,6 +1155,10 @@
     "includeOOC": {
       "label": "Inclure HORS-PERS",
       "desc": "État par défaut du bouton d’inclusion HORS-PERS."
+    },
+    "removeCodeBlocksFromStatusBlock": {
+      "label": "Supprimer les blocs de code supplémentaires du bloc de statut",
+      "desc": "Supprimer les délimiteurs de code au début et à la fin du bloc de statut dans les bulles de chat. Visuel uniquement ; le contenu stocké n’est pas modifié."
     },
     "removeMarkdownImages": {
       "label": "Supprimer la syntaxe d’image Markdown",
