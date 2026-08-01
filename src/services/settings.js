@@ -319,6 +319,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantDelete.label',
     descKey: 'settings:appearance.showAssistantDelete.desc',
+    hidden: true,
   },
   {
     key: 'showAssistantEdit',
@@ -328,6 +329,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantEdit.label',
     descKey: 'settings:appearance.showAssistantEdit.desc',
+    hidden: true,
   },
   {
     key: 'showAssistantCopy',
@@ -337,6 +339,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantCopy.label',
     descKey: 'settings:appearance.showAssistantCopy.desc',
+    hidden: true,
   },
   {
     key: 'showAssistantFork',
@@ -346,6 +349,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantFork.label',
     descKey: 'settings:appearance.showAssistantFork.desc',
+    hidden: true,
   },
   {
     key: 'showAssistantRegenerate',
@@ -355,6 +359,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantRegenerate.label',
     descKey: 'settings:appearance.showAssistantRegenerate.desc',
+    hidden: true,
   },
   {
     key: 'showAssistantSpeak',
@@ -364,6 +369,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantSpeak.label',
     descKey: 'settings:appearance.showAssistantSpeak.desc',
+    hidden: true,
   },
   {
     key: 'showAssistantPrompt',
@@ -373,6 +379,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantPrompt.label',
     descKey: 'settings:appearance.showAssistantPrompt.desc',
+    hidden: true,
   },
   {
     key: 'showAssistantRequestDetails',
@@ -382,6 +389,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantRequestDetails.label',
     descKey: 'settings:appearance.showAssistantRequestDetails.desc',
+    hidden: true,
   },
   {
     key: 'showAssistantDeleteAll',
@@ -391,6 +399,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantDeleteAll.label',
     descKey: 'settings:appearance.showAssistantDeleteAll.desc',
+    hidden: true,
   },
   {
     key: 'showAssistantDeleteFromHere',
@@ -400,6 +409,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantDeleteFromHere.label',
     descKey: 'settings:appearance.showAssistantDeleteFromHere.desc',
+    hidden: true,
   },
   {
     key: 'showAssistantDirectorDetails',
@@ -409,6 +419,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantDirectorDetails.label',
     descKey: 'settings:appearance.showAssistantDirectorDetails.desc',
+    hidden: true,
   },
   {
     key: 'showAssistantVisible',
@@ -418,6 +429,7 @@ export const SETTINGS = [
     group: 'assistantButtons',
     labelKey: 'settings:appearance.showAssistantVisible.label',
     descKey: 'settings:appearance.showAssistantVisible.desc',
+    hidden: true,
   },
   {
     key: 'assistantButtonOrder',
@@ -442,27 +454,66 @@ export const SETTINGS = [
     descKey: 'settings:appearance.assistantButtonOrder.desc',
     props: {
       buttons: [
-        { key: 'delete', labelKey: 'settings:appearance.showAssistantDelete.label' },
-        { key: 'deleteAll', labelKey: 'settings:appearance.showAssistantDeleteAll.label' },
+        {
+          key: 'delete',
+          labelKey: 'settings:appearance.showAssistantDelete.label',
+          settingKey: 'showAssistantDelete',
+        },
+        {
+          key: 'deleteAll',
+          labelKey: 'settings:appearance.showAssistantDeleteAll.label',
+          settingKey: 'showAssistantDeleteAll',
+        },
         {
           key: 'deleteFromHere',
           labelKey: 'settings:appearance.showAssistantDeleteFromHere.label',
+          settingKey: 'showAssistantDeleteFromHere',
         },
-        { key: 'edit', labelKey: 'settings:appearance.showAssistantEdit.label' },
-        { key: 'copy', labelKey: 'settings:appearance.showAssistantCopy.label' },
-        { key: 'fork', labelKey: 'settings:appearance.showAssistantFork.label' },
-        { key: 'regenerate', labelKey: 'settings:appearance.showAssistantRegenerate.label' },
-        { key: 'speak', labelKey: 'settings:appearance.showAssistantSpeak.label' },
-        { key: 'prompt', labelKey: 'settings:appearance.showAssistantPrompt.label' },
+        {
+          key: 'edit',
+          labelKey: 'settings:appearance.showAssistantEdit.label',
+          settingKey: 'showAssistantEdit',
+        },
+        {
+          key: 'copy',
+          labelKey: 'settings:appearance.showAssistantCopy.label',
+          settingKey: 'showAssistantCopy',
+        },
+        {
+          key: 'fork',
+          labelKey: 'settings:appearance.showAssistantFork.label',
+          settingKey: 'showAssistantFork',
+        },
+        {
+          key: 'regenerate',
+          labelKey: 'settings:appearance.showAssistantRegenerate.label',
+          settingKey: 'showAssistantRegenerate',
+        },
+        {
+          key: 'speak',
+          labelKey: 'settings:appearance.showAssistantSpeak.label',
+          settingKey: 'showAssistantSpeak',
+        },
+        {
+          key: 'prompt',
+          labelKey: 'settings:appearance.showAssistantPrompt.label',
+          settingKey: 'showAssistantPrompt',
+        },
         {
           key: 'requestDetails',
           labelKey: 'settings:appearance.showAssistantRequestDetails.label',
+          settingKey: 'showAssistantRequestDetails',
         },
         {
           key: 'directorDetails',
           labelKey: 'settings:appearance.showAssistantDirectorDetails.label',
+          settingKey: 'showAssistantDirectorDetails',
         },
-        { key: 'visible', labelKey: 'settings:appearance.showAssistantVisible.label' },
+        {
+          key: 'visible',
+          labelKey: 'settings:appearance.showAssistantVisible.label',
+          settingKey: 'showAssistantVisible',
+        },
       ],
     },
   },
@@ -474,6 +525,7 @@ export const SETTINGS = [
     group: 'userButtons',
     labelKey: 'settings:appearance.showUserDelete.label',
     descKey: 'settings:appearance.showUserDelete.desc',
+    hidden: true,
   },
   {
     key: 'showUserEdit',
@@ -483,6 +535,7 @@ export const SETTINGS = [
     group: 'userButtons',
     labelKey: 'settings:appearance.showUserEdit.label',
     descKey: 'settings:appearance.showUserEdit.desc',
+    hidden: true,
   },
   {
     key: 'showUserCopy',
@@ -492,6 +545,7 @@ export const SETTINGS = [
     group: 'userButtons',
     labelKey: 'settings:appearance.showUserCopy.label',
     descKey: 'settings:appearance.showUserCopy.desc',
+    hidden: true,
   },
   {
     key: 'showUserFork',
@@ -501,6 +555,7 @@ export const SETTINGS = [
     group: 'userButtons',
     labelKey: 'settings:appearance.showUserFork.label',
     descKey: 'settings:appearance.showUserFork.desc',
+    hidden: true,
   },
   {
     key: 'showUserDeleteAll',
@@ -510,6 +565,7 @@ export const SETTINGS = [
     group: 'userButtons',
     labelKey: 'settings:appearance.showUserDeleteAll.label',
     descKey: 'settings:appearance.showUserDeleteAll.desc',
+    hidden: true,
   },
   {
     key: 'showUserDeleteFromHere',
@@ -519,6 +575,7 @@ export const SETTINGS = [
     group: 'userButtons',
     labelKey: 'settings:appearance.showUserDeleteFromHere.label',
     descKey: 'settings:appearance.showUserDeleteFromHere.desc',
+    hidden: true,
   },
   {
     key: 'showUserMakeShortcut',
@@ -528,6 +585,7 @@ export const SETTINGS = [
     group: 'userButtons',
     labelKey: 'settings:appearance.showUserMakeShortcut.label',
     descKey: 'settings:appearance.showUserMakeShortcut.desc',
+    hidden: true,
   },
   {
     key: 'showUserVisible',
@@ -537,6 +595,7 @@ export const SETTINGS = [
     group: 'userButtons',
     labelKey: 'settings:appearance.showUserVisible.label',
     descKey: 'settings:appearance.showUserVisible.desc',
+    hidden: true,
   },
   {
     key: 'userButtonOrder',
@@ -557,14 +616,46 @@ export const SETTINGS = [
     descKey: 'settings:appearance.userButtonOrder.desc',
     props: {
       buttons: [
-        { key: 'delete', labelKey: 'settings:appearance.showUserDelete.label' },
-        { key: 'deleteAll', labelKey: 'settings:appearance.showUserDeleteAll.label' },
-        { key: 'deleteFromHere', labelKey: 'settings:appearance.showUserDeleteFromHere.label' },
-        { key: 'edit', labelKey: 'settings:appearance.showUserEdit.label' },
-        { key: 'copy', labelKey: 'settings:appearance.showUserCopy.label' },
-        { key: 'fork', labelKey: 'settings:appearance.showUserFork.label' },
-        { key: 'makeShortcut', labelKey: 'settings:appearance.showUserMakeShortcut.label' },
-        { key: 'visible', labelKey: 'settings:appearance.showUserVisible.label' },
+        {
+          key: 'delete',
+          labelKey: 'settings:appearance.showUserDelete.label',
+          settingKey: 'showUserDelete',
+        },
+        {
+          key: 'deleteAll',
+          labelKey: 'settings:appearance.showUserDeleteAll.label',
+          settingKey: 'showUserDeleteAll',
+        },
+        {
+          key: 'deleteFromHere',
+          labelKey: 'settings:appearance.showUserDeleteFromHere.label',
+          settingKey: 'showUserDeleteFromHere',
+        },
+        {
+          key: 'edit',
+          labelKey: 'settings:appearance.showUserEdit.label',
+          settingKey: 'showUserEdit',
+        },
+        {
+          key: 'copy',
+          labelKey: 'settings:appearance.showUserCopy.label',
+          settingKey: 'showUserCopy',
+        },
+        {
+          key: 'fork',
+          labelKey: 'settings:appearance.showUserFork.label',
+          settingKey: 'showUserFork',
+        },
+        {
+          key: 'makeShortcut',
+          labelKey: 'settings:appearance.showUserMakeShortcut.label',
+          settingKey: 'showUserMakeShortcut',
+        },
+        {
+          key: 'visible',
+          labelKey: 'settings:appearance.showUserVisible.label',
+          settingKey: 'showUserVisible',
+        },
       ],
     },
   },
@@ -576,6 +667,7 @@ export const SETTINGS = [
     group: 'chatButtons',
     labelKey: 'settings:appearance.showChatOOC.label',
     descKey: 'settings:appearance.showChatOOC.desc',
+    hidden: true,
   },
   {
     key: 'showChatAttachFile',
@@ -585,6 +677,7 @@ export const SETTINGS = [
     group: 'chatButtons',
     labelKey: 'settings:appearance.showChatAttachFile.label',
     descKey: 'settings:appearance.showChatAttachFile.desc',
+    hidden: true,
   },
   {
     key: 'showChatShortcuts',
@@ -594,6 +687,7 @@ export const SETTINGS = [
     group: 'chatButtons',
     labelKey: 'settings:appearance.showChatShortcuts.label',
     descKey: 'settings:appearance.showChatShortcuts.desc',
+    hidden: true,
   },
   {
     key: 'showChatMemories',
@@ -603,6 +697,7 @@ export const SETTINGS = [
     group: 'chatButtons',
     labelKey: 'settings:appearance.showChatMemories.label',
     descKey: 'settings:appearance.showChatMemories.desc',
+    hidden: true,
   },
   {
     key: 'showChatSTT',
@@ -612,6 +707,7 @@ export const SETTINGS = [
     group: 'chatButtons',
     labelKey: 'settings:appearance.showChatSTT.label',
     descKey: 'settings:appearance.showChatSTT.desc',
+    hidden: true,
   },
   {
     key: 'showChatAutoTTS',
@@ -621,6 +717,7 @@ export const SETTINGS = [
     group: 'chatButtons',
     labelKey: 'settings:appearance.showChatAutoTTS.label',
     descKey: 'settings:appearance.showChatAutoTTS.desc',
+    hidden: true,
   },
   {
     key: 'showChatEnterToSend',
@@ -630,6 +727,7 @@ export const SETTINGS = [
     group: 'chatButtons',
     labelKey: 'settings:appearance.showChatEnterToSend.label',
     descKey: 'settings:appearance.showChatEnterToSend.desc',
+    hidden: true,
   },
   {
     key: 'showChatAutoReply',
@@ -639,6 +737,7 @@ export const SETTINGS = [
     group: 'chatButtons',
     labelKey: 'settings:appearance.showChatAutoReply.label',
     descKey: 'settings:appearance.showChatAutoReply.desc',
+    hidden: true,
   },
   {
     key: 'showChatAutoSend',
@@ -648,6 +747,7 @@ export const SETTINGS = [
     group: 'chatButtons',
     labelKey: 'settings:appearance.showChatAutoSend.label',
     descKey: 'settings:appearance.showChatAutoSend.desc',
+    hidden: true,
   },
   {
     key: 'chatButtonOrder',
@@ -669,15 +769,51 @@ export const SETTINGS = [
     descKey: 'settings:appearance.chatButtonOrder.desc',
     props: {
       buttons: [
-        { key: 'ooc', labelKey: 'settings:appearance.showChatOOC.label' },
-        { key: 'attachFile', labelKey: 'settings:appearance.showChatAttachFile.label' },
-        { key: 'shortcuts', labelKey: 'settings:appearance.showChatShortcuts.label' },
-        { key: 'memories', labelKey: 'settings:appearance.showChatMemories.label' },
-        { key: 'stt', labelKey: 'settings:appearance.showChatSTT.label' },
-        { key: 'autoTTS', labelKey: 'settings:appearance.showChatAutoTTS.label' },
-        { key: 'enterToSend', labelKey: 'settings:appearance.showChatEnterToSend.label' },
-        { key: 'autoReply', labelKey: 'settings:appearance.showChatAutoReply.label' },
-        { key: 'autoSend', labelKey: 'settings:appearance.showChatAutoSend.label' },
+        {
+          key: 'ooc',
+          labelKey: 'settings:appearance.showChatOOC.label',
+          settingKey: 'showChatOOC',
+        },
+        {
+          key: 'attachFile',
+          labelKey: 'settings:appearance.showChatAttachFile.label',
+          settingKey: 'showChatAttachFile',
+        },
+        {
+          key: 'shortcuts',
+          labelKey: 'settings:appearance.showChatShortcuts.label',
+          settingKey: 'showChatShortcuts',
+        },
+        {
+          key: 'memories',
+          labelKey: 'settings:appearance.showChatMemories.label',
+          settingKey: 'showChatMemories',
+        },
+        {
+          key: 'stt',
+          labelKey: 'settings:appearance.showChatSTT.label',
+          settingKey: 'showChatSTT',
+        },
+        {
+          key: 'autoTTS',
+          labelKey: 'settings:appearance.showChatAutoTTS.label',
+          settingKey: 'showChatAutoTTS',
+        },
+        {
+          key: 'enterToSend',
+          labelKey: 'settings:appearance.showChatEnterToSend.label',
+          settingKey: 'showChatEnterToSend',
+        },
+        {
+          key: 'autoReply',
+          labelKey: 'settings:appearance.showChatAutoReply.label',
+          settingKey: 'showChatAutoReply',
+        },
+        {
+          key: 'autoSend',
+          labelKey: 'settings:appearance.showChatAutoSend.label',
+          settingKey: 'showChatAutoSend',
+        },
       ],
     },
   },

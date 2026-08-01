@@ -26,7 +26,7 @@ function SettingsModal() {
   )
   const { scrollRef, onScroll } = useModalScrollPosition(`settings.${activeCategory}`)
 
-  const filtered = SETTINGS.filter((s) => s.category === activeCategory)
+  const filtered = SETTINGS.filter((s) => s.category === activeCategory && !s.hidden)
 
   function groupedSettings(settings) {
     const settingsByGroup = new Map()
