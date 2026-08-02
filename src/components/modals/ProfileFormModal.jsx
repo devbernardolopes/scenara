@@ -893,7 +893,7 @@ function ProfileFormModal({ profile }) {
               titleKey="api.profile.form.samplingProfiles"
               options={samplingProfiles}
               selected={selSamplingProfile}
-              onSelect={setSelSamplingProfile}
+              onSelect={(v) => setSelSamplingProfile(v ? Number(v) : '')}
               onApply={handleApplySamplingProfile}
               onManage={() => openModal('samplingProfileManagement')}
               emptyKey="api.profile.form.noSamplingProfiles"
@@ -904,7 +904,7 @@ function ProfileFormModal({ profile }) {
               titleKey="api.profile.form.stopSequences"
               options={stopSets}
               selected={selStopSet}
-              onSelect={setSelStopSet}
+              onSelect={(v) => setSelStopSet(v ? Number(v) : '')}
               onApply={handleApplyStopSet}
               onManage={() => openModal('stopSequenceManagement')}
               emptyKey="api.profile.form.noStopSequences"
