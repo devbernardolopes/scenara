@@ -122,6 +122,7 @@ export async function generateChatResponse({
       threadId,
       personaMap,
       beforeDate,
+      statusBlock: statusBlockOverride,
     })
 
   const payloadStatusBlock =
@@ -346,6 +347,7 @@ export async function generateChatResponse({
       personaMap,
       signal,
       ctx,
+      statusBlock: payloadStatusBlock,
     })
     if (sbResult?.status === 'success') {
       statusBlockDirectorAttempted = true

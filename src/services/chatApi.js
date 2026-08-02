@@ -966,6 +966,7 @@ export async function buildChatRequestPayload({
   threadId,
   personaMap,
   beforeDate,
+  statusBlock: statusBlockOverride,
 }) {
   const includeOOC = character?.includeOOC !== false
   const keepMessages = Number(
@@ -1006,7 +1007,10 @@ export async function buildChatRequestPayload({
 
   const latestThread = await getThread(threadId)
   const memoryText = await buildInjectedMemory(character, latestThread, { beforeDate })
-  const statusBlock = getEffectiveStatusBlock(character, latestThread?.statusBlock)
+  const statusBlock =
+    statusBlockOverride != null
+      ? statusBlockOverride
+      : getEffectiveStatusBlock(character, latestThread?.statusBlock)
 
   // During regeneration, roll the thread's lastSummarizationAt back to the
   // state at the regenerated message's position: a summary that happened after
