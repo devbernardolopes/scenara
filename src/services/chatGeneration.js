@@ -144,6 +144,8 @@ export async function generateChatResponse({
   let statusBlockDirectorAttempted = false
   let statusBlockDirectorSystemPrompt = ''
   let statusBlockDirectorUserPrompt = ''
+  let statusBlockDirectorModel = ''
+  let statusBlockDirectorParams = {}
   let promptData = JSON.stringify({
     payload,
     model: profile.model,
@@ -352,6 +354,8 @@ export async function generateChatResponse({
         statusBlockDirectorDurationMs = sbResult.apiDurationMs
         statusBlockDirectorSystemPrompt = sbResult.systemInstructions || ''
         statusBlockDirectorUserPrompt = sbResult.userInstructions || ''
+        statusBlockDirectorModel = sbResult.directorModel || ''
+        statusBlockDirectorParams = sbResult.directorParams || {}
       } else {
         statusBlockDirectorFailed = true
       }
@@ -375,6 +379,8 @@ export async function generateChatResponse({
     statusBlockDirectorAttempted,
     statusBlockDirectorSystemPrompt,
     statusBlockDirectorUserPrompt,
+    statusBlockDirectorModel,
+    statusBlockDirectorParams,
     error: null,
   }
 }

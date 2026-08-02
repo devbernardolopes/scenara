@@ -569,8 +569,8 @@ function MessageBubble({
     openModal('showStatusBlockPrompt', {
       systemPrompt: activeEntry.statusBlockDirectorSystemPrompt || '',
       userPrompt: activeEntry.statusBlockDirectorUserPrompt || '',
-      model: slotPromptData?.model || null,
-      params: slotPromptData?.params || null,
+      model: activeEntry.statusBlockDirectorModel || null,
+      params: activeEntry.statusBlockDirectorParams || null,
       modalTitle: t('statusBlockDirectorPrompt'),
     })
   }

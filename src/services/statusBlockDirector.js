@@ -117,6 +117,8 @@ export async function runStatusBlockDirector({
       apiDurationMs,
       systemInstructions,
       userInstructions,
+      directorModel: dProfile.model || '',
+      directorParams: dProfile.params || {},
     }
   } catch (err) {
     return { status: 'error', error: err }
