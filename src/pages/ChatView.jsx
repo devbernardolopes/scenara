@@ -436,12 +436,18 @@ function ChatView() {
 
       await loadPersonas()
 
-      const orphan = detectOrphanedMessages(msgs)
-      if (orphan && !generatingRef.current && !getGeneratingThreads().has(Number(threadId))) {
+      const latestMsgs = await getMessagesByThread(threadId)
+      const orphan = detectOrphanedMessages(latestMsgs)
+      if (
+        orphan &&
+        !generatingRef.current &&
+        getStreamingMessageId(threadId) == null &&
+        !getGeneratingThreads().has(Number(threadId))
+      ) {
         if (orphan.type === 'send') {
           await cleanupSendOrphan(orphan.messageId)
         } else if (orphan.type === 'regenerate') {
-          await cleanupRegenerateOrphan(orphan.messageId, msgs)
+          await cleanupRegenerateOrphan(orphan.messageId, latestMsgs)
         }
         const updatedMsgs = await getMessagesByThread(threadId)
         setMessages(dedupeMessages(updatedMsgs))
@@ -900,6 +906,12 @@ function ChatView() {
       setBlockingGenerating(
         state.inflight.some((i) => i.threadId === tid && apiQueue.BLOCKING_KINDS.includes(i.type)),
       )
+      const statusBlockRegenInflight = state.inflight.some(
+        (i) => i.threadId === tid && i.type === 'regenerate' && i.subtype === 'statusBlock',
+      )
+      if (!statusBlockRegenInflight) {
+        setStatusBlockRegenerating(null)
+      }
     }
     handler()
     const unsub = apiQueue.subscribe(handler)
@@ -912,7 +924,9 @@ function ChatView() {
 
   useEffect(() => {
     if (getGeneratingThreads().has(Number(threadId))) {
-      Promise.resolve().then(() => setGenerating(true))
+      Promise.resolve().then(() => {
+        if (getGeneratingThreads().has(Number(threadId))) setGenerating(true)
+      })
     }
     function handleGeneratingChange(e) {
       const { threadId: eventThreadId, generating: isGenerating } = e.detail
@@ -998,13 +1012,21 @@ function ChatView() {
     const msgId = getStreamingMessageId(threadId)
     if (msgId != null) {
       Promise.resolve().then(() => {
-        if (!cancelled) setStreamingMsgId(msgId)
+        if (!cancelled && getStreamingMessageId(threadId) === msgId) setStreamingMsgId(msgId)
       })
     }
     function handleStreamingChange(e) {
       const { threadId: eventThreadId, messageId } = e.detail
       if (Number(eventThreadId) === Number(threadId)) {
         setStreamingMsgId(messageId)
+        if (messageId != null) {
+          const slotIndex = getStreamingSlotIndex(threadId)
+          setStreamingSlotIndices((prev) =>
+            slotIndex != null ? { ...prev, [messageId]: slotIndex } : prev,
+          )
+        } else {
+          setStreamingSlotIndices({})
+        }
       }
     }
     window.addEventListener('streaming-message-changed', handleStreamingChange)
@@ -1023,10 +1045,14 @@ function ChatView() {
       if (cancelled || isLocalStreamerRef.current) return
       if (Number(currentThreadIdRef.current) === Number(threadId)) {
         const prev = messagesRef.current
+        const prevLast = prev?.[prev.length - 1]
+        const currLast = msgs[msgs.length - 1]
         if (
           prev &&
           prev.length === msgs.length &&
-          prev[prev.length - 1]?.id === msgs[msgs.length - 1]?.id
+          prevLast?.id === currLast?.id &&
+          prevLast?.content === currLast?.content &&
+          prevLast?.bundleMessages === currLast?.bundleMessages
         ) {
           return
         }
