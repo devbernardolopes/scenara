@@ -141,6 +141,9 @@ export async function generateChatResponse({
   let directorFailed = false
   let chatDurationMs = null
   let directorDurationMs = null
+  let statusBlockDirectorAttempted = false
+  let statusBlockDirectorSystemPrompt = ''
+  let statusBlockDirectorUserPrompt = ''
   let promptData = JSON.stringify({
     payload,
     model: profile.model,
@@ -329,9 +332,6 @@ export async function generateChatResponse({
   let directedStatusBlock = ''
   let statusBlockDirectorDurationMs = null
   let statusBlockDirectorFailed = false
-  let statusBlockDirectorAttempted = false
-  let statusBlockDirectorSystemPrompt = ''
-  let statusBlockDirectorUserPrompt = ''
   if (!isOOC) {
     const sbResult = await runStatusBlockDirector({
       character,
