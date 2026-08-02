@@ -733,6 +733,16 @@ export async function buildTranscript({
   return lines.join('\n\n')
 }
 
+const DEFAULT_OOC_SYSTEM = [
+  'This is an OOC (out-of-character) request. Respond only in OOC mode. Be concise, direct, pragmatic, and exact. Do not roleplay, narrate, or continue the story.',
+  '{{system_prompt}}',
+  '{{character_prompt}}',
+  '{{status_block}}',
+  '{{lore}}',
+  '{{transcript}}',
+  '{{memory}}',
+].join('\n\n')
+
 export async function buildOOCMessagesPayload({
   character,
   chatPersona,
@@ -742,7 +752,6 @@ export async function buildOOCMessagesPayload({
   userMessage,
   personaMap,
   memoryText,
-  memoryHeader,
   lastSummarizationAt = null,
   activeScenario = null,
   statusBlock = null,
@@ -760,7 +769,6 @@ export async function buildOOCMessagesPayload({
   const currentPersonaName = currentPersona?.name || personaName
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
   loreBlocks = resolveLoreVars(loreBlocks, replaceVarsIn)
-  const statusBlockResolved = replaceVarsIn(statusBlock)
 
   const defaultPersonaId = await getSetting('defaultPersonaId')
   const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
@@ -778,13 +786,58 @@ export async function buildOOCMessagesPayload({
       personasHistory,
     })
 
-  const systemParts = []
-
   const oocSystemInstr = oocSettings.oocSystemInstructions
   const oocUserInstr = oocSettings.oocUserInstructions
-  const systemHasTranscript = (oocSystemInstr || '').includes('{{transcript}}')
-
   const userPersonaPrefixOverride = character?.userPersonaPrefix === false ? false : true
+
+  // --- Pre-resolved context sections for the OOC templates ---
+
+  const statusBlockResolved = replaceVarsIn(statusBlock)
+
+  const systemPromptResolved = replaceVarsIn(character?.systemPrompt)
+
+  // Character prompt section deliberately excludes the status block so that
+  // {{character_prompt}} and {{status_block}} stay orthogonal.
+  let promptSection = ''
+  const prompt = replaceVarsIn(character?.prompt)
+  if (prompt) {
+    const parts = [prompt]
+    const personality = replaceVarsIn(character?.personality)
+    if (personality) parts.push(personality)
+    const globalContextRaw = resolveGlobalContextInjection(character, {
+      isFirstMessage,
+      lastSummarizationAt,
+    })
+    if (globalContextRaw) parts.push(replaceVarsIn(globalContextRaw))
+    promptSection = parts.join('\n\n')
+    const rawScenarioText = resolveScenarioInjection(character, {
+      isFirstMessage,
+      lastSummarizationAt,
+      activeScenario,
+    })
+    const scenarioText = rawScenarioText ? replaceVarsIn(rawScenarioText) : ''
+    if (scenarioText) promptSection = `${promptSection}\n\n${scenarioText}`
+  }
+  const charPromptSection = (() => {
+    if (!promptSection) return ''
+    const cph = oocSettings.characterPromptHeader
+    if (cph?.value) {
+      return replaceVarsIn(cph.value) + (cph.enabled ? '\n\n' : '\n') + promptSection
+    }
+    return promptSection
+  })()
+
+  const loreParts = [loreBlocks.beforeChar, loreBlocks.afterChar]
+  if (loreBlocks.atDepth instanceof Map) {
+    for (const text of loreBlocks.atDepth.values()) {
+      if (text) loreParts.push(text)
+    }
+  }
+  loreParts.push(loreBlocks.beforePrompt, loreBlocks.afterPrompt)
+  const loreJoined = loreParts.filter(Boolean).join('\n\n')
+  const loreSection = loreJoined
+    ? applySectionHeader(oocSettings.loreContextHeader, loreJoined, replaceVarsIn)
+    : ''
 
   let transcriptWithVars = ''
   if (messages.length > 0) {
@@ -807,95 +860,45 @@ export async function buildOOCMessagesPayload({
     })
     transcriptWithVars = replaceVarsIn(transcript)
   }
-
-  if (oocSystemInstr) {
-    const sys = replaceVarsWithDesc(oocSystemInstr).replace(
-      /{{status_block}}/gi,
-      statusBlockResolved,
-    )
-    systemParts.push(
-      systemHasTranscript ? sys.replace(/{{transcript}}/gi, transcriptWithVars) : sys,
-    )
-  }
-
-  // When the Character Prompt is empty, Status Block is placed right after the
-  // SYSTEM Prompt instead of inside the character-prompt block.
-  if (!character?.prompt?.trim() && statusBlockResolved) {
-    systemParts.push(statusBlockResolved)
-  }
-
-  if (loreBlocks.beforeChar) {
-    systemParts.push(
-      applySectionHeader(oocSettings.loreContextHeader, loreBlocks.beforeChar, replaceVarsIn),
-    )
-  }
-
-  const promptBlock = buildCharacterPromptBlock(character, {
-    isScenarioFirstMessage: isFirstMessage,
-    lastSummarizationAt,
-    activeScenario,
-    statusBlock,
-    replaceVarsIn,
-  })
-  if (promptBlock) {
-    const cph = oocSettings.characterPromptHeader
-    if (cph.value) {
-      systemParts.push(replaceVarsIn(cph.value) + (cph.enabled ? '\n\n' : '\n') + promptBlock)
-    } else {
-      systemParts.push(promptBlock)
-    }
-  }
-
-  const oocAfterChar = [loreBlocks.afterChar]
-  if (loreBlocks.atDepth instanceof Map) {
-    for (const text of loreBlocks.atDepth.values()) {
-      if (text) oocAfterChar.push(text)
-    }
-  }
-  const loreAfter = applySectionHeader(
-    oocSettings.loreContextHeader,
-    oocAfterChar.filter(Boolean).join('\n\n'),
-    replaceVarsIn,
-  )
-  if (loreAfter) {
-    systemParts.push(loreAfter)
-  }
-
-  if (loreBlocks.beforePrompt) {
-    systemParts.push(
-      applySectionHeader(oocSettings.loreContextHeader, loreBlocks.beforePrompt, replaceVarsIn),
-    )
-  }
-
-  if (transcriptWithVars && !systemHasTranscript) {
+  const transcriptSection = (() => {
+    if (!transcriptWithVars) return ''
     const mh = oocSettings.messagesHeader
-    if (mh.value) {
-      systemParts.push(replaceVarsIn(mh.value) + (mh.enabled ? '\n\n' : '\n') + transcriptWithVars)
-    } else {
-      systemParts.push(transcriptWithVars)
+    if (mh?.value) {
+      return replaceVarsIn(mh.value) + (mh.enabled ? '\n\n' : '\n') + transcriptWithVars
     }
-  }
+    return transcriptWithVars
+  })()
 
-  if (loreBlocks.afterPrompt) {
-    systemParts.push(
-      applySectionHeader(oocSettings.loreContextHeader, loreBlocks.afterPrompt, replaceVarsIn),
-    )
-  }
+  const memorySection = memoryText || ''
 
-  const result = [{ role: 'system', content: systemParts.join('\n\n') }]
+  const replaceOocTemplates = (text) =>
+    replaceVarsWithDesc(text)
+      .replace(/{{system_prompt}}/gi, systemPromptResolved)
+      .replace(/{{character_prompt}}/gi, charPromptSection)
+      .replace(/{{status_block}}/gi, statusBlockResolved)
+      .replace(/{{lore}}/gi, loreSection)
+      .replace(/{{transcript}}/gi, transcriptSection)
+      .replace(/{{memory}}/gi, memorySection)
+      // {{content}} resolves last so the user message is never re-parsed.
+      .replace(/\{\{content\}\}/gi, userMessage || '')
+
+  const collapseBlanks = (text) => text.replace(/\n{3,}/g, '\n\n')
+
+  const defaultSystem = collapseBlanks(replaceOocTemplates(DEFAULT_OOC_SYSTEM))
+  let systemContent = oocSystemInstr
+    ? collapseBlanks(replaceOocTemplates(oocSystemInstr))
+    : defaultSystem
+  if (!systemContent.trim()) systemContent = defaultSystem
+
+  const result = [{ role: 'system', content: systemContent }]
   const entryTypes = ['oocSystem']
 
   if (userMessage) {
     if (oocUserInstr) {
-      const base = replaceVarsWithDesc(oocUserInstr).replace(
-        /{{status_block}}/gi,
-        statusBlockResolved,
-      )
-      const userHasTranscript = oocUserInstr.includes('{{transcript}}')
-      let content = userHasTranscript ? base.replace(/{{transcript}}/gi, transcriptWithVars) : base
-      if (content.includes('{{content}}')) {
-        content = content.replace(/\{\{content\}\}/gi, userMessage)
-      } else if (!userHasTranscript) {
+      const rawHasContent = /{{content}}/i.test(oocUserInstr)
+      const rawHasTranscript = /{{transcript}}/i.test(oocUserInstr)
+      let content = replaceOocTemplates(oocUserInstr)
+      if (!rawHasContent && !rawHasTranscript) {
         content += '\n\n' + userMessage
       }
       result.push({ role: 'user', content })
@@ -903,13 +906,6 @@ export async function buildOOCMessagesPayload({
       result.push({ role: 'user', content: userMessage })
     }
     entryTypes.push('oocUser')
-  }
-
-  if (memoryText) {
-    return {
-      payload: appendMemoryToPayload(result, memoryText, memoryHeader),
-      entryTypes,
-    }
   }
 
   return { payload: result, entryTypes }
@@ -1072,7 +1068,6 @@ export async function buildChatRequestPayload({
       userMessage: lastUserMsg,
       personaMap,
       memoryText,
-      memoryHeader: '',
       lastSummarizationAt: effectiveLastSummarizationAt,
       activeScenario: latestThread?.activeScenario || null,
       statusBlock,

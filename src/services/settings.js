@@ -1329,7 +1329,7 @@ export const SETTINGS = [
     group: 'ooc',
     type: 'textarea',
     default:
-      'This is an OOC (out-of-character) request. Respond only in OOC mode. Be concise, direct, pragmatic, and exact. Do not roleplay, narrate, or continue the story.',
+      'This is an OOC (out-of-character) request. Respond only in OOC mode. Be concise, direct, pragmatic, and exact. Do not roleplay, narrate, or continue the story.\n\n{{system_prompt}}\n\n{{character_prompt}}\n\n{{status_block}}\n\n{{lore}}\n\n{{transcript}}\n\n{{memory}}',
     props: { rows: 6, collapsible: true, summary: 'tokens' },
     labelKey: 'settings:prompting.oocSystem.label',
     descKey: 'settings:prompting.oocSystem.desc',
