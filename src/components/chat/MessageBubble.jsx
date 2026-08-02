@@ -1005,6 +1005,7 @@ function MessageBubble({
                   collapsedCodeBlocks={collapsedCodeBlocks}
                   onToggleCodeBlock={onToggleCodeBlock}
                   messageId={message.id}
+                  openModal={openModal}
                 />
               ) : plainSegments ? (
                 <p className="mb-2 last:mb-0 whitespace-pre-wrap">

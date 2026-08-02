@@ -95,6 +95,7 @@ const PP_SANITIZE_SCHEMA = {
   attributes: {
     ...defaultSchema.attributes,
     pp: ['r'],
+    a: [...(defaultSchema.attributes?.a || []), 'target', 'rel'],
   },
 }
 
@@ -104,6 +105,7 @@ function CodeBlocksMarkdownBase({
   collapsedCodeBlocks,
   onToggleCodeBlock,
   messageId,
+  openModal,
 }) {
   let blockIndex = 0
 
@@ -122,6 +124,27 @@ function CodeBlocksMarkdownBase({
           )
         },
         p: ({ children }) => <p className="mb-2 last:mb-0 whitespace-pre-wrap">{children}</p>,
+        a: ({ href, children }) => (
+          <a
+            href={href}
+            {...(/^https?:\/\//.test(href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            className="cursor-pointer"
+          >
+            {children}
+          </a>
+        ),
+        img: ({ src, alt }) => (
+          <img
+            src={src}
+            alt={alt || ''}
+            className="block mx-auto max-w-full cursor-pointer"
+            onClick={(e) => {
+              if (!e.target.closest('a')) {
+                openModal?.('imageViewer', { src, modalSize: 'fullscreen' })
+              }
+            }}
+          />
+        ),
         code: ({ children, className }) => (
           <code
             className={`font-mono text-[0.85em] px-1.5 py-0.5 rounded bg-code border border-border ${className || ''} break-words`}
