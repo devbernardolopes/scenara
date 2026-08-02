@@ -46,7 +46,14 @@ function notify() {
 export function getState() {
   return {
     queueLength: queue.length + inflight.size,
-    queue: queue.map((item) => ({ id: item.id, threadId: item.threadId, type: item.type })),
+    queue: queue.map((item) => ({
+      id: item.id,
+      threadId: item.threadId,
+      type: item.type,
+      subtype: item.subtype,
+      messageId: item.messageId,
+      slotIndex: item.slotIndex,
+    })),
     inflight: [...inflight].map((item) => ({
       id: item.id,
       threadId: item.threadId,

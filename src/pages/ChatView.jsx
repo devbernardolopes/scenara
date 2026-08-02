@@ -393,16 +393,23 @@ function ChatView() {
 
       // Restore statusBlockRegenerating for in-flight Status Block regenerations
       const queueState = apiQueue.getState()
-      const inflightStatusBlockRegen = queueState.inflight.find(
-        (item) =>
-          item.threadId === Number(threadId) &&
-          item.type === 'regenerate' &&
-          item.subtype === 'statusBlock',
-      )
-      if (inflightStatusBlockRegen) {
+      const statusBlockRegenItem =
+        queueState.inflight.find(
+          (item) =>
+            item.threadId === Number(threadId) &&
+            item.type === 'regenerate' &&
+            item.subtype === 'statusBlock',
+        ) ||
+        queueState.queue.find(
+          (item) =>
+            item.threadId === Number(threadId) &&
+            item.type === 'regenerate' &&
+            item.subtype === 'statusBlock',
+        )
+      if (statusBlockRegenItem) {
         setStatusBlockRegenerating({
-          messageId: inflightStatusBlockRegen.messageId,
-          slotIndex: inflightStatusBlockRegen.slotIndex,
+          messageId: statusBlockRegenItem.messageId,
+          slotIndex: statusBlockRegenItem.slotIndex,
         })
       }
 
@@ -906,12 +913,18 @@ function ChatView() {
       setBlockingGenerating(
         state.inflight.some((i) => i.threadId === tid && apiQueue.BLOCKING_KINDS.includes(i.type)),
       )
-      const statusBlockRegenInflight = state.inflight.some(
-        (i) => i.threadId === tid && i.type === 'regenerate' && i.subtype === 'statusBlock',
+      const statusBlockRegenItem =
+        state.inflight.find(
+          (i) => i.threadId === tid && i.type === 'regenerate' && i.subtype === 'statusBlock',
+        ) ||
+        state.queue.find(
+          (q) => q.threadId === tid && q.type === 'regenerate' && q.subtype === 'statusBlock',
+        )
+      setStatusBlockRegenerating(
+        statusBlockRegenItem
+          ? { messageId: statusBlockRegenItem.messageId, slotIndex: statusBlockRegenItem.slotIndex }
+          : null,
       )
-      if (!statusBlockRegenInflight) {
-        setStatusBlockRegenerating(null)
-      }
     }
     handler()
     const unsub = apiQueue.subscribe(handler)
