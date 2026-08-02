@@ -52,7 +52,7 @@ function AddButton({ onClick, label }) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full min-h-[44px] flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-md text-secondary hover:text-text hover:border-border-light transition-colors"
+      className="w-full sticky top-0 z-10 min-h-[44px] flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-md bg-surface text-secondary hover:text-text hover:border-border-light transition-colors"
     >
       <Plus className="w-4 h-4" />
       <span className="text-sm">{label}</span>
