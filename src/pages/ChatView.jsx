@@ -126,6 +126,17 @@ async function resetStatusBlockOnEmptyChat(threadId, msgs) {
   await updateThread(threadId, { statusBlock: charStatusBlock })
 }
 
+function getPreviousStatusBlock(msg) {
+  if (!msg?.bundleMessages) return null
+  const entries = parseBundleEntries(msg.bundleMessages)
+  if (!entries || entries.length === 0) return null
+  const lastEntry = entries[entries.length - 1]
+  if (lastEntry?.statusBlockUsed && lastEntry.statusBlock !== lastEntry.statusBlockUsed) {
+    return lastEntry.statusBlockUsed
+  }
+  return null
+}
+
 function createTrailingThrottle(fn, intervalMs) {
   let timer = null
   let lastArgs = null
@@ -2016,6 +2027,7 @@ function ChatView() {
         signal: regenAbortController.signal,
         controller: regenAbortController,
         execute: async (ctx) => {
+          const prevStatusBlock = regenEntries[slotIndex - 1]?.statusBlockUsed
           return await generateChatResponse({
             character,
             chatPersona,
@@ -2035,6 +2047,7 @@ function ChatView() {
             },
             ctx,
             beforeDate,
+            statusBlock: prevStatusBlock,
           })
         },
       }).promise
@@ -2421,6 +2434,12 @@ function ChatView() {
     })
     await deleteMessage(id)
 
+    const prevStatusBlock = getPreviousStatusBlock(msg)
+    if (prevStatusBlock != null) {
+      await updateThread(threadId, { statusBlock: prevStatusBlock })
+      setThread((prev) => (prev ? { ...prev, statusBlock: prevStatusBlock } : prev))
+    }
+
     if (msg?.createdAt) {
       const thr = await getThread(threadId)
       if (thr?.lastSummarizationAt && msg.createdAt > thr.lastSummarizationAt) {
@@ -2460,6 +2479,12 @@ function ChatView() {
       delete next[id]
       return next
     })
+
+    const prevStatusBlock = getPreviousStatusBlock(delMsg)
+    if (prevStatusBlock != null) {
+      await updateThread(threadId, { statusBlock: prevStatusBlock })
+      setThread((prev) => (prev ? { ...prev, statusBlock: prevStatusBlock } : prev))
+    }
 
     if (delMsg?.createdAt) {
       const thr = await getThread(threadId)
@@ -2507,6 +2532,16 @@ function ChatView() {
     }
 
     await deleteMessagesFrom(id)
+
+    const firstDeletedWithDirectorMod = messagesRef.current
+      .slice(idx)
+      .find((m) => getPreviousStatusBlock(m) != null)
+    if (firstDeletedWithDirectorMod) {
+      const prevSb = getPreviousStatusBlock(firstDeletedWithDirectorMod)
+      await updateThread(threadId, { statusBlock: prevSb })
+      setThread((prev) => (prev ? { ...prev, statusBlock: prevSb } : prev))
+    }
+
     setActiveSlotIndices((prev) => {
       const next = { ...prev }
       deletedIds.forEach((d) => delete next[d])

@@ -85,6 +85,7 @@ export async function generateChatResponse({
   onFinish,
   ctx,
   beforeDate,
+  statusBlock: statusBlockOverride,
 }) {
   const profile = isOOC
     ? await getEffectiveProfileFor('ooc', character)
@@ -123,10 +124,10 @@ export async function generateChatResponse({
       beforeDate,
     })
 
-  const payloadStatusBlock = getEffectiveStatusBlock(
-    character,
-    (await getThread(threadId))?.statusBlock,
-  )
+  const payloadStatusBlock =
+    statusBlockOverride != null
+      ? getEffectiveStatusBlock(character, statusBlockOverride)
+      : getEffectiveStatusBlock(character, (await getThread(threadId))?.statusBlock)
 
   const activeParams = getActiveParams(profile)
   const messageFlags = computeMessageFlags(entryTypes, msgNumbers, currentMsgs, { beforeDate })
