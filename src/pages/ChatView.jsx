@@ -116,6 +116,16 @@ function dedupeMessages(msgs) {
   return Array.from(seen.values())
 }
 
+async function resetStatusBlockOnEmptyChat(threadId, msgs) {
+  if (msgs.some(isRealMessage)) return
+  const thr = await getThread(threadId)
+  if (!thr) return
+  const chr = await getCharacter(thr.characterId)
+  const charStatusBlock = chr?.statusBlock || ''
+  if (thr.statusBlock === charStatusBlock) return
+  await updateThread(threadId, { statusBlock: charStatusBlock })
+}
+
 function createTrailingThrottle(fn, intervalMs) {
   let timer = null
   let lastArgs = null
@@ -2428,6 +2438,7 @@ function ChatView() {
 
     const msgs = await getMessagesByThread(threadId)
     setMessages(dedupeMessages(msgs))
+    await resetStatusBlockOnEmptyChat(threadId, msgs)
     showToast(t('messageDeleted'), { type: 'success' })
   }
 
@@ -2465,7 +2476,9 @@ function ChatView() {
       }
     }
 
-    setMessages(dedupeMessages(await getMessagesByThread(threadId)))
+    const remainingMsgs = await getMessagesByThread(threadId)
+    setMessages(dedupeMessages(remainingMsgs))
+    await resetStatusBlockOnEmptyChat(threadId, remainingMsgs)
     showToast(t('messageDeleted'), { type: 'success' })
   }
 
@@ -2513,7 +2526,9 @@ function ChatView() {
       }
     }
 
-    setMessages(dedupeMessages(await getMessagesByThread(threadId)))
+    const remainingMsgs = await getMessagesByThread(threadId)
+    setMessages(dedupeMessages(remainingMsgs))
+    await resetStatusBlockOnEmptyChat(threadId, remainingMsgs)
     showToast(t('messageDeleted'), { type: 'success' })
   }
 
