@@ -6,6 +6,7 @@ import ModalShell from '../shared/ModalShell'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../services/tokenEstimator'
 import { getEffectiveProfileFor } from '../../services/connectionProfiles'
+import { getActiveParams } from '../../services/chatApi'
 import { buildCurrentSummarizationPayload } from '../../services/summarization'
 import { ChevronDown } from '../../lib/icons'
 
@@ -73,7 +74,7 @@ function MemoryRegenerationModal({ threadId, entry }) {
 
   const paramEntries = useMemo(
     () =>
-      Object.entries(profile?.params || {}).filter(
+      Object.entries(profile ? getActiveParams(profile) : {}).filter(
         ([, v]) =>
           v !== '' && v !== null && v !== undefined && !(Array.isArray(v) && v.length === 0),
       ),

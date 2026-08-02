@@ -1,6 +1,6 @@
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { applyDirectorTemplate, buildDirectorMessages } from './director'
-import { replaceVars, sendChatCompletion } from './chatApi'
+import { getActiveParams, replaceVars, sendChatCompletion } from './chatApi'
 import { getWritingInstruction } from './writingInstructions'
 import { getThread } from './threads'
 import { getEffectiveStatusBlock } from './statusBlocks'
@@ -118,7 +118,7 @@ export async function runStatusBlockDirector({
       systemInstructions,
       userInstructions,
       directorModel: dProfile.model || '',
-      directorParams: dProfile.params || {},
+      directorParams: getActiveParams(dProfile),
     }
   } catch (err) {
     return { status: 'error', error: err }
