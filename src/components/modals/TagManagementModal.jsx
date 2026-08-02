@@ -183,38 +183,40 @@ function TagManagementModal() {
         <CloseButton onClick={closeModal} />
       </div>
 
+      <div className="px-6 py-3 border-b border-border shrink-0">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder={t('tags.placeholder')}
+              className="w-full min-h-[44px] px-3 pr-10 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            {editingTag && (
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
+                aria-label={t('tags.cancelEdit')}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <button
+            type="submit"
+            className="min-h-[44px] px-4 btn-primary text-sm flex items-center gap-2 shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            {editingTag ? t('tags.update') : t('tags.add')}
+          </button>
+        </form>
+      </div>
+
       <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto px-6 py-4">
         <div className="space-y-4">
-          <form onSubmit={handleSubmit} className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder={t('tags.placeholder')}
-                className="w-full min-h-[44px] px-3 pr-10 text-sm bg-surface border border-border rounded-md text-text placeholder-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              {editingTag && (
-                <button
-                  type="button"
-                  onClick={handleCancelEdit}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
-                  aria-label={t('tags.cancelEdit')}
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-            <button
-              type="submit"
-              className="min-h-[44px] px-4 btn-primary text-sm flex items-center gap-2 shrink-0"
-            >
-              <Plus className="w-4 h-4" />
-              {editingTag ? t('tags.update') : t('tags.add')}
-            </button>
-          </form>
-
           <CollapsibleSection
             label={<span className="flex items-center gap-2">{t('tags.filter.title')}</span>}
             summary={

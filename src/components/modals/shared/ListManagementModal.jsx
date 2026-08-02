@@ -180,40 +180,42 @@ function ListManagementModal({ config }) {
         <h2 className="text-xl font-semibold text-text">{t(titleKey)}</h2>
         <CloseButton onClick={closeModal} />
       </div>
+      <div className="px-6 py-3 border-b border-border shrink-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          {config.canCreate !== false && (
+            <button
+              type="button"
+              onClick={startCreate}
+              className="min-h-[44px] px-4 btn-primary text-sm flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" /> {t(createLabelKey)}
+            </button>
+          )}
+          {config.canImport !== false && (
+            <button
+              type="button"
+              onClick={() => importRef.current?.click()}
+              className="min-h-[44px] px-4 border border-border rounded-md text-text hover:bg-surface-hover text-sm flex items-center gap-2"
+            >
+              <Upload className="w-4 h-4" /> {t(importLabelKey)}
+            </button>
+          )}
+          <input
+            ref={importRef}
+            type="file"
+            accept=".json"
+            onChange={handleImportFile}
+            className="hidden"
+          />
+        </div>
+
+        {config.comingSoonNoteKey ? (
+          <p className="text-xs text-tertiary mt-1">{t(config.comingSoonNoteKey)}</p>
+        ) : null}
+      </div>
+
       <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto px-6 py-4">
         <div className="space-y-4">
-          <div className="flex items-center gap-2 flex-wrap">
-            {config.canCreate !== false && (
-              <button
-                type="button"
-                onClick={startCreate}
-                className="min-h-[44px] px-4 btn-primary text-sm flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" /> {t(createLabelKey)}
-              </button>
-            )}
-            {config.canImport !== false && (
-              <button
-                type="button"
-                onClick={() => importRef.current?.click()}
-                className="min-h-[44px] px-4 border border-border rounded-md text-text hover:bg-surface-hover text-sm flex items-center gap-2"
-              >
-                <Upload className="w-4 h-4" /> {t(importLabelKey)}
-              </button>
-            )}
-            <input
-              ref={importRef}
-              type="file"
-              accept=".json"
-              onChange={handleImportFile}
-              className="hidden"
-            />
-          </div>
-
-          {config.comingSoonNoteKey ? (
-            <p className="text-xs text-tertiary">{t(config.comingSoonNoteKey)}</p>
-          ) : null}
-
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <p className="text-secondary text-sm">{t('common:loading')}</p>
