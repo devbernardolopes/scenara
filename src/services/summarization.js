@@ -144,7 +144,6 @@ export async function buildSummarizationPayload({
 
   let personaEndSystemPrompt = ''
   let personaEndCharacterPrompt = ''
-  let personaEndMessages = ''
   const personaTiming =
     character?.personaInjectionTiming || (await getSetting('prompting.personaInjectionTiming'))
   const personaPlacement =
@@ -165,8 +164,6 @@ export async function buildSummarizationPayload({
       personaEndSystemPrompt = injected
     } else if (personaPlacement === 'endOfCharacterPrompt') {
       personaEndCharacterPrompt = injected
-    } else if (personaPlacement === 'endOfMessages') {
-      personaEndMessages = injected
     }
   }
 
@@ -243,10 +240,9 @@ export async function buildSummarizationPayload({
     charPromptSection = personaEndCharacterPrompt
   }
 
-  let transcriptSection = messagesHeader.value
+  const transcriptSection = messagesHeader.value
     ? `${replaceVarsWithDesc(messagesHeader.value)}${messagesHeader.enabled ? '\n\n' : '\n'}${transcript}`
     : transcript
-  if (personaEndMessages) transcriptSection = `${transcriptSection}\n\n${personaEndMessages}`
 
   const statusBlockSection = replaceVarsWithDesc(
     getEffectiveStatusBlock(character, thread?.statusBlock),
