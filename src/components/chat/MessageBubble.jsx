@@ -563,6 +563,17 @@ function MessageBubble({
     })
   }
 
+  function handleShowStatusBlockPrompt() {
+    if (!activeEntry?.statusBlockDirectorAttempted) return
+    openModal('showStatusBlockPrompt', {
+      systemPrompt: activeEntry.statusBlockDirectorSystemPrompt || '',
+      userPrompt: activeEntry.statusBlockDirectorUserPrompt || '',
+      model: slotPromptData?.model || null,
+      params: slotPromptData?.params || null,
+      modalTitle: t('statusBlockDirectorPrompt'),
+    })
+  }
+
   useEffect(() => {
     if (!overflowOpen) return
     function handleClick(e) {
@@ -1069,6 +1080,11 @@ function MessageBubble({
                   }
                   regenerateStatusBlockLabel={t('regenerateStatusBlock')}
                   statusBlockDirectorFailed={statusBlockDirectorFailed}
+                  onShowStatusBlockPrompt={
+                    statusBlockDirectorActive ? handleShowStatusBlockPrompt : undefined
+                  }
+                  showStatusBlockPromptLabel={t('showStatusBlockPrompt')}
+                  statusBlockDirectorAttempted={activeEntry?.statusBlockDirectorAttempted}
                 >
                   <code className="language-status-block">{statusBlockRender}</code>
                 </CodeBlockWrapper>

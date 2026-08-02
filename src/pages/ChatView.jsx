@@ -1350,6 +1350,15 @@ function ChatView() {
           statusBlockDirectorFailed: !isOOC
             ? result.statusBlockDirectorFailed || undefined
             : undefined,
+          statusBlockDirectorAttempted: !isOOC
+            ? result.statusBlockDirectorAttempted || false
+            : false,
+          statusBlockDirectorSystemPrompt: !isOOC
+            ? result.statusBlockDirectorSystemPrompt || ''
+            : undefined,
+          statusBlockDirectorUserPrompt: !isOOC
+            ? result.statusBlockDirectorUserPrompt || ''
+            : undefined,
         }
         const successBundleJson = JSON.stringify([successEntry])
         await updateMessage(assistantMsgId, {
@@ -2134,6 +2143,15 @@ function ChatView() {
             : undefined
           finalEntries[slotIndex].statusBlockDirectorFailed = !isOOCRegen
             ? result.statusBlockDirectorFailed || undefined
+            : undefined
+          finalEntries[slotIndex].statusBlockDirectorAttempted = !isOOCRegen
+            ? result.statusBlockDirectorAttempted || false
+            : false
+          finalEntries[slotIndex].statusBlockDirectorSystemPrompt = !isOOCRegen
+            ? result.statusBlockDirectorSystemPrompt || ''
+            : undefined
+          finalEntries[slotIndex].statusBlockDirectorUserPrompt = !isOOCRegen
+            ? result.statusBlockDirectorUserPrompt || ''
             : undefined
         }
         await updateMessage(messageId, {

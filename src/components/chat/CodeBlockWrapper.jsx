@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import rehypeRaw from 'rehype-raw'
-import { ChevronDown, ChevronUp, Copy, Edit3, RefreshCw } from '../../lib/icons'
+import { ChevronDown, ChevronUp, Copy, Edit3, FileText, RefreshCw } from '../../lib/icons'
 import { showToast } from '../../lib/toast'
 
 function handleCodeCopy(codeContent) {
@@ -25,6 +25,9 @@ function CodeBlockWrapperBase({
   onRegenerateStatusBlock,
   regenerateStatusBlockLabel,
   statusBlockDirectorFailed,
+  onShowStatusBlockPrompt,
+  showStatusBlockPromptLabel,
+  statusBlockDirectorAttempted,
 }) {
   return (
     <div className="relative group flow-root">
@@ -45,6 +48,18 @@ function CodeBlockWrapperBase({
         >
           {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
         </button>
+
+        {isStatusBlock && onShowStatusBlockPrompt && (
+          <button
+            onClick={onShowStatusBlockPrompt}
+            disabled={!statusBlockDirectorAttempted || statusBlockDirectorFailed}
+            className="p-1.5 rounded bg-surface/90 hover:bg-surface text-tertiary hover:text-text border border-border transition-all active:scale-95 focus:opacity-100 disabled:opacity-30 disabled:pointer-events-none"
+            title={showStatusBlockPromptLabel || 'Show Director Status Block Prompt'}
+            aria-label={showStatusBlockPromptLabel || 'Show Director Status Block Prompt'}
+          >
+            <FileText className="w-4 h-4" />
+          </button>
+        )}
 
         {isStatusBlock && onEditStatusBlock && (
           <button

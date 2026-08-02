@@ -40,6 +40,7 @@ import PromptBankManagementModal from './components/modals/PromptBankManagementM
 import PromptBankFormModal from './components/modals/PromptBankFormModal'
 import CreatePromptBankKindModal from './components/modals/CreatePromptBankKindModal'
 import ShowPromptModal from './components/modals/ShowPromptModal'
+import ShowStatusBlockPromptModal from './components/modals/ShowStatusBlockPromptModal'
 import RequestDetailsModal from './components/modals/RequestDetailsModal'
 import DirectorDetailsModal from './components/modals/DirectorDetailsModal'
 import DirectorRegenerationResultModal from './components/modals/DirectorRegenerationResultModal'
@@ -91,6 +92,7 @@ registerModal('promptBankManagement', PromptBankManagementModal)
 registerModal('promptBankForm', PromptBankFormModal)
 registerModal('promptBankKind', CreatePromptBankKindModal)
 registerModal('showPrompt', ShowPromptModal)
+registerModal('showStatusBlockPrompt', ShowStatusBlockPromptModal)
 registerModal('requestDetails', RequestDetailsModal)
 registerModal('directorDetails', DirectorDetailsModal)
 registerModal('directorRegenerationResult', DirectorRegenerationResultModal)

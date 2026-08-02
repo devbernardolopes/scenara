@@ -115,6 +115,8 @@ export async function runStatusBlockDirector({
       content: result.content || '',
       responseData: result.response,
       apiDurationMs,
+      systemInstructions,
+      userInstructions,
     }
   } catch (err) {
     return { status: 'error', error: err }

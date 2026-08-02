@@ -48,9 +48,11 @@
   "ttsError": "Speech synthesis failed.",
   "ttsModelNotLoaded": "Kitten TTS model not loaded. Load a model in Settings > TTS.",
   "showPrompt": "Prompt anzeigen",
+  "showStatusBlockPrompt": "Statusblock-Prompt anzeigen",
   "showMemoryEntryPrompt": "Speichereintrag-Prompt anzeigen",
   "requestDetails": "Anfragedetails",
   "directorDetails": "Regisseur-Details",
+  "statusBlockDirectorPrompt": "Regisseur Statusblock-Prompt",
   "visible": "Visible",
   "hidden": "Hidden",
   "requestDetailsModal": {

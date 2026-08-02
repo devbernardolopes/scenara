@@ -157,6 +157,9 @@ export async function generateChatResponse({
     directorFailed,
     loreActivated: loreActivated || [],
     lorebooks: lorebooks || [],
+    statusBlockDirectorAttempted,
+    statusBlockDirectorSystemPrompt,
+    statusBlockDirectorUserPrompt,
   })
 
   const sendResult = await sendChatCompletion({
@@ -326,6 +329,9 @@ export async function generateChatResponse({
   let directedStatusBlock = ''
   let statusBlockDirectorDurationMs = null
   let statusBlockDirectorFailed = false
+  let statusBlockDirectorAttempted = false
+  let statusBlockDirectorSystemPrompt = ''
+  let statusBlockDirectorUserPrompt = ''
   if (!isOOC) {
     const sbResult = await runStatusBlockDirector({
       character,
@@ -340,9 +346,12 @@ export async function generateChatResponse({
       ctx,
     })
     if (sbResult?.status === 'success') {
+      statusBlockDirectorAttempted = true
       if (sbResult.content?.trim()) {
         directedStatusBlock = sbResult.content
         statusBlockDirectorDurationMs = sbResult.apiDurationMs
+        statusBlockDirectorSystemPrompt = sbResult.systemInstructions || ''
+        statusBlockDirectorUserPrompt = sbResult.userInstructions || ''
       } else {
         statusBlockDirectorFailed = true
       }
@@ -363,6 +372,9 @@ export async function generateChatResponse({
     payloadStatusBlock,
     statusBlockDirectorDurationMs,
     statusBlockDirectorFailed,
+    statusBlockDirectorAttempted,
+    statusBlockDirectorSystemPrompt,
+    statusBlockDirectorUserPrompt,
     error: null,
   }
 }
