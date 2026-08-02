@@ -342,6 +342,7 @@ function MessageBubble({
     !message.isOOC &&
     !editing &&
     !requestFailed &&
+    !streaming &&
     (statusBlockDisplay || '').trim().length > 0
 
   const statusBlockDirectorActive =

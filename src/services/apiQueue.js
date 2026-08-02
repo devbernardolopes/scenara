@@ -52,6 +52,9 @@ export function getState() {
       threadId: item.threadId,
       type: item.type,
       director: !!item.directorPhase,
+      messageId: item.messageId,
+      slotIndex: item.slotIndex,
+      subtype: item.subtype,
     })),
   }
 }
@@ -157,7 +160,16 @@ function autoRemoveIfAborted(item) {
   )
 }
 
-export function enqueue({ threadId, type, execute, signal, controller }) {
+export function enqueue({
+  threadId,
+  type,
+  execute,
+  signal,
+  controller,
+  messageId,
+  slotIndex,
+  subtype,
+}) {
   let resolve, reject
   const promise = new Promise((res, rej) => {
     resolve = res
@@ -174,6 +186,9 @@ export function enqueue({ threadId, type, execute, signal, controller }) {
     controller,
     resolve,
     reject,
+    messageId: messageId != null ? Number(messageId) : undefined,
+    slotIndex,
+    subtype,
     streamingStarted: false,
     enqueuedAt: Date.now(),
     lastActivityAt: null,

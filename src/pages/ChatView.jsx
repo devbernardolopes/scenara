@@ -333,10 +333,10 @@ function ChatView() {
       setStreamingSlotIndices({})
 
       const streamingMsgId = getStreamingMessageId(threadId)
+      const streamingSlotIndex = getStreamingSlotIndex(threadId)
       if (streamingMsgId != null) {
-        const savedSlot = getStreamingSlotIndex(threadId)
-        if (savedSlot != null) {
-          setStreamingSlotIndices({ [streamingMsgId]: savedSlot })
+        if (streamingSlotIndex != null) {
+          setStreamingSlotIndices({ [streamingMsgId]: streamingSlotIndex })
         }
       }
 
@@ -363,7 +363,12 @@ function ChatView() {
       const statusBlockForBackfill = thr?.statusBlock
       const msgsToBackfill = msgs
         .filter(
-          (m) => m.role === 'assistant' && !m.isOOC && !m.isSummaryMarker && !m.isAutoTitleMarker,
+          (m) =>
+            m.role === 'assistant' &&
+            !m.isOOC &&
+            !m.isSummaryMarker &&
+            !m.isAutoTitleMarker &&
+            m.id !== streamingMsgId,
         )
         .map((m) => {
           const entries = parseBundleEntries(m.bundleMessages)
@@ -385,6 +390,22 @@ function ChatView() {
         const refreshed = await getMessagesByThread(threadId)
         setMessages(dedupeMessages(refreshed))
       }
+
+      // Restore statusBlockRegenerating for in-flight Status Block regenerations
+      const queueState = apiQueue.getState()
+      const inflightStatusBlockRegen = queueState.inflight.find(
+        (item) =>
+          item.threadId === Number(threadId) &&
+          item.type === 'regenerate' &&
+          item.subtype === 'statusBlock',
+      )
+      if (inflightStatusBlockRegen) {
+        setStatusBlockRegenerating({
+          messageId: inflightStatusBlockRegen.messageId,
+          slotIndex: inflightStatusBlockRegen.slotIndex,
+        })
+      }
+
       const chatProfileId = await getSetting('requestKind.chat.profileId')
       setNoChatProfile(!chatProfileId)
 
@@ -2033,6 +2054,8 @@ function ChatView() {
       const result = await apiQueue.enqueue({
         threadId,
         type: 'regenerate',
+        messageId,
+        slotIndex,
         signal: regenAbortController.signal,
         controller: regenAbortController,
         execute: async (ctx) => {
@@ -2316,6 +2339,9 @@ function ChatView() {
         sbResult = await apiQueue.enqueue({
           threadId,
           type: 'regenerate',
+          messageId,
+          slotIndex,
+          subtype: 'statusBlock',
           signal: sbAbortController.signal,
           controller: sbAbortController,
           execute: async (ctx) => {
