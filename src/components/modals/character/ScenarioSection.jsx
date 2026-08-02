@@ -72,6 +72,7 @@ function ScenarioSection({ form, onChange, characterId }) {
     const next = {
       id: crypto.randomUUID(),
       content: '',
+      statusBlock: '',
       lifetime: 'firstSummary',
       active: scenarios.length === 0,
     }
@@ -84,6 +85,13 @@ function ScenarioSection({ form, onChange, characterId }) {
       scenarios.map((s) =>
         s.id === id ? { ...s, content, active: content.trim() ? s.active : false } : s,
       ),
+    )
+  }
+
+  function handleStatusBlockChange(id, statusBlock) {
+    onChange(
+      'scenarios',
+      scenarios.map((s) => (s.id === id ? { ...s, statusBlock } : s)),
     )
   }
 
@@ -146,6 +154,11 @@ function ScenarioSection({ form, onChange, characterId }) {
   function handleClear(scenario, e) {
     e.stopPropagation()
     handleContentChange(scenario.id, '')
+  }
+
+  function handleClearStatusBlock(scenario, e) {
+    e.stopPropagation()
+    handleStatusBlockChange(scenario.id, '')
   }
 
   const hasAnyContent = scenarios.some((s) => s.content?.trim())
@@ -304,6 +317,46 @@ function ScenarioSection({ form, onChange, characterId }) {
                     <Copy className="w-4 h-4" />
                   </button>
                 </div>
+              </div>
+
+              <div className="mt-3">
+                <CollapsibleSection
+                  label={t('scenarioStatusBlockLabel')}
+                  summary={
+                    scenario.statusBlock
+                      ? t('common:tokenCount', { count: estimateTokens(scenario.statusBlock) })
+                      : null
+                  }
+                  storageKey={
+                    characterId
+                      ? `charSection.scenarioStatusBlock.${characterId}.${scenario.id}`
+                      : undefined
+                  }
+                  defaultExpanded={false}
+                  hasContent={!!scenario.statusBlock}
+                >
+                  <div className="relative mt-2">
+                    <AutoResizeTextarea
+                      className={`${inputClass} resize-none pr-12 min-h-[128px]`}
+                      value={scenario.statusBlock || ''}
+                      onChange={(e) => handleStatusBlockChange(scenario.id, e.target.value)}
+                      placeholder={t('scenarioStatusBlockPlaceholder')}
+                      extraHeight={8}
+                    />
+                    <div className="absolute top-2 right-2">
+                      <button
+                        type="button"
+                        onClick={(e) => handleClearStatusBlock(scenario, e)}
+                        disabled={!scenario.statusBlock?.trim()}
+                        className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-surface text-secondary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        aria-label={t('clearScenarioStatusBlock')}
+                        title={t('clearScenarioStatusBlock')}
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </CollapsibleSection>
               </div>
 
               <div className="mt-3">

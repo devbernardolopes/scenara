@@ -201,6 +201,7 @@ function buildScenarios(scenario) {
       id: crypto.randomUUID(),
       name: '',
       content: cleanText(scenario),
+      statusBlock: '',
       lifetime: 'firstSummary',
       active: true,
     },

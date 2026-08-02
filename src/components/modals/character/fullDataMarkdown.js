@@ -33,6 +33,9 @@ function buildFullDataMarkdown(form, writingInstructionText) {
     scenarios.forEach((s) => {
       blocks.push(`## ${s.name?.trim() || 'Untitled Scenario'}`)
       blocks.push(s.content.trim())
+      if (s.statusBlock?.trim()) {
+        blocks.push(`**Status Block:**\n\n${s.statusBlock.trim()}`)
+      }
     })
   }
 
