@@ -36,7 +36,7 @@ import {
 import { getSetting } from '../services/settings'
 import { injectQuoteMarks } from '../lib/postProcessing'
 import { generateChatResponse, parseBundleEntries } from '../services/chatGeneration'
-import { isMessageHidden, stripOOCDelimiters } from '../services/chatApi'
+import { isMessageHidden, stripOOCDelimiters, buildChatRequestPayload } from '../services/chatApi'
 import { getEffectiveStatusBlock } from '../services/statusBlocks'
 import { runStatusBlockDirector } from '../services/statusBlockDirector'
 import * as apiQueue from '../services/apiQueue'
@@ -2359,10 +2359,18 @@ function ChatView() {
     }
     const currentPersona = selectedPersonaId ? await getPersona(selectedPersonaId) : chatPersona
 
+    const freshCharacter =
+      thread?.characterId != null
+        ? (await getCharacter(thread.characterId)) || character
+        : character
+
     const entries = parseBundleEntries(msg.bundleMessages)
     const entry =
       entries && slotIndex >= 0 && slotIndex < entries.length ? entries[slotIndex] : null
     if (!entry) return
+
+    const statusBlockOverride =
+      entry.statusBlockUsed || entry.statusBlock || thread?.statusBlock || ''
 
     let messageSystem = ''
     let messageUser = ''
@@ -2375,6 +2383,43 @@ function ChatView() {
           messageUser = payload.find((m) => m.role === 'user')?.content || ''
         }
       } catch {}
+    }
+
+    // Rebuild the current payload so the Director's {{message_system}} /
+    // {{message_user}} template variables reflect the latest character and
+    // thread state (mirrors the whole-message regeneration path). Falls back
+    // to the stored snapshot if the build fails.
+    try {
+      const msgIdx = messagesRef.current.findIndex((m) => m.id === messageId)
+      const currentMsgs = withoutFailedMessages(messagesRef.current.slice(0, msgIdx))
+      const lastMsgBefore = currentMsgs[currentMsgs.length - 1]
+      const beforeDate = lastMsgBefore?.createdAt
+        ? new Date(lastMsgBefore.createdAt)
+        : msg?.createdAt
+          ? new Date(msg.createdAt)
+          : null
+      const isThreadStart =
+        currentMsgs.filter((m) => isRealMessage(m) && !isMessageHidden(m)).length === 0
+      const isFirstMessage = isThreadStart && freshCharacter?.firstMessage
+      const { payload } = await buildChatRequestPayload({
+        character: freshCharacter,
+        chatPersona,
+        currentPersona,
+        messages: currentMsgs,
+        isFirstMessage,
+        isThreadStart,
+        isOOC: false,
+        threadId,
+        personaMap,
+        beforeDate,
+        statusBlock: statusBlockOverride,
+      })
+      const freshSystem = payload.find((m) => m.role === 'system')?.content || ''
+      const freshUser = payload.find((m) => m.role === 'user')?.content || ''
+      if (freshSystem) messageSystem = freshSystem
+      if (freshUser) messageUser = freshUser
+    } catch {
+      // Keep the stored snapshot values above when the payload can't be rebuilt.
     }
 
     setStatusBlockRegenerating({ messageId, slotIndex })
@@ -2393,7 +2438,7 @@ function ChatView() {
           controller: sbAbortController,
           execute: async (ctx) => {
             return await runStatusBlockDirector({
-              character,
+              character: freshCharacter,
               chatPersona,
               currentPersona,
               threadId,
@@ -2403,7 +2448,7 @@ function ChatView() {
               personaMap,
               signal: sbAbortController.signal,
               ctx,
-              statusBlock: entry.statusBlockUsed || entry.statusBlock || thread?.statusBlock || '',
+              statusBlock: statusBlockOverride,
             })
           },
         }).promise
@@ -2420,6 +2465,12 @@ function ChatView() {
         if (currentEntries && slotIndex >= 0 && slotIndex < currentEntries.length) {
           currentEntries[slotIndex].statusBlock = nextStatusBlock
           currentEntries[slotIndex].statusBlockDirectorFailed = false
+          currentEntries[slotIndex].statusBlockDirectorAttempted = true
+          currentEntries[slotIndex].statusBlockDirectorSystemPrompt =
+            sbResult.systemInstructions || ''
+          currentEntries[slotIndex].statusBlockDirectorUserPrompt = sbResult.userInstructions || ''
+          currentEntries[slotIndex].statusBlockDirectorModel = sbResult.directorModel || ''
+          currentEntries[slotIndex].statusBlockDirectorParams = sbResult.directorParams || {}
           const nextBundleJson = JSON.stringify(currentEntries)
           await updateMessage(messageId, { bundleMessages: nextBundleJson })
           setMessages((prev) =>
