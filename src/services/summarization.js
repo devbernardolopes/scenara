@@ -142,31 +142,6 @@ export async function buildSummarizationPayload({
     replaceVarsWithDesc,
   })
 
-  let personaEndSystemPrompt = ''
-  let personaEndCharacterPrompt = ''
-  const personaTiming =
-    character?.personaInjectionTiming || (await getSetting('prompting.personaInjectionTiming'))
-  const personaPlacement =
-    character?.personaInjectionPlacement ||
-    (await getSetting('prompting.personaInjectionPlacement'))
-  const personaTemplate = await getSetting('prompting.personaInjectionTemplate')
-  if (personaTiming === 'always' && personaTemplate) {
-    let injected = replacePersonaTemplate(personaTemplate, {
-      charName,
-      personaName,
-      currentPersonaName,
-      currentPersona,
-      chatPersona,
-      defaultPersona,
-      personasHistory,
-    })
-    if (personaPlacement === 'endOfSystemPrompt') {
-      personaEndSystemPrompt = injected
-    } else if (personaPlacement === 'endOfCharacterPrompt') {
-      personaEndCharacterPrompt = injected
-    }
-  }
-
   let systemContent = character?.summarizationSystemInstructions
   if (!systemContent) {
     systemContent = await getSetting('prompting.summarizationSystem')
@@ -227,17 +202,11 @@ export async function buildSummarizationPayload({
 
     if (resolvedGlobalContext) combined = `${combined}\n\n${resolvedGlobalContext}`
     if (resolvedScenario) combined = `${combined}\n\n${resolvedScenario}`
-
-    if (personaEndCharacterPrompt) combined = `${combined}\n\n${personaEndCharacterPrompt}`
     charPromptSection = charPromptHeader.value
       ? `${replaceVarsWithDesc(charPromptHeader.value)}${charPromptHeader.enabled ? '\n\n' : '\n'}${combined}`
       : combined
   } else if (contextSection) {
-    charPromptSection = personaEndCharacterPrompt
-      ? `${contextSection}\n\n${personaEndCharacterPrompt}`
-      : contextSection
-  } else if (personaEndCharacterPrompt) {
-    charPromptSection = personaEndCharacterPrompt
+    charPromptSection = contextSection
   }
 
   const transcriptSection = messagesHeader.value
@@ -254,17 +223,6 @@ export async function buildSummarizationPayload({
       .replace(/{{memory}}/gi, memorySection)
       .replace(/{{character_prompt}}/gi, charPromptSection)
       .replace(/{{status_block}}/gi, statusBlockSection)
-
-  if (personaEndSystemPrompt) {
-    if (/\{\{character_prompt\}\}/i.test(systemContent)) {
-      systemContent = systemContent.replace(
-        /\{\{character_prompt\}\}/gi,
-        `${personaEndSystemPrompt}\n\n{{character_prompt}}`,
-      )
-    } else {
-      systemContent = `${systemContent}\n\n${personaEndSystemPrompt}`
-    }
-  }
 
   systemContent = replaceTemplates(systemContent)
 
