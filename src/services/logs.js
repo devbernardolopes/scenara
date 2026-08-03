@@ -1,8 +1,17 @@
 import db from '../db'
+import { getSetting } from './settings'
 
 export const LOG_CAP = 5000
 
 export async function addLog(entry) {
+  let enabled = true
+  try {
+    enabled = (await getSetting('logs.enabled')) !== false
+  } catch {
+    /* never let a settings read break logging paths */
+  }
+  if (!enabled) return null
+
   const record = {
     type: entry.type || 'info',
     threadId: entry.threadId != null ? Number(entry.threadId) : null,

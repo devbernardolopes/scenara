@@ -403,6 +403,10 @@
       "label": "Resaltar botones de eliminar",
       "desc": "Muestra los botones de eliminar con un fondo rojo distintivo para enfatizarlos."
     },
+    "enableLogs": {
+      "label": "Activar registros",
+      "desc": "Registra solicitudes de API, notificaciones y errores en el visor de registros local. Desactívalo para detener todo el registro."
+    },
     "showStatus": {
       "label": "Mostrar barra de estado",
       "desc": "Muestra la barra de estado sobre el campo de entrada con el nombre del modelo activo."

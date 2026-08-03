@@ -886,6 +886,15 @@ export const SETTINGS = [
     descKey: 'settings:appearance.highlightDeleteButtons.desc',
   },
   {
+    key: 'logs.enabled',
+    category: 'appearance',
+    group: 'interface',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.enableLogs.label',
+    descKey: 'settings:appearance.enableLogs.desc',
+  },
+  {
     key: 'showStatus',
     category: 'appearance',
     group: 'chat',

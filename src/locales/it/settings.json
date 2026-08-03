@@ -403,6 +403,10 @@
       "label": "Evidenzia pulsanti elimina",
       "desc": "Mostra i pulsanti elimina con uno sfondo rosso distinto per evidenziarli."
     },
+    "enableLogs": {
+      "label": "Attiva log",
+      "desc": "Registra richieste API, notifiche ed errori nel visualizzatore di log locale. Disattiva per interrompere qualsiasi registrazione."
+    },
     "showStatus": {
       "label": "Mostra barra di stato",
       "desc": "Mostra la barra di stato sopra il campo di input con il nome del modello attivo."

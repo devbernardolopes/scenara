@@ -299,6 +299,10 @@
       "label": "Destacar Botões de Excluir",
       "desc": "Mostrar botões de excluir com fundo vermelho para ênfase."
     },
+    "enableLogs": {
+      "label": "Ativar Logs",
+      "desc": "Registra requisições de API, notificações e erros no visualizador de logs local. Desative para interromper todo o registro."
+    },
     "showStatus": {
       "label": "Mostrar Status",
       "desc": "Mostrar a barra de status acima da entrada com o nome do modelo ativo."

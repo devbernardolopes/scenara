@@ -403,6 +403,10 @@
       "label": "Highlight Delete Buttons",
       "desc": "Show delete buttons with a distinct red background for emphasis."
     },
+    "enableLogs": {
+      "label": "Protokollierung aktivieren",
+      "desc": "API-Anfragen, Benachrichtigungen und Fehler in der lokalen Protokollansicht aufzeichnen. Deaktivieren, um die gesamte Protokollierung zu stoppen."
+    },
     "showStatus": {
       "label": "Show Status Bar",
       "desc": "Show the status bar above the chat input with the active model name."

@@ -403,6 +403,10 @@
       "label": "Highlight Delete Buttons",
       "desc": "Show delete buttons with a distinct red background for emphasis."
     },
+    "enableLogs": {
+      "label": "Enable Logs",
+      "desc": "Record API requests, toasts, and errors to the local log viewer. Disable to stop all logging."
+    },
     "showStatus": {
       "label": "Show Status Bar",
       "desc": "Show the status bar above the chat input with the active model name."

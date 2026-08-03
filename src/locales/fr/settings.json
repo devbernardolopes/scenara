@@ -403,6 +403,10 @@
       "label": "Mettre en évidence les boutons de suppression",
       "desc": "Affiche les boutons de suppression avec un arrière-plan rouge distinct pour les souligner."
     },
+    "enableLogs": {
+      "label": "Activer les journaux",
+      "desc": "Enregistre les requêtes API, les notifications et les erreurs dans la visionneuse de journaux locale. Désactivez pour arrêter toute journalisation."
+    },
     "showStatus": {
       "label": "Afficher la barre d’état",
       "desc": "Affiche la barre d’état au-dessus du champ de saisie avec le nom du modèle actif."
