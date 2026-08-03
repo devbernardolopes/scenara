@@ -487,8 +487,6 @@
   --surface-glass-border: 1px solid rgba(0, 255, 0, 0.1);
 }
 
-/* ==================== NEW THEMES ==================== */
-
 /* --- Midnight (Deep cosmic dark) --- */
 .theme-midnight {
   --color-primary: #6366f1;
@@ -901,6 +899,391 @@
   --surface-glass-border: 1px solid rgba(0, 255, 234, 0.15);
 }
 
+/* --- Grimoire (Dark Academia) --- */
+.theme-grimoire {
+  --color-primary: #c5a059; /* Antique Gold */
+  --color-primary-rgb: 197, 160, 89;
+  --color-primary-hover: #d4b26a;
+  --color-primary-subtle: #3d301a;
+  --color-on-primary: #1a140d;
+  --color-on-primary-muted: rgba(26, 20, 13, 0.7);
+  --color-surface: #231c14; /* Dark Espresso */
+  --color-surface-secondary: #2c241b;
+  --color-surface-hover: #3a3025;
+  --color-text: #e8dcc4; /* Parchment */
+  --color-text-secondary: #bdae93;
+  --color-text-tertiary: #8c7a61;
+  --color-text-highlight: #d4af37;
+  --color-border: #4a3d2e;
+  --color-border-light: #3a3025;
+  --color-overlay: rgba(15, 10, 5, 0.85);
+  --color-success: #6b8e23;
+  --color-warning: #d97706;
+  --color-error: #991b1b; /* Crimson */
+  --color-accent: #7a1f1f;
+  --color-accent-hover: #992626;
+  --color-delete: #991b1b;
+  --color-delete-hover: #7f1d1d;
+  --color-on-delete: #ffffff;
+  --color-delete-always: #991b1b;
+  --color-delete-hover-always: #7f1d1d;
+  --color-on-delete-always: #ffffff;
+  --color-ooc: #b45309;
+  --color-ooc-subtle: rgba(180, 83, 9, 0.15);
+  --color-ooc-text: #fef3c7;
+  --color-ooc-muted: rgba(254, 243, 199, 0.7);
+  --color-ooc-placeholder: rgba(254, 243, 199, 0.45);
+  --color-pill-count-bg: #3d301a;
+  --color-pill-count-text: #d4b26a;
+  --color-pill-queued-bg: #4a2511;
+  --color-pill-queued-text: #fca5a5;
+  --color-pill-eta-bg: #14532d;
+  --color-pill-eta-text: #86efac;
+  --color-pill-perf-bg: #4c1d95;
+  --color-pill-perf-text: #d8b4fe;
+  --color-code-bg: rgba(197, 160, 89, 0.08);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --shadow-sidebar: 2px 0 10px rgba(0, 0, 0, 0.4);
+  --shadow-header: 0 2px 10px rgba(0, 0, 0, 0.4);
+  --shadow-input-area: 0 -2px 10px rgba(0, 0, 0, 0.4);
+  --shadow-section: 0 1px 6px rgba(0, 0, 0, 0.3);
+  --surface-glass-opacity: 0.85;
+  --surface-glass-blur: 16px;
+  --surface-glass-border: 1px solid rgba(197, 160, 89, 0.1);
+}
+
+/* --- Lo-Fi Sunset --- */
+.theme-lofi {
+  --color-primary: #ff9a8b; /* Soft Peach/Coral */
+  --color-primary-rgb: 255, 154, 139;
+  --color-primary-hover: #ffb3a7;
+  --color-primary-subtle: #4a2c38;
+  --color-on-primary: #2d1b2e;
+  --color-on-primary-muted: rgba(45, 27, 46, 0.7);
+  --color-surface: #2d2438; /* Dusky Violet */
+  --color-surface-secondary: #3b2f4a;
+  --color-surface-hover: #4a3b5c;
+  --color-text: #fcd5ce;
+  --color-text-secondary: #d8b4e2; /* Lavender */
+  --color-text-tertiary: #a6809c;
+  --color-text-highlight: #ffd166;
+  --color-border: #55466b;
+  --color-border-light: #413454;
+  --color-overlay: rgba(25, 15, 35, 0.8);
+  --color-success: #8884d8;
+  --color-warning: #ffd166;
+  --color-error: #ff6b6b;
+  --color-accent: #8884d8;
+  --color-accent-hover: #9fa0e4;
+  --color-delete: #ff6b6b;
+  --color-delete-hover: #ff5252;
+  --color-on-delete: #ffffff;
+  --color-delete-always: #ff6b6b;
+  --color-delete-hover-always: #ff5252;
+  --color-on-delete-always: #ffffff;
+  --color-ooc: #f59e0b;
+  --color-ooc-subtle: rgba(245, 158, 11, 0.12);
+  --color-ooc-text: #fef3c7;
+  --color-ooc-muted: rgba(254, 243, 199, 0.7);
+  --color-ooc-placeholder: rgba(254, 243, 199, 0.45);
+  --color-pill-count-bg: #4a2c38;
+  --color-pill-count-text: #ffb3a7;
+  --color-pill-queued-bg: #5b4020;
+  --color-pill-queued-text: #ffd166;
+  --color-pill-eta-bg: #204a5b;
+  --color-pill-eta-text: #99f6e4;
+  --color-pill-perf-bg: #3b2f4a;
+  --color-pill-perf-text: #d8b4e2;
+  --color-code-bg: rgba(255, 154, 139, 0.08);
+  --shadow-sm: 0 2px 4px rgba(45, 27, 46, 0.2);
+  --shadow-md: 0 4px 8px rgba(45, 27, 46, 0.25);
+  --shadow-lg: 0 10px 20px rgba(45, 27, 46, 0.3);
+  --shadow-sidebar: 2px 0 12px rgba(45, 27, 46, 0.2);
+  --shadow-header: 0 2px 12px rgba(45, 27, 46, 0.2);
+  --shadow-input-area: 0 -2px 12px rgba(45, 27, 46, 0.2);
+  --shadow-section: 0 1px 6px rgba(45, 27, 46, 0.15);
+  --surface-glass-opacity: 0.8;
+  --surface-glass-blur: 20px;
+  --surface-glass-border: 1px solid rgba(255, 154, 139, 0.1);
+}
+
+/* --- Botanical (The Greenhouse) --- */
+.theme-botanical {
+  --color-primary: #4a7c59; /* Moss Green */
+  --color-primary-rgb: 74, 124, 89;
+  --color-primary-hover: #5c936d;
+  --color-primary-subtle: #dce5df;
+  --color-on-primary: #ffffff;
+  --color-on-primary-muted: rgba(255, 255, 255, 0.8);
+  --color-surface: #f4f1ea; /* Warm Off-White */
+  --color-surface-secondary: #e8e3d7;
+  --color-surface-hover: #dfd9cb;
+  --color-text: #2c3e2d;
+  --color-text-secondary: #556b55;
+  --color-text-tertiary: #7a8c7a;
+  --color-text-highlight: #cc7722;
+  --color-border: #c2bba8;
+  --color-border-light: #d5d0c1;
+  --color-overlay: rgba(44, 62, 45, 0.5);
+  --color-success: #2d6a4f;
+  --color-warning: #d97706;
+  --color-error: #9b2c2c;
+  --color-accent: #cc7722; /* Terracotta */
+  --color-accent-hover: #e08833;
+  --color-delete: #9b2c2c;
+  --color-delete-hover: #742a2a;
+  --color-on-delete: #ffffff;
+  --color-delete-always: #9b2c2c;
+  --color-delete-hover-always: #742a2a;
+  --color-on-delete-always: #ffffff;
+  --color-ooc: #b45309;
+  --color-ooc-subtle: rgba(180, 83, 9, 0.1);
+  --color-ooc-text: #451a03;
+  --color-ooc-muted: rgba(69, 26, 3, 0.65);
+  --color-ooc-placeholder: rgba(69, 26, 3, 0.45);
+  --color-pill-count-bg: #dce5df;
+  --color-pill-count-text: #2d5a3f;
+  --color-pill-queued-bg: #fef3c7;
+  --color-pill-queued-text: #92400e;
+  --color-pill-eta-bg: #d1fae5;
+  --color-pill-eta-text: #065f46;
+  --color-pill-perf-bg: #ffedd5;
+  --color-pill-perf-text: #9a3412;
+  --color-code-bg: rgba(44, 62, 45, 0.06);
+  --shadow-sm: 0 1px 3px rgba(44, 62, 45, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(44, 62, 45, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(44, 62, 45, 0.1);
+  --shadow-sidebar: 2px 0 8px rgba(44, 62, 45, 0.06);
+  --shadow-header: 0 2px 8px rgba(44, 62, 45, 0.06);
+  --shadow-input-area: 0 -2px 8px rgba(44, 62, 45, 0.06);
+  --shadow-section: 0 1px 4px rgba(44, 62, 45, 0.04);
+  --surface-glass-opacity: 0.75;
+  --surface-glass-blur: 16px;
+  --surface-glass-border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* --- Noir (Pulp Detective) --- */
+.theme-noir {
+  --color-primary: #c1121f; /* Blood Red */
+  --color-primary-rgb: 193, 18, 31;
+  --color-primary-hover: #df1f30;
+  --color-primary-subtle: #2a1215;
+  --color-on-primary: #ffffff;
+  --color-on-primary-muted: rgba(255, 255, 255, 0.8);
+  --color-surface: #111111; /* Charcoal */
+  --color-surface-secondary: #1a1a1a;
+  --color-surface-hover: #262626;
+  --color-text: #f2f2f2; /* Stark White */
+  --color-text-secondary: #a6a6a6;
+  --color-text-tertiary: #737373;
+  --color-text-highlight: #e6e6e6;
+  --color-border: #333333;
+  --color-border-light: #262626;
+  --color-overlay: rgba(0, 0, 0, 0.85);
+  --color-success: #4ade80;
+  --color-warning: #facc15;
+  --color-error: #ef4444;
+  --color-accent: #e0e0e0; /* Silver */
+  --color-accent-hover: #ffffff;
+  --color-delete: #ef4444;
+  --color-delete-hover: #dc2626;
+  --color-on-delete: #ffffff;
+  --color-delete-always: #ef4444;
+  --color-delete-hover-always: #dc2626;
+  --color-on-delete-always: #ffffff;
+  --color-ooc: #f59e0b;
+  --color-ooc-subtle: rgba(245, 158, 11, 0.12);
+  --color-ooc-text: #fef3c7;
+  --color-ooc-muted: rgba(254, 243, 199, 0.7);
+  --color-ooc-placeholder: rgba(254, 243, 199, 0.45);
+  --color-pill-count-bg: #2a1215;
+  --color-pill-count-text: #df1f30;
+  --color-pill-queued-bg: #422006;
+  --color-pill-queued-text: #fcd34d;
+  --color-pill-eta-bg: #052e16;
+  --color-pill-eta-text: #4ade80;
+  --color-pill-perf-bg: #1e1e1e;
+  --color-pill-perf-text: #a6a6a6;
+  --color-code-bg: rgba(255, 255, 255, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 6px 10px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 15px 25px rgba(0, 0, 0, 0.8);
+  --shadow-sidebar: 4px 0 15px rgba(0, 0, 0, 0.6);
+  --shadow-header: 0 4px 15px rgba(0, 0, 0, 0.6);
+  --shadow-input-area: 0 -4px 15px rgba(0, 0, 0, 0.6);
+  --shadow-section: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --surface-glass-opacity: 0.9;
+  --surface-glass-blur: 12px;
+  --surface-glass-border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* --- Celestial (Tarot) --- */
+.theme-celestial {
+  --color-primary: #d4af37; /* Pale Gold */
+  --color-primary-rgb: 212, 175, 55;
+  --color-primary-hover: #e5c158;
+  --color-primary-subtle: #332b15;
+  --color-on-primary: #1a1a2e;
+  --color-on-primary-muted: rgba(26, 26, 46, 0.7);
+  --color-surface: #1a1a2e; /* Deep Indigo */
+  --color-surface-secondary: #16213e;
+  --color-surface-hover: #0f3460;
+  --color-text: #e2e8f0; /* Starlight White */
+  --color-text-secondary: #a5b4fc;
+  --color-text-tertiary: #6366f1;
+  --color-text-highlight: #fde047;
+  --color-border: #312e81;
+  --color-border-light: #282566;
+  --color-overlay: rgba(10, 10, 31, 0.85);
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-accent: #8a4baf; /* Twilight Purple */
+  --color-accent-hover: #a05bc7;
+  --color-delete: #f87171;
+  --color-delete-hover: #ef4444;
+  --color-on-delete: #ffffff;
+  --color-delete-always: #f87171;
+  --color-delete-hover-always: #ef4444;
+  --color-on-delete-always: #ffffff;
+  --color-ooc: #3b82f6;
+  --color-ooc-subtle: rgba(59, 130, 246, 0.12);
+  --color-ooc-text: #e0f2fe;
+  --color-ooc-muted: rgba(224, 242, 254, 0.7);
+  --color-ooc-placeholder: rgba(224, 242, 254, 0.45);
+  --color-pill-count-bg: #332b15;
+  --color-pill-count-text: #e5c158;
+  --color-pill-queued-bg: #451a03;
+  --color-pill-queued-text: #fcd34d;
+  --color-pill-eta-bg: #14532d;
+  --color-pill-eta-text: #86efac;
+  --color-pill-perf-bg: #4c1d95;
+  --color-pill-perf-text: #d8b4fe;
+  --color-code-bg: rgba(212, 175, 55, 0.08);
+  --shadow-sm: 0 1px 3px rgba(212, 175, 55, 0.15);
+  --shadow-md: 0 4px 8px -2px rgba(212, 175, 55, 0.25);
+  --shadow-lg: 0 10px 20px -4px rgba(212, 175, 55, 0.35);
+  --shadow-sidebar: 2px 0 10px rgba(212, 175, 55, 0.15);
+  --shadow-header: 0 2px 10px rgba(212, 175, 55, 0.15);
+  --shadow-input-area: 0 -2px 10px rgba(212, 175, 55, 0.15);
+  --shadow-section: 0 1px 6px rgba(212, 175, 55, 0.12);
+  --surface-glass-opacity: 0.85;
+  --surface-glass-blur: 16px;
+  --surface-glass-border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+/* --- Amber Wasteland (Retro-Futurism) --- */
+.theme-amber-wasteland {
+  --color-primary: #ffbf00; /* Amber */
+  --color-primary-rgb: 255, 191, 0;
+  --color-primary-hover: #ffcf40;
+  --color-primary-subtle: #332600;
+  --color-on-primary: #1a1c14;
+  --color-on-primary-muted: rgba(26, 28, 20, 0.7);
+  --color-surface: #1a1c14; /* Dark Olive/Black */
+  --color-surface-secondary: #22241a;
+  --color-surface-hover: #2e3123;
+  --color-text: #ffbf00;
+  --color-text-secondary: #cc9900;
+  --color-text-tertiary: #806000;
+  --color-text-highlight: #ffff00;
+  --color-border: #4d3800;
+  --color-border-light: #332600;
+  --color-overlay: rgba(26, 28, 20, 0.9);
+  --color-success: #a3e635;
+  --color-warning: #f97316;
+  --color-error: #ef4444;
+  --color-accent: #ff8c00; /* Dark Orange */
+  --color-accent-hover: #ffaa33;
+  --color-delete: #ef4444;
+  --color-delete-hover: #dc2626;
+  --color-on-delete: #ffffff;
+  --color-delete-always: #ef4444;
+  --color-delete-hover-always: #dc2626;
+  --color-on-delete-always: #ffffff;
+  --color-ooc: #f59e0b;
+  --color-ooc-subtle: rgba(245, 158, 11, 0.12);
+  --color-ooc-text: #fef3c7;
+  --color-ooc-muted: rgba(254, 243, 199, 0.7);
+  --color-ooc-placeholder: rgba(254, 243, 199, 0.45);
+  --color-pill-count-bg: #332600;
+  --color-pill-count-text: #ffcf40;
+  --color-pill-queued-bg: #431407;
+  --color-pill-queued-text: #fca5a5;
+  --color-pill-eta-bg: #14532d;
+  --color-pill-eta-text: #86efac;
+  --color-pill-perf-bg: #451a03;
+  --color-pill-perf-text: #fdba74;
+  --color-code-bg: rgba(255, 191, 0, 0.08);
+  --shadow-sm: 0 1px 2px rgba(255, 191, 0, 0.15);
+  --shadow-md: 0 4px 6px -1px rgba(255, 191, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(255, 191, 0, 0.25);
+  --shadow-sidebar: 2px 0 10px rgba(255, 191, 0, 0.15);
+  --shadow-header: 0 2px 10px rgba(255, 191, 0, 0.15);
+  --shadow-input-area: 0 -2px 10px rgba(255, 191, 0, 0.15);
+  --shadow-section: 0 1px 6px rgba(255, 191, 0, 0.12);
+  --surface-glass-opacity: 0.85;
+  --surface-glass-blur: 16px;
+  --surface-glass-border: 1px solid rgba(255, 191, 0, 0.1);
+}
+
+/* --- Y2K (Frutiger Aero) --- */
+.theme-y2k {
+  --color-primary: #00a8e1; /* Sky Blue */
+  --color-primary-rgb: 0, 168, 225;
+  --color-primary-hover: #33bce8;
+  --color-primary-subtle: #bae6fd;
+  --color-on-primary: #ffffff;
+  --color-on-primary-muted: rgba(255, 255, 255, 0.8);
+  --color-surface: #f0f8ff; /* Alice Blue */
+  --color-surface-secondary: #e0f2fe;
+  --color-surface-hover: #bae6fd;
+  --color-text: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-tertiary: #64748b;
+  --color-text-highlight: #10b981;
+  --color-border: #93c5fd;
+  --color-border-light: #bfdbfe;
+  --color-overlay: rgba(14, 165, 233, 0.3);
+  --color-success: #10b981; /* Grassy Green */
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-accent: #10b981;
+  --color-accent-hover: #34d399;
+  --color-delete: #ef4444;
+  --color-delete-hover: #dc2626;
+  --color-on-delete: #ffffff;
+  --color-delete-always: #ef4444;
+  --color-delete-hover-always: #dc2626;
+  --color-on-delete-always: #ffffff;
+  --color-ooc: #8b5cf6;
+  --color-ooc-subtle: rgba(139, 92, 246, 0.1);
+  --color-ooc-text: #4c1d95;
+  --color-ooc-muted: rgba(76, 29, 149, 0.65);
+  --color-ooc-placeholder: rgba(76, 29, 149, 0.45);
+  --color-pill-count-bg: #bae6fd;
+  --color-pill-count-text: #0369a1;
+  --color-pill-queued-bg: #fef3c7;
+  --color-pill-queued-text: #b45309;
+  --color-pill-eta-bg: #d1fae5;
+  --color-pill-eta-text: #047857;
+  --color-pill-perf-bg: #ede9fe;
+  --color-pill-perf-text: #6d28d9;
+  --color-code-bg: rgba(14, 165, 233, 0.08);
+  --shadow-sm: 0 2px 4px rgba(14, 165, 233, 0.1);
+  --shadow-md: 0 4px 8px rgba(14, 165, 233, 0.15);
+  --shadow-lg: 0 10px 20px rgba(14, 165, 233, 0.2);
+  --shadow-sidebar: 2px 0 12px rgba(14, 165, 233, 0.1);
+  --shadow-header: 0 2px 12px rgba(14, 165, 233, 0.1);
+  --shadow-input-area: 0 -2px 12px rgba(14, 165, 233, 0.1);
+  --shadow-section: 0 1px 6px rgba(14, 165, 233, 0.08);
+  --surface-glass-opacity: 0.7;
+  --surface-glass-blur: 24px;
+  --surface-glass-border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
 /* ============================================================
    Theme personality overrides — radius, texture, glow.
    Applied via .theme-* selectors so they activate per-theme.
@@ -977,6 +1360,62 @@
 /* Neon Abyss: max glow */
 .theme-neon-abyss {
   --glow-intensity: 2;
+}
+
+/* Grimoire: softer corners, warm glow */
+.theme-grimoire {
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --glow-intensity: 0.9;
+}
+
+/* Lo-Fi: very round, friendly, soft glows */
+.theme-lofi {
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --glow-intensity: 0.6;
+}
+
+/* Botanical: organic, large pill shapes */
+.theme-botanical {
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-pill: 9999px;
+  --glow-intensity: 0.8;
+}
+
+/* Noir: sharp corners, minimal glow */
+.theme-noir {
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-pill: 0;
+  --glow-intensity: 0.3;
+}
+
+/* Celestial: dramatic magical glow */
+.theme-celestial {
+  --glow-intensity: 1.4;
+}
+
+/* Amber Wasteland: sharp corners, high terminal glow */
+.theme-amber-wasteland {
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-pill: 0;
+  --glow-intensity: 1.8;
+}
+
+/* Y2K: bubbly and highly rounded */
+.theme-y2k {
+  --radius-sm: 0.75rem;
+  --radius-md: 1.25rem;
+  --radius-lg: 2rem;
+  --glow-intensity: 1.1;
 }
 
 /* ============================================================
@@ -1775,4 +2214,65 @@ html.theme-vaporwave .main-content::after {
   background-size: 40px 40px;
   pointer-events: none;
   z-index: 0;
+}
+
+/* Grimoire: subtle parchment paper grain */
+html.theme-grimoire .main-content::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Lo-Fi: subtle VHS static noise */
+html.theme-lofi .main-content::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Celestial: faint starry dust overlay (screen blend mode makes it sparkle) */
+html.theme-celestial .main-content::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  opacity: 0.05;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Amber Wasteland: amber-tinted CRT scanlines + heavy vignette */
+html.theme-amber-wasteland body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 191, 0, 0.03) 2px,
+    rgba(255, 191, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+html.theme-amber-wasteland::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
+  pointer-events: none;
+  z-index: 9998;
 }
