@@ -1,6 +1,6 @@
 function SettingToggle({ value, onChange, id }) {
   return (
-    <div className="flex items-center min-h-[44px]">
+    <div className="flex items-center min-h-[44px] shrink-0">
       <button
         role="switch"
         aria-checked={!!value}

@@ -164,7 +164,11 @@ function SettingsModal() {
           onSelect={setActiveCategory}
         />
 
-        <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto px-6 py-4">
+        <div
+          ref={scrollRef}
+          onScroll={onScroll}
+          className="flex-1 overflow-y-auto px-3 sm:px-6 py-4"
+        >
           {activeCategory === 'api' ? (
             <ApiSettingsPanel />
           ) : activeCategory === 'database' ? (

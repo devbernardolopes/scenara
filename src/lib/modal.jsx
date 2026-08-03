@@ -93,7 +93,7 @@ export function ModalProvider({ children }) {
           >
             <Suspense
               fallback={
-                <div className="bg-glass border-glass rounded-lg shadow-surface-lg max-w-4xl w-full mx-4 p-12 text-center text-secondary text-sm">
+                <div className="bg-glass border-glass rounded-lg shadow-surface-lg max-w-4xl w-full mx-2 sm:mx-4 p-12 text-center text-secondary text-sm">
                   {t('loading')}
                 </div>
               }
@@ -109,7 +109,7 @@ export function ModalProvider({ children }) {
                 </div>
               ) : (
                 <div
-                  className="bg-glass border-glass rounded-lg shadow-surface-lg max-w-4xl w-full mx-4 h-[85vh] max-h-[90vh] flex flex-col overflow-hidden"
+                  className="bg-glass border-glass rounded-lg shadow-surface-lg max-w-4xl w-full mx-2 sm:mx-4 h-[85vh] max-h-[90vh] flex flex-col overflow-hidden"
                   style={{ borderRadius: 'var(--radius-lg)' }}
                   onMouseDown={() => {
                     mousedownInsideRef.current = true
