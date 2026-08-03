@@ -126,15 +126,17 @@ async function resetStatusBlockOnEmptyChat(threadId, msgs) {
   await updateThread(threadId, { statusBlock: charStatusBlock })
 }
 
-function getPreviousStatusBlock(msg) {
-  if (!msg?.bundleMessages) return null
-  const entries = parseBundleEntries(msg.bundleMessages)
-  if (!entries || entries.length === 0) return null
-  const lastEntry = entries[entries.length - 1]
-  if (lastEntry?.statusBlockUsed && lastEntry.statusBlock !== lastEntry.statusBlockUsed) {
-    return lastEntry.statusBlockUsed
+function getStatusBlockJustAbove(msgs, character, beforeIndex) {
+  for (let i = beforeIndex - 1; i >= 0; i--) {
+    const m = msgs[i]
+    if (!isRealMessage(m) || m.isOOC || m.role !== 'assistant') continue
+    const entries = parseBundleEntries(m.bundleMessages)
+    if (!entries || entries.length === 0) continue
+    const idx = m.activeSlotIndex ?? 0
+    const entry = entries[idx] ?? entries[entries.length - 1]
+    if (entry?.statusBlock) return entry.statusBlock
   }
-  return null
+  return character?.statusBlock || ''
 }
 
 function createTrailingThrottle(fn, intervalMs) {
@@ -1327,6 +1329,7 @@ function ChatView() {
         currentPersona,
         currentMsgs,
         isFirstMessage,
+        statusBlock: getStatusBlockJustAbove(currentMsgs, character, currentMsgs.length),
         isOOC,
         threadId,
         personaMap,
@@ -2100,7 +2103,11 @@ function ChatView() {
         signal: regenAbortController.signal,
         controller: regenAbortController,
         execute: async (ctx) => {
-          const prevStatusBlock = regenEntries[slotIndex - 1]?.statusBlockUsed
+          const prevStatusBlock = getStatusBlockJustAbove(
+            currentMsgs,
+            character,
+            currentMsgs.length,
+          )
           return await generateChatResponse({
             character,
             chatPersona,
@@ -2369,8 +2376,14 @@ function ChatView() {
       entries && slotIndex >= 0 && slotIndex < entries.length ? entries[slotIndex] : null
     if (!entry) return
 
-    const statusBlockOverride =
-      entry.statusBlockUsed || entry.statusBlock || thread?.statusBlock || ''
+    const msgIdx = messagesRef.current.findIndex((m) => m.id === messageId)
+    const currentMsgs = withoutFailedMessages(messagesRef.current.slice(0, msgIdx))
+
+    const statusBlockOverride = getStatusBlockJustAbove(
+      currentMsgs,
+      freshCharacter,
+      currentMsgs.length,
+    )
 
     let messageSystem = ''
     let messageUser = ''
@@ -2390,8 +2403,6 @@ function ChatView() {
     // thread state (mirrors the whole-message regeneration path). Falls back
     // to the stored snapshot if the build fails.
     try {
-      const msgIdx = messagesRef.current.findIndex((m) => m.id === messageId)
-      const currentMsgs = withoutFailedMessages(messagesRef.current.slice(0, msgIdx))
       const lastMsgBefore = currentMsgs[currentMsgs.length - 1]
       const beforeDate = lastMsgBefore?.createdAt
         ? new Date(lastMsgBefore.createdAt)
@@ -2576,10 +2587,13 @@ function ChatView() {
     })
     await deleteMessage(id)
 
-    const prevStatusBlock = getPreviousStatusBlock(msg)
-    if (prevStatusBlock != null) {
-      await updateThread(threadId, { statusBlock: prevStatusBlock })
-      setThread((prev) => (prev ? { ...prev, statusBlock: prevStatusBlock } : prev))
+    const msgs = await getMessagesByThread(threadId)
+    setMessages(dedupeMessages(msgs))
+
+    const nextStatusBlock = getStatusBlockJustAbove(msgs, character, msgs.length)
+    if (nextStatusBlock) {
+      await updateThread(threadId, { statusBlock: nextStatusBlock })
+      setThread((prev) => (prev ? { ...prev, statusBlock: nextStatusBlock } : prev))
     }
 
     if (msg?.createdAt) {
@@ -2597,8 +2611,6 @@ function ChatView() {
       }
     }
 
-    const msgs = await getMessagesByThread(threadId)
-    setMessages(dedupeMessages(msgs))
     await resetStatusBlockOnEmptyChat(threadId, msgs)
     showToast(t('messageDeleted'), { type: 'success' })
   }
@@ -2622,10 +2634,13 @@ function ChatView() {
       return next
     })
 
-    const prevStatusBlock = getPreviousStatusBlock(delMsg)
-    if (prevStatusBlock != null) {
-      await updateThread(threadId, { statusBlock: prevStatusBlock })
-      setThread((prev) => (prev ? { ...prev, statusBlock: prevStatusBlock } : prev))
+    const remainingMsgs = await getMessagesByThread(threadId)
+    setMessages(dedupeMessages(remainingMsgs))
+
+    const nextStatusBlock = getStatusBlockJustAbove(remainingMsgs, character, remainingMsgs.length)
+    if (nextStatusBlock) {
+      await updateThread(threadId, { statusBlock: nextStatusBlock })
+      setThread((prev) => (prev ? { ...prev, statusBlock: nextStatusBlock } : prev))
     }
 
     if (delMsg?.createdAt) {
@@ -2643,8 +2658,6 @@ function ChatView() {
       }
     }
 
-    const remainingMsgs = await getMessagesByThread(threadId)
-    setMessages(dedupeMessages(remainingMsgs))
     await resetStatusBlockOnEmptyChat(threadId, remainingMsgs)
     showToast(t('messageDeleted'), { type: 'success' })
   }
@@ -2675,15 +2688,6 @@ function ChatView() {
 
     await deleteMessagesFrom(id)
 
-    const firstDeletedWithDirectorMod = messagesRef.current
-      .slice(idx)
-      .find((m) => getPreviousStatusBlock(m) != null)
-    if (firstDeletedWithDirectorMod) {
-      const prevSb = getPreviousStatusBlock(firstDeletedWithDirectorMod)
-      await updateThread(threadId, { statusBlock: prevSb })
-      setThread((prev) => (prev ? { ...prev, statusBlock: prevSb } : prev))
-    }
-
     setActiveSlotIndices((prev) => {
       const next = { ...prev }
       deletedIds.forEach((d) => delete next[d])
@@ -2705,6 +2709,12 @@ function ChatView() {
 
     const remainingMsgs = await getMessagesByThread(threadId)
     setMessages(dedupeMessages(remainingMsgs))
+
+    const nextStatusBlock = getStatusBlockJustAbove(remainingMsgs, character, remainingMsgs.length)
+    if (nextStatusBlock) {
+      await updateThread(threadId, { statusBlock: nextStatusBlock })
+      setThread((prev) => (prev ? { ...prev, statusBlock: nextStatusBlock } : prev))
+    }
     await resetStatusBlockOnEmptyChat(threadId, remainingMsgs)
     showToast(t('messageDeleted'), { type: 'success' })
   }
