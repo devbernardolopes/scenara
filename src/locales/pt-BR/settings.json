@@ -354,7 +354,14 @@
     "vaporwave": "Vaporwave",
     "retroCrt": "Retro CRT",
     "solarizedDark": "Solarizado Escuro",
-    "neonAbyss": "Abismo Neon"
+    "neonAbyss": "Abismo Neon",
+    "grimoire": "Grimório",
+    "lofi": "Lo-Fi",
+    "botanical": "Botânico",
+    "noir": "Noir",
+    "celestial": "Celestial",
+    "amberWasteland": "Ermo Âmbar",
+    "y2k": "Y2K"
   },
   "api": {
     "activeProvider": {
