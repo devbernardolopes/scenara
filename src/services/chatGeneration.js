@@ -13,7 +13,6 @@ import { getThread } from './threads'
 import { getEffectiveStatusBlock } from './statusBlocks'
 import { runStatusBlockDirector } from './statusBlockDirector'
 import { trimLeadingTrailingNewlines, trimWhitespace } from './messages'
-import * as apiQueue from './apiQueue'
 import i18n from '../lib/i18n'
 import { showToast } from '../lib/toast'
 
@@ -249,7 +248,6 @@ export async function generateChatResponse({
         throw new Error(i18n.t('chat:noProfileModel'))
       }
 
-      await apiQueue.waitForCooldown()
       showToast(i18n.t('chat:directorReviewing'), { type: 'info' })
       ctx?.setDirectorPhase?.(true)
       try {

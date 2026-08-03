@@ -20,7 +20,7 @@ import {
   buildDirectorMessages,
   getAutoTitleTemplateValues,
 } from './director'
-import { waitForCooldown, getThreadQueuedCount, getThreadInflightCount } from './apiQueue'
+import { getThreadQueuedCount, getThreadInflightCount } from './apiQueue'
 import { showToast } from '../lib/toast'
 import { run, disposeModel } from '../lib/inferenceClient'
 import i18n from '../lib/i18n'
@@ -253,7 +253,6 @@ export async function triggerAutoTitle({
     try {
       const dProfile = await getEffectiveProfileFor('director', character)
       if (!dProfile?.model) throw new Error('No Director profile configured')
-      await waitForCooldown()
       showToast(i18n.t('chat:directorReviewing'), { type: 'info' })
       const { system_autotitle, user_autotitle } = await getAutoTitleTemplateValues(character)
       const templateVars = {

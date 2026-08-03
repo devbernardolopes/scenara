@@ -296,11 +296,3 @@ export function subscribe(fn) {
 export function cancelSummarizationRequests(threadId) {
   return cancelThreadRequests(threadId, { kinds: ['summarization'] })
 }
-
-export async function waitForCooldown() {
-  const cooldownMs = await getCooldownMs()
-  const elapsed = Date.now() - lastDispatchTime
-  if (elapsed < cooldownMs) {
-    await sleep(cooldownMs - elapsed)
-  }
-}
