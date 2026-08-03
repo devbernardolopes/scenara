@@ -83,7 +83,7 @@ function ListEntryCard({
             <span className="font-medium text-text truncate">{title}</span>
             {badges}
           </div>
-          {subtitle ? <p className="text-xs text-secondary mt-0.5">{subtitle}</p> : null}
+          {subtitle ? <p className="text-xs text-secondary mt-0.5 break-all">{subtitle}</p> : null}
           {description ? <p className="text-xs text-tertiary mt-0.5">{description}</p> : null}
         </div>
       </div>
