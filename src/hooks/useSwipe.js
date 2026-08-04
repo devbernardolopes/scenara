@@ -18,6 +18,9 @@ export function useSwipe(ref, { onSwipeLeft, onSwipeRight, enabled = true, thres
     const el = ref.current
     if (!el || !enabled) return
 
+    const prevTouchAction = el.style.touchAction
+    el.style.touchAction = 'pan-y'
+
     function cleanupTransitionListeners() {
       for (const { type, fn } of activeListeners.current) {
         el.removeEventListener(type, fn)
@@ -53,7 +56,7 @@ export function useSwipe(ref, { onSwipeLeft, onSwipeRight, enabled = true, thres
       }
 
       if (Math.abs(dx) > threshold) {
-        e.preventDefault()
+        if (e.cancelable) e.preventDefault()
         el.style.transition = 'none'
         el.style.transform = `translateX(${dx}px)`
       }
@@ -129,6 +132,7 @@ export function useSwipe(ref, { onSwipeLeft, onSwipeRight, enabled = true, thres
       el.removeEventListener('touchmove', handleTouchMove)
       el.removeEventListener('touchend', handleTouchEnd)
       resetDragState()
+      el.style.touchAction = prevTouchAction
       startRef.current = null
     }
   }, [ref, enabled, threshold])
