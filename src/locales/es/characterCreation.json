@@ -243,6 +243,7 @@
   "directorLiteralResponse": "{{response}}",
   "directorLiteralSystem": "Mensaje del sistema de la llamada API",
   "directorLiteralUser": "Mensaje del usuario de la llamada API",
+  "directorLiteralMessagesWindow": "Last N chat messages from the API call including the response (oldest first)",
   "directorLiteralWriting": "Instrucciones de escritura del personaje",
   "directorLiteralStatusBlock": "Bloque de estado actual del chat",
   "directorLiteralChar": "Nombre del personaje",

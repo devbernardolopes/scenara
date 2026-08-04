@@ -274,11 +274,14 @@ export async function triggerAutoTitle({
         user_autotitle,
         status_block: statusBlockResolved,
       }
-      const systemInstructions = applyDirectorTemplate(
+      const systemInstructions = await applyDirectorTemplate(
         directorConfig.systemInstructions,
         templateVars,
       )
-      const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
+      const userInstructions = await applyDirectorTemplate(
+        directorConfig.userInstructions,
+        templateVars,
+      )
       const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
       ctx?.setDirectorPhase?.(true)
       let reviewed

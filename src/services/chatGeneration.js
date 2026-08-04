@@ -2,7 +2,9 @@ import { getEffectiveProfileFor } from './connectionProfiles'
 import { getDirectorReviewConfig, buildDirectorMessages, applyDirectorTemplate } from './director'
 import {
   buildChatRequestPayload,
+  buildMessagesWindowTranscript,
   getActiveParams,
+  getLastNonOocUserMessageContent,
   prefixAssistantMessage,
   replaceVars,
   sendChatCompletion,
@@ -110,20 +112,30 @@ export async function generateChatResponse({
   const personaName = chatPersona?.name || currentPersona?.name || ''
   const assistantSpeaker = character?.speakerName || charName
 
-  const { payload, entryTypes, msgNumbers, loreActivated, lorebooks } =
-    await buildChatRequestPayload({
-      character,
-      chatPersona,
-      currentPersona,
-      messages: currentMsgs,
-      isFirstMessage,
-      isThreadStart,
-      isOOC,
-      threadId,
-      personaMap,
-      beforeDate,
-      statusBlock: statusBlockOverride,
-    })
+  const {
+    payload,
+    entryTypes,
+    msgNumbers,
+    messages: apiMessages,
+    loreActivated,
+    lorebooks,
+  } = await buildChatRequestPayload({
+    character,
+    chatPersona,
+    currentPersona,
+    messages: currentMsgs,
+    isFirstMessage,
+    isThreadStart,
+    isOOC,
+    threadId,
+    personaMap,
+    beforeDate,
+    statusBlock: statusBlockOverride,
+  })
+
+  // Latest (last) non-OOC user message from the API call — used by both the
+  // regular-chat Director and the Status Block Director passes.
+  const messageUser = getLastNonOocUserMessageContent(payload, entryTypes, apiMessages)
 
   const payloadStatusBlock =
     statusBlockOverride != null
@@ -226,22 +238,34 @@ export async function generateChatResponse({
         personaName: userPersonaName,
         currentPersonaName,
       })
+      const messagesTranscript = await buildMessagesWindowTranscript({
+        baseMessages: apiMessages,
+        responseContent: content,
+        character,
+        chatPersona,
+        currentPersona,
+        personaMap,
+      })
       const templateVars = {
         message: prefixedMessage,
         message_response: prefixedMessage,
         message_system: payload.find((m) => m.role === 'system')?.content || '',
-        message_user: payload.find((m) => m.role === 'user')?.content || '',
+        message_user: messageUser,
+        messagesTranscript,
         writingInstructions: writingInstructionContent,
         status_block: statusBlock,
         char: charName,
         user: userPersonaName,
         name: currentPersonaName,
       }
-      const systemInstructions = applyDirectorTemplate(
+      const systemInstructions = await applyDirectorTemplate(
         directorConfig.systemInstructions,
         templateVars,
       )
-      const userInstructions = applyDirectorTemplate(directorConfig.userInstructions, templateVars)
+      const userInstructions = await applyDirectorTemplate(
+        directorConfig.userInstructions,
+        templateVars,
+      )
       const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
 
       directorAttempted = true
@@ -347,7 +371,8 @@ export async function generateChatResponse({
       threadId,
       message: finalContent,
       messageSystem: payload.find((m) => m.role === 'system')?.content || '',
-      messageUser: payload.find((m) => m.role === 'user')?.content || '',
+      messageUser,
+      messages: apiMessages,
       personaMap,
       signal,
       ctx,

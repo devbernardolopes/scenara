@@ -746,6 +746,106 @@ export async function buildTranscript({
   return lines.join('\n\n')
 }
 
+// Returns the content of the last (newest) non-OOC user chat message from the
+// API-call payload. Payload chat entries are pushed in `apiMessages` order, so
+// a forward scan maps each entry typed 'chatMessage' back to its source message
+// reliably — even when synthetic entries (lore, prompts) are interleaved. The
+// content is taken from the payload entry (prefixes applied), matching what the
+// model actually saw in the request.
+export function getLastNonOocUserMessageContent(payload, entryTypes, apiMessages) {
+  if (!Array.isArray(payload) || !Array.isArray(entryTypes)) return ''
+  const sources = new Array(payload.length).fill(null)
+  let chatIdx = 0
+  for (let i = 0; i < payload.length; i++) {
+    if (entryTypes[i] === 'chatMessage') {
+      sources[i] = apiMessages?.[chatIdx] || null
+      chatIdx++
+    }
+  }
+  for (let i = payload.length - 1; i >= 0; i--) {
+    if (payload[i]?.role !== 'user') continue
+    if (entryTypes[i] !== 'chatMessage') continue
+    const src = sources[i]
+    if (!src || src.isOOC || isMessageHidden(src)) continue
+    return payload[i].content || ''
+  }
+  return ''
+}
+
+// Builds a `(count) => Promise<string>` resolver for the {{messages_N}} director
+// template. The current assistant response anchors the window: it is appended as
+// the newest message so {{messages_N}} always ends where {{message_response}}
+// resolves to (buildTranscript adds the assistant role prefix, matching the
+// prefixed response). The window is sliced to the last `count` messages in
+// chronological order — identical in format to {{transcript}}, stopping at the
+// oldest message when the history is shorter than `count`.
+export async function buildMessagesWindowTranscript({
+  baseMessages,
+  responseContent,
+  character,
+  chatPersona,
+  currentPersona,
+  personaMap,
+}) {
+  const charName = character?.name || ''
+  const personaName = chatPersona?.name || ''
+  const currentPersonaName = currentPersona?.name || personaName
+  const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
+
+  const defaultPersonaId = await getSetting('defaultPersonaId')
+  const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
+  const personasHistory = buildPersonasHistory(baseMessages, { chatPersona, personaMap })
+
+  const replaceVarsWithDesc = (text) =>
+    replacePersonaTemplate(text, {
+      charName,
+      personaName,
+      currentPersonaName,
+      currentPersona,
+      chatPersona,
+      defaultPersona,
+      personasHistory,
+    })
+
+  const userPersonaPrefixOverride = character?.userPersonaPrefix === false ? false : true
+
+  const rolePrefixes = {
+    systemRolePrefix: await getSetting('prompting.systemRolePrefix'),
+    assistantRolePrefix: await getSetting('prompting.assistantRolePrefix'),
+    userRolePrefix: await getSetting('prompting.userRolePrefix'),
+    userRolePrefixWithPersona: await getSetting('prompting.userRolePrefixWithPersona'),
+    systemRolePrefixOoc: await getSetting('prompting.systemRolePrefixOoc'),
+    assistantRolePrefixOoc: await getSetting('prompting.assistantRolePrefixOoc'),
+    userRolePrefixOoc: await getSetting('prompting.userRolePrefixOoc'),
+  }
+
+  const allMessages = [...(Array.isArray(baseMessages) ? baseMessages : [])]
+  if (responseContent) {
+    allMessages.push({ role: 'assistant', content: responseContent })
+  }
+
+  return (count) => {
+    const n = Number(count)
+    if (!Number.isFinite(n) || n <= 0) return Promise.resolve('')
+    const filtered = allMessages.filter(
+      (m) => !m?.isSummaryMarker && !m?.isAutoTitleMarker && !isMessageHidden(m),
+    )
+    if (filtered.length === 0) return Promise.resolve('')
+    const window = filtered.slice(-n)
+    if (window.length === 0) return Promise.resolve('')
+    return buildTranscript({
+      messages: window,
+      personaName,
+      currentPersonaName,
+      userPersonaPrefixOverride,
+      personaMap,
+      rolePrefixes,
+      replaceVarsIn,
+      replaceVarsWithDesc,
+    })
+  }
+}
+
 export async function prefixAssistantMessage(
   content,
   { charName, personaName, currentPersonaName } = {},
@@ -1173,6 +1273,7 @@ export async function buildChatRequestPayload({
     payload,
     entryTypes,
     msgNumbers,
+    messages: processedMessages,
     loreActivated: loreBlocks.activated || [],
     lorebooks: loreBlocks.lorebooks || [],
   }

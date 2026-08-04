@@ -249,6 +249,10 @@ function DirectorSection({ form, onChange, characterId }) {
             <code className="text-accent">{'{{message_user}}'}</code> — {t('directorLiteralUser')}
           </div>
           <div>
+            <code className="text-accent">{'{{messages_N}}'}</code> —{' '}
+            {t('directorLiteralMessagesWindow')}
+          </div>
+          <div>
             <code className="text-accent">{'{{writing_instructions}}'}</code> —{' '}
             {t('directorLiteralWriting')}
           </div>

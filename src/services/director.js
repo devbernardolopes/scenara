@@ -43,7 +43,7 @@ export function buildDirectorMessages({ systemInstructions, userInstructions }) 
   ]
 }
 
-export function applyDirectorTemplate(
+export async function applyDirectorTemplate(
   text,
   {
     message,
@@ -58,6 +58,7 @@ export function applyDirectorTemplate(
     user_autotitle,
     status_block,
     memory,
+    messagesTranscript,
   } = {},
 ) {
   if (!text) return text
@@ -95,7 +96,38 @@ export function applyDirectorTemplate(
     passes++
   }
 
+  if (messagesTranscript) {
+    next = await resolveMessagesTokens(next, messagesTranscript)
+  }
+
   return next
+}
+
+// Dynamic {{messages_N}} template: substituted with the transcript of the last N
+// chat messages (including the current response), stopping at the oldest message
+// when the history is shorter than N. When no resolver is provided the tokens are
+// left as-is (consistent with unknown tokens).
+const MESSAGES_N_RE = /\{\{messages_(\d+)\}\}/gi
+
+async function resolveMessagesTokens(text, messagesTranscript) {
+  const matches = [...text.matchAll(MESSAGES_N_RE)]
+  if (matches.length === 0) return text
+  const cache = new Map()
+  const parts = []
+  let last = 0
+  for (const match of matches) {
+    const n = Number(match[1])
+    let resolved = cache.get(n)
+    if (resolved === undefined) {
+      resolved = (await messagesTranscript(n)) ?? ''
+      cache.set(n, resolved)
+    }
+    parts.push(text.slice(last, match.index))
+    parts.push(resolved)
+    last = match.index + match[0].length
+  }
+  parts.push(text.slice(last))
+  return parts.join('')
 }
 
 const DEFAULT_AUTO_TITLE_SYSTEM =

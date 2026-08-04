@@ -1,6 +1,12 @@
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { applyDirectorTemplate, buildDirectorMessages } from './director'
-import { getActiveParams, prefixAssistantMessage, replaceVars, sendChatCompletion } from './chatApi'
+import {
+  buildMessagesWindowTranscript,
+  getActiveParams,
+  prefixAssistantMessage,
+  replaceVars,
+  sendChatCompletion,
+} from './chatApi'
 import { getWritingInstruction } from './writingInstructions'
 import { getThread } from './threads'
 import { getEffectiveStatusBlock } from './statusBlocks'
@@ -36,6 +42,7 @@ export async function runStatusBlockDirector({
   message,
   messageSystem,
   messageUser,
+  messages,
   personaMap,
   signal,
   ctx,
@@ -74,11 +81,21 @@ export async function runStatusBlockDirector({
     currentPersonaName,
   })
 
+  const messagesTranscript = await buildMessagesWindowTranscript({
+    baseMessages: messages,
+    responseContent: message,
+    character,
+    chatPersona,
+    currentPersona,
+    personaMap,
+  })
+
   const templateVars = {
     message: prefixedMessage,
     message_response: prefixedMessage,
     message_system: messageSystem || '',
     message_user: messageUser || '',
+    messagesTranscript,
     writingInstructions: writingInstructionContent,
     status_block: statusBlock,
     memory: memoryText,
@@ -86,8 +103,8 @@ export async function runStatusBlockDirector({
     user: personaName,
     name: currentPersonaName,
   }
-  const systemInstructions = applyDirectorTemplate(config.systemInstructions, templateVars)
-  const userInstructions = applyDirectorTemplate(config.userInstructions, templateVars)
+  const systemInstructions = await applyDirectorTemplate(config.systemInstructions, templateVars)
+  const userInstructions = await applyDirectorTemplate(config.userInstructions, templateVars)
   const dPayload = buildDirectorMessages({ systemInstructions, userInstructions })
 
   const dProfile = await getEffectiveProfileFor('director', character)

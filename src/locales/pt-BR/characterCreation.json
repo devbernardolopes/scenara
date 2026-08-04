@@ -220,6 +220,7 @@
   "directorLiteralResponse": "Resposta original do assistente",
   "directorLiteralSystem": "Mensagem do sistema da chamada de API",
   "directorLiteralUser": "Mensagem do usuário da chamada de API",
+  "directorLiteralMessagesWindow": "Últimas N mensagens do chat da chamada de API, incluindo a resposta (mais antigas primeiro)",
   "directorLiteralWriting": "Instruções de escrita do personagem",
   "directorLiteralStatusBlock": "Bloco de status atual do chat",
   "directorLiteralChar": "Nome do personagem",
