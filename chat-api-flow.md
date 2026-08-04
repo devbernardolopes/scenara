@@ -154,7 +154,7 @@ The `{{user}}` variable uses `chatPersona` (the thread's default persona), not `
 An array `systemParts` is assembled (for elements configured with `endOfSystemPrompt` placement):
 
 1. **Character Prompt** (`character.prompt`, required): pushed first after `replaceVarsIn()`
-2. **Extra Prompt** (`character.extraPrompt`): pushed only if `isFirstMessage === true` and text is non-empty
+2. **Extra Prompt** (`character.extraPrompt`): pushed (text non-empty) when this is the first exchange — either `isFirstMessage === true` (empty chat), or the chat still has no real assistant reply (only initial messages and the triggering user message). It stops being injected once a real assistant response exists.
 3. **Writing Instruction** (when `placement: 'endOfSystemPrompt'`): pushed if ALL of:
    - `writingInstruction?.content` exists
    - resolved `writingTiming === 'always'`

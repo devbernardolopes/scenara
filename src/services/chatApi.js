@@ -21,6 +21,15 @@ export function isMessageHidden(message) {
   return entry?.hidden === true
 }
 
+// A message is an initial (greeting) message when every bundle slot carries
+// `origin: 'initial'`. Mirrors the INI-flag convention in computeMessageFlags.
+export function isInitialMessage(message) {
+  const entries = parseBundleEntries(message?.bundleMessages)
+  return (
+    Array.isArray(entries) && entries.length > 0 && entries.every((e) => e.origin === 'initial')
+  )
+}
+
 function extractErrorDetail(errBody) {
   if (!errBody) return ''
   try {
@@ -445,7 +454,11 @@ export async function buildMessagesPayload({
   }
 
   const extraPrompt = replaceVarsIn(character?.extraPrompt)
-  if (isFirstMessage && extraPrompt) systemParts.push(extraPrompt)
+  const hasInitialMessages = messages.some(isInitialMessage)
+  const hasRealReply = messages.some((m) => !isInitialMessage(m) && m.role === 'assistant')
+  if ((isFirstMessage || (hasInitialMessages && !hasRealReply)) && extraPrompt) {
+    systemParts.push(extraPrompt)
+  }
 
   const result = [{ role: 'system', content: systemParts.join('\n\n') }]
   const entryTypes = ['system']
