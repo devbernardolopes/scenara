@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { isValidAvatar, normalizeAvatar } from '../../../lib/image'
+import { isValidAvatar, normalizeAvatar } from '../../../../lib/image'
 import AvatarInput from '../../../shared/AvatarInput'
 
 function formatDataSize(byteLen) {
