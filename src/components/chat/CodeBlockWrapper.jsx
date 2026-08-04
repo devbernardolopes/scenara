@@ -5,6 +5,7 @@ import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import rehypeRaw from 'rehype-raw'
 import { ChevronDown, ChevronUp, Copy, Edit3, FileText, RefreshCw } from '../../lib/icons'
 import { showToast } from '../../lib/toast'
+import { ppEffectClass } from '../../lib/postProcessing'
 
 function handleCodeCopy(codeContent) {
   if (!codeContent) return
@@ -133,7 +134,10 @@ function CodeBlocksMarkdownBase({
           const rule = activeRules[Number(r)]
           if (!rule) return <>{children}</>
           return (
-            <span style={{ color: rule.color, fontSize: `${rule.fontSizePercent}%` }}>
+            <span
+              className={ppEffectClass(rule.effect)}
+              style={{ color: rule.color, fontSize: `${rule.fontSizePercent}%` }}
+            >
               {children}
             </span>
           )

@@ -11,7 +11,7 @@ import { isViewableImage } from '../../lib/image'
 import { replaceVars, stripOOCDelimiters } from '../../services/chatApi'
 import { stripStatusBlockCodeFences } from '../../services/statusBlocks'
 import { getStreamingStartTime } from '../../services/generatingState'
-import { injectRuleTags, applyRulesToPlainText } from '../../lib/postProcessing'
+import { injectRuleTags, applyRulesToPlainText, ppEffectClass } from '../../lib/postProcessing'
 import {
   Trash2,
   Edit3,
@@ -1025,6 +1025,7 @@ function MessageBubble({
                     seg.type === 'styled' ? (
                       <span
                         key={idx}
+                        className={ppEffectClass(activeRules[seg.ruleIndex]?.effect)}
                         style={{
                           color: activeRules[seg.ruleIndex].color,
                           fontSize: `${activeRules[seg.ruleIndex].fontSizePercent}%`,

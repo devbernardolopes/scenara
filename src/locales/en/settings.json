@@ -34,6 +34,17 @@
     "closing": "Closing character(s)",
     "color": "Color",
     "fontSize": "Font size",
+    "effect": "Effect",
+    "effects": {
+      "none": "None",
+      "shake": "Shake",
+      "blink": "Blink",
+      "glow": "Glow",
+      "pulse": "Pulse",
+      "wiggle": "Wiggle",
+      "grow": "Grow",
+      "shrink": "Shrink"
+    },
     "addRule": "Add rule",
     "reset": "Reset to defaults",
     "delete": "Delete",

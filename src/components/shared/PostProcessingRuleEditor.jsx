@@ -5,7 +5,12 @@ import { useConfirm } from '../../lib/confirm'
 import DragHandle from './DragHandle'
 import { SortableList, SortableItem } from './SortableList'
 import SettingSlider from '../modals/settings/controls/SettingSlider'
-import { applyRulesToPlainText, DEFAULT_PP_RULES } from '../../lib/postProcessing'
+import {
+  applyRulesToPlainText,
+  DEFAULT_PP_RULES,
+  PP_EFFECTS,
+  ppEffectClass,
+} from '../../lib/postProcessing'
 
 const PREVIEW_TEXT = '*He stepped into the dim room* "We should leave now," she whispered softly.'
 
@@ -159,7 +164,7 @@ function RuleRow({ rule, index, onChange, onDelete, setNodeRef, style, dragHandl
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label className="flex items-center gap-2 text-sm text-text">
           <span className="text-xs font-medium text-secondary">{t('postProcessing.color')}</span>
           <input
@@ -180,6 +185,24 @@ function RuleRow({ rule, index, onChange, onDelete, setNodeRef, style, dragHandl
             formatValue={(v) => `${v}%`}
           />
         </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-secondary">{t('postProcessing.effect')}</label>
+        <select
+          value={rule.effect || 'none'}
+          onChange={(e) => update({ effect: e.target.value })}
+          className="mt-1 w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface text-text text-sm"
+        >
+          {PP_EFFECTS.map((fx) => (
+            <option key={fx} value={fx}>
+              {t(`postProcessing.effects.${fx}`)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex justify-end">
         <DragHandle {...dragHandleProps} label={t('common:list.actions.reorder')} />
       </div>
     </div>
@@ -215,6 +238,7 @@ export default function PostProcessingRuleEditor({ rules, onChange, resetToRules
         closeChars: ['*'],
         color: '#888888',
         fontSizePercent: 100,
+        effect: 'none',
       },
     ])
   }
@@ -249,6 +273,7 @@ export default function PostProcessingRuleEditor({ rules, onChange, resetToRules
             seg.type === 'styled' ? (
               <span
                 key={idx}
+                className={ppEffectClass(rules[seg.ruleIndex]?.effect)}
                 style={{
                   color: rules[seg.ruleIndex]?.color,
                   fontSize: `${rules[seg.ruleIndex]?.fontSizePercent}%`,

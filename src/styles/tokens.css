@@ -1842,6 +1842,126 @@
   animation: icon-pulse 2s ease-in-out infinite;
 }
 
+/* ============================================================
+   Post-processing text effects (PPRule.effect)
+   Applied to styled spans inside message bubbles and the
+   post-processing live preview. transform-based effects need
+   inline-block because transforms do not apply to inline boxes.
+   ============================================================ */
+@keyframes pp-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+.animate-pp-shake {
+  display: inline-block;
+  animation: pp-shake 0.4s linear infinite;
+}
+
+@keyframes pp-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+.animate-pp-blink {
+  animation: pp-blink 1.1s ease-in-out infinite;
+}
+
+@keyframes pp-glow {
+  0%,
+  100% {
+    text-shadow:
+      0 0 2px currentColor,
+      0 0 6px currentColor;
+  }
+  50% {
+    text-shadow:
+      0 0 5px currentColor,
+      0 0 14px currentColor;
+  }
+}
+.animate-pp-glow {
+  animation: pp-glow 1.6s ease-in-out infinite;
+}
+
+@keyframes pp-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+.animate-pp-pulse {
+  animation: pp-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pp-wiggle {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+.animate-pp-wiggle {
+  display: inline-block;
+  animation: pp-wiggle 0.3s linear infinite;
+}
+
+@keyframes pp-grow {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+.animate-pp-grow {
+  display: inline-block;
+  animation: pp-grow 1.2s ease-in-out infinite;
+}
+
+@keyframes pp-shrink {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+}
+.animate-pp-shrink {
+  display: inline-block;
+  animation: pp-shrink 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pp-shake,
+  .animate-pp-blink,
+  .animate-pp-glow,
+  .animate-pp-pulse,
+  .animate-pp-wiggle,
+  .animate-pp-grow,
+  .animate-pp-shrink {
+    animation: none;
+  }
+}
+
 /* Safe area handling for iOS/Android dynamic toolbars */
 html,
 body,

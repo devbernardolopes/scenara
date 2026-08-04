@@ -6,7 +6,14 @@
  * @property {string[]} closeChars  // one or more literal strings, e.g. ["\"", "”"]
  * @property {string} color         // CSS color value
  * @property {number} fontSizePercent // 50-150
+ * @property {string} [effect]      // 'none' | 'shake' | 'blink' | 'glow' | 'pulse' | 'wiggle' | 'grow' | 'shrink'
  */
+
+export const PP_EFFECTS = ['none', 'shake', 'blink', 'glow', 'pulse', 'wiggle', 'grow', 'shrink']
+
+export function ppEffectClass(effect) {
+  return effect && effect !== 'none' ? `animate-pp-${effect}` : ''
+}
 
 export const DEFAULT_PP_RULES = [
   {
@@ -16,6 +23,7 @@ export const DEFAULT_PP_RULES = [
     closeChars: ['*', '_', '**'],
     color: '#6b7280',
     fontSizePercent: 95,
+    effect: 'none',
   },
   {
     id: 'preset-dialogue',
@@ -24,6 +32,7 @@ export const DEFAULT_PP_RULES = [
     closeChars: ['"', '\u201d', '\u2019', '"*'],
     color: '#eab308',
     fontSizePercent: 125,
+    effect: 'none',
   },
 ]
 

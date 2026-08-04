@@ -39,6 +39,7 @@ function rulesDiffer(a, b) {
       ra.label !== rb.label ||
       ra.color !== rb.color ||
       ra.fontSizePercent !== rb.fontSizePercent ||
+      ra.effect !== rb.effect ||
       JSON.stringify(ra.openChars) !== JSON.stringify(rb.openChars) ||
       JSON.stringify(ra.closeChars) !== JSON.stringify(rb.closeChars)
     )
