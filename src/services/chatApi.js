@@ -819,7 +819,16 @@ export async function buildMessagesWindowTranscript({
     userRolePrefixOoc: await getSetting('prompting.userRolePrefixOoc'),
   }
 
-  const allMessages = [...(Array.isArray(baseMessages) ? baseMessages : [])]
+  // Substitute {{char}}/{{user}}/{{name}} in non-user message content so the
+  // window mirrors what the API payload contains (buildMessagesPayload runs
+  // replaceVarsIn on every non-user message) — this is what makes templates
+  // inside initial/greeting messages resolve. User content stays raw.
+  const allMessages = [
+    ...(Array.isArray(baseMessages) ? baseMessages : []).map((m) => {
+      if (!m || m.role === 'user') return m
+      return { ...m, content: replaceVarsIn(m.content) }
+    }),
+  ]
   if (responseContent) {
     allMessages.push({ role: 'assistant', content: responseContent })
   }
