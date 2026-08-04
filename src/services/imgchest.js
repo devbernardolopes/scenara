@@ -35,9 +35,9 @@ export async function imgchestUpload(token, dataUrl, baseUrl, { signal } = {}) {
   const file = new File([blob], `avatar.${ext}`, { type: blob.type })
 
   const form = new FormData()
-  form.append('nsfw', 'true')
+  form.append('nsfw', '1')
   form.append('privacy', 'secret')
-  form.append('anonymous', 'true')
+  form.append('anonymous', '1')
   form.append('images[]', file)
 
   const res = await fetch(`${normalizeBaseUrl(baseUrl)}/post`, {
