@@ -1950,18 +1950,6 @@
   animation: pp-shrink 1.2s ease-in-out infinite;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .animate-pp-shake,
-  .animate-pp-blink,
-  .animate-pp-glow,
-  .animate-pp-pulse,
-  .animate-pp-wiggle,
-  .animate-pp-grow,
-  .animate-pp-shrink {
-    animation: none;
-  }
-}
-
 /* Safe area handling for iOS/Android dynamic toolbars */
 html,
 body,
