@@ -93,7 +93,7 @@ function SettingSlider({
           }
         }}
         onTouchEnd={(e) => e.stopPropagation()}
-        className="w-48 accent-primary disabled:opacity-40"
+        className="w-48 accent-primary touch-pan-y disabled:opacity-40"
       />
       {editing ? (
         <input
