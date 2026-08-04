@@ -795,6 +795,10 @@
       "system": "SYSTEM",
       "assistant": "ASSISTANT"
     },
+    "speakerName": {
+      "label": "Speaker Name",
+      "desc": "Default value pre-filled into the Speaker Name field of new and imported characters. Leave empty to disable."
+    },
     "systemRolePrefix": {
       "label": "SYSTEM Role Prefix",
       "desc": "Prefix for system messages."

@@ -631,6 +631,10 @@
       "system": "SYSTEM",
       "assistant": "ASSISTANT"
     },
+    "speakerName": {
+      "label": "Nome do Orador",
+      "desc": "Valor padrão pré-preenchido no campo Nome do Orador de personagens novos e importados. Deixe vazio para desativar."
+    },
     "systemRolePrefix": {
       "label": "Prefixo de Papel SYSTEM",
       "desc": "Prefixo para mensagens do sistema."

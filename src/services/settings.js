@@ -1382,6 +1382,15 @@ export const SETTINGS = [
     descKey: 'settings:prompting.oocUser.desc',
   },
   {
+    key: 'prompting.speakerName',
+    category: 'prompting',
+    type: 'text',
+    default: 'Assistant',
+    group: 'rolePrefixes',
+    labelKey: 'settings:prompting.speakerName.label',
+    descKey: 'settings:prompting.speakerName.desc',
+  },
+  {
     key: 'prompting.systemRolePrefix',
     category: 'prompting',
     type: 'text',

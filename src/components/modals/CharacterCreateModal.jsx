@@ -139,6 +139,7 @@ const DEFAULTS_MAP = {
   'prompting.personaInjectionMessageRole': 'personaInjectionMessageRole',
   'prompting.firstMessageRole': 'firstMessageRole',
   'prompting.continueRole': 'continueRole',
+  'prompting.speakerName': 'speakerName',
 }
 
 const OVERRIDE_FIELDS = [
@@ -381,7 +382,9 @@ function CharacterCreateModal({ character: existing, initialData }) {
       keys.forEach((key, i) => {
         const val = values[i]
         if (val !== null && val !== undefined) {
-          patches[DEFAULTS_MAP[key]] = val
+          const formKey = DEFAULTS_MAP[key]
+          if (formKey === 'speakerName' && form[formKey]?.trim()) return
+          patches[formKey] = val
         }
       })
       if (Object.keys(patches).length === 0) return
