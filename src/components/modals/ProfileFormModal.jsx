@@ -842,14 +842,10 @@ function ProfileFormModal({ profile }) {
             )}
             {supportsIncludeReasoning && (
               <div className="flex items-center justify-between">
-                <label
-                  className="text-xs font-medium text-secondary"
-                  htmlFor={formId + '-includeReasoning'}
-                >
+                <span className="text-xs font-medium text-secondary">
                   {t('api.profile.form.includeReasoning')}
-                </label>
+                </span>
                 <SettingToggle
-                  id={formId + '-includeReasoning'}
                   value={form.params.include_reasoning ?? false}
                   onChange={(v) => updateParam('include_reasoning', v)}
                 />

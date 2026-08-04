@@ -26,9 +26,9 @@ function formatDataSize(byteLen) {
 
 function ToggleRow({ label, checked, onChange, disabled = false }) {
   return (
-    <label
+    <div
       className={`flex items-center justify-between gap-3 min-h-[44px] ${
-        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+        disabled ? 'opacity-50' : ''
       }`}
     >
       <span className="text-sm text-text">{label}</span>
@@ -49,7 +49,7 @@ function ToggleRow({ label, checked, onChange, disabled = false }) {
           }`}
         />
       </button>
-    </label>
+    </div>
   )
 }
 

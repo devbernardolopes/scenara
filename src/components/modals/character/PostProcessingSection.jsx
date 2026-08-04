@@ -7,7 +7,7 @@ import { RefreshCw } from '../../../lib/icons'
 
 function ToggleRow({ label, checked, onChange, disabled }) {
   return (
-    <label className="flex items-center justify-between gap-3 min-h-[44px] cursor-pointer">
+    <div className="flex items-center justify-between gap-3 min-h-[44px]">
       <span className="text-sm text-text">{label}</span>
       <button
         type="button"
@@ -26,7 +26,7 @@ function ToggleRow({ label, checked, onChange, disabled }) {
           }`}
         />
       </button>
-    </label>
+    </div>
   )
 }
 

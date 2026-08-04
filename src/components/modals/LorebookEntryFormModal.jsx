@@ -20,9 +20,9 @@ const SECONDARY_LOGIC_OPTIONS = ['none', 'andAny', 'andAll', 'notAny', 'notAll']
 
 function ToggleRow({ label, checked, onChange, disabled = false, description }) {
   return (
-    <label
+    <div
       className={`flex items-center justify-between gap-3 min-h-[44px] ${
-        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+        disabled ? 'opacity-50' : ''
       }`}
     >
       <span className="min-w-0">
@@ -46,7 +46,7 @@ function ToggleRow({ label, checked, onChange, disabled = false, description }) 
           }`}
         />
       </button>
-    </label>
+    </div>
   )
 }
 

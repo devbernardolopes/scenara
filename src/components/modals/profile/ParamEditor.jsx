@@ -33,7 +33,7 @@ function ParamEditor({
           <div className="flex items-center justify-between mb-1">
             <label
               className={`text-xs font-medium ${isDisabled ? 'text-tertiary' : 'text-secondary'}`}
-              htmlFor={formId + '-param-' + param.key}
+              htmlFor={param.type === 'boolean' ? undefined : formId + '-param-' + param.key}
             >
               {param.label || param.key}
             </label>
@@ -57,7 +57,6 @@ function ParamEditor({
           )}
           {param.type === 'boolean' && (
             <SettingToggle
-              id={formId + '-param-' + param.key}
               value={values[param.key] ?? param.default ?? false}
               onChange={(v) => onChange(param.key, v)}
             />
