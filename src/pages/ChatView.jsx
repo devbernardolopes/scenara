@@ -900,7 +900,7 @@ function ChatView() {
     }
   }, [threadId, setMessages])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     handleSendRef.current = handleSend
   })
 
