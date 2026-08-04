@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useOnlineStatus } from '../../hooks/useOnlineStatus'
-import { isExternalImageUrl } from '../../lib/image'
+import { isExternalImageUrl, isSingleEmoji } from '../../lib/image'
 import IconButton from './IconButton'
 import DragHandle from './DragHandle'
 import { Edit3, Star, Copy, Download, Trash2 } from '../../lib/icons'
@@ -73,7 +73,9 @@ function ListEntryCard({
             (imageSrc.startsWith('data:image/') || (isExternalImageUrl(imageSrc) && online)) ? (
               <img src={imageSrc} alt="" className="size-[44px] object-cover rounded-md" />
             ) : (
-              <span className="text-2xl leading-none">{imageSrc || '👤'}</span>
+              <span className="text-2xl leading-none">
+                {isSingleEmoji(imageSrc) ? imageSrc : '👤'}
+              </span>
             )}
           </div>
         )}

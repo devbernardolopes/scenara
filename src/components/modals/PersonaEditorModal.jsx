@@ -3,14 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
 import { showToast } from '../../lib/toast'
-import { isViewableImage } from '../../lib/image'
+import { isViewableImage, isValidAvatar, normalizeAvatar } from '../../lib/image'
 import db from '../../db'
 import CloseButton from '../shared/CloseButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import { estimateTokens } from '../../services/tokenEstimator'
 import Avatar from '../shared/Avatar'
-import { Plus, X, Cloud } from '../../lib/icons'
+import AvatarInput from '../shared/AvatarInput'
+import { Plus, Cloud } from '../../lib/icons'
 import { useModalScrollPosition } from '../../hooks/useModalScrollPosition'
 import { getCatboxService, catboxUploadAvatar } from '../../services/cloudServices'
 import { validateUploadSize } from '../../services/catbox'
@@ -33,7 +34,7 @@ function PersonaEditorModal() {
     avatar: '',
     description: '',
   })
-  const fileRef = useRef(null)
+  const avatarInvalid = Boolean(form.avatar.trim()) && !isValidAvatar(form.avatar)
   const [catboxService, setCatboxService] = useState(null)
   const [converting, setConverting] = useState(false)
   const catboxAbortRef = useRef(null)
@@ -54,19 +55,6 @@ function PersonaEditorModal() {
     window.addEventListener('cloudServices-changed', handler)
     return () => window.removeEventListener('cloudServices-changed', handler)
   }, [])
-
-  function handleFileUpload(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      const dataUrl = ev.target?.result
-      if (typeof dataUrl === 'string') {
-        setForm((prev) => ({ ...prev, avatar: dataUrl }))
-      }
-    }
-    reader.readAsDataURL(file)
-  }
 
   async function handleConvertToCatbox() {
     if (!catboxService) {
@@ -131,12 +119,13 @@ function PersonaEditorModal() {
 
   async function handleSave(e) {
     e.preventDefault()
-    if (!form.name.trim()) return
+    if (!form.name.trim() || avatarInvalid) return
     const now = new Date()
+    const payload = { ...form, avatar: normalizeAvatar(form.avatar) }
     if (editing === 'new') {
-      await db.personas.add({ ...form, createdAt: now, updatedAt: now })
+      await db.personas.add({ ...payload, createdAt: now, updatedAt: now })
     } else {
-      await db.personas.update(editing, { ...form, updatedAt: now })
+      await db.personas.update(editing, { ...payload, updatedAt: now })
     }
     const updated = await db.personas.orderBy('createdAt').toArray()
     setPersonas(updated)
@@ -198,69 +187,21 @@ function PersonaEditorModal() {
               >
                 {t('personaAvatarLabel')}
               </label>
-              <div className="flex items-center gap-2">
-                <Avatar
-                  src={form.avatar}
-                  size="2xl"
-                  className="shrink-0"
-                  onClick={() =>
-                    isViewableImage(form.avatar) &&
-                    openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })
-                  }
-                />
-                <div className="relative flex-1">
-                  {form.avatar.startsWith('data:') ? (
-                    <input
-                      className={`${inputClass} pr-10`}
-                      value={t('personaAvatarImageData', {
-                        size: formatDataSize(form.avatar.length),
-                      })}
-                      readOnly
-                    />
-                  ) : (
-                    <input
-                      className={`${inputClass} pr-10`}
-                      value={form.avatar}
-                      onChange={update('avatar')}
-                      placeholder={t('personaAvatarPlaceholder')}
-                    />
-                  )}
-                  {form.avatar && (
-                    <button
-                      type="button"
-                      onClick={() => setForm((prev) => ({ ...prev, avatar: '' }))}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
-                      aria-label={t('personaAvatarClear')}
-                      title={t('personaAvatarClear')}
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  className="min-h-[44px] min-w-[44px] flex items-center justify-center border border-border rounded-md text-secondary hover:text-text hover:bg-surface-hover shrink-0"
-                  aria-label={t('uploadImage', { ns: 'common' })}
-                  title={t('uploadImage', { ns: 'common' })}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12"
-                    />
-                  </svg>
-                </button>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </div>
+              <AvatarInput
+                value={form.avatar}
+                onChange={(v) => setForm((prev) => ({ ...prev, avatar: v }))}
+                inputId="persona-editor-avatar"
+                placeholder={t('personaAvatarPlaceholder')}
+                imageDataLabel={t('personaAvatarImageData', {
+                  size: formatDataSize(form.avatar.length),
+                })}
+                clearLabel={t('personaAvatarClear')}
+                uploadLabel={t('uploadImage', { ns: 'common' })}
+                errorText={t('common:avatar.invalid')}
+                onZoom={() =>
+                  openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })
+                }
+              />
               {form.avatar.startsWith('data:') && catboxService && (
                 <button
                   type="button"
@@ -317,7 +258,7 @@ function PersonaEditorModal() {
             </button>
             <button
               type="submit"
-              disabled={!form.name.trim()}
+              disabled={!form.name.trim() || avatarInvalid}
               className="min-h-[44px] px-6 btn-primary text-sm disabled:opacity-50"
             >
               {t('save')}

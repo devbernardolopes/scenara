@@ -298,6 +298,9 @@
     "none": "Ninguno (desactivado)",
     "empty": "Aún no hay perfiles. Crea uno en Perfiles de conexión."
   },
+  "avatar": {
+    "invalid": "Usa un emoji o una URL de imagen."
+  },
   "saveDialog": {
     "title": "Cambios sin guardar",
     "message": "Tienes cambios sin guardar. ¿Qué quieres hacer?",

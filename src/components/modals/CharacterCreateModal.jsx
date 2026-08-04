@@ -8,6 +8,7 @@ import {
   updateCharacterLastSection,
 } from '../../services/characters'
 import { getSetting, getPostProcessingRules } from '../../services/settings'
+import { isValidAvatar, normalizeAvatar } from '../../lib/image'
 import { getAllTags, createTag } from '../../services/tags'
 import { estimateTokens } from '../../services/tokenEstimator'
 import { getWritingInstruction } from '../../services/writingInstructions'
@@ -263,6 +264,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
     isImport ? buildInitialForm(initialData) : buildInitialForm(existing),
   )
   const [form, setForm] = useState(initial)
+  const avatarInvalid = Boolean(form.avatar.trim()) && !isValidAvatar(form.avatar)
   const [saving, setSaving] = useState(false)
   const [activeSection, setActiveSection] = useState(form.lastSection || 'character')
   const savePendingRef = useRef(false)
@@ -507,10 +509,12 @@ function CharacterCreateModal({ character: existing, initialData }) {
   }
 
   async function saveCharacter() {
+    if (avatarInvalid) return
     setSaving(true)
     try {
       const data = {
         ...form,
+        avatar: normalizeAvatar(form.avatar),
         initialMessages: (form.initialMessages || []).filter((m) => m.content?.trim()),
         exampleMessages: (form.exampleMessages || []).filter((m) => m.content?.trim()),
         scenarios: (form.scenarios || []).filter((s) => s.content?.trim()),
@@ -526,13 +530,13 @@ function CharacterCreateModal({ character: existing, initialData }) {
   }
 
   async function handleSave() {
-    if (!form.name.trim()) return
+    if (!form.name.trim() || avatarInvalid) return
     await saveCharacter()
     closeModal()
   }
 
   async function handleCloseAttempt() {
-    const canSave = Boolean(form.name.trim())
+    const canSave = Boolean(form.name.trim()) && !avatarInvalid
     const result = await promptSave({
       saveDisabled: !canSave,
       message: !canSave
@@ -618,7 +622,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
           <SaveButton
             isDirty={isDirty}
             saving={saving}
-            disabled={!form.name.trim()}
+            disabled={!form.name.trim() || avatarInvalid}
             onClick={handleSave}
             savingText={t('saving')}
           >

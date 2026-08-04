@@ -1,5 +1,5 @@
 import { useOnlineStatus } from '../../hooks/useOnlineStatus'
-import { isExternalImageUrl } from '../../lib/image'
+import { isExternalImageUrl, isSingleEmoji } from '../../lib/image'
 
 const SIZES = {
   sm: 'text-xl w-7 h-7',
@@ -33,7 +33,7 @@ function Avatar({ src, alt = '', size = 'md', className = '', onClick }) {
   }
   return (
     <span data-avatar className={`${cls} ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
-      {src}
+      {isSingleEmoji(src) ? src : '👤'}
     </span>
   )
 }

@@ -18,7 +18,7 @@ import ThreadCardTitle from './ThreadCardTitle'
 import { getColorHex } from '../../config/colorPalettes'
 import { replaceVars } from '../../services/chatApi'
 import { useOnlineStatus } from '../../hooks/useOnlineStatus'
-import { isExternalImageUrl } from '../../lib/image'
+import { isExternalImageUrl, isSingleEmoji } from '../../lib/image'
 
 const ThreadCard = forwardRef(function ThreadCard(
   {
@@ -76,8 +76,8 @@ const ThreadCard = forwardRef(function ThreadCard(
             />
           ) : (
             <div className="flex items-center justify-center w-full min-h-0 overflow-hidden leading-none text-2xl">
-            {/* <div className="flex items-center justify-center h-full w-full min-h-0 overflow-hidden leading-none text-2xl"> */}
-              {character?.avatar || '👤'}
+              {/* <div className="flex items-center justify-center h-full w-full min-h-0 overflow-hidden leading-none text-2xl"> */}
+              {isSingleEmoji(character.avatar) ? character.avatar : '👤'}
             </div>
           )}
           <div

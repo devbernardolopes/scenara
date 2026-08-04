@@ -298,6 +298,9 @@
     "none": "Keines (deaktiviert)",
     "empty": "Noch keine Profile. Erstelle eines in Verbindungsprofile."
   },
+  "avatar": {
+    "invalid": "Verwende ein Emoji oder eine Bild-URL."
+  },
   "saveDialog": {
     "title": "Nicht gespeicherte Änderungen",
     "message": "Du hast nicht gespeicherte Änderungen. Was möchtest du tun?",

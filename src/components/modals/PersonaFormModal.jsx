@@ -2,19 +2,18 @@ import { useState, useEffect, useRef, useMemo, useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
-import { isViewableImage } from '../../lib/image'
+import { isValidAvatar, normalizeAvatar } from '../../lib/image'
 import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import Label from '../shared/Label'
-import Avatar from '../shared/Avatar'
+import AvatarInput from '../shared/AvatarInput'
 import { createPersona, updatePersona, getAllPersonas } from '../../services/personas'
 import { estimateTokens } from '../../services/tokenEstimator'
 import { findColorSlot } from '../../config/colorPalettes'
 import { useTheme } from '../../hooks/useTheme'
 import ColorPicker from '../shared/ColorPicker'
-import { X } from '../../lib/icons'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
@@ -79,10 +78,10 @@ function PersonaFormModal({ persona }) {
   const [form, setForm] = useState({ ...initial })
   const [saving, setSaving] = useState(false)
   const [isLastDefault, setIsLastDefault] = useState(false)
-  const fileRef = useRef(null)
   const savePendingRef = useRef(false)
 
   const isDirty = Object.keys(initial).some((key) => form[key] !== initial[key])
+  const avatarInvalid = Boolean(form.avatar.trim()) && !isValidAvatar(form.avatar)
 
   useEffect(() => {
     if (editing) {
@@ -119,27 +118,15 @@ function PersonaFormModal({ persona }) {
     return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }))
   }
 
-  function handleFileUpload(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      const dataUrl = ev.target?.result
-      if (typeof dataUrl === 'string') {
-        setForm((prev) => ({ ...prev, avatar: dataUrl }))
-      }
-    }
-    reader.readAsDataURL(file)
-  }
-
   async function savePersona() {
+    if (avatarInvalid) return
     setSaving(true)
     try {
       if (editing) {
         await updatePersona(persona.id, {
           name: form.name.trim(),
           title: form.title.trim(),
-          avatar: form.avatar,
+          avatar: normalizeAvatar(form.avatar),
           description: form.description.trim(),
           color: form.color,
           colorSlot: form.colorSlot,
@@ -149,7 +136,7 @@ function PersonaFormModal({ persona }) {
         await createPersona({
           name: form.name.trim(),
           title: form.title.trim(),
-          avatar: form.avatar,
+          avatar: normalizeAvatar(form.avatar),
           description: form.description.trim(),
           color: form.color,
           colorSlot: form.colorSlot,
@@ -162,7 +149,7 @@ function PersonaFormModal({ persona }) {
   }
 
   async function handleSave() {
-    if (!form.name.trim() || saving) return
+    if (!form.name.trim() || avatarInvalid || saving) return
     await savePersona()
     closeModal()
   }
@@ -193,7 +180,7 @@ function PersonaFormModal({ persona }) {
           <SaveButton
             isDirty={isDirty}
             saving={saving}
-            disabled={!form.name.trim()}
+            disabled={!form.name.trim() || avatarInvalid}
             onClick={handleSave}
             savingText={t('persona.form.saving')}
           >
@@ -239,71 +226,19 @@ function PersonaFormModal({ persona }) {
           <label className="block text-sm font-medium text-text mb-1" htmlFor={formId + '-avatar'}>
             {t('persona.form.avatarLabel')}
           </label>
-          <div className="flex items-center gap-2">
-            <Avatar
-              src={form.avatar}
-              size="2xl"
-              className="shrink-0 cursor-pointer"
-              onClick={() =>
-                isViewableImage(form.avatar) &&
-                openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })
-              }
-            />
-            <div className="relative flex-1">
-              {form.avatar.startsWith('data:') ? (
-                <input
-                  id={formId + '-avatar'}
-                  className={`${inputClass} pr-10`}
-                  value={t('persona.form.avatarImageData', {
-                    size: formatDataSize(form.avatar.length),
-                  })}
-                  readOnly
-                />
-              ) : (
-                <input
-                  id={formId + '-avatar'}
-                  className={`${inputClass} pr-10`}
-                  value={form.avatar}
-                  onChange={update('avatar')}
-                  placeholder={t('persona.form.avatarPlaceholder')}
-                />
-              )}
-              {form.avatar && (
-                <button
-                  type="button"
-                  onClick={() => setForm((prev) => ({ ...prev, avatar: '' }))}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
-                  aria-label={t('persona.form.avatarClear')}
-                  title={t('persona.form.avatarClear')}
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center border border-border rounded-md text-secondary hover:text-text hover:bg-surface-hover shrink-0"
-              aria-label={t('persona.form.uploadFile')}
-              title={t('persona.form.uploadFile')}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12"
-                />
-              </svg>
-            </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-          </div>
+          <AvatarInput
+            value={form.avatar}
+            onChange={(v) => setForm((prev) => ({ ...prev, avatar: v }))}
+            inputId={formId + '-avatar'}
+            placeholder={t('persona.form.avatarPlaceholder')}
+            imageDataLabel={t('persona.form.avatarImageData', {
+              size: formatDataSize(form.avatar.length),
+            })}
+            clearLabel={t('persona.form.avatarClear')}
+            uploadLabel={t('persona.form.uploadFile')}
+            errorText={t('common:avatar.invalid')}
+            onZoom={() => openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })}
+          />
         </div>
 
         <CollapsibleSection

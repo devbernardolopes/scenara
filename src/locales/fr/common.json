@@ -298,6 +298,9 @@
     "none": "Aucun (désactivé)",
     "empty": "Aucun profil pour le moment. Créez-en un dans Profils de connexion."
   },
+  "avatar": {
+    "invalid": "Utilisez un emoji ou une URL d'image."
+  },
   "saveDialog": {
     "title": "Modifications non enregistrées",
     "message": "Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?",

@@ -298,6 +298,9 @@
     "none": "None (disabled)",
     "empty": "No profiles yet. Create one in Connection Profiles."
   },
+  "avatar": {
+    "invalid": "Use an emoji or an image URL."
+  },
   "saveDialog": {
     "title": "Unsaved changes",
     "message": "You have unsaved changes. What would you like to do?",

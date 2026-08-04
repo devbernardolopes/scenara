@@ -2,7 +2,6 @@ import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModal } from '../../../hooks/useModal'
 import { showToast } from '../../../lib/toast'
-import { isViewableImage } from '../../../lib/image'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import Label from '../../shared/Label'
 import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
@@ -11,8 +10,8 @@ import { estimateTokens } from '../../../services/tokenEstimator'
 import { getAllWritingInstructions } from '../../../services/writingInstructions'
 import { getCatboxService, catboxUploadAvatar } from '../../../services/cloudServices'
 import { validateUploadSize } from '../../../services/catbox'
-import Avatar from '../../shared/Avatar'
-import { FileText, X, Cloud } from '../../../lib/icons'
+import AvatarInput from '../../shared/AvatarInput'
+import { FileText, Cloud } from '../../../lib/icons'
 import { LIFETIME_OPTIONS, LifetimeButtonGroup } from './ScenarioSection'
 
 const inputClass =
@@ -27,7 +26,6 @@ function formatDataSize(byteLen) {
 function CharacterSection({ form, onChange, characterId }) {
   const { t } = useTranslation('characterCreation')
   const { openModal } = useModal()
-  const fileRef = useRef(null)
   const [writingInstructions, setWritingInstructions] = useState([])
   const [catboxService, setCatboxService] = useState(null)
   const [converting, setConverting] = useState(false)
@@ -58,19 +56,6 @@ function CharacterSection({ form, onChange, characterId }) {
   const selectedWI = form.writingInstruction
     ? writingInstructions.find((wi) => wi.id === form.writingInstruction)
     : null
-
-  function handleFileUpload(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      const dataUrl = ev.target?.result
-      if (typeof dataUrl === 'string') {
-        onChange('avatar', dataUrl)
-      }
-    }
-    reader.readAsDataURL(file)
-  }
 
   async function handleConvertToCatbox() {
     if (!catboxService) {
@@ -162,67 +147,17 @@ function CharacterSection({ form, onChange, characterId }) {
         >
           {t('avatarLabel')}
         </label>
-        <div className="flex items-center gap-2">
-          <Avatar
-            src={form.avatar}
-            size="2xl"
-            className="shrink-0"
-            onClick={() =>
-              isViewableImage(form.avatar) &&
-              openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })
-            }
-          />
-          <div className="relative flex-1">
-            {form.avatar.startsWith('data:') ? (
-              <input
-                className={`${inputClass} pr-10`}
-                value={t('avatarImageData', { size: formatDataSize(form.avatar.length) })}
-                readOnly
-              />
-            ) : (
-              <input
-                className={`${inputClass} pr-10`}
-                value={form.avatar}
-                onChange={(e) => onChange('avatar', e.target.value)}
-                placeholder={t('avatarPlaceholder')}
-              />
-            )}
-            {form.avatar && (
-              <button
-                type="button"
-                onClick={() => onChange('avatar', '')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
-                aria-label={t('avatarClear')}
-                title={t('avatarClear')}
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center border border-border rounded-md text-secondary hover:text-text hover:bg-surface-hover shrink-0"
-            aria-label={t('uploadImage', { ns: 'common' })}
-            title={t('uploadImage', { ns: 'common' })}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12"
-              />
-            </svg>
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-        </div>
+        <AvatarInput
+          value={form.avatar}
+          onChange={(v) => onChange('avatar', v)}
+          inputId="character-avatar"
+          placeholder={t('avatarPlaceholder')}
+          imageDataLabel={t('avatarImageData', { size: formatDataSize(form.avatar.length) })}
+          clearLabel={t('avatarClear')}
+          uploadLabel={t('uploadImage', { ns: 'common' })}
+          errorText={t('common:avatar.invalid')}
+          onZoom={() => openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })}
+        />
         {form.avatar.startsWith('data:') && catboxService && (
           <button
             type="button"

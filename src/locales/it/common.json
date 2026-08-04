@@ -298,6 +298,9 @@
     "none": "Nessuno (disattivato)",
     "empty": "Nessun profilo ancora. Creane uno in Profili di connessione."
   },
+  "avatar": {
+    "invalid": "Usa un'emoji o un URL immagine."
+  },
   "saveDialog": {
     "title": "Modifiche non salvate",
     "message": "Hai modifiche non salvate. Cosa vuoi fare?",

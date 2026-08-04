@@ -4,13 +4,13 @@ import { useModal } from '../../hooks/useModal'
 import { useModalScrollPosition } from '../../hooks/useModalScrollPosition'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import { useConfirm } from '../../lib/confirm'
-import { isViewableImage } from '../../lib/image'
+import { isValidAvatar, normalizeAvatar } from '../../lib/image'
 import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
 import AutoResizeTextarea from '../shared/AutoResizeTextarea'
 import Label from '../shared/Label'
-import Avatar from '../shared/Avatar'
+import AvatarInput from '../shared/AvatarInput'
 import { Plus, X, Zap, Square, Cloud } from '../../lib/icons'
 import DragHandle from '../shared/DragHandle'
 import { SortableList, SortableItem } from '../shared/SortableList'
@@ -92,7 +92,6 @@ function LorebookFormModal({ lorebook }) {
   const [form, setForm] = useState({ ...initial })
   const [entries, setEntries] = useState([])
   const [saving, setSaving] = useState(false)
-  const fileRef = useRef(null)
   const savePendingRef = useRef(false)
   const [catboxService, setCatboxService] = useState(null)
   const [converting, setConverting] = useState(false)
@@ -112,6 +111,7 @@ function LorebookFormModal({ lorebook }) {
   }, [])
 
   const isDirty = Object.keys(initial).some((key) => form[key] !== initial[key])
+  const avatarInvalid = Boolean(form.avatar.trim()) && !isValidAvatar(form.avatar)
 
   useEffect(() => {
     if (lorebookId) {
@@ -142,19 +142,6 @@ function LorebookFormModal({ lorebook }) {
 
   function update(field) {
     return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }))
-  }
-
-  async function handleFileUpload(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      const dataUrl = ev.target?.result
-      if (typeof dataUrl === 'string') {
-        setForm((prev) => ({ ...prev, avatar: dataUrl }))
-      }
-    }
-    reader.readAsDataURL(file)
   }
 
   async function handleConvertToCatbox() {
@@ -203,11 +190,12 @@ function LorebookFormModal({ lorebook }) {
   }
 
   async function saveLorebook(closeAfter = true) {
+    if (avatarInvalid) return
     setSaving(true)
     try {
       const payload = {
         name: form.name.trim(),
-        avatar: form.avatar,
+        avatar: normalizeAvatar(form.avatar),
         description: form.description.trim(),
         scanDepth: form.scanDepth === '' || form.scanDepth == null ? null : Number(form.scanDepth),
         tokenBudget:
@@ -233,7 +221,7 @@ function LorebookFormModal({ lorebook }) {
   }
 
   async function handleSave() {
-    if (!form.name.trim() || saving) return
+    if (!form.name.trim() || avatarInvalid || saving) return
     await saveLorebook(true)
   }
 
@@ -313,7 +301,7 @@ function LorebookFormModal({ lorebook }) {
           <SaveButton
             isDirty={isDirty}
             saving={saving}
-            disabled={!form.name.trim()}
+            disabled={!form.name.trim() || avatarInvalid}
             onClick={handleSave}
             savingText={t('lorebook.form.saving')}
           >
@@ -342,69 +330,19 @@ function LorebookFormModal({ lorebook }) {
 
         <div>
           <Label description={t('lorebook.form.avatarDesc')}>{t('lorebook.form.avatar')}</Label>
-          <div className="flex items-center gap-2">
-            <Avatar
-              src={form.avatar}
-              size="2xl"
-              className="shrink-0 cursor-pointer"
-              onClick={() =>
-                isViewableImage(form.avatar) &&
-                openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })
-              }
-            />
-            <div className="relative flex-1">
-              {form.avatar.startsWith('data:') ? (
-                <input
-                  className={`${inputClass} pr-10`}
-                  value={t('lorebook.form.avatarImageData', {
-                    size: formatDataSize(form.avatar.length),
-                  })}
-                  readOnly
-                />
-              ) : (
-                <input
-                  className={`${inputClass} pr-10`}
-                  value={form.avatar}
-                  onChange={update('avatar')}
-                  placeholder={t('lorebook.form.avatarPlaceholder')}
-                />
-              )}
-              {form.avatar && (
-                <button
-                  type="button"
-                  onClick={() => setForm((prev) => ({ ...prev, avatar: '' }))}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-tertiary hover:text-text"
-                  aria-label={t('lorebook.form.avatarClear')}
-                  title={t('lorebook.form.avatarClear')}
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center border border-border rounded-md text-secondary hover:text-text hover:bg-surface-hover shrink-0"
-              aria-label={t('lorebook.form.uploadFile')}
-              title={t('lorebook.form.uploadFile')}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2M7 10l5-5m0 0l5 5m-5-5v12"
-                />
-              </svg>
-            </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-          </div>
+          <AvatarInput
+            value={form.avatar}
+            onChange={(v) => setForm((prev) => ({ ...prev, avatar: v }))}
+            inputId="lorebook-form-avatar"
+            placeholder={t('lorebook.form.avatarPlaceholder')}
+            imageDataLabel={t('lorebook.form.avatarImageData', {
+              size: formatDataSize(form.avatar.length),
+            })}
+            clearLabel={t('lorebook.form.avatarClear')}
+            uploadLabel={t('lorebook.form.uploadFile')}
+            errorText={t('common:avatar.invalid')}
+            onZoom={() => openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })}
+          />
           {form.avatar.startsWith('data:') && catboxService && (
             <button
               type="button"
