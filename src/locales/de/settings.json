@@ -34,6 +34,17 @@
     "closing": "Schließende(s) Zeichen",
     "color": "Farbe",
     "fontSize": "Schriftgröße",
+    "effect": "Effect",
+    "effects": {
+      "none": "None",
+      "shake": "Shake",
+      "blink": "Blink",
+      "glow": "Glow",
+      "pulse": "Pulse",
+      "wiggle": "Wiggle",
+      "grow": "Grow",
+      "shrink": "Shrink"
+    },
     "addRule": "Regel hinzufügen",
     "reset": "Auf Standard zurücksetzen",
     "delete": "Löschen",
@@ -553,6 +564,7 @@
         "model": "Model",
         "parameters": "Parameters",
         "resetParams": "Reset to defaults",
+        "saveAsSamplingProfile": "Als Sampling-Profil speichern",
         "resetParamsConfirm": {
           "title": "Reset parameters?",
           "message": "This will restore all parameters to their default values for this provider."
@@ -1058,6 +1070,8 @@
     "form": {
       "title": "Create Sampling Profile",
       "editTitle": "Edit Sampling Profile",
+      "saveAsTitle": "Sampling-Profil speichern",
+      "saveAsHint": "Speichert die aktuellen Sampling-Parameter, die Stopp-Zeichenfolgen (falls vorhanden) und — für AI Horde nativ — die Prompt-Vorlage in ein wiederverwendbares Sampling-Profil.",
       "nameLabel": "Name",
       "namePlaceholder": "e.g. Creative, Fast draft",
       "paramsLabel": "Parameters",

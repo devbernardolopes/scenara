@@ -72,6 +72,8 @@ export async function createSamplingProfile(data) {
   const id = await db.samplingProfiles.add({
     name: data.name,
     params: data.params || {},
+    promptTemplate: data.promptTemplate || null,
+    promptTemplateCustom: data.promptTemplateCustom || '',
     createdAt: now,
     updatedAt: now,
   })
@@ -122,6 +124,8 @@ export async function duplicateSamplingProfile(id) {
   const newId = await db.samplingProfiles.add({
     name: `${original.name} (copy)`,
     params: { ...original.params },
+    promptTemplate: original.promptTemplate || null,
+    promptTemplateCustom: original.promptTemplateCustom || '',
     createdAt: now,
     updatedAt: now,
   })
@@ -149,7 +153,12 @@ export async function exportSamplingProfile(id) {
   showToast(i18n.t('common:toast.samplingProfile.exported', { name: item.name }), {
     type: 'success',
   })
-  return { name: item.name, params: item.params || {} }
+  return {
+    name: item.name,
+    params: item.params || {},
+    promptTemplate: item.promptTemplate || null,
+    promptTemplateCustom: item.promptTemplateCustom || '',
+  }
 }
 
 export async function exportSamplingProfiles(ids) {
@@ -171,6 +180,8 @@ export async function importSamplingProfiles(items) {
     const id = await db.samplingProfiles.add({
       name: item.name.trim(),
       params: item.params && typeof item.params === 'object' ? item.params : {},
+      promptTemplate: item.promptTemplate || null,
+      promptTemplateCustom: item.promptTemplateCustom || '',
       createdAt: now,
       updatedAt: now,
     })

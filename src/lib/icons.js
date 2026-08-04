@@ -62,6 +62,7 @@ export {
   CornerDownLeft,
   Reply,
   Forward,
+  Save,
   Lock,
   Unlock,
   Pin,

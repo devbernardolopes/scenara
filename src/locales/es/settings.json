@@ -34,6 +34,17 @@
     "closing": "Caracter(es) de cierre",
     "color": "Color",
     "fontSize": "Tamaño de fuente",
+    "effect": "Effect",
+    "effects": {
+      "none": "None",
+      "shake": "Shake",
+      "blink": "Blink",
+      "glow": "Glow",
+      "pulse": "Pulse",
+      "wiggle": "Wiggle",
+      "grow": "Grow",
+      "shrink": "Shrink"
+    },
     "addRule": "Añadir regla",
     "reset": "Restablecer valores",
     "delete": "Eliminar",
@@ -553,6 +564,7 @@
         "model": "Modelo",
         "parameters": "Parámetros",
         "resetParams": "Restablecer valores",
+        "saveAsSamplingProfile": "Guardar como perfil de muestreo",
         "resetParamsConfirm": {
           "title": "¿Restablecer parámetros?",
           "message": "Esto restaurará todos los parámetros a sus valores predeterminados para este proveedor."
@@ -1058,6 +1070,8 @@
     "form": {
       "title": "Create Sampling Profile",
       "editTitle": "Edit Sampling Profile",
+      "saveAsTitle": "Guardar perfil de muestreo",
+      "saveAsHint": "Guarda los parámetros de muestreo actuales, las cadenas de parada (si las hay) y — para AI Horde nativo — la plantilla de prompt en un perfil de muestreo reutilizable.",
       "nameLabel": "Name",
       "namePlaceholder": "e.g. Creative, Fast draft",
       "paramsLabel": "Parameters",

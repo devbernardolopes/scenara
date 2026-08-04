@@ -457,6 +457,7 @@
         "model": "Modelo",
         "parameters": "Parâmetros",
         "resetParams": "Restaurar padrões",
+        "saveAsSamplingProfile": "Salvar como perfil de amostragem",
         "resetParamsConfirm": {
           "title": "Restaurar parâmetros?",
           "message": "Isso restaurará todos os parâmetros para seus valores padrão deste provedor."
@@ -699,6 +700,12 @@
       },
       "loreContext": {
         "label": "Contexto de Lore"
+      },
+      "samplingProfile": {
+        "form": {
+          "saveAsTitle": "Salvar perfil de amostragem",
+          "saveAsHint": "Salva os parâmetros de amostragem atuais, as strings de parada (se houver) e — para AI Horde nativo — o modelo de prompt em um perfil de amostragem reutilizável."
+        }
       },
       "writingInstruction": {
         "label": "Instrução de Escrita"

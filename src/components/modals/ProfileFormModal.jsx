@@ -28,7 +28,7 @@ import ModelSelect from './settings/controls/ModelSelect'
 import SettingToggle from './settings/controls/SettingToggle'
 import ParamEditor from './profile/ParamEditor'
 import RecommendedSettingsCard from './profile/RecommendedSettingsCard'
-import { RefreshCw } from '../../lib/icons'
+import { RefreshCw, Save } from '../../lib/icons'
 
 const CEREBRAS_REASONING_MAP = {
   'gpt-oss-120b': { options: ['low', 'medium', 'high'], default: 'medium' },
@@ -397,6 +397,30 @@ function ProfileFormModal({ profile }) {
       ? form.params.hordeMethod || 'native'
       : undefined
     mergeParams(filterParamsForProvider(p.params, form.providerId, activeMethod))
+    if (p.promptTemplate) {
+      setForm((prev) => ({
+        ...prev,
+        promptTemplate: p.promptTemplate,
+        promptTemplateCustom: p.promptTemplateCustom || '',
+      }))
+    }
+  }
+
+  function handleSaveAsSamplingProfile() {
+    const activeMethod = selectedProvider?.supportsHordeMethods
+      ? form.params.hordeMethod || 'native'
+      : undefined
+    const filtered = filterParamsForProvider(form.params, form.providerId, activeMethod)
+    const params = Object.fromEntries(
+      Object.entries(filtered).filter(([, v]) => !(Array.isArray(v) && v.length === 0)),
+    )
+    openModal('samplingProfileSave', {
+      params,
+      promptTemplate: isHordeNative ? form.promptTemplate || null : null,
+      promptTemplateCustom:
+        isHordeNative && form.promptTemplate === 'custom' ? form.promptTemplateCustom : '',
+      suggestedName: form.name,
+    })
   }
 
   function handleApplyStopSet() {
@@ -856,16 +880,26 @@ function ProfileFormModal({ profile }) {
 
         {paramDefs.length > 0 && (
           <div className="space-y-4 pt-2 border-t border-border">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
               <p className="text-sm font-medium text-text">{t('api.profile.form.parameters')}</p>
-              <button
-                type="button"
-                onClick={handleResetParams}
-                className="min-h-[44px] px-4 py-2 rounded-md text-sm font-medium border border-border bg-surface text-secondary hover:bg-surface-hover inline-flex items-center gap-2"
-              >
-                <RefreshCw className="w-4 h-4" />
-                {t('api.profile.form.resetParams')}
-              </button>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleSaveAsSamplingProfile}
+                  className="min-h-[44px] px-4 py-2 rounded-md text-sm font-medium border border-border bg-surface text-secondary hover:bg-surface-hover inline-flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  {t('api.profile.form.saveAsSamplingProfile')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetParams}
+                  className="min-h-[44px] px-4 py-2 rounded-md text-sm font-medium border border-border bg-surface text-secondary hover:bg-surface-hover inline-flex items-center gap-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  {t('api.profile.form.resetParams')}
+                </button>
+              </div>
             </div>
             <div className="space-y-4">
               <ParamEditor

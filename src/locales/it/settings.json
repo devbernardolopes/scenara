@@ -34,6 +34,17 @@
     "closing": "Carattere/i di chiusura",
     "color": "Colore",
     "fontSize": "Dimensione carattere",
+    "effect": "Effect",
+    "effects": {
+      "none": "None",
+      "shake": "Shake",
+      "blink": "Blink",
+      "glow": "Glow",
+      "pulse": "Pulse",
+      "wiggle": "Wiggle",
+      "grow": "Grow",
+      "shrink": "Shrink"
+    },
     "addRule": "Aggiungi regola",
     "reset": "Ripristina predefiniti",
     "delete": "Elimina",
@@ -553,6 +564,7 @@
         "model": "Modello",
         "parameters": "Parametri",
         "resetParams": "Ripristina predefiniti",
+        "saveAsSamplingProfile": "Salva come profilo di campionamento",
         "resetParamsConfirm": {
           "title": "Ripristinare i parametri?",
           "message": "Questo ripristinerà tutti i parametri ai valori predefiniti per questo provider."
@@ -1058,6 +1070,8 @@
     "form": {
       "title": "Create Sampling Profile",
       "editTitle": "Edit Sampling Profile",
+      "saveAsTitle": "Salva profilo di campionamento",
+      "saveAsHint": "Salva i parametri di campionamento correnti, le stringhe di stop (se presenti) e — per AI Horde nativo — il modello di prompt in un profilo di campionamento riutilizzabile.",
       "nameLabel": "Name",
       "namePlaceholder": "e.g. Creative, Fast draft",
       "paramsLabel": "Parameters",

@@ -34,6 +34,17 @@
     "closing": "Caractère(s) de fermeture",
     "color": "Couleur",
     "fontSize": "Taille de police",
+    "effect": "Effect",
+    "effects": {
+      "none": "None",
+      "shake": "Shake",
+      "blink": "Blink",
+      "glow": "Glow",
+      "pulse": "Pulse",
+      "wiggle": "Wiggle",
+      "grow": "Grow",
+      "shrink": "Shrink"
+    },
     "addRule": "Ajouter une règle",
     "reset": "Réinitialiser",
     "delete": "Supprimer",
@@ -553,6 +564,7 @@
         "model": "Modèle",
         "parameters": "Paramètres",
         "resetParams": "Réinitialiser",
+        "saveAsSamplingProfile": "Enregistrer comme profil d’échantillonnage",
         "resetParamsConfirm": {
           "title": "Réinitialiser les paramètres ?",
           "message": "Cela restaurera tous les paramètres à leurs valeurs par défaut pour ce fournisseur."
@@ -1058,6 +1070,8 @@
     "form": {
       "title": "Create Sampling Profile",
       "editTitle": "Edit Sampling Profile",
+      "saveAsTitle": "Enregistrer le profil d’échantillonnage",
+      "saveAsHint": "Enregistre les paramètres d’échantillonnage actuels, les chaînes d’arrêt (le cas échéant) et — pour AI Horde natif — le modèle de prompt dans un profil d’échantillonnage réutilisable.",
       "nameLabel": "Name",
       "namePlaceholder": "e.g. Creative, Fast draft",
       "paramsLabel": "Parameters",
