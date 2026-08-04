@@ -8,8 +8,14 @@ import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
 import PromptBankButton from '../../shared/PromptBankButton'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { getAllWritingInstructions } from '../../../services/writingInstructions'
-import { getCatboxService, catboxUploadAvatar } from '../../../services/cloudServices'
+import {
+  getCatboxService,
+  catboxUploadAvatar,
+  getImgchestService,
+  imgchestUploadAvatar,
+} from '../../../services/cloudServices'
 import { validateUploadSize } from '../../../services/catbox'
+import { validateImgchestUploadSize } from '../../../services/imgchest'
 import AvatarInput from '../../shared/AvatarInput'
 import { FileText, Cloud } from '../../../lib/icons'
 import { LIFETIME_OPTIONS, LifetimeButtonGroup } from './ScenarioSection'
@@ -30,10 +36,14 @@ function CharacterSection({ form, onChange, characterId }) {
   const [catboxService, setCatboxService] = useState(null)
   const [converting, setConverting] = useState(false)
   const catboxAbortRef = useRef(null)
+  const [imgchestService, setImgchestService] = useState(null)
+  const [convertingImgchest, setConvertingImgchest] = useState(false)
+  const imgchestAbortRef = useRef(null)
 
   useEffect(() => {
     return () => {
       catboxAbortRef.current?.abort()
+      imgchestAbortRef.current?.abort()
     }
   }, [])
 
@@ -47,7 +57,11 @@ function CharacterSection({ form, onChange, characterId }) {
 
   useEffect(() => {
     getCatboxService().then(setCatboxService)
-    const handler = () => getCatboxService().then(setCatboxService)
+    getImgchestService().then(setImgchestService)
+    const handler = () => {
+      getCatboxService().then(setCatboxService)
+      getImgchestService().then(setImgchestService)
+    }
     window.addEventListener('cloudServices-changed', handler)
     return () => window.removeEventListener('cloudServices-changed', handler)
   }, [])
@@ -92,6 +106,44 @@ function CharacterSection({ form, onChange, characterId }) {
       clearTimeout(timeoutId)
       catboxAbortRef.current = null
       setConverting(false)
+    }
+  }
+
+  async function handleConvertToImgchest() {
+    if (!imgchestService) {
+      showToast(t('imgchestNoService'), { type: 'warning' })
+      return
+    }
+    const validation = validateImgchestUploadSize(form.avatar)
+    if (!validation.ok) {
+      const isGif = form.avatar.includes('image/gif')
+      showToast(
+        t('imgchestSizeLimit', { limit: validation.limitMB, type: isGif ? 'GIF' : 'image' }),
+        { type: 'error' },
+      )
+      return
+    }
+    imgchestAbortRef.current?.abort()
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 60000)
+    imgchestAbortRef.current = controller
+    setConvertingImgchest(true)
+    try {
+      const url = await imgchestUploadAvatar(imgchestService, form.avatar, {
+        signal: controller.signal,
+      })
+      onChange('avatar', url)
+      showToast(t('imgchestConvertSuccess'), { type: 'success' })
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        showToast(t('imgchestConvertError', { error: 'Timed out' }), { type: 'error' })
+      } else {
+        showToast(t('imgchestConvertError', { error: err.message }), { type: 'error' })
+      }
+    } finally {
+      clearTimeout(timeoutId)
+      imgchestAbortRef.current = null
+      setConvertingImgchest(false)
     }
   }
 
@@ -167,6 +219,17 @@ function CharacterSection({ form, onChange, characterId }) {
           >
             <Cloud className="w-3 h-3" />
             {converting ? t('convertingToCatbox') : t('convertToCatbox')}
+          </button>
+        )}
+        {form.avatar.startsWith('data:') && imgchestService && (
+          <button
+            type="button"
+            onClick={handleConvertToImgchest}
+            disabled={convertingImgchest}
+            className="flex items-center gap-1.5 mt-1.5 text-xs text-accent hover:underline disabled:opacity-50"
+          >
+            <Cloud className="w-3 h-3" />
+            {convertingImgchest ? t('convertingToImgchest') : t('convertToImgchest')}
           </button>
         )}
       </div>

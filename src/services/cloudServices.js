@@ -3,6 +3,7 @@ import { getSetting, setSetting } from './settings'
 import { showToast } from '../lib/toast'
 import i18n from '../lib/i18n'
 import { catboxUpload, catboxCreateAlbum, catboxAddToAlbum, extractFileRef } from './catbox'
+import { imgchestUpload } from './imgchest'
 
 export const SERVICE_TYPES = [
   {
@@ -21,6 +22,19 @@ export const SERVICE_TYPES = [
     defaultBaseUrl: 'https://api.github.com',
     credentialFields: [
       { key: 'token', labelKey: 'settings:cloudService.credentials.githubToken', type: 'password' },
+    ],
+  },
+  {
+    id: 'imgchest',
+    nameKey: 'settings:cloudService.types.imgchest.name',
+    descKey: 'settings:cloudService.types.imgchest.desc',
+    defaultBaseUrl: 'https://api.imgchest.com/v1',
+    credentialFields: [
+      {
+        key: 'token',
+        labelKey: 'settings:cloudService.credentials.imgchestToken',
+        type: 'password',
+      },
     ],
   },
 ]
@@ -251,4 +265,14 @@ export async function catboxUploadAvatar(serviceRecord, dataUrl, { signal } = {}
 export async function getGistService() {
   const all = await db.cloudServices.toArray()
   return all.find((s) => s.serviceType === 'github-gist') || null
+}
+
+export async function getImgchestService() {
+  const all = await db.cloudServices.toArray()
+  return all.find((s) => s.serviceType === 'imgchest') || null
+}
+
+export async function imgchestUploadAvatar(serviceRecord, dataUrl, { signal } = {}) {
+  const token = serviceRecord.credentials?.token || ''
+  return imgchestUpload(token, dataUrl, serviceRecord.baseUrl, { signal })
 }

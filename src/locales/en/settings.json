@@ -1649,11 +1649,16 @@
       "githubGist": {
         "name": "GitHub Gist",
         "desc": "Store database exports as secret GitHub Gists."
+      },
+      "imgchest": {
+        "name": "Image Chest",
+        "desc": "Image hosting with secret posts. Upload avatars privately using a Personal Access Token."
       }
     },
     "credentials": {
       "userhash": "User Hash",
-      "githubToken": "Personal Access Token"
+      "githubToken": "Personal Access Token",
+      "imgchestToken": "Personal Access Token"
     },
     "form": {
       "title": "Add Cloud Service",
