@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useConfirm } from '../../lib/confirm'
 import ModalShell from '../shared/ModalShell'
-import { sendChatCompletion } from '../../services/chatApi'
+import { sendChatCompletion, getActiveParams } from '../../services/chatApi'
 import { getEffectiveProfileFor } from '../../services/connectionProfiles'
 import { updateThreadMemory } from '../../services/threadMemories'
 import { updateThread } from '../../services/threads'
@@ -25,6 +25,7 @@ function MemoryRegenerationResultModal({
   const [error, setError] = useState(null)
   const [finished, setFinished] = useState(false)
   const abortRef = useRef(null)
+  const usedProfileRef = useRef(null)
 
   const triggerRequest = useCallback(
     async (content) => {
@@ -41,6 +42,7 @@ function MemoryRegenerationResultModal({
         if (!profile?.model) {
           throw new Error(t('memoryRegeneration.noProfile'))
         }
+        usedProfileRef.current = { model: profile.model, params: getActiveParams(profile) }
 
         const response = await sendChatCompletion({
           profile,
@@ -115,6 +117,12 @@ function MemoryRegenerationResultModal({
     if (!trimmed) return
 
     await updateThreadMemory(entry.id, { content: trimmed })
+
+    const used = usedProfileRef.current
+    await updateThreadMemory(entry.id, {
+      model: used?.model ?? entry.model,
+      params: used?.params ?? entry.params,
+    })
 
     const updatedPayload = entry.payload ? [...entry.payload] : []
     if (updatedPayload.length >= 1) {
