@@ -1,6 +1,11 @@
 import { PROVIDERS, getBaseUrl, getDefaultBaseUrl } from './apiProviders'
 import { sendHordeNativeChatCompletion } from './hordeNativeApi'
-import { getSetting, normalizeSectionHeader } from './settings'
+import {
+  getSetting,
+  normalizeSectionHeader,
+  DEFAULT_PERSONAS_HISTORY_TEMPLATE,
+  DEFAULT_PERSONAS_HISTORY_ENTRY_TEMPLATE,
+} from './settings'
 import { getThread } from './threads'
 import { getWritingInstruction } from './writingInstructions'
 import { buildInjectedMemory } from './threadMemories'
@@ -113,20 +118,57 @@ export function replacePersonaTemplate(
 // (chatPersona, from thread.personaId) always participates, even before it has
 // sent any messages — so the token resolves on the very first message and on
 // regeneration of it. Message-derived personas are appended and deduped by id.
-export function buildPersonasHistory(messages, { chatPersona, personaMap } = {}) {
+//
+// The block layout is customizable via settings:
+//   template      — wrapper that receives the joined entry lines via
+//                   {{personas_entries}}; standard {{char}}/{{user}}/{{name}}/
+//                   {{description}}/{{description_chat}}/{{description_default}}
+//                   resolve to the global values.
+//   entryTemplate — per-persona format using {{name}} and {{description}}. When
+//                   a persona has no description and the default entry template
+//                   is used, it falls back to a name-only line.
+export function buildPersonasHistory(
+  messages,
+  {
+    chatPersona,
+    personaMap,
+    template = DEFAULT_PERSONAS_HISTORY_TEMPLATE,
+    entryTemplate = DEFAULT_PERSONAS_HISTORY_ENTRY_TEMPLATE,
+    charName = '',
+    personaName = '',
+    currentPersonaName = '',
+    currentPersona = null,
+    defaultPersona = null,
+  } = {},
+) {
   const seen = new Set()
   const entries = []
   const push = (p) => {
     if (!p) return
     if (p.id != null && seen.has(p.id)) return
     if (p.id != null) seen.add(p.id)
-    entries.push(p.description ? `- ${p.name}: ${p.description}` : `- ${p.name}`)
+    const desc = p.description
+    const useFallback = !desc && entryTemplate === DEFAULT_PERSONAS_HISTORY_ENTRY_TEMPLATE
+    entries.push(
+      useFallback
+        ? `- ${p.name}`
+        : entryTemplate
+            .replace(/{{name}}/gi, p.name || '')
+            .replace(/{{description}}/gi, desc || ''),
+    )
   }
   push(chatPersona)
   for (const m of messages || []) {
     push(m?.personaId ? personaMap?.[m.personaId] : null)
   }
-  return entries.length > 0 ? `Personas in this conversation:\n${entries.join('\n')}` : ''
+  if (entries.length === 0) return ''
+
+  let block = replaceVars(template || '', { charName, personaName, currentPersonaName })
+  block = block
+    .replace(/{{description}}/gi, currentPersona?.description || '')
+    .replace(/{{description_chat}}/gi, chatPersona?.description || '')
+    .replace(/{{description_default}}/gi, defaultPersona?.description || '')
+  return block.replace(/{{personas_entries}}/gi, entries.join('\n'))
 }
 
 // Strips the configured OOC delimiters from message content when the
@@ -357,7 +399,17 @@ export async function buildMessagesPayload({
   loreBlocks = resolveLoreVars(loreBlocks, replaceVarsIn)
 
   const usedPersonaIds = [...new Set(messages.map((m) => m.personaId).filter(Boolean))]
-  const personasHistory = buildPersonasHistory(messages, { chatPersona, personaMap })
+  const personasHistory = buildPersonasHistory(messages, {
+    chatPersona,
+    personaMap,
+    template: settings.personasHistoryTemplate,
+    entryTemplate: settings.personasHistoryEntryTemplate,
+    charName,
+    personaName,
+    currentPersonaName,
+    currentPersona,
+    defaultPersona,
+  })
 
   const replaceVarsWithDesc = (text) =>
     replacePersonaTemplate(text, {
@@ -794,7 +846,17 @@ export async function buildMessagesWindowTranscript({
 
   const defaultPersonaId = await getSetting('defaultPersonaId')
   const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
-  const personasHistory = buildPersonasHistory(baseMessages, { chatPersona, personaMap })
+  const personasHistory = buildPersonasHistory(baseMessages, {
+    chatPersona,
+    personaMap,
+    template: await getSetting('prompting.personasHistoryTemplate'),
+    entryTemplate: await getSetting('prompting.personasHistoryEntryTemplate'),
+    charName,
+    personaName,
+    currentPersonaName,
+    currentPersona,
+    defaultPersona,
+  })
 
   const replaceVarsWithDesc = (text) =>
     replacePersonaTemplate(text, {
@@ -907,7 +969,17 @@ export async function buildOOCMessagesPayload({
   const defaultPersonaId = await getSetting('defaultPersonaId')
   const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
 
-  const personasHistory = buildPersonasHistory(messages, { chatPersona, personaMap })
+  const personasHistory = buildPersonasHistory(messages, {
+    chatPersona,
+    personaMap,
+    template: await getSetting('prompting.personasHistoryTemplate'),
+    entryTemplate: await getSetting('prompting.personasHistoryEntryTemplate'),
+    charName,
+    personaName,
+    currentPersonaName,
+    currentPersona,
+    defaultPersona,
+  })
 
   const replaceVarsWithDesc = (text) =>
     replacePersonaTemplate(text, {
@@ -1236,6 +1308,8 @@ export async function buildChatRequestPayload({
       continueRole: await getSetting('prompting.continueRole'),
       continuePrompt: await getSetting('prompting.continuePrompt'),
       personaInjectionTemplate: await getSetting('prompting.personaInjectionTemplate'),
+      personasHistoryTemplate: await getSetting('prompting.personasHistoryTemplate'),
+      personasHistoryEntryTemplate: await getSetting('prompting.personasHistoryEntryTemplate'),
       writingInjectionTiming: await getSetting('prompting.writingInjectionTiming'),
       writingPlacement: await getSetting('prompting.writingPlacement'),
       writingMessageRole: await getSetting('prompting.writingMessageRole'),

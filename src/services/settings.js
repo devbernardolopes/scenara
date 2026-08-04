@@ -3,6 +3,9 @@ import db from '../db'
 import { COLOR_SLOTS, getPalette } from '../config/colorPalettes'
 import { DEFAULT_PP_RULES } from '../lib/postProcessing'
 
+export const DEFAULT_PERSONAS_HISTORY_TEMPLATE = `Personas in this conversation:\n{{personas_entries}}`
+export const DEFAULT_PERSONAS_HISTORY_ENTRY_TEMPLATE = '- {{name}}: {{description}}'
+
 async function migrateColorsOnThemeChange(newTheme) {
   const palette = getPalette(newTheme)
 
@@ -1676,6 +1679,26 @@ export const SETTINGS = [
     props: { rows: 6, collapsible: true, summary: 'tokens' },
     labelKey: 'settings:prompting.personaInjectionTemplate.label',
     descKey: 'settings:prompting.personaInjectionTemplate.desc',
+  },
+  {
+    key: 'prompting.personasHistoryTemplate',
+    category: 'prompting',
+    group: 'extra',
+    type: 'textarea',
+    default: DEFAULT_PERSONAS_HISTORY_TEMPLATE,
+    props: { rows: 6, collapsible: true, summary: 'tokens' },
+    labelKey: 'settings:prompting.personasHistoryTemplate.label',
+    descKey: 'settings:prompting.personasHistoryTemplate.desc',
+  },
+  {
+    key: 'prompting.personasHistoryEntryTemplate',
+    category: 'prompting',
+    group: 'extra',
+    type: 'textarea',
+    default: DEFAULT_PERSONAS_HISTORY_ENTRY_TEMPLATE,
+    props: { rows: 6, collapsible: true, summary: 'tokens' },
+    labelKey: 'settings:prompting.personasHistoryEntryTemplate.label',
+    descKey: 'settings:prompting.personasHistoryEntryTemplate.desc',
   },
   {
     key: 'prompting.trimMessages',

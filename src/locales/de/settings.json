@@ -787,6 +787,14 @@
       "label": "Persona Injection Template",
       "desc": "Template for injecting persona context into prompts."
     },
+    "personasHistoryTemplate": {
+      "label": "Persona-Verlaufsvorlage",
+      "desc": "Vorlage für den {{personas_history}}-Block, der alle an der Konversation beteiligten Personas auflistet. Verwende {{personas_entries}} als Platzhalter für die Zeilen der einzelnen Personas. Unterstützt außerdem {{char}} (Charaktername), {{user}} (aktiver Persona-Name), {{name}} (aktiver Persona-Name), {{description}} (Beschreibung der aktiven Benutzer-Persona), {{description_chat}} (Beschreibung der Persona, die den Chat begonnen hat), {{description_default}} (Beschreibung der Standard-Benutzer-Persona)."
+    },
+    "personasHistoryEntryTemplate": {
+      "label": "Vorlage für Persona-Verlaufseinträge",
+      "desc": "Format für jede Persona-Zeile im {{personas_history}}-Block. Unterstützte Variablen: {{name}} (Persona-Name), {{description}} (Persona-Beschreibung). Wenn eine Persona keine Beschreibung hat und die Standardvorlage verwendet wird, fällt die Zeile auf den Namen zurück."
+    },
     "oocMessageRole": {
       "label": "AI OOC Message Role",
       "desc": "Role assigned to out-of-character messages."

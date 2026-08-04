@@ -785,7 +785,15 @@
     },
     "personaInjectionTemplate": {
       "label": "Persona Injection Template",
-      "desc": "Template for injecting persona context into prompts. Supported variables: {{char}} (character name), {{user}} (active persona name), {{name}} (active persona name), {{description}} (active user persona description), {{description_chat}} (description of the persona that started the chat), {{description_default}} (description of the default user persona)."
+      "desc": "Template for injecting persona context into prompts. Supported variables: {{char}} (character name), {{user}} (active persona name), {{name}} (active persona name), {{description}} (active user persona description), {{description_chat}} (description of the persona that started the chat), {{description_default}} (description of the default user persona), {{personas_history}} (list of all personas that participated in the conversation)."
+    },
+    "personasHistoryTemplate": {
+      "label": "Personas History Template",
+      "desc": "Template for the {{personas_history}} block listing every persona that participated in the conversation. Use {{personas_entries}} as the placeholder for the per-persona lines. Also supports {{char}} (character name), {{user}} (active persona name), {{name}} (active persona name), {{description}} (active user persona description), {{description_chat}} (description of the persona that started the chat), {{description_default}} (description of the default user persona)."
+    },
+    "personasHistoryEntryTemplate": {
+      "label": "Personas History Entry Template",
+      "desc": "Format for each persona line inside the {{personas_history}} block. Supported variables: {{name}} (persona name), {{description}} (persona description). When a persona has no description and the default template is used, the line falls back to the name only."
     },
     "oocMessageRole": {
       "label": "AI OOC Message Role",

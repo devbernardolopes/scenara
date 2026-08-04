@@ -116,7 +116,17 @@ export async function buildSummarizationPayload({
 
   const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
 
-  const personasHistory = buildPersonasHistory(processedMessages, { chatPersona, personaMap })
+  const personasHistory = buildPersonasHistory(processedMessages, {
+    chatPersona,
+    personaMap,
+    template: await getSetting('prompting.personasHistoryTemplate'),
+    entryTemplate: await getSetting('prompting.personasHistoryEntryTemplate'),
+    charName,
+    personaName,
+    currentPersonaName,
+    currentPersona,
+    defaultPersona,
+  })
 
   const replaceVarsWithDesc = (text) =>
     replacePersonaTemplate(text, {

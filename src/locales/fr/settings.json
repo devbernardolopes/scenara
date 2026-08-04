@@ -787,6 +787,14 @@
       "label": "Persona Injection Template",
       "desc": "Template for injecting persona context into prompts."
     },
+    "personasHistoryTemplate": {
+      "label": "Modèle d’historique des personnages",
+      "desc": "Modèle pour le bloc {{personas_history}} répertoriant chaque personnage ayant participé à la conversation. Utilisez {{personas_entries}} comme espace réservé pour les lignes de chaque personnage. Prend également en charge {{char}} (nom du personnage), {{user}} (nom du personnage actif), {{name}} (nom du personnage actif), {{description}} (description du personnage utilisateur actif), {{description_chat}} (description du personnage qui a commencé la conversation), {{description_default}} (description du personnage utilisateur par défaut)."
+    },
+    "personasHistoryEntryTemplate": {
+      "label": "Modèle d’entrée d’historique des personnages",
+      "desc": "Format de chaque ligne de personnage dans le bloc {{personas_history}}. Variables prises en charge : {{name}} (nom du personnage), {{description}} (description du personnage). Lorsqu’un personnage n’a pas de description et que le modèle par défaut est utilisé, la ligne se réduit au nom seul."
+    },
     "oocMessageRole": {
       "label": "AI OOC Message Role",
       "desc": "Role assigned to out-of-character messages."
