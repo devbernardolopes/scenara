@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-const ANIMATION_MS = 200
+const ANIMATION_MS = 100
 
 export function useSwipe(ref, { onSwipeLeft, onSwipeRight, enabled = true, threshold = 50 }) {
   const startRef = useRef(null)
