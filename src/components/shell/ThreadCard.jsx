@@ -77,7 +77,7 @@ const ThreadCard = forwardRef(function ThreadCard(
           ) : (
             <div className="flex items-center justify-center w-full min-h-0 overflow-hidden leading-none text-2xl">
               {/* <div className="flex items-center justify-center h-full w-full min-h-0 overflow-hidden leading-none text-2xl"> */}
-              {isSingleEmoji(character.avatar) ? character.avatar : '👤'}
+              {isSingleEmoji(character?.avatar) ? character?.avatar : '👤'}
             </div>
           )}
           <div
