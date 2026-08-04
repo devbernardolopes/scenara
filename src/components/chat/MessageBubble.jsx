@@ -9,7 +9,11 @@ import { useChatSettings } from '../../hooks/useChatSettings'
 import { showToast } from '../../lib/toast'
 import { isViewableImage } from '../../lib/image'
 import { replaceVars, stripOOCDelimiters } from '../../services/chatApi'
-import { stripStatusBlockCodeFences, statusBlocksDiffer } from '../../services/statusBlocks'
+import {
+  stripStatusBlockCodeFences,
+  statusBlocksDiffer,
+  diffChars,
+} from '../../services/statusBlocks'
 import { getStreamingStartTime } from '../../services/generatingState'
 import { injectRuleTags, applyRulesToPlainText, ppEffectClass } from '../../lib/postProcessing'
 import {
@@ -342,7 +346,14 @@ function MessageBubble({
     personaName,
     currentPersonaName: currentPersonaName || personaName,
   })
-  const statusBlockChanged = statusBlocksDiffer(statusBlockDisplay, previousStatusBlockDisplay)
+  const previousStatusBlockRender =
+    character?.removeCodeBlocksFromStatusBlock === false
+      ? previousStatusBlockDisplay
+      : stripStatusBlockCodeFences(previousStatusBlockDisplay)
+  const statusBlockChanged = statusBlocksDiffer(statusBlockRender, previousStatusBlockRender)
+  const statusBlockDiffSegments = statusBlockChanged
+    ? diffChars(previousStatusBlockRender, statusBlockRender)
+    : null
 
   const statusBlockVisible =
     !isUser &&
@@ -1097,10 +1108,21 @@ function MessageBubble({
                   statusBlockDirectorAttempted={activeEntry?.statusBlockDirectorAttempted}
                   statusBlockChanged={statusBlockChanged}
                 >
-                  <code
-                    className={`language-status-block ${statusBlockChanged ? 'underline decoration-accent decoration-2 underline-offset-2' : ''}`}
-                  >
-                    {statusBlockRender}
+                  <code className="language-status-block">
+                    {statusBlockDiffSegments
+                      ? statusBlockDiffSegments.map((seg, idx) =>
+                          seg.changed ? (
+                            <span
+                              key={idx}
+                              className="underline decoration-accent decoration-2 underline-offset-2"
+                            >
+                              {seg.text}
+                            </span>
+                          ) : (
+                            <span key={idx}>{seg.text}</span>
+                          ),
+                        )
+                      : statusBlockRender}
                   </code>
                 </CodeBlockWrapper>
               </div>
@@ -1108,13 +1130,24 @@ function MessageBubble({
               <div
                 onDoubleClick={handleStartStatusBlockEdit}
                 className={`mt-2 rounded-md border p-3 text-sm whitespace-pre-wrap break-words cursor-text ${
-                  statusBlockChanged
-                    ? 'border-accent bg-accent-subtle underline decoration-accent decoration-2 underline-offset-2'
-                    : 'border-border bg-code'
+                  statusBlockChanged ? 'border-accent bg-accent-subtle' : 'border-border bg-code'
                 }`}
                 style={statusBlockChanged ? { borderLeftWidth: '3px' } : undefined}
               >
-                {statusBlockRender}
+                {statusBlockDiffSegments
+                  ? statusBlockDiffSegments.map((seg, idx) =>
+                      seg.changed ? (
+                        <span
+                          key={idx}
+                          className="underline decoration-accent decoration-2 underline-offset-2"
+                        >
+                          {seg.text}
+                        </span>
+                      ) : (
+                        <span key={idx}>{seg.text}</span>
+                      ),
+                    )
+                  : statusBlockRender}
               </div>
             ))}
         </div>

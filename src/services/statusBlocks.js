@@ -34,3 +34,47 @@ export function statusBlocksDiffer(a, b) {
   const nb = (stripStatusBlockCodeFences(b) || '').trim()
   return na !== nb
 }
+
+// Character-level diff between two strings, returned as coalesced segments of
+// `{ text, changed }`. `changed` marks characters of `b` that have no match in
+// `a` (additions/replacements) — used to underline only the exact text that
+// changed between the previous and current Status Block. Code-point aware so
+// astral characters (emoji, etc.) are never split.
+export function diffChars(a, b) {
+  const sa = Array.from(String(a ?? ''))
+  const sb = Array.from(String(b ?? ''))
+  const m = sa.length
+  const n = sb.length
+  const dp = Array.from({ length: m + 1 }, () => new Uint32Array(n + 1))
+  for (let i = m - 1; i >= 0; i--) {
+    for (let j = n - 1; j >= 0; j--) {
+      dp[i][j] = sa[i] === sb[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1])
+    }
+  }
+  const segments = []
+  let i = 0
+  let j = 0
+  while (i < m && j < n) {
+    if (sa[i] === sb[j]) {
+      segments.push({ text: sb[j], changed: false })
+      i++
+      j++
+    } else if (dp[i + 1][j] >= dp[i][j + 1]) {
+      i++
+    } else {
+      segments.push({ text: sb[j], changed: true })
+      j++
+    }
+  }
+  while (j < n) {
+    segments.push({ text: sb[j], changed: true })
+    j++
+  }
+  const merged = []
+  for (const seg of segments) {
+    const last = merged[merged.length - 1]
+    if (last && last.changed === seg.changed) last.text += seg.text
+    else merged.push({ ...seg })
+  }
+  return merged
+}
