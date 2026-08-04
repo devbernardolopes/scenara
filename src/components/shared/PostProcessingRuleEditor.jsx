@@ -159,7 +159,7 @@ function RuleRow({ rule, index, onChange, onDelete, setNodeRef, style, dragHandl
         />
       </div>
 
-      <div className="flex items-center gap-4 flex-wrap">
+      <div className="grid grid-cols-1 sm:grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
         <label className="flex items-center gap-2 text-sm text-text">
           <span className="text-xs font-medium text-secondary">{t('postProcessing.color')}</span>
           <input
@@ -169,10 +169,8 @@ function RuleRow({ rule, index, onChange, onDelete, setNodeRef, style, dragHandl
             className="w-10 h-10 rounded border border-border bg-transparent cursor-pointer"
           />
         </label>
-        <div className="flex items-center gap-3 flex-1 min-w-[200px]">
-          <span className="text-xs font-medium text-secondary shrink-0">
-            {t('postProcessing.fontSize')}
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 min-w-0">
+          <span className="text-xs font-medium text-secondary">{t('postProcessing.fontSize')}</span>
           <SettingSlider
             value={rule.fontSizePercent}
             onChange={(v) => update({ fontSizePercent: v })}
