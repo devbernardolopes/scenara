@@ -87,7 +87,6 @@ export async function generateChatResponse({
   onFinish,
   ctx,
   beforeDate,
-  loreScanMessages,
   statusBlock: statusBlockOverride,
 }) {
   const profile = isOOC
@@ -131,7 +130,6 @@ export async function generateChatResponse({
     threadId,
     personaMap,
     beforeDate,
-    loreScanMessages,
     statusBlock: statusBlockOverride,
   })
 

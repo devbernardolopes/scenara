@@ -1168,7 +1168,6 @@ export async function buildChatRequestPayload({
   threadId,
   personaMap,
   beforeDate,
-  loreScanMessages,
   statusBlock: statusBlockOverride,
 }) {
   const includeOOC = character?.includeOOC !== false
@@ -1227,12 +1226,7 @@ export async function buildChatRequestPayload({
 
   // Include hidden messages (e.g. invisible OOC) in the lorebook scan
   // buffer so that their content can still trigger lorebook entries.
-  // During regeneration, also scan the regenerated message's own previous
-  // content (kept out of the model prompt) so its keywords stay active.
-  const scanMessages = [
-    ...effectiveMessages.filter((m) => !m?.isSummaryMarker && !m?.isAutoTitleMarker),
-    ...(loreScanMessages || []),
-  ]
+  const scanMessages = effectiveMessages.filter((m) => !m?.isSummaryMarker && !m?.isAutoTitleMarker)
 
   const loreBlocks = await getActiveLoreBlocks({
     character,

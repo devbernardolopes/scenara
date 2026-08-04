@@ -2011,15 +2011,6 @@ function ChatView() {
       let currentMsgs = messagesRef.current.slice(0, idx)
       currentMsgs = withoutFailedMessages(currentMsgs)
 
-      // Feed the regenerated message's own previous content into the lorebook
-      // scan buffer (not the model prompt) so keywords in it still activate
-      // entries. Skip failed messages, whose content is just error text.
-      const regenHasRealContent =
-        !failedIdsRef.current.has(msg.id) &&
-        typeof msg.content === 'string' &&
-        msg.content.trim().length > 0
-      const loreScanMessages = regenHasRealContent ? [msg] : []
-
       const lastMsgBefore = currentMsgs[currentMsgs.length - 1]
       const beforeDate = lastMsgBefore?.createdAt
         ? new Date(lastMsgBefore.createdAt)
@@ -2122,7 +2113,6 @@ function ChatView() {
             chatPersona,
             currentPersona,
             currentMsgs,
-            loreScanMessages,
             isFirstMessage,
             isThreadStart,
             isOOC: isOOCRegen,
