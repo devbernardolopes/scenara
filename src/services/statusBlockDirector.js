@@ -1,6 +1,6 @@
 import { getEffectiveProfileFor } from './connectionProfiles'
 import { applyDirectorTemplate, buildDirectorMessages } from './director'
-import { getActiveParams, replaceVars, sendChatCompletion } from './chatApi'
+import { getActiveParams, prefixAssistantMessage, replaceVars, sendChatCompletion } from './chatApi'
 import { getWritingInstruction } from './writingInstructions'
 import { getThread } from './threads'
 import { getEffectiveStatusBlock } from './statusBlocks'
@@ -68,9 +68,15 @@ export async function runStatusBlockDirector({
   const personaName = chatPersona?.name || ''
   const currentPersonaName = currentPersona?.name || personaName
 
+  const prefixedMessage = await prefixAssistantMessage(message, {
+    charName,
+    personaName,
+    currentPersonaName,
+  })
+
   const templateVars = {
-    message,
-    message_response: message,
+    message: prefixedMessage,
+    message_response: prefixedMessage,
     message_system: messageSystem || '',
     message_user: messageUser || '',
     writingInstructions: writingInstructionContent,

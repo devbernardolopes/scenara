@@ -3,6 +3,7 @@ import { getDirectorReviewConfig, buildDirectorMessages, applyDirectorTemplate }
 import {
   buildChatRequestPayload,
   getActiveParams,
+  prefixAssistantMessage,
   replaceVars,
   sendChatCompletion,
   stripOOCDelimiters,
@@ -220,9 +221,14 @@ export async function generateChatResponse({
         personaName: userPersonaName,
         currentPersonaName,
       })
+      const prefixedMessage = await prefixAssistantMessage(content, {
+        charName,
+        personaName: userPersonaName,
+        currentPersonaName,
+      })
       const templateVars = {
-        message: content,
-        message_response: content,
+        message: prefixedMessage,
+        message_response: prefixedMessage,
         message_system: payload.find((m) => m.role === 'system')?.content || '',
         message_user: payload.find((m) => m.role === 'user')?.content || '',
         writingInstructions: writingInstructionContent,

@@ -5,6 +5,7 @@ import {
   replaceVars,
   replacePersonaTemplate,
   buildTranscript,
+  prefixAssistantMessage,
   appendMemoryToPayload,
   isMessageHidden,
 } from './chatApi'
@@ -255,9 +256,14 @@ export async function triggerAutoTitle({
       if (!dProfile?.model) throw new Error('No Director profile configured')
       showToast(i18n.t('chat:directorReviewing'), { type: 'info' })
       const { system_autotitle, user_autotitle } = await getAutoTitleTemplateValues(character)
+      const prefixedTitle = await prefixAssistantMessage(cleanTitle, {
+        charName,
+        personaName,
+        currentPersonaName,
+      })
       const templateVars = {
-        message: cleanTitle,
-        message_response: cleanTitle,
+        message: prefixedTitle,
+        message_response: prefixedTitle,
         message_system: payloadWithMemory.find((m) => m.role === 'system')?.content || '',
         message_user: payloadWithMemory.find((m) => m.role === 'user')?.content || '',
         writingInstructions: '',

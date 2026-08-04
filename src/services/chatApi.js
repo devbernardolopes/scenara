@@ -746,6 +746,18 @@ export async function buildTranscript({
   return lines.join('\n\n')
 }
 
+export async function prefixAssistantMessage(
+  content,
+  { charName, personaName, currentPersonaName } = {},
+) {
+  if (!content) return content
+  const rawPrefix = (await getSetting('prompting.assistantRolePrefix')) || '[ASSISTANT]:'
+  let prefix = replaceVars(rawPrefix, { charName, personaName, currentPersonaName })
+  if (!prefix) return content
+  if (!/\s$/.test(prefix)) prefix += '\n'
+  return prefix + content
+}
+
 const DEFAULT_OOC_SYSTEM = [
   'This is an OOC (out-of-character) request. Respond only in OOC mode. Be concise, direct, pragmatic, and exact. Do not roleplay, narrate, or continue the story.',
   '{{system_prompt}}',
