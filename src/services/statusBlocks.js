@@ -24,3 +24,13 @@ export function stripStatusBlockCodeFences(text) {
   if (closer.test(out)) out = out.replace(closer, '')
   return out
 }
+
+// Compares two Status Blocks for the visual "changed" highlight. Both sides are
+// normalized the same way they are rendered (code fences stripped, whitespace
+// trimmed) so cosmetic differences don't count as changes. Template variables
+// must be resolved by the caller before comparing.
+export function statusBlocksDiffer(a, b) {
+  const na = (stripStatusBlockCodeFences(a) || '').trim()
+  const nb = (stripStatusBlockCodeFences(b) || '').trim()
+  return na !== nb
+}

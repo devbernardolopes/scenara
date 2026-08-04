@@ -9,7 +9,7 @@ import { useChatSettings } from '../../hooks/useChatSettings'
 import { showToast } from '../../lib/toast'
 import { isViewableImage } from '../../lib/image'
 import { replaceVars, stripOOCDelimiters } from '../../services/chatApi'
-import { stripStatusBlockCodeFences } from '../../services/statusBlocks'
+import { stripStatusBlockCodeFences, statusBlocksDiffer } from '../../services/statusBlocks'
 import { getStreamingStartTime } from '../../services/generatingState'
 import { injectRuleTags, applyRulesToPlainText, ppEffectClass } from '../../lib/postProcessing'
 import {
@@ -200,6 +200,7 @@ function MessageBubble({
   personaName,
   currentPersonaName,
   statusBlock,
+  previousStatusBlock,
   statusBlockCollapsed,
   onEditStatusBlock,
   onToggleStatusBlockCollapse,
@@ -335,6 +336,13 @@ function MessageBubble({
     character?.removeCodeBlocksFromStatusBlock === false
       ? statusBlockDisplay
       : stripStatusBlockCodeFences(statusBlockDisplay)
+
+  const previousStatusBlockDisplay = replaceVars(previousStatusBlock, {
+    charName: character?.name,
+    personaName,
+    currentPersonaName: currentPersonaName || personaName,
+  })
+  const statusBlockChanged = statusBlocksDiffer(statusBlockDisplay, previousStatusBlockDisplay)
 
   const statusBlockVisible =
     !isUser &&
@@ -1087,14 +1095,24 @@ function MessageBubble({
                   }
                   showStatusBlockPromptLabel={t('showStatusBlockPrompt')}
                   statusBlockDirectorAttempted={activeEntry?.statusBlockDirectorAttempted}
+                  statusBlockChanged={statusBlockChanged}
                 >
-                  <code className="language-status-block">{statusBlockRender}</code>
+                  <code
+                    className={`language-status-block ${statusBlockChanged ? 'underline decoration-accent decoration-2 underline-offset-2' : ''}`}
+                  >
+                    {statusBlockRender}
+                  </code>
                 </CodeBlockWrapper>
               </div>
             ) : (
               <div
                 onDoubleClick={handleStartStatusBlockEdit}
-                className="mt-2 rounded-md border border-border bg-code p-3 text-sm whitespace-pre-wrap break-words cursor-text"
+                className={`mt-2 rounded-md border p-3 text-sm whitespace-pre-wrap break-words cursor-text ${
+                  statusBlockChanged
+                    ? 'border-accent bg-accent-subtle underline decoration-accent decoration-2 underline-offset-2'
+                    : 'border-border bg-code'
+                }`}
+                style={statusBlockChanged ? { borderLeftWidth: '3px' } : undefined}
               >
                 {statusBlockRender}
               </div>

@@ -1623,6 +1623,9 @@
 .border-accent {
   border-color: var(--color-accent);
 }
+.decoration-accent {
+  text-decoration-color: var(--color-accent);
+}
 .ring-accent {
   --tw-ring-color: var(--color-accent);
 }

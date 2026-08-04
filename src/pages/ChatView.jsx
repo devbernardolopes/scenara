@@ -3029,6 +3029,9 @@ function ChatView() {
                     ? (bundleEntry?.apiDurationMs ?? null)
                     : (msg.apiDurationMs ?? null)
                   const slotStatusBlock = bundleEntry?.statusBlock || ''
+                  const previousStatusBlock =
+                    bundleEntry?.statusBlockUsed ??
+                    getStatusBlockJustAbove(messages, character, idx)
                   const statusBlockCollapsed = bundleEntry?.statusBlockCollapsed === true
                   const statusCurrentPersonaName =
                     personaMap?.[selectedPersonaId]?.name ||
@@ -3077,6 +3080,7 @@ function ChatView() {
                         onToggleCodeBlock={handleToggleCodeBlock}
                         onToggleVisible={handleToggleVisible}
                         statusBlock={slotStatusBlock}
+                        previousStatusBlock={previousStatusBlock}
                         statusBlockCollapsed={statusBlockCollapsed}
                         currentPersonaName={statusCurrentPersonaName}
                         onEditStatusBlock={handleEditStatusBlock}
