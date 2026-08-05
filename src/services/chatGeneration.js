@@ -15,7 +15,7 @@ import { getSetting } from './settings'
 import { getThread } from './threads'
 import { getEffectiveStatusBlock } from './statusBlocks'
 import { runStatusBlockDirector } from './statusBlockDirector'
-import { trimLeadingTrailingNewlines, trimWhitespace } from './messages'
+import { applyResponseTrims } from './messages'
 import i18n from '../lib/i18n'
 import { showToast } from '../lib/toast'
 
@@ -217,8 +217,7 @@ export async function generateChatResponse({
 
   const trimMsgs = await getSetting('prompting.trimMessages')
   const trimWsAi = await getSetting('prompting.trimWhitespacesAi')
-  let finalContent = trimMsgs ? trimLeadingTrailingNewlines(content) : content
-  if (trimWsAi) finalContent = trimWhitespace(finalContent)
+  let finalContent = applyResponseTrims(content, trimMsgs, trimWsAi)
 
   if (directorConfig) {
     try {
@@ -306,8 +305,7 @@ export async function generateChatResponse({
           directorResponse = reviewed
           directorResponseData = reviewedResult.response
           if (directorConfig.outputDirectorResponse) {
-            finalContent = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
-            if (trimWsAi) finalContent = trimWhitespace(finalContent)
+            finalContent = applyResponseTrims(reviewed, trimMsgs, trimWsAi)
             responseData = reviewedResult.response
           }
           promptData = JSON.stringify({

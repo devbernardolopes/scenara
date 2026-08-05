@@ -27,6 +27,7 @@ import {
 } from './apiQueue'
 import { removeCodeBlocksFromMessages, removeMarkdownImagesFromMessages } from './chatApi'
 import { parseBundleEntries } from './chatGeneration'
+import { applyResponseTrims } from './messages'
 
 const DEFAULT_SYSTEM_INSTRUCTION = 'You are a memory generator for conversational AI.'
 
@@ -388,7 +389,9 @@ export async function triggerSummarization({
   const summary = sendResult.content
   if (!summary?.trim()) throw new Error('Empty summary generated')
 
-  const cleanedSummary = summary.trim()
+  const trimMsgs = await getSetting('prompting.trimMessages')
+  const trimWsAi = await getSetting('prompting.trimWhitespacesAi')
+  const cleanedSummary = applyResponseTrims(summary, trimMsgs, trimWsAi)
   const timestamp = new Date().toISOString()
   await Promise.all(
     unsummarizedMessages.map((message) => updateMessage(message.id, { summarizedAt: timestamp })),

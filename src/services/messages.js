@@ -201,3 +201,10 @@ export function trimWhitespace(text) {
   if (!text) return text
   return text.replace(/^\s+|\s+$/g, '')
 }
+
+export function applyResponseTrims(text, trimMessages, trimWhitespacesAi) {
+  if (!text) return text
+  let result = trimMessages ? trimLeadingTrailingNewlines(text) : text
+  if (trimWhitespacesAi) result = trimWhitespace(result)
+  return result
+}

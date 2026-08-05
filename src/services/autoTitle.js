@@ -13,7 +13,7 @@ import { getSetting } from './settings'
 import { getPersona } from './personas'
 import { updateThread } from './threads'
 import { getEffectiveStatusBlock } from './statusBlocks'
-import { trimLeadingTrailingNewlines } from './messages'
+import { applyResponseTrims } from './messages'
 import { buildInjectedMemory } from './threadMemories'
 import {
   getDirectorConfig,
@@ -246,7 +246,9 @@ export async function triggerAutoTitle({
 
   if (!title?.trim()) throw new Error('Empty title generated')
 
-  let cleanTitle = title.trim()
+  const trimMsgs = await getSetting('prompting.trimMessages')
+  const trimWsAi = await getSetting('prompting.trimWhitespacesAi')
+  let cleanTitle = applyResponseTrims(title, trimMsgs, trimWsAi)
   let directorReviewed = false
 
   const directorConfig = await getDirectorConfig(character, 'autoTitle')
@@ -303,10 +305,9 @@ export async function triggerAutoTitle({
       } finally {
         ctx?.setDirectorPhase?.(false)
       }
-      const trimMsgs = await getSetting('prompting.trimMessages')
-      const reviewedTrimmed = trimMsgs ? trimLeadingTrailingNewlines(reviewed) : reviewed
+      const reviewedTrimmed = applyResponseTrims(reviewed, trimMsgs, trimWsAi)
       if (reviewedTrimmed?.trim()) {
-        cleanTitle = reviewedTrimmed.trim()
+        cleanTitle = reviewedTrimmed
         directorReviewed = true
       }
     } catch {
