@@ -167,20 +167,21 @@ function ProfileFormModal({ profile }) {
     [],
   )
 
-  const initial = useMemo(
-    () => ({
+  const initial = useMemo(() => {
+    const initialHordeMethod =
+      profile?.providerId === 'ai-horde' ? profile?.params?.hordeMethod || 'native' : undefined
+    return {
       name: profile?.name || '',
       providerId: profile?.providerId || '',
       keyId: profile?.keyId || null,
       model: profile?.model || '',
       params: resolveParams(profile),
       disabledParams: profile?.disabledParams ? { ...profile.disabledParams } : {},
-      baseUrl: profile?.baseUrl || getDefaultBaseUrl(profile?.providerId) || '',
+      baseUrl: profile?.baseUrl || getDefaultBaseUrl(profile?.providerId, initialHordeMethod) || '',
       promptTemplate: profile?.promptTemplate || '',
       promptTemplateCustom: profile?.promptTemplateCustom || '',
-    }),
-    [],
-  )
+    }
+  }, [])
 
   const [form, setForm] = useState({ ...initial })
   const [saving, setSaving] = useState(false)
@@ -612,7 +613,11 @@ function ProfileFormModal({ profile }) {
                 model: '',
                 params: {},
                 disabledParams: {},
-                baseUrl: getDefaultBaseUrl(nextProvider) || '',
+                baseUrl:
+                  getDefaultBaseUrl(
+                    nextProvider,
+                    nextProvider === 'ai-horde' ? 'native' : undefined,
+                  ) || '',
                 promptTemplate: '',
                 promptTemplateCustom: '',
               }))
@@ -684,7 +689,21 @@ function ProfileFormModal({ profile }) {
             <select
               id={formId + '-horde'}
               value={form.params.hordeMethod || 'native'}
-              onChange={(e) => updateParam('hordeMethod', e.target.value)}
+              onChange={(e) => {
+                const nextMethod = e.target.value
+                setForm((prev) => {
+                  const prevMethod = prev.params.hordeMethod || 'native'
+                  const prevDefault = getDefaultBaseUrl('ai-horde', prevMethod)
+                  const nextDefault = getDefaultBaseUrl('ai-horde', nextMethod)
+                  const baseUrl =
+                    !prev.baseUrl || prev.baseUrl === prevDefault ? nextDefault : prev.baseUrl
+                  return {
+                    ...prev,
+                    params: { ...prev.params, hordeMethod: nextMethod },
+                    baseUrl,
+                  }
+                })
+              }}
               className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text text-sm"
             >
               <option value="native">{t('api.profile.form.hordeMethodNative')}</option>
