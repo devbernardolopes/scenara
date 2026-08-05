@@ -119,6 +119,7 @@ export async function generateChatResponse({
     messages: apiMessages,
     loreActivated,
     lorebooks,
+    loreTriggers,
   } = await buildChatRequestPayload({
     character,
     chatPersona,
@@ -175,6 +176,7 @@ export async function generateChatResponse({
     directorFailed,
     loreActivated: loreActivated || [],
     lorebooks: lorebooks || [],
+    loreTriggers: loreTriggers || {},
     statusBlockDirectorAttempted,
     statusBlockDirectorSystemPrompt,
     statusBlockDirectorUserPrompt,
@@ -322,6 +324,9 @@ export async function generateChatResponse({
             directorResponse,
             directorResponseData,
             directorFailed,
+            loreActivated: loreActivated || [],
+            lorebooks: lorebooks || [],
+            loreTriggers: loreTriggers || {},
           })
         }
       } finally {
@@ -345,6 +350,9 @@ export async function generateChatResponse({
         directorResponse,
         directorResponseData,
         directorFailed,
+        loreActivated: loreActivated || [],
+        lorebooks: lorebooks || [],
+        loreTriggers: loreTriggers || {},
       })
       showToast(i18n.t('chat:directorFailed'), { type: 'warning' })
     }

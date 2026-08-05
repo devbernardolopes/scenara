@@ -15,7 +15,13 @@ import {
   diffChars,
 } from '../../services/statusBlocks'
 import { getStreamingStartTime } from '../../services/generatingState'
-import { injectRuleTags, applyRulesToPlainText, ppEffectClass } from '../../lib/postProcessing'
+import {
+  injectRuleTags,
+  applyRulesToPlainText,
+  injectLoreHighlightTags,
+  applyLoreHighlightsToSegments,
+  ppEffectClass,
+} from '../../lib/postProcessing'
 import {
   Trash2,
   Edit3,
@@ -181,6 +187,7 @@ function MessageBubble({
   streaming,
   bundleMessages,
   bundleIndex,
+  loreTriggerKeys,
   streamingSlotIndex,
   streamingContent,
   currentOrigin,
@@ -244,6 +251,7 @@ function MessageBubble({
     chatFontSize,
     messageBubbleSize,
     renderMarkdown,
+    highlightLoreTriggers,
     order,
     postProcessingEnabled,
     globalPPRules,
@@ -292,16 +300,36 @@ function MessageBubble({
     streaming && streamingContent != null ? streamingContent : message.content,
   )
 
-  const displayContentForRender = useMemo(() => {
-    if (renderMarkdown && activeRules.length) return injectRuleTags(displayContent, activeRules)
-    return displayContent
-  }, [displayContent, renderMarkdown, activeRules])
+  const loreKeys = useMemo(
+    () =>
+      loreTriggerKeys?.length
+        ? loreTriggerKeys.map((t) => ({ key: t.key, caseSensitive: t.caseSensitive }))
+        : null,
+    [loreTriggerKeys],
+  )
 
-  const plainSegments = useMemo(() => {
-    if (!renderMarkdown && activeRules.length)
-      return applyRulesToPlainText(displayContent, activeRules)
-    return null
-  }, [displayContent, renderMarkdown, activeRules])
+  let displayContentForRender = displayContent
+  if (renderMarkdown) {
+    if (highlightLoreTriggers !== false && loreKeys?.length > 0) {
+      displayContentForRender = injectLoreHighlightTags(displayContent, loreKeys)
+    }
+    if (activeRules.length) {
+      displayContentForRender = injectRuleTags(displayContentForRender, activeRules)
+    }
+  }
+
+  let plainSegments = null
+  if (!renderMarkdown) {
+    const hasRules = activeRules.length > 0
+    const hasLore = highlightLoreTriggers !== false && loreKeys?.length > 0
+    if (hasRules || hasLore) {
+      let segs = hasRules
+        ? applyRulesToPlainText(displayContent, activeRules)
+        : [{ type: 'text', content: displayContent }]
+      if (hasLore) segs = applyLoreHighlightsToSegments(segs, loreKeys)
+      plainSegments = segs
+    }
+  }
 
   const isMobile = useIsMobile()
   const hasMultipleSlots = bundleMessages?.length > 1
@@ -1040,8 +1068,15 @@ function MessageBubble({
                 />
               ) : plainSegments ? (
                 <p className="mb-2 last:mb-0 whitespace-pre-wrap">
-                  {plainSegments.map((seg, idx) =>
-                    seg.type === 'styled' ? (
+                  {plainSegments.map((seg, idx) => {
+                    const content = seg.lore ? (
+                      <span className="underline decoration-accent decoration-2 underline-offset-2">
+                        {seg.content}
+                      </span>
+                    ) : (
+                      seg.content
+                    )
+                    return seg.type === 'styled' ? (
                       <span
                         key={idx}
                         className={ppEffectClass(activeRules[seg.ruleIndex]?.effect)}
@@ -1050,12 +1085,12 @@ function MessageBubble({
                           fontSize: `${activeRules[seg.ruleIndex].fontSizePercent}%`,
                         }}
                       >
-                        {seg.content}
+                        {content}
                       </span>
                     ) : (
-                      <span key={idx}>{seg.content}</span>
-                    ),
-                  )}
+                      <span key={idx}>{content}</span>
+                    )
+                  })}
                 </p>
               ) : (
                 <p className="mb-2 last:mb-0 whitespace-pre-wrap">{displayContent}</p>

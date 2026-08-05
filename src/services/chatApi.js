@@ -1359,6 +1359,7 @@ export async function buildChatRequestPayload({
     messages: processedMessages,
     loreActivated: loreBlocks.activated || [],
     lorebooks: loreBlocks.lorebooks || [],
+    loreTriggers: loreBlocks.loreTriggers,
   }
 }
 

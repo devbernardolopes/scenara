@@ -197,11 +197,15 @@ export async function getActiveLoreBlocks({ character, messages, scanMessages })
   const seenContents = new Set()
   const allActivated = []
   const activatedMeta = []
+  const loreTriggersMap = new Map() // messageId -> Map<key, {key, caseSensitive}>
 
   for (const lorebook of lorebooks) {
     const entries = await getEntriesForLorebook(lorebook.id)
     if (!entries.length) continue
-    const buffer = buildScanBuffer(scanMessages || messages, lorebook.scanDepth)
+    const scanMsgs = scanMessages || messages
+    const scanSlice =
+      lorebook.scanDepth && lorebook.scanDepth > 0 ? scanMsgs.slice(-lorebook.scanDepth) : scanMsgs
+    const buffer = buildScanBuffer(scanMsgs, lorebook.scanDepth)
     const activated = await activateEntries(lorebook, entries, buffer, character, rollCache)
     const deduped = dedupByContent(activated, seenContents)
     const trimmed = trimToTokenBudget(deduped, lorebook.tokenBudget)
@@ -216,6 +220,25 @@ export async function getActiveLoreBlocks({ character, messages, scanMessages })
         entry: entry.name || entry.keys?.[0] || `#${entry.id}`,
         position,
       })
+      if (!entry.keys?.length) continue
+      for (const msg of scanSlice) {
+        const content = msg?.content || ''
+        if (!content) continue
+        const haystack = entry.caseSensitive ? content : content.toLowerCase()
+        for (const key of entry.keys) {
+          const needle = entry.caseSensitive ? key : key.toLowerCase()
+          if (!needle || !haystack.includes(needle)) continue
+          let inner = loreTriggersMap.get(msg.id)
+          if (!inner) {
+            inner = new Map()
+            loreTriggersMap.set(msg.id, inner)
+          }
+          inner.set(`${key}\u0000${entry.caseSensitive ? '1' : '0'}`, {
+            key,
+            caseSensitive: entry.caseSensitive,
+          })
+        }
+      }
     }
   }
 
@@ -223,6 +246,12 @@ export async function getActiveLoreBlocks({ character, messages, scanMessages })
   blocks.atDepth = joinAtDepth(blocks.atDepth)
   blocks.lorebooks = lorebooks.map((lb) => lb.name || '')
   blocks.activated = activatedMeta
+  if (loreTriggersMap.size) {
+    blocks.loreTriggers = {}
+    for (const [msgId, inner] of loreTriggersMap) {
+      blocks.loreTriggers[msgId] = [...inner.values()]
+    }
+  }
 
   return blocks
 }

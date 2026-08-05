@@ -114,7 +114,7 @@ export const CodeBlockWrapper = memo(CodeBlockWrapperBase)
 
 const PP_SANITIZE_SCHEMA = {
   ...defaultSchema,
-  tagNames: [...(defaultSchema.tagNames || []), 'pp'],
+  tagNames: [...(defaultSchema.tagNames || []), 'pp', 'lh'],
   attributes: {
     ...defaultSchema.attributes,
     pp: ['r'],
@@ -149,6 +149,11 @@ function CodeBlocksMarkdownBase({
             </span>
           )
         },
+        lh: ({ children }) => (
+          <span className="underline decoration-accent decoration-2 underline-offset-2">
+            {children}
+          </span>
+        ),
         p: ({ children }) => <p className="mb-2 last:mb-0 whitespace-pre-wrap">{children}</p>,
         a: ({ href, children }) => (
           <a

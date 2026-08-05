@@ -981,6 +981,15 @@ export const SETTINGS = [
     descKey: 'settings:appearance.renderMarkdown.desc',
   },
   {
+    key: 'highlightLoreTriggers',
+    category: 'appearance',
+    group: 'chat',
+    type: 'toggle',
+    default: true,
+    labelKey: 'settings:appearance.highlightLoreTriggers.label',
+    descKey: 'settings:appearance.highlightLoreTriggers.desc',
+  },
+  {
     key: 'defaultAutoTitle',
     category: 'defaults',
     type: 'toggle',

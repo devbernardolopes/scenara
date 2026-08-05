@@ -2815,6 +2815,37 @@ function ChatView() {
     return map
   }, [messages])
 
+  // Per-message lorebook trigger keys: message M's triggers are recorded in the
+  // promptData of the *next* real message's active slot (M was part of that
+  // request's scan buffer), so look them up there.
+  const loreTriggerMap = useMemo(() => {
+    const map = new Map()
+    const isMarker = (m) => m?.isSummaryMarker || m?.isAutoTitleMarker
+    for (let i = 0; i < messages.length; i++) {
+      const m = messages[i]
+      if (isMarker(m)) continue
+      let j = i + 1
+      while (j < messages.length && isMarker(messages[j])) j++
+      if (j >= messages.length) break
+      const nextMsg = messages[j]
+      const entries = bundleMap.get(nextMsg.id)
+      if (!entries?.length) continue
+      const trackIdx = nextMsg.activeSlotIndex ?? activeSlotIndices[nextMsg.id]
+      const nextIdx = trackIdx != null ? Math.min(trackIdx, entries.length - 1) : 0
+      const entry = entries[nextIdx]
+      if (!entry?.promptData) continue
+      let pd = null
+      try {
+        pd = typeof entry.promptData === 'string' ? JSON.parse(entry.promptData) : entry.promptData
+      } catch {
+        continue
+      }
+      const triggers = pd?.loreTriggers?.[m.id]
+      if (triggers?.length) map.set(m.id, triggers)
+    }
+    return map
+  }, [messages, bundleMap, activeSlotIndices])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -3060,6 +3091,7 @@ function ChatView() {
                         streamingSlotIndex={streamingSlotIndices[msg.id]}
                         bundleMessages={bundleMessages}
                         bundleIndex={bundleIndex}
+                        loreTriggerKeys={loreTriggerMap.get(msg.id) || null}
                         collapsedCodeBlocks={collapsedCodeBlocks}
                         currentOrigin={currentOrigin}
                         slotCreatedAt={slotCreatedAt}

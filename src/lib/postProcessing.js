@@ -237,6 +237,109 @@ export function applyRulesToPlainText(text, rules) {
   return scanText(text, rules)
 }
 
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * Collect non-overlapping [start, end] ranges of every trigger key match in
+ * `text`, honoring each key's case-sensitivity. Overlapping matches from
+ * different keys are merged so output stays well-formed.
+ */
+function collectLoreRanges(text, triggerKeys) {
+  const ranges = []
+  for (const tk of triggerKeys) {
+    if (!tk?.key) continue
+    let re
+    try {
+      re = new RegExp(escapeRegExp(tk.key), tk.caseSensitive ? 'g' : 'gi')
+    } catch {
+      continue
+    }
+    let m
+    while ((m = re.exec(text)) !== null) {
+      if (m[0].length) ranges.push([m.index, m.index + m[0].length])
+      if (m.index === re.lastIndex) re.lastIndex++
+    }
+  }
+  ranges.sort((a, b) => a[0] - b[0])
+  const merged = []
+  for (const r of ranges) {
+    if (merged.length && r[0] <= merged[merged.length - 1][1]) {
+      merged[merged.length - 1][1] = Math.max(merged[merged.length - 1][1], r[1])
+    } else {
+      merged.push([r[0], r[1]])
+    }
+  }
+  return merged
+}
+
+/**
+ * Markdown-on path: wrap each lorebook trigger match in `<lh>…</lh>` so it
+ * survives rehype-raw + rehype-sanitize and is underlined by the `lh` component.
+ * Code ranges are skipped. Run *before* `injectRuleTags` so rule styling and the
+ * underline compose.
+ *
+ * @param {string} md
+ * @param {Array<{key: string, caseSensitive?: boolean}>} triggerKeys
+ * @returns {string}
+ */
+export function injectLoreHighlightTags(md, triggerKeys) {
+  if (!md || !triggerKeys?.length) return md
+  const codeRanges = findCodeRanges(md)
+  const inCode = codeRanges.length ? buildInCode(md, codeRanges) : null
+  const ranges = collectLoreRanges(md, triggerKeys).filter(([s]) => !inCode?.(s))
+  if (!ranges.length) return md
+  let out = ''
+  let pos = 0
+  for (const [s, e] of ranges) {
+    out += md.slice(pos, s)
+    out += `<lh>${md.slice(s, e)}</lh>`
+    pos = e
+  }
+  out += md.slice(pos)
+  return out
+}
+
+function splitLoreKeySegments(text, triggerKeys) {
+  const ranges = collectLoreRanges(text, triggerKeys)
+  if (!ranges.length) return [{ content: text, lore: false }]
+  const parts = []
+  let pos = 0
+  for (const [s, e] of ranges) {
+    if (s > pos) parts.push({ content: text.slice(pos, s), lore: false })
+    parts.push({ content: text.slice(s, e), lore: true })
+    pos = e
+  }
+  if (pos < text.length) parts.push({ content: text.slice(pos), lore: false })
+  return parts
+}
+
+/**
+ * Plain-text path: split each scan segment by lorebook trigger matches so the
+ * underline composes with rule color/font styling. Styled segments keep their
+ * ruleIndex; every resulting part gains a `lore` flag.
+ */
+export function applyLoreHighlightsToSegments(segments, triggerKeys) {
+  if (!triggerKeys?.length) return segments
+  const out = []
+  for (const seg of segments) {
+    for (const part of splitLoreKeySegments(seg.content, triggerKeys)) {
+      if (seg.type === 'styled') {
+        out.push({
+          type: 'styled',
+          ruleIndex: seg.ruleIndex,
+          content: part.content,
+          lore: part.lore,
+        })
+      } else {
+        out.push({ type: 'text', content: part.content, lore: part.lore })
+      }
+    }
+  }
+  return out
+}
+
 /**
  * For the Markdown-on path: wrap each matched span in `<pp r="RULE_INDEX">…</pp>`
  * so it survives rehype-raw + rehype-sanitize and is styled by the `pp` component.

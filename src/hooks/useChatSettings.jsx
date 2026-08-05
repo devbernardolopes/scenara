@@ -33,6 +33,7 @@ const ALL_KEYS = [
   'chatFontSize',
   'messageBubbleSize',
   'renderMarkdown',
+  'highlightLoreTriggers',
   'defaultPostProcessing',
   'postProcessingRules',
   'prompting.oocDelimiters',
@@ -48,6 +49,7 @@ export function ChatSettingsProvider({ children }) {
   const [chatFontSize, setChatFontSize] = useState('sm')
   const [messageBubbleSize, setMessageBubbleSize] = useState('normal')
   const [renderMarkdown, setRenderMarkdown] = useState(true)
+  const [highlightLoreTriggers, setHighlightLoreTriggers] = useState(true)
   const [order, setOrder] = useState({ assistantButtonOrder: null, userButtonOrder: null })
   const [postProcessingEnabled, setPostProcessingEnabled] = useState(true)
   const [globalPPRules, setGlobalPPRules] = useState(DEFAULT_PP_RULES)
@@ -66,6 +68,7 @@ export function ChatSettingsProvider({ children }) {
       setChatFontSize(map.chatFontSize || 'sm')
       setMessageBubbleSize(map.messageBubbleSize || 'normal')
       setRenderMarkdown(map.renderMarkdown !== false)
+      setHighlightLoreTriggers(map.highlightLoreTriggers !== false)
       setPostProcessingEnabled(map.defaultPostProcessing !== false)
       if (
         map.postProcessingRules &&
@@ -92,6 +95,7 @@ export function ChatSettingsProvider({ children }) {
       if (key === 'chatFontSize') setChatFontSize(e.detail.value || 'sm')
       if (key === 'messageBubbleSize') setMessageBubbleSize(e.detail.value || 'normal')
       if (key === 'renderMarkdown') setRenderMarkdown(e.detail.value !== false)
+      if (key === 'highlightLoreTriggers') setHighlightLoreTriggers(e.detail.value !== false)
       if (key === 'defaultPostProcessing') setPostProcessingEnabled(e.detail.value !== false)
       if (key === 'postProcessingRules') {
         const v = e.detail.value
@@ -110,6 +114,7 @@ export function ChatSettingsProvider({ children }) {
       chatFontSize,
       messageBubbleSize,
       renderMarkdown,
+      highlightLoreTriggers,
       order,
       postProcessingEnabled,
       globalPPRules,
@@ -121,6 +126,7 @@ export function ChatSettingsProvider({ children }) {
       chatFontSize,
       messageBubbleSize,
       renderMarkdown,
+      highlightLoreTriggers,
       order,
       postProcessingEnabled,
       globalPPRules,
