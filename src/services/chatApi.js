@@ -1423,9 +1423,15 @@ export async function sendChatCompletion({
 
   const activeParams = getActiveParams(profile)
 
+  const wireMessages = messages.map((msg) => {
+    const copy = { ...msg }
+    delete copy.personaId
+    return copy
+  })
+
   const body = {
     model: profile.model,
-    messages,
+    messages: wireMessages,
     ...activeParams,
   }
 
