@@ -1380,6 +1380,7 @@ export async function sendChatCompletion({
   assistantSpeaker,
   personaMap,
 }) {
+  onMeta?.(null)
   const isHordeNative =
     profile.providerId === 'ai-horde' &&
     (profile.params?.hordeMethod || 'openai-compatible') === 'native'

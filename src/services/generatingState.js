@@ -103,7 +103,10 @@ const hordeMeta = new Map()
 
 export function setThreadHordeMeta(threadId, meta) {
   const id = Number(threadId)
-  if (!meta) return
+  if (!meta) {
+    clearThreadHordeMeta(id)
+    return
+  }
   const prev = hordeMeta.get(id) || {}
   const next = { ...prev, ...meta }
   hordeMeta.set(id, next)
