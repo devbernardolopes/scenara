@@ -89,7 +89,8 @@
       "favorite": "Marcar personaje como favorito",
       "duplicate": "Duplicar personaje",
       "export": "Exportar personaje",
-      "selectPersona": "Seleccionar persona"
+      "selectPersona": "Seleccionar persona",
+      "moveToFolder": "Mover a carpeta"
     },
     "search": {
       "placeholder": "Buscar personajes...",
@@ -122,6 +123,16 @@
       "title": "Duplicar personaje",
       "message": "¿Seguro que quieres duplicar {{name}}?",
       "confirm": "Duplicar"
+    },
+    "folders": {
+      "all": "Todos",
+      "manage": "Gestionar carpetas",
+      "none": "Sin carpeta",
+      "moveTo": "Mover a carpeta",
+      "empty": "Esta carpeta está vacía."
+    },
+    "favorites": {
+      "title": "Favoritos"
     }
   },
   "loading": "Cargando…",
@@ -347,6 +358,23 @@
     },
     "duplicate": "La etiqueta \"{{name}}\" ya existe",
     "emptyName": "El nombre de la etiqueta no puede estar vacío"
+  },
+  "folders": {
+    "title": "Carpetas",
+    "add": "Añadir",
+    "update": "Actualizar",
+    "placeholder": "Introduce el nombre de la carpeta...",
+    "cancelEdit": "Cancelar edición",
+    "noFolders": "Aún no hay carpetas. ¡Crea una arriba!",
+    "delete": "Eliminar {{name}}",
+    "confirmDelete": {
+      "title": "Eliminar carpeta",
+      "message": "¿Eliminar la carpeta « {{name}} »?",
+      "messageWithChars": "¿Eliminar la carpeta « {{name}} »? {{count}} personaje(s) se moverán a « Sin carpeta ».",
+      "confirm": "Eliminar"
+    },
+    "duplicate": "La carpeta « {{name}} » ya existe",
+    "emptyName": "El nombre de la carpeta no puede estar vacío"
   },
   "localInference": {
     "placeholder": "La configuración de inferencia local estará disponible aquí."

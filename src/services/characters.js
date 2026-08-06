@@ -192,7 +192,7 @@ export async function exportCharacter(id) {
     showToast(i18n.t('common:toast.export.invalidItem'), { type: 'error' })
     throw new Error('Character not found')
   }
-  const { id: _id, createdAt: _ca, updatedAt: _ua, ...data } = c
+  const { id: _id, createdAt: _ca, updatedAt: _ua, folderId: _fid, ...data } = c
   if (data.tags?.length) {
     const tagObjs = await Promise.all(data.tags.map((tid) => db.tags.get(tid)))
     data.tags = tagObjs.filter(Boolean).map((t) => t.name)

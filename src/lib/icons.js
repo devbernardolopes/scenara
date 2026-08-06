@@ -19,6 +19,7 @@ export {
   Download,
   Upload,
   UserPlus,
+  FolderPlus,
   ChevronLeft,
   ChevronRight,
   ArrowLeft,

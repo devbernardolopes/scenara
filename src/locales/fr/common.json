@@ -89,7 +89,8 @@
       "favorite": "Ajouter le personnage aux favoris",
       "duplicate": "Dupliquer le personnage",
       "export": "Exporter le personnage",
-      "selectPersona": "Sélectionner une persona"
+      "selectPersona": "Sélectionner une persona",
+      "moveToFolder": "Déplacer vers un dossier"
     },
     "search": {
       "placeholder": "Rechercher des personnages...",
@@ -122,6 +123,16 @@
       "title": "Dupliquer le personnage",
       "message": "Voulez-vous vraiment dupliquer {{name}} ?",
       "confirm": "Dupliquer"
+    },
+    "folders": {
+      "all": "Tous",
+      "manage": "Gérer les dossiers",
+      "none": "Aucun dossier",
+      "moveTo": "Déplacer vers un dossier",
+      "empty": "Ce dossier est vide."
+    },
+    "favorites": {
+      "title": "Favoris"
     }
   },
   "loading": "Chargement…",
@@ -347,6 +358,23 @@
     },
     "duplicate": "L'étiquette \"{{name}}\" existe déjà",
     "emptyName": "Le nom de l'étiquette ne peut pas être vide"
+  },
+  "folders": {
+    "title": "Dossiers",
+    "add": "Ajouter",
+    "update": "Mettre à jour",
+    "placeholder": "Saisissez le nom du dossier...",
+    "cancelEdit": "Annuler la modification",
+    "noFolders": "Aucun dossier pour le moment. Créez-en un ci-dessus !",
+    "delete": "Supprimer {{name}}",
+    "confirmDelete": {
+      "title": "Supprimer le dossier",
+      "message": "Supprimer le dossier « {{name}} » ?",
+      "messageWithChars": "Supprimer le dossier « {{name}} » ? {{count}} personnage(s) seront déplacé(s) vers « Aucun dossier ».",
+      "confirm": "Supprimer"
+    },
+    "duplicate": "Le dossier « {{name}} » existe déjà",
+    "emptyName": "Le nom du dossier ne peut pas être vide"
   },
   "localInference": {
     "placeholder": "Les paramètres d'inférence locale seront disponibles ici."

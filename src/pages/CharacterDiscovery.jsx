@@ -12,6 +12,7 @@ import {
   duplicateCharacter,
   exportCharacter,
   getCharacterChatCounts,
+  updateCharacter,
 } from '../services/characters'
 import { downloadJson } from '../lib/download'
 import { showToast } from '../lib/toast'
@@ -27,6 +28,10 @@ import ModelStatusBar from '../components/shell/ModelStatusBar'
 import MarqueeText from '../components/shared/MarqueeText'
 import PersonaPicker from '../components/shared/PersonaPicker'
 import { getAllTags } from '../services/tags'
+import { getAllFolders } from '../services/folders'
+import FolderTabsBar from '../components/discovery/FolderTabsBar'
+import FavoritesShelf from '../components/discovery/FavoritesShelf'
+import FolderPicker from '../components/discovery/FolderPicker'
 import {
   Trash2,
   Heart,
@@ -39,13 +44,14 @@ import {
   ArrowUpDown,
   SlidersHorizontal,
   CloudCog,
+  FolderPlus,
 } from '../lib/icons'
 
 const SORT_OPTIONS = ['createdAt', 'updatedAt', 'lastUsed', 'chatCount', 'name']
 
 const CARD_SIZE_GRID = {
-  smaller: 'grid gap-3 sm:grid-cols-3 lg:grid-cols-4',
-  small: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3',
+  smaller: 'grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4',
+  small: 'grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3',
   regular: 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3',
   large: 'grid gap-4 sm:grid-cols-1 lg:grid-cols-2',
   xlarge: 'grid gap-5 sm:grid-cols-1 lg:grid-cols-1',
@@ -85,6 +91,29 @@ function StartChatButton({ character, onStart, open, onToggle, onClose }) {
           onClose()
           onStart(character, persona)
         }}
+      />
+    </div>
+  )
+}
+
+function FolderAssignButton({ character, folders, open, onToggle, onClose, onSelect }) {
+  const { t } = useTranslation('common')
+  const anchorRef = useRef(null)
+
+  return (
+    <div className="relative" ref={anchorRef}>
+      <IconButton
+        icon={FolderPlus}
+        label={t('discovery.actions.moveToFolder')}
+        onClick={onToggle}
+      />
+      <FolderPicker
+        open={open}
+        anchorRef={anchorRef}
+        folders={folders}
+        currentFolderId={character.folderId}
+        onSelect={onSelect}
+        onClose={onClose}
       />
     </div>
   )
@@ -218,46 +247,67 @@ function CharacterDiscovery() {
   const [sortOrder, setSortOrder] = useState('desc')
   const [chatCounts, setChatCounts] = useState(new Map())
   const [tagsMap, setTagsMap] = useState(new Map())
+  const [folders, setFolders] = useState([])
+  const [activeFolderId, setActiveFolderId] = useState('all')
+  const [folderPickerFor, setFolderPickerFor] = useState(null)
   const [cardSize, setCardSize] = useState('regular')
   const suppressNextReloadRef = useRef(false)
   const scrollRef = useRef(null)
 
+  const scopedCharacters = useMemo(() => {
+    if (activeFolderId === 'all') return characters
+    return characters.filter((c) => c.folderId === activeFolderId)
+  }, [characters, activeFolderId])
+
   const filteredCharacters = useMemo(() => {
     const q = searchQuery.toLowerCase().trim()
-    if (!q) return characters
-    return characters.filter(
+    if (!q) return scopedCharacters
+    return scopedCharacters.filter(
       (c) =>
         (c.name || '').toLowerCase().includes(q) ||
         (c.tagline || c.description || '').toLowerCase().includes(q) ||
         (c.prompt || c.personality || '').toLowerCase().includes(q),
     )
-  }, [characters, searchQuery])
+  }, [scopedCharacters, searchQuery])
 
-  const sortedCharacters = useMemo(() => {
-    const list = [...filteredCharacters]
-    list.sort((a, b) => {
-      let cmp = 0
-      switch (sortBy) {
-        case 'createdAt':
-          cmp = new Date(a.createdAt) - new Date(b.createdAt)
-          break
-        case 'updatedAt':
-          cmp = new Date(a.updatedAt || a.createdAt) - new Date(b.updatedAt || b.createdAt)
-          break
-        case 'lastUsed':
-          cmp = new Date(a.lastUsedAt || a.createdAt) - new Date(b.lastUsedAt || b.createdAt)
-          break
-        case 'chatCount':
-          cmp = (chatCounts.get(a.id) || 0) - (chatCounts.get(b.id) || 0)
-          break
-        case 'name':
-          cmp = (a.name || '').localeCompare(b.name || '')
-          break
-      }
-      return sortOrder === 'desc' ? -cmp : cmp
-    })
-    return list
-  }, [filteredCharacters, sortBy, sortOrder, chatCounts])
+  const sortList = useCallback(
+    (list) => {
+      const out = [...list]
+      out.sort((a, b) => {
+        let cmp = 0
+        switch (sortBy) {
+          case 'createdAt':
+            cmp = new Date(a.createdAt) - new Date(b.createdAt)
+            break
+          case 'updatedAt':
+            cmp = new Date(a.updatedAt || a.createdAt) - new Date(b.updatedAt || b.createdAt)
+            break
+          case 'lastUsed':
+            cmp = new Date(a.lastUsedAt || a.createdAt) - new Date(b.lastUsedAt || b.createdAt)
+            break
+          case 'chatCount':
+            cmp = (chatCounts.get(a.id) || 0) - (chatCounts.get(b.id) || 0)
+            break
+          case 'name':
+            cmp = (a.name || '').localeCompare(b.name || '')
+            break
+        }
+        return sortOrder === 'desc' ? -cmp : cmp
+      })
+      return out
+    },
+    [sortBy, sortOrder, chatCounts],
+  )
+
+  const favoriteCharacters = useMemo(
+    () => sortList(filteredCharacters.filter((c) => c.isFavorite)),
+    [filteredCharacters, sortList],
+  )
+
+  const sortedCharacters = useMemo(
+    () => sortList(filteredCharacters.filter((c) => !c.isFavorite)),
+    [filteredCharacters, sortList],
+  )
 
   const isUnlimited = cardsPerPage === Infinity
   const totalPages = isUnlimited
@@ -317,6 +367,22 @@ function CharacterDiscovery() {
     setChatCounts(counts)
   }
 
+  const foldersLoadedOnceRef = useRef(false)
+  async function loadFolders() {
+    const data = await getAllFolders()
+    setFolders(data)
+    if (!foldersLoadedOnceRef.current) {
+      foldersLoadedOnceRef.current = true
+      const saved = await getUIState('discovery.activeFolderId')
+      const valid = saved && data.some((f) => f.id === saved)
+      setActiveFolderId(valid ? saved : 'all')
+    } else {
+      setActiveFolderId((prev) =>
+        prev !== 'all' && !data.some((f) => f.id === prev) ? 'all' : prev,
+      )
+    }
+  }
+
   useEffect(() => {
     function onCharactersChanged() {
       if (suppressNextReloadRef.current) {
@@ -326,6 +392,7 @@ function CharacterDiscovery() {
       loadCharacters()
     }
     loadCharacters(true)
+    loadFolders()
     getSetting('cardsPerPage').then((val) => setCardsPerPage(val || 10))
     getSetting('characterCardMarquee').then((val) => setCharacterCardMarquee(val !== false))
     getSetting('discoveryCardSize').then((val) => setCardSize(val || 'regular'))
@@ -335,10 +402,12 @@ function CharacterDiscovery() {
     window.addEventListener('characters-changed', onCharactersChanged)
     window.addEventListener('threads-changed', loadChatCounts)
     window.addEventListener('tags-changed', loadTagsMap)
+    window.addEventListener('folders-changed', loadFolders)
     return () => {
       window.removeEventListener('characters-changed', onCharactersChanged)
       window.removeEventListener('threads-changed', loadChatCounts)
       window.removeEventListener('tags-changed', loadTagsMap)
+      window.removeEventListener('folders-changed', loadFolders)
     }
   }, [])
 
@@ -360,7 +429,7 @@ function CharacterDiscovery() {
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, sortBy, sortOrder])
+  }, [searchQuery, sortBy, sortOrder, activeFolderId])
 
   const persistSortBy = useCallback((val) => {
     setSortBy(val)
@@ -375,6 +444,11 @@ function CharacterDiscovery() {
   const persistSearchQuery = useCallback((val) => {
     setSearchQuery(val)
     setUIState('discovery.searchQuery', val)
+  }, [])
+
+  const persistActiveFolderId = useCallback((val) => {
+    setActiveFolderId(val)
+    setUIState('discovery.activeFolderId', val)
   }, [])
 
   const handlePageChange = useCallback((page) => {
@@ -485,8 +559,13 @@ function CharacterDiscovery() {
     })
   }
 
-  function handleFavorite(_character) {
-    // To be implemented
+  async function handleFavorite(character) {
+    await updateCharacter(character.id, { isFavorite: !character.isFavorite })
+  }
+
+  async function handleAssignFolder(character, folderId) {
+    await updateCharacter(character.id, { folderId })
+    setFolderPickerFor(null)
   }
 
   async function handleDuplicate(character) {
@@ -543,7 +622,13 @@ function CharacterDiscovery() {
   return (
     <div className="flex flex-col h-full">
       {/* <div className="shrink-0 px-4 md:px-8 pt-4 md:pt-8 pb-1"> */}
-      <div className="shrink-0 px-4 md:px-8 pt-4 pb-1">
+      <div className="shrink-0 px-4 md:px-8 pt-4 pb-1 space-y-2">
+        <FolderTabsBar
+          folders={folders}
+          activeFolderId={activeFolderId}
+          onSelect={persistActiveFolderId}
+          onManage={() => openModal('folderManagement')}
+        />
         <CollapsibleSection
           label={
             <span className="flex items-center gap-2">
@@ -592,13 +677,18 @@ function CharacterDiscovery() {
         ref={scrollRef}
         className="flex-1 overflow-y-auto px-4 md:px-8 pt-1 pb-4 bg-gradient-surface-radial"
       >
+        <FavoritesShelf characters={favoriteCharacters} onSelect={handleEditCharacter} />
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-secondary text-sm">{t('loading')}</p>
           </div>
         ) : sortedCharacters.length === 0 ? (
           <p className="text-secondary text-sm py-8 text-center">
-            {searchQuery ? t('discovery.search.noResults') : t('discovery.noCharacters')}
+            {searchQuery
+              ? t('discovery.search.noResults')
+              : activeFolderId !== 'all'
+                ? t('discovery.folders.empty')
+                : t('discovery.noCharacters')}
           </p>
         ) : (
           <div className={CARD_SIZE_GRID[cardSize]}>
@@ -686,7 +776,7 @@ function CharacterDiscovery() {
                     </div>
                   </div>
                   <div className="p-3 space-y-3 mt-auto">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <IconButton
                         icon={Trash2}
                         label={t('discovery.actions.delete')}
@@ -697,6 +787,8 @@ function CharacterDiscovery() {
                         icon={Heart}
                         label={t('discovery.actions.favorite')}
                         onClick={() => handleFavorite(char)}
+                        className={char.isFavorite ? 'text-favorite' : ''}
+                        iconClassName={char.isFavorite ? 'fill-current' : ''}
                       />
                       <IconButton
                         icon={Copy}
@@ -707,6 +799,16 @@ function CharacterDiscovery() {
                         icon={Download}
                         label={t('discovery.actions.export')}
                         onClick={() => handleExport(char)}
+                      />
+                      <FolderAssignButton
+                        character={char}
+                        folders={folders}
+                        open={folderPickerFor === char.id}
+                        onToggle={() =>
+                          setFolderPickerFor((prev) => (prev === char.id ? null : char.id))
+                        }
+                        onClose={() => setFolderPickerFor(null)}
+                        onSelect={(folderId) => handleAssignFolder(char, folderId)}
                       />
                     </div>
                     <StartChatButton

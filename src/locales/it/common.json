@@ -89,7 +89,8 @@
       "favorite": "Aggiungi personaggio ai preferiti",
       "duplicate": "Duplica personaggio",
       "export": "Esporta personaggio",
-      "selectPersona": "Seleziona persona"
+      "selectPersona": "Seleziona persona",
+      "moveToFolder": "Sposta nella cartella"
     },
     "search": {
       "placeholder": "Cerca personaggi...",
@@ -122,6 +123,16 @@
       "title": "Duplica personaggio",
       "message": "Sei sicuro di voler duplicare {{name}}?",
       "confirm": "Duplica"
+    },
+    "folders": {
+      "all": "Tutti",
+      "manage": "Gestisci cartelle",
+      "none": "Nessuna cartella",
+      "moveTo": "Sposta nella cartella",
+      "empty": "Questa cartella è vuota."
+    },
+    "favorites": {
+      "title": "Preferiti"
     }
   },
   "loading": "Caricamento…",
@@ -347,6 +358,23 @@
     },
     "duplicate": "Il tag \"{{name}}\" esiste già",
     "emptyName": "Il nome del tag non può essere vuoto"
+  },
+  "folders": {
+    "title": "Cartelle",
+    "add": "Aggiungi",
+    "update": "Aggiorna",
+    "placeholder": "Inserisci il nome della cartella...",
+    "cancelEdit": "Annulla modifica",
+    "noFolders": "Nessuna cartella ancora. Creane una qui sopra!",
+    "delete": "Elimina {{name}}",
+    "confirmDelete": {
+      "title": "Elimina cartella",
+      "message": "Eliminare la cartella « {{name}} »?",
+      "messageWithChars": "Eliminare la cartella « {{name}} »? {{count}} personaggio/i verranno spostati in « Nessuna cartella ».",
+      "confirm": "Elimina"
+    },
+    "duplicate": "La cartella « {{name}} » esiste già",
+    "emptyName": "Il nome della cartella non può essere vuoto"
   },
   "localInference": {
     "placeholder": "Le impostazioni di inferenza locale saranno disponibili qui."

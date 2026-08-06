@@ -35,6 +35,7 @@
   --color-accent: #7c3aed;
   --color-accent-hover: #6d28d9;
 
+  --color-favorite: #db2777;
   --color-delete: #dc2626;
   --color-delete-hover: #b91c1c;
   --color-on-delete: #ffffff;
@@ -107,6 +108,7 @@
   --color-accent: #a78bfa;
   --color-accent-hover: #c4b5fd;
 
+  --color-favorite: #f472b6;
   --color-delete: #ef4444;
   --color-delete-hover: #dc2626;
   --color-on-delete: #ffffff;
@@ -175,6 +177,7 @@
   --color-accent: #8b5cf6;
   --color-accent-hover: #7c3aed;
 
+  --color-favorite: #be185d;
   --color-delete: #b91c1c;
   --color-delete-hover: #991b1b;
   --color-on-delete: #ffffff;
@@ -243,6 +246,7 @@
   --color-accent: #f472b6;
   --color-accent-hover: #f9a8d4;
 
+  --color-favorite: #db2777;
   --color-delete: #e11d48;
   --color-delete-hover: #be123c;
   --color-on-delete: #ffffff;
@@ -311,6 +315,7 @@
   --color-accent: #6b21a8;
   --color-accent-hover: #581c87;
 
+  --color-favorite: #c026d3;
   --color-delete: #b91c1c;
   --color-delete-hover: #991b1b;
   --color-on-delete: #ffffff;
@@ -379,6 +384,7 @@
   --color-accent: #ff8c00;
   --color-accent-hover: #ffa500;
 
+  --color-favorite: #ff69b4;
   --color-delete: #ff4500;
   --color-delete-hover: #cc3700;
   --color-on-delete: #000000;
@@ -447,6 +453,7 @@
   --color-accent: #00ffff;
   --color-accent-hover: #66ffff;
 
+  --color-favorite: #ff4da6;
   --color-delete: #cc0000;
   --color-delete-hover: #990000;
   --color-on-delete: #ffffff;
@@ -515,6 +522,7 @@
   --color-accent: #a78bfa;
   --color-accent-hover: #c4b5fd;
 
+  --color-favorite: #f9a8d4;
   --color-delete: #f87171;
   --color-delete-hover: #ef4444;
   --color-on-delete: #ffffff;
@@ -583,6 +591,7 @@
   --color-accent: #f472b6;
   --color-accent-hover: #fb7185;
 
+  --color-favorite: #f472b6;
   --color-delete: #fb7185;
   --color-delete-hover: #f43f5e;
   --color-on-delete: #111827;
@@ -642,6 +651,7 @@
   --color-accent: #00ffff;
   --color-accent-hover: #66ffff;
 
+  --color-favorite: #ff00c8;
   --color-delete: #ff0044;
   --color-delete-hover: #cc0033;
   --color-on-delete: #ffffff;
@@ -701,6 +711,7 @@
   --color-accent: #00ffff;
   --color-accent-hover: #88ffff;
 
+  --color-favorite: #ff71ce;
   --color-delete: #ff4488;
   --color-delete-hover: #e11d48;
   --color-on-delete: #ffffff;
@@ -758,6 +769,7 @@
   --color-accent: #eab308;
   --color-accent-hover: #fde047;
 
+  --color-favorite: #ff5f8f;
   --color-delete: #ef4444;
   --color-delete-hover: #b91c1c;
   --color-on-delete: #ffffff;
@@ -813,6 +825,7 @@
   --color-accent: #6c71c4;
   --color-accent-hover: #8c8ec0;
 
+  --color-favorite: #d33682;
   --color-delete: #dc322f;
   --color-delete-hover: #b22c2a;
   --color-on-delete: #ffffff;
@@ -870,6 +883,7 @@
   --color-accent: #ff00ff;
   --color-accent-hover: #ff66ff;
 
+  --color-favorite: #ff5ec7;
   --color-delete: #ff0055;
   --color-delete-hover: #cc0044;
   --color-on-delete: #ffffff;
@@ -920,6 +934,7 @@
   --color-error: #991b1b; /* Crimson */
   --color-accent: #7a1f1f;
   --color-accent-hover: #992626;
+  --color-favorite: #be185d;
   --color-delete: #991b1b;
   --color-delete-hover: #7f1d1d;
   --color-on-delete: #ffffff;
@@ -975,6 +990,7 @@
   --color-error: #ff6b6b;
   --color-accent: #8884d8;
   --color-accent-hover: #9fa0e4;
+  --color-favorite: #e0437a;
   --color-delete: #ff6b6b;
   --color-delete-hover: #ff5252;
   --color-on-delete: #ffffff;
@@ -1030,6 +1046,7 @@
   --color-error: #9b2c2c;
   --color-accent: #cc7722; /* Terracotta */
   --color-accent-hover: #e08833;
+  --color-favorite: #d14b6a;
   --color-delete: #9b2c2c;
   --color-delete-hover: #742a2a;
   --color-on-delete: #ffffff;
@@ -1085,6 +1102,7 @@
   --color-error: #ef4444;
   --color-accent: #e0e0e0; /* Silver */
   --color-accent-hover: #ffffff;
+  --color-favorite: #f472b6;
   --color-delete: #ef4444;
   --color-delete-hover: #dc2626;
   --color-on-delete: #ffffff;
@@ -1140,6 +1158,7 @@
   --color-error: #f87171;
   --color-accent: #8a4baf; /* Twilight Purple */
   --color-accent-hover: #a05bc7;
+  --color-favorite: #f9a8d4;
   --color-delete: #f87171;
   --color-delete-hover: #ef4444;
   --color-on-delete: #ffffff;
@@ -1195,6 +1214,7 @@
   --color-error: #ef4444;
   --color-accent: #ff8c00; /* Dark Orange */
   --color-accent-hover: #ffaa33;
+  --color-favorite: #ff8fab;
   --color-delete: #ef4444;
   --color-delete-hover: #dc2626;
   --color-on-delete: #ffffff;
@@ -1250,6 +1270,7 @@
   --color-error: #ef4444;
   --color-accent: #10b981;
   --color-accent-hover: #34d399;
+  --color-favorite: #ff6b9d;
   --color-delete: #ef4444;
   --color-delete-hover: #dc2626;
   --color-on-delete: #ffffff;
@@ -1680,6 +1701,9 @@
 }
 .text-delete {
   color: var(--color-delete);
+}
+.text-favorite {
+  color: var(--color-favorite);
 }
 
 /* Always-highlighted delete — bypasses the "Highlight Delete Buttons" toggle */

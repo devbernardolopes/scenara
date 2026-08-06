@@ -89,7 +89,8 @@
       "favorite": "Favorite character",
       "duplicate": "Duplicate character",
       "export": "Export character",
-      "selectPersona": "Select persona"
+      "selectPersona": "Select persona",
+      "moveToFolder": "Move to folder"
     },
     "search": {
       "placeholder": "Search characters...",
@@ -122,6 +123,16 @@
       "title": "Duplicate Character",
       "message": "Are you sure you want to duplicate {{name}}?",
       "confirm": "Duplicate"
+    },
+    "folders": {
+      "all": "All",
+      "manage": "Manage folders",
+      "none": "No folder",
+      "moveTo": "Move to folder",
+      "empty": "This folder is empty."
+    },
+    "favorites": {
+      "title": "Favorites"
     }
   },
   "loading": "Loading…",
@@ -347,6 +358,23 @@
     },
     "duplicate": "Tag \"{{name}}\" already exists",
     "emptyName": "Tag name cannot be empty"
+  },
+  "folders": {
+    "title": "Folders",
+    "add": "Add",
+    "update": "Update",
+    "placeholder": "Enter folder name...",
+    "cancelEdit": "Cancel editing",
+    "noFolders": "No folders yet. Create one above!",
+    "delete": "Delete {{name}}",
+    "confirmDelete": {
+      "title": "Delete Folder",
+      "message": "Delete folder \"{{name}}\"?",
+      "messageWithChars": "Delete folder \"{{name}}\"? {{count}} character(s) will be moved to \"No folder\".",
+      "confirm": "Delete"
+    },
+    "duplicate": "Folder \"{{name}}\" already exists",
+    "emptyName": "Folder name cannot be empty"
   },
   "localInference": {
     "placeholder": "Local inference settings will be available here."

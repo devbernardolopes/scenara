@@ -49,6 +49,7 @@ import MemoryModal from './components/modals/MemoryModal'
 import MemoryRegenerationModal from './components/modals/MemoryRegenerationModal'
 import MemoryRegenerationResultModal from './components/modals/MemoryRegenerationResultModal'
 import TagManagementModal from './components/modals/TagManagementModal'
+import FolderManagementModal from './components/modals/FolderManagementModal'
 import LocalInferenceModal from './components/modals/LocalInferenceModal'
 import CancelConfirmModal from './components/modals/CancelConfirmModal'
 import AutoTitleCancelModal from './components/modals/AutoTitleCancelModal'
@@ -102,6 +103,7 @@ registerModal('memory', MemoryModal)
 registerModal('memoryRegeneration', MemoryRegenerationModal)
 registerModal('memoryRegenerationResult', MemoryRegenerationResultModal)
 registerModal('tagManagement', TagManagementModal)
+registerModal('folderManagement', FolderManagementModal)
 registerModal('localInference', LocalInferenceModal)
 registerModal('cancelConfirm', CancelConfirmModal)
 registerModal('autoTitleCancel', AutoTitleCancelModal)

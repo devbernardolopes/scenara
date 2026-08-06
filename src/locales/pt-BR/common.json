@@ -72,7 +72,8 @@
       "favorite": "Favoritar personagem",
       "duplicate": "Duplicar personagem",
       "export": "Exportar personagem",
-      "selectPersona": "Selecionar persona"
+      "selectPersona": "Selecionar persona",
+      "moveToFolder": "Mover para pasta"
     },
     "search": {
       "placeholder": "Pesquisar personagens...",
@@ -105,6 +106,16 @@
       "title": "Duplicar Personagem",
       "message": "Tem certeza que deseja duplicar {{name}}?",
       "confirm": "Duplicar"
+    },
+    "folders": {
+      "all": "Todas",
+      "manage": "Gerenciar pastas",
+      "none": "Sem pasta",
+      "moveTo": "Mover para pasta",
+      "empty": "Esta pasta está vazia."
+    },
+    "favorites": {
+      "title": "Favoritos"
     }
   },
   "dismissModelBar": "Dispensar barra de modelo do chat",
@@ -295,6 +306,23 @@
     },
     "duplicate": "Tag \"{{name}}\" já existe",
     "emptyName": "O nome da tag não pode estar vazio"
+  },
+  "folders": {
+    "title": "Pastas",
+    "add": "Adicionar",
+    "update": "Atualizar",
+    "placeholder": "Digite o nome da pasta...",
+    "cancelEdit": "Cancelar edição",
+    "noFolders": "Nenhuma pasta ainda. Crie uma acima!",
+    "delete": "Excluir {{name}}",
+    "confirmDelete": {
+      "title": "Excluir Pasta",
+      "message": "Excluir pasta \"{{name}}\"?",
+      "messageWithChars": "Excluir pasta \"{{name}}\"? {{count}} personagem(ns) serão movidos para \"Sem pasta\".",
+      "confirm": "Excluir"
+    },
+    "duplicate": "Pasta \"{{name}}\" já existe",
+    "emptyName": "O nome da pasta não pode estar vazio"
   },
   "localInference": {
     "placeholder": "As configurações de inferência local estarão disponíveis aqui."

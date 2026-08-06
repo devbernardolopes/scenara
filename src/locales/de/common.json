@@ -89,7 +89,8 @@
       "favorite": "Charakter favorisieren",
       "duplicate": "Charakter duplizieren",
       "export": "Charakter exportieren",
-      "selectPersona": "Persona auswählen"
+      "selectPersona": "Persona auswählen",
+      "moveToFolder": "In Ordner verschieben"
     },
     "search": {
       "placeholder": "Charaktere suchen...",
@@ -122,6 +123,16 @@
       "title": "Charakter duplizieren",
       "message": "Möchtest du {{name}} wirklich duplizieren?",
       "confirm": "Duplizieren"
+    },
+    "folders": {
+      "all": "Alle",
+      "manage": "Ordner verwalten",
+      "none": "Kein Ordner",
+      "moveTo": "In Ordner verschieben",
+      "empty": "Dieser Ordner ist leer."
+    },
+    "favorites": {
+      "title": "Favoriten"
     }
   },
   "loading": "Laden…",
@@ -347,6 +358,23 @@
     },
     "duplicate": "Tag \"{{name}}\" existiert bereits",
     "emptyName": "Der Tag-Name darf nicht leer sein"
+  },
+  "folders": {
+    "title": "Ordner",
+    "add": "Hinzufügen",
+    "update": "Aktualisieren",
+    "placeholder": "Ordnernamen eingeben...",
+    "cancelEdit": "Bearbeiten abbrechen",
+    "noFolders": "Noch keine Ordner. Erstelle oben einen!",
+    "delete": "{{name}} löschen",
+    "confirmDelete": {
+      "title": "Ordner löschen",
+      "message": "Ordner „{{name}}\" löschen?",
+      "messageWithChars": "Ordner „{{name}}\" löschen? {{count}} Charakter(e) werden in „Kein Ordner\" verschoben.",
+      "confirm": "Löschen"
+    },
+    "duplicate": "Ordner „{{name}}\" existiert bereits",
+    "emptyName": "Ordnername darf nicht leer sein"
   },
   "localInference": {
     "placeholder": "Lokale Inferenzeinstellungen werden hier verfügbar sein."
