@@ -9,7 +9,8 @@ const inputClass =
 function PromptTextarea({ value, onChange, placeholder, disabled, extraHeight = 8 }) {
   const { t } = useTranslation('common')
   const { openModal } = useModal()
-  const hasContent = Boolean(value?.trim())
+  const hasContent = Boolean(value)
+  const hasMeaningfulContent = Boolean(value?.trim())
 
   function handleSaveToBank() {
     openModal('promptBankForm', {
@@ -41,7 +42,7 @@ function PromptTextarea({ value, onChange, placeholder, disabled, extraHeight = 
         <button
           type="button"
           onClick={handleSaveToBank}
-          disabled={!hasContent}
+          disabled={!hasMeaningfulContent}
           className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-surface text-secondary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           aria-label={t('promptBank.saveToBank')}
           title={t('promptBank.saveToBank')}
