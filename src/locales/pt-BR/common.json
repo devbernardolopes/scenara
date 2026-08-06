@@ -114,6 +114,11 @@
   "saving": "Salvando…",
   "save": "Salvar",
   "cancel": "Cancelar",
+  "clear": "Limpar",
+  "promptBank": {
+    "newPrompt": "Novo prompt",
+    "saveToBank": "Salvar no Banco de Prompts"
+  },
   "confirm": "Confirmar",
   "confirmDefaultMessage": "Tem certeza?",
   "ok": "OK",

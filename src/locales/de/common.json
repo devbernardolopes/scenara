@@ -128,6 +128,11 @@
   "saving": "Wird gespeichert…",
   "save": "Save",
   "cancel": "Cancel",
+  "clear": "Löschen",
+  "promptBank": {
+    "newPrompt": "Neuer Prompt",
+    "saveToBank": "Im Prompt Bank speichern"
+  },
   "manage": "Manage",
   "confirm": "Bestätigen",
   "confirmDefaultMessage": "Bist du sicher?",

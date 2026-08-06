@@ -4,7 +4,7 @@ import { useModal } from '../../../hooks/useModal'
 import { showToast } from '../../../lib/toast'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import Label from '../../shared/Label'
-import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
+import PromptTextarea from '../../shared/PromptTextarea'
 import PromptBankButton from '../../shared/PromptBankButton'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { getAllWritingInstructions } from '../../../services/writingInstructions'
@@ -245,12 +245,10 @@ function CharacterSection({ form, onChange, characterId }) {
         defaultExpanded={false}
         headerExtra={<PromptBankButton onSelect={(content) => onChange('systemPrompt', content)} />}
       >
-        <AutoResizeTextarea
-          className={`${inputClass} resize-none mt-2`}
+        <PromptTextarea
           value={form.systemPrompt || ''}
-          onChange={(e) => onChange('systemPrompt', e.target.value)}
+          onChange={(v) => onChange('systemPrompt', v)}
           placeholder={t('systemPromptPlaceholder')}
-          extraHeight={8}
         />
       </CollapsibleSection>
 
@@ -263,12 +261,10 @@ function CharacterSection({ form, onChange, characterId }) {
         defaultExpanded={true}
         headerExtra={<PromptBankButton onSelect={(content) => onChange('prompt', content)} />}
       >
-        <AutoResizeTextarea
-          className={`${inputClass} resize-none mt-2`}
+        <PromptTextarea
           value={form.prompt || ''}
-          onChange={(e) => onChange('prompt', e.target.value)}
+          onChange={(v) => onChange('prompt', v)}
           placeholder={t('promptPlaceholder')}
-          extraHeight={8}
         />
       </CollapsibleSection>
 
@@ -283,12 +279,10 @@ function CharacterSection({ form, onChange, characterId }) {
         defaultExpanded={false}
         headerExtra={<PromptBankButton onSelect={(content) => onChange('personality', content)} />}
       >
-        <AutoResizeTextarea
-          className={`${inputClass} resize-none mt-2`}
+        <PromptTextarea
           value={form.personality || ''}
-          onChange={(e) => onChange('personality', e.target.value)}
+          onChange={(v) => onChange('personality', v)}
           placeholder={t('personalityPlaceholder')}
-          extraHeight={8}
         />
       </CollapsibleSection>
 
@@ -303,12 +297,10 @@ function CharacterSection({ form, onChange, characterId }) {
         defaultExpanded={false}
         headerExtra={<PromptBankButton onSelect={(content) => onChange('statusBlock', content)} />}
       >
-        <AutoResizeTextarea
-          className={`${inputClass} resize-none mt-2`}
+        <PromptTextarea
           value={form.statusBlock || ''}
-          onChange={(e) => onChange('statusBlock', e.target.value)}
+          onChange={(v) => onChange('statusBlock', v)}
           placeholder={t('statusBlockPlaceholder')}
-          extraHeight={8}
         />
       </CollapsibleSection>
 
@@ -325,12 +317,10 @@ function CharacterSection({ form, onChange, characterId }) {
           <PromptBankButton onSelect={(content) => onChange('globalContext', content)} />
         }
       >
-        <AutoResizeTextarea
-          className={`${inputClass} resize-none mt-2`}
+        <PromptTextarea
           value={form.globalContext || ''}
-          onChange={(e) => onChange('globalContext', e.target.value)}
+          onChange={(v) => onChange('globalContext', v)}
           placeholder={t('globalContextPlaceholder')}
-          extraHeight={8}
         />
       </CollapsibleSection>
 
@@ -355,12 +345,10 @@ function CharacterSection({ form, onChange, characterId }) {
         defaultExpanded={false}
         headerExtra={<PromptBankButton onSelect={(content) => onChange('extraPrompt', content)} />}
       >
-        <AutoResizeTextarea
-          className={`${inputClass} resize-none mt-2`}
+        <PromptTextarea
           value={form.extraPrompt || ''}
-          onChange={(e) => onChange('extraPrompt', e.target.value)}
+          onChange={(v) => onChange('extraPrompt', v)}
           placeholder={t('extraPromptPlaceholder')}
-          extraHeight={8}
         />
       </CollapsibleSection>
 
@@ -377,12 +365,10 @@ function CharacterSection({ form, onChange, characterId }) {
           <PromptBankButton onSelect={(content) => onChange('postHistoryInstructions', content)} />
         }
       >
-        <AutoResizeTextarea
-          className={`${inputClass} resize-none mt-2`}
+        <PromptTextarea
           value={form.postHistoryInstructions || ''}
-          onChange={(e) => onChange('postHistoryInstructions', e.target.value)}
+          onChange={(v) => onChange('postHistoryInstructions', v)}
           placeholder={t('postHistoryInstructionsPlaceholder')}
-          extraHeight={8}
         />
       </CollapsibleSection>
 

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import CollapsibleSection from '../../shared/CollapsibleSection'
-import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
+import PromptTextarea from '../../shared/PromptTextarea'
 import PromptBankButton from '../../shared/PromptBankButton'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { getSetting } from '../../../services/settings'
@@ -10,9 +10,6 @@ import SettingSlider from '../settings/controls/SettingSlider'
 import SettingToggle from '../settings/controls/SettingToggle'
 import SettingSelect from '../settings/controls/SettingSelect'
 import SettingButtonGroup from '../settings/controls/SettingButtonGroup'
-
-const inputClass =
-  'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
 
 const MEMORY_OPTION_LABELS = {
   never: 'settings:defaults.memoryOptions.never',
@@ -172,13 +169,11 @@ function OverridesSection({ form, onChange, characterId }) {
             />
           }
         >
-          <AutoResizeTextarea
-            className={`${inputClass} resize-none mt-2`}
+          <PromptTextarea
             value={form.autoTitleSystemInstructions}
-            onChange={(e) => onChange('autoTitleSystemInstructions', e.target.value)}
+            onChange={(v) => onChange('autoTitleSystemInstructions', v)}
             placeholder={t('autoTitleSystemInstructionsPlaceholder')}
             disabled={!form.autoTitle}
-            extraHeight={8}
           />
         </CollapsibleSection>
 
@@ -197,13 +192,11 @@ function OverridesSection({ form, onChange, characterId }) {
             />
           }
         >
-          <AutoResizeTextarea
-            className={`${inputClass} resize-none mt-2`}
+          <PromptTextarea
             value={form.autoTitleUserInstructions}
-            onChange={(e) => onChange('autoTitleUserInstructions', e.target.value)}
+            onChange={(v) => onChange('autoTitleUserInstructions', v)}
             placeholder={t('autoTitleUserInstructionsPlaceholder')}
             disabled={!form.autoTitle}
-            extraHeight={8}
           />
         </CollapsibleSection>
       </div>
@@ -304,13 +297,11 @@ function OverridesSection({ form, onChange, characterId }) {
             />
           }
         >
-          <AutoResizeTextarea
-            className={`${inputClass} resize-none mt-2`}
+          <PromptTextarea
             value={form.summarizationSystemInstructions}
-            onChange={(e) => onChange('summarizationSystemInstructions', e.target.value)}
+            onChange={(v) => onChange('summarizationSystemInstructions', v)}
             placeholder={t('summarizationSystemInstructionsPlaceholder')}
             disabled={form.memory === 'never'}
-            extraHeight={8}
           />
         </CollapsibleSection>
 
@@ -331,13 +322,11 @@ function OverridesSection({ form, onChange, characterId }) {
             />
           }
         >
-          <AutoResizeTextarea
-            className={`${inputClass} resize-none mt-2`}
+          <PromptTextarea
             value={form.summarizationUserInstructions}
-            onChange={(e) => onChange('summarizationUserInstructions', e.target.value)}
+            onChange={(v) => onChange('summarizationUserInstructions', v)}
             placeholder={t('summarizationUserInstructionsPlaceholder')}
             disabled={form.memory === 'never'}
-            extraHeight={8}
           />
         </CollapsibleSection>
       </div>
@@ -504,12 +493,10 @@ function OverridesSection({ form, onChange, characterId }) {
             <PromptBankButton onSelect={(content) => onChange('firstMessagePrompt', content)} />
           }
         >
-          <AutoResizeTextarea
-            className={`${inputClass} resize-none mt-2`}
+          <PromptTextarea
             value={form.firstMessagePrompt}
-            onChange={(e) => onChange('firstMessagePrompt', e.target.value)}
+            onChange={(v) => onChange('firstMessagePrompt', v)}
             placeholder={t('firstMessagePromptPlaceholder')}
-            extraHeight={8}
           />
         </CollapsibleSection>
 
@@ -536,12 +523,10 @@ function OverridesSection({ form, onChange, characterId }) {
             <PromptBankButton onSelect={(content) => onChange('continuePrompt', content)} />
           }
         >
-          <AutoResizeTextarea
-            className={`${inputClass} resize-none mt-2`}
+          <PromptTextarea
             value={form.continuePrompt}
-            onChange={(e) => onChange('continuePrompt', e.target.value)}
+            onChange={(v) => onChange('continuePrompt', v)}
             placeholder={t('continuePromptPlaceholder')}
-            extraHeight={8}
           />
         </CollapsibleSection>
       </div>

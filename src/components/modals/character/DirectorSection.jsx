@@ -1,13 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import CollapsibleSection from '../../shared/CollapsibleSection'
-import AutoResizeTextarea from '../../shared/AutoResizeTextarea'
+import PromptTextarea from '../../shared/PromptTextarea'
 import PromptBankButton from '../../shared/PromptBankButton'
 import { estimateTokens } from '../../../services/tokenEstimator'
 import { setUIState } from '../../../services/uiState'
-
-const inputClass =
-  'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
 
 const GROUPS = [
   {
@@ -170,13 +167,11 @@ function Group({ group, form, onChange, characterId, directorEnabled }) {
               />
             }
           >
-            <AutoResizeTextarea
-              className={`${inputClass} resize-none mt-2`}
+            <PromptTextarea
               value={systemInstructions}
-              onChange={(e) => onChange(group.systemInstructionsKey, e.target.value)}
+              onChange={(v) => onChange(group.systemInstructionsKey, v)}
               placeholder={t(group.systemInstructionsPlaceholderKey)}
               disabled={!groupEnabled}
-              extraHeight={8}
             />
           </CollapsibleSection>
         )}
@@ -194,13 +189,11 @@ function Group({ group, form, onChange, characterId, directorEnabled }) {
             <PromptBankButton onSelect={(content) => onChange(group.instructionsKey, content)} />
           }
         >
-          <AutoResizeTextarea
-            className={`${inputClass} resize-none mt-2`}
+          <PromptTextarea
             value={instructions}
-            onChange={(e) => onChange(group.instructionsKey, e.target.value)}
+            onChange={(v) => onChange(group.instructionsKey, v)}
             placeholder={t(group.placeholderKey)}
             disabled={!groupEnabled}
-            extraHeight={8}
           />
         </CollapsibleSection>
         {group.outputDirectorResponseKey && (

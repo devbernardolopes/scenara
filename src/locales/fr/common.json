@@ -128,6 +128,11 @@
   "saving": "Enregistrement…",
   "save": "Save",
   "cancel": "Cancel",
+  "clear": "Effacer",
+  "promptBank": {
+    "newPrompt": "Nouveau prompt",
+    "saveToBank": "Enregistrer dans la banque de prompts"
+  },
   "manage": "Manage",
   "confirm": "Confirmer",
   "confirmDefaultMessage": "Êtes-vous sûr ?",

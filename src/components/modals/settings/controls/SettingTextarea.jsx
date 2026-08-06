@@ -1,5 +1,6 @@
 import CollapsibleSection from '../../../shared/CollapsibleSection'
 import AutoResizeTextarea from '../../../shared/AutoResizeTextarea'
+import PromptTextarea from '../../../shared/PromptTextarea'
 import PromptBankButton from '../../../shared/PromptBankButton'
 import { estimateTokens } from '../../../../services/tokenEstimator'
 
@@ -25,15 +26,18 @@ function SettingTextarea({
   storageKey,
   promptBankEnabled,
 }) {
-  const content = (
-    <AutoResizeTextarea
-      value={value ?? ''}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm resize-y"
-      extraHeight={8}
-    />
-  )
+  const content =
+    collapsible && promptBankEnabled ? (
+      <PromptTextarea value={value} onChange={onChange} placeholder={placeholder} />
+    ) : (
+      <AutoResizeTextarea
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm resize-y"
+        extraHeight={8}
+      />
+    )
 
   const headerExtra = promptBankEnabled ? <PromptBankButton onSelect={onChange} /> : null
 

@@ -19,16 +19,16 @@ import { estimateTokens } from '../../services/tokenEstimator'
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
 
-function PromptBankFormModal({ promptBankEntry }) {
+function PromptBankFormModal({ promptBankEntry, initialValues }) {
   const { t } = useTranslation('settings')
   const { openModal, closeModal, setCloseGuard } = useModal()
   const { promptSave } = useSaveConfirm()
   const editing = Boolean(promptBankEntry)
 
   const initialRef = useRef({
-    name: promptBankEntry?.name || '',
-    kind: promptBankEntry?.kind || '',
-    content: promptBankEntry?.content || '',
+    name: promptBankEntry?.name ?? initialValues?.name ?? '',
+    kind: promptBankEntry?.kind ?? initialValues?.kind ?? '',
+    content: promptBankEntry?.content ?? initialValues?.content ?? '',
   })
 
   const [form, setForm] = useState({ ...initialRef.current })

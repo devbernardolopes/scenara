@@ -29,6 +29,14 @@ export const HORDE_PROMPT_TEMPLATES = {
 {{/history}}
 <|im_start|>assistant`,
 
+//   chatml: `<|im_start|>system
+// {{system}}<|im_end|>
+// {{#history}}
+// <|im_start|>{{role}}
+// {{content}}<|im_end|>
+// {{/history}}
+// <|im_start|>assistant`,
+
   metharme: `<|system|>{{system}}{{#history}}<|{{roleTag}}|>{{content}}{{/history}}<|model|>`,
 }
 
