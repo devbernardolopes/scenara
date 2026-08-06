@@ -95,6 +95,7 @@
   "tokens_one": "{{count}} token",
   "tokens_other": "{{count}} tokens",
   "apiDuration": "{{duration}}",
+  "queuePosition": "File d'attente : {{position}}",
   "words_one": "{{count}} mot",
   "words_other": "{{count}} mots",
   "edited": "(modifié)",

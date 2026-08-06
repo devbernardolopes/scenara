@@ -91,9 +91,40 @@ export function startGenerating(threadId) {
 export function stopGenerating(threadId) {
   const id = Number(threadId)
   generatingThreads.delete(id)
+  clearThreadHordeMeta(id)
   window.dispatchEvent(
     new CustomEvent('generating-state-changed', {
       detail: { threadId: id, generating: false },
+    }),
+  )
+}
+
+const hordeMeta = new Map()
+
+export function setThreadHordeMeta(threadId, meta) {
+  const id = Number(threadId)
+  if (!meta) return
+  const prev = hordeMeta.get(id) || {}
+  const next = { ...prev, ...meta }
+  hordeMeta.set(id, next)
+  window.dispatchEvent(
+    new CustomEvent('horde-meta-changed', {
+      detail: { threadId: id, meta: next },
+    }),
+  )
+}
+
+export function getThreadHordeMeta(threadId) {
+  const meta = hordeMeta.get(Number(threadId))
+  return meta ? { ...meta } : null
+}
+
+export function clearThreadHordeMeta(threadId) {
+  const id = Number(threadId)
+  if (!hordeMeta.delete(id)) return
+  window.dispatchEvent(
+    new CustomEvent('horde-meta-changed', {
+      detail: { threadId: id, meta: null },
     }),
   )
 }

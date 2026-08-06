@@ -1372,6 +1372,7 @@ export async function sendChatCompletion({
   onStreamingStarted,
   onActivity,
   onTiming,
+  onMeta,
   threadId = null,
   kind = null,
   charName,
@@ -1397,6 +1398,7 @@ export async function sendChatCompletion({
       onStreamingStarted,
       onActivity,
       onTiming,
+      onMeta,
       threadId,
       kind,
     })

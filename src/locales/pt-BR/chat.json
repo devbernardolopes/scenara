@@ -90,6 +90,7 @@
   "tokens_one": "{{count}} token",
   "tokens_other": "{{count}} tokens",
   "apiDuration": "{{duration}}",
+  "queuePosition": "Posição na fila: {{position}}",
   "words_one": "{{count}} palavra",
   "words_other": "{{count}} palavras",
   "edited": "(editado)",

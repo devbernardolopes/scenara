@@ -95,6 +95,7 @@
   "tokens_one": "{{count}} token",
   "tokens_other": "{{count}} token",
   "apiDuration": "{{duration}}",
+  "queuePosition": "Coda: {{position}}",
   "words_one": "{{count}} parola",
   "words_other": "{{count}} parole",
   "edited": "(modificato)",

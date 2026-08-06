@@ -52,6 +52,8 @@ import {
   clearStreamingSlotIndex,
   setStreamingStartTime,
   clearStreamingStartTime,
+  setThreadHordeMeta,
+  getThreadHordeMeta,
 } from '../services/generatingState'
 import { shouldAutoTitle, triggerAutoTitle } from '../services/autoTitle'
 import {
@@ -268,6 +270,7 @@ function ChatView() {
   const [pendingMarkers, setPendingMarkers] = useState([])
   const [streamingMsgId, setStreamingMsgId] = useState(null)
   const [streamingContent, setStreamingContent] = useState(null)
+  const [hordeMeta, setHordeMeta] = useState(() => getThreadHordeMeta(threadId))
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [noChatProfile, setNoChatProfile] = useState(false)
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
@@ -1052,6 +1055,17 @@ function ChatView() {
   }, [threadId])
 
   useEffect(() => {
+    setHordeMeta(getThreadHordeMeta(threadId))
+    function handleHordeMetaChange(e) {
+      if (Number(e.detail?.threadId) === Number(threadId)) {
+        setHordeMeta(getThreadHordeMeta(threadId))
+      }
+    }
+    window.addEventListener('horde-meta-changed', handleHordeMetaChange)
+    return () => window.removeEventListener('horde-meta-changed', handleHordeMetaChange)
+  }, [threadId])
+
+  useEffect(() => {
     if (!generating) return
     let cancelled = false
     const poll = async () => {
@@ -1340,6 +1354,7 @@ function ChatView() {
             showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
           }
         },
+        onMeta: (meta) => setThreadHordeMeta(threadId, meta),
         ctx,
       })
 
@@ -2125,6 +2140,7 @@ function ChatView() {
                 showToast(t('responseTruncated', { ns: 'chat' }), { type: 'warning' })
               }
             },
+            onMeta: (meta) => setThreadHordeMeta(threadId, meta),
             ctx,
             beforeDate,
             statusBlock: prevStatusBlock,
@@ -3088,6 +3104,7 @@ function ChatView() {
                         nameLabel={getMessageName(msg)}
                         streaming={msg.id === streamingMsgId}
                         streamingContent={msg.id === streamingMsgId ? streamingContent : null}
+                        streamingHordeMeta={msg.id === streamingMsgId ? hordeMeta : null}
                         streamingSlotIndex={streamingSlotIndices[msg.id]}
                         bundleMessages={bundleMessages}
                         bundleIndex={bundleIndex}

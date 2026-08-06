@@ -46,6 +46,7 @@ export async function runStatusBlockDirector({
   personaMap,
   signal,
   ctx,
+  onMeta,
   statusBlock: statusBlockOverride,
 }) {
   const config = getStatusBlockDirectorConfig(character)
@@ -127,6 +128,7 @@ export async function runStatusBlockDirector({
       assistantSpeaker: character?.speakerName || charName,
       personaMap,
       onActivity: ctx?.markActivity,
+      onMeta,
       onTiming: (ms) => {
         apiDurationMs = ms
       },

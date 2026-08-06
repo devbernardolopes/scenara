@@ -85,6 +85,7 @@ export async function generateChatResponse({
   signal,
   onToken,
   onFinish,
+  onMeta,
   ctx,
   beforeDate,
   statusBlock: statusBlockOverride,
@@ -194,6 +195,7 @@ export async function generateChatResponse({
     personaMap,
     onToken: directorConfig ? undefined : onToken,
     onFinish,
+    onMeta,
     onStreamingStarted: ctx?.markStreaming,
     onActivity: ctx?.markActivity,
     onTiming: (ms) => {
@@ -293,6 +295,7 @@ export async function generateChatResponse({
           assistantSpeaker,
           onToken,
           onFinish,
+          onMeta,
           onStreamingStarted: ctx?.markStreaming,
           onActivity: ctx?.markActivity,
           onTiming: (ms) => {
@@ -382,6 +385,7 @@ export async function generateChatResponse({
       personaMap,
       signal,
       ctx,
+      onMeta,
       statusBlock: payloadStatusBlock,
     })
     if (sbResult?.status === 'success') {

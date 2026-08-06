@@ -283,6 +283,7 @@ export async function sendHordeNativeCompletion({
   onStreamingStarted,
   onActivity,
   onTiming,
+  onMeta,
   threadId = null,
   kind = null,
   stopSequences = null,
@@ -340,8 +341,22 @@ export async function sendHordeNativeCompletion({
       throw new Error(extractErrorDetail(errBody) || `HTTP ${submitRes.status}`)
     }
 
-    const { id } = await submitRes.json()
+    const submitJson = await submitRes.json()
+    const { id } = submitJson
     if (!id) throw new Error('No job ID returned by Horde')
+
+    let lastMeta = {}
+    const reportMeta = (meta) => {
+      const next = { ...lastMeta, ...meta }
+      const changed =
+        next.message !== lastMeta.message || next.queuePosition !== lastMeta.queuePosition
+      if (!changed) return
+      lastMeta = next
+      onMeta?.(next)
+    }
+    if (submitJson.message?.trim()) {
+      reportMeta({ message: submitJson.message })
+    }
 
     while (true) {
       if (signal?.aborted) {
@@ -364,6 +379,13 @@ export async function sendHordeNativeCompletion({
 
       const json = await statusRes.json()
       responseBody = json
+
+      if (json.message?.trim()) {
+        reportMeta({ message: json.message })
+      }
+      if (json.queue_position != null) {
+        reportMeta({ queuePosition: json.queue_position })
+      }
 
       if (json.faulted) {
         throw new Error(json.generations?.[0]?.text || 'Generation faulted on Horde worker')
@@ -427,6 +449,7 @@ export async function sendHordeNativeChatCompletion({
   onStreamingStarted,
   onActivity,
   onTiming,
+  onMeta,
   threadId = null,
   kind = null,
 }) {
@@ -464,6 +487,7 @@ export async function sendHordeNativeChatCompletion({
       onStreamingStarted,
       onActivity,
       onTiming,
+      onMeta,
       threadId,
       kind,
       stopSequences,
@@ -519,6 +543,7 @@ export async function sendHordeNativeChatCompletion({
     onStreamingStarted,
     onActivity,
     onTiming,
+    onMeta,
     threadId,
     kind,
     stopSequences,

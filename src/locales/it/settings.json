@@ -449,6 +449,10 @@
     "renderMarkdown": {
       "label": "Renderizza Markdown",
       "desc": "Renderizza la formattazione Markdown nei messaggi di chat e nei titoli delle conversazioni."
+    },
+    "highlightLoreTriggers": {
+      "label": "Highlight Lorebook Triggers",
+      "desc": "Underline the words in chat messages that triggered a lorebook entry."
     }
   },
   "themeOptions": {

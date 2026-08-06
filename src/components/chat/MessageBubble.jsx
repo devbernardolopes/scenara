@@ -190,6 +190,7 @@ function MessageBubble({
   loreTriggerKeys,
   streamingSlotIndex,
   streamingContent,
+  streamingHordeMeta,
   currentOrigin,
   onBundleNavigate,
   onDeleteRequest,
@@ -1096,7 +1097,25 @@ function MessageBubble({
                 <p className="mb-2 last:mb-0 whitespace-pre-wrap">{displayContent}</p>
               )}
               {streaming && (!hasMultipleSlots || bundleIndex === streamingSlotIndex) && (
-                <RefreshCw className="inline-block w-4 h-4 text-primary animate-spin ml-0.5 align-text-bottom" />
+                <>
+                  <RefreshCw className="inline-block w-4 h-4 text-primary animate-spin ml-0.5 align-text-bottom" />
+                  {streamingHordeMeta &&
+                    (streamingHordeMeta.message || streamingHordeMeta.queuePosition != null) && (
+                      <span
+                        className="ml-1.5 inline-block align-text-bottom text-xs italic text-tertiary select-none cursor-default"
+                        onDoubleClick={(e) => e.stopPropagation()}
+                      >
+                        {[
+                          streamingHordeMeta.message,
+                          streamingHordeMeta.queuePosition != null
+                            ? t('queuePosition', { position: streamingHordeMeta.queuePosition })
+                            : null,
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </span>
+                    )}
+                </>
               )}
             </div>
           )}
