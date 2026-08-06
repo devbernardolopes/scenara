@@ -2403,6 +2403,7 @@ function ChatView() {
 
     let messageSystem = ''
     let messageUser = ''
+    let apiMessages = null
     if (entry?.promptData) {
       try {
         const parsed = JSON.parse(entry.promptData)
@@ -2428,7 +2429,7 @@ function ChatView() {
       const isThreadStart =
         currentMsgs.filter((m) => isRealMessage(m) && !isMessageHidden(m)).length === 0
       const isFirstMessage = isThreadStart && freshCharacter?.firstMessage
-      const { payload } = await buildChatRequestPayload({
+      const { payload, messages } = await buildChatRequestPayload({
         character: freshCharacter,
         chatPersona,
         currentPersona,
@@ -2441,6 +2442,7 @@ function ChatView() {
         beforeDate,
         statusBlock: statusBlockOverride,
       })
+      apiMessages = messages
       const freshSystem = payload.find((m) => m.role === 'system')?.content || ''
       const freshUser = payload.find((m) => m.role === 'user')?.content || ''
       if (freshSystem) messageSystem = freshSystem
@@ -2472,6 +2474,7 @@ function ChatView() {
               message: entry.content || msg.content || '',
               messageSystem,
               messageUser,
+              messages: apiMessages,
               personaMap,
               signal: sbAbortController.signal,
               ctx,
