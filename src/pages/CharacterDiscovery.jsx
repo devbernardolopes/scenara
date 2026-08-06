@@ -175,7 +175,7 @@ function CharacterPortraitImage({ src, alt }) {
   if (isExternalImageUrl(src) && !online) {
     return (
       <span className="flex items-center justify-center w-full text-4xl leading-none">
-      {/* <span className="flex items-center justify-center w-full h-full text-4xl leading-none"> */}
+        {/* <span className="flex items-center justify-center w-full h-full text-4xl leading-none"> */}
         {'👤'}
       </span>
     )
@@ -183,7 +183,7 @@ function CharacterPortraitImage({ src, alt }) {
   if (!isViewableImage(src)) {
     return (
       <span className="flex items-center justify-center w-full text-4xl leading-none">
-      {/* <span className="flex items-center justify-center w-full h-full text-4xl leading-none"> */}
+        {/* <span className="flex items-center justify-center w-full h-full text-4xl leading-none"> */}
         {src || '👤'}
       </span>
     )
@@ -220,6 +220,7 @@ function CharacterDiscovery() {
   const [tagsMap, setTagsMap] = useState(new Map())
   const [cardSize, setCardSize] = useState('regular')
   const suppressNextReloadRef = useRef(false)
+  const scrollRef = useRef(null)
 
   const filteredCharacters = useMemo(() => {
     const q = searchQuery.toLowerCase().trim()
@@ -374,6 +375,11 @@ function CharacterDiscovery() {
   const persistSearchQuery = useCallback((val) => {
     setSearchQuery(val)
     setUIState('discovery.searchQuery', val)
+  }, [])
+
+  const handlePageChange = useCallback((page) => {
+    setCurrentPage(page)
+    scrollRef.current?.scrollTo({ top: 0 })
   }, [])
 
   async function handleEditCharacter(character) {
@@ -582,7 +588,10 @@ function CharacterDiscovery() {
         </CollapsibleSection>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 md:px-8 pt-1 pb-4 bg-gradient-surface-radial">
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto px-4 md:px-8 pt-1 pb-4 bg-gradient-surface-radial"
+      >
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-secondary text-sm">{t('loading')}</p>
@@ -723,7 +732,7 @@ function CharacterDiscovery() {
           <Pagination
             currentPage={safePage}
             totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPageChange={handlePageChange}
           />
         </div>
       ) : (
