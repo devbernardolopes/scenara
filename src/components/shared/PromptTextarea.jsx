@@ -20,7 +20,7 @@ function PromptTextarea({ value, onChange, placeholder, disabled, extraHeight = 
   return (
     <div className="relative mt-2">
       <AutoResizeTextarea
-        className={`${inputClass} resize-none pr-40 min-h-[128px]`}
+        className={`${inputClass} resize-none pr-12 min-h-[128px]`}
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
@@ -42,11 +42,11 @@ function PromptTextarea({ value, onChange, placeholder, disabled, extraHeight = 
           type="button"
           onClick={handleSaveToBank}
           disabled={!hasContent}
-          className="min-h-[32px] px-2 flex items-center gap-1 rounded-md bg-surface text-secondary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-xs"
+          className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded-md bg-surface text-secondary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          aria-label={t('promptBank.saveToBank')}
           title={t('promptBank.saveToBank')}
         >
-          <Save className="w-3.5 h-3.5" />
-          <span>{t('promptBank.saveToBank')}</span>
+          <Save className="w-4 h-4" />
         </button>
       </div>
     </div>
