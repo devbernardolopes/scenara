@@ -126,6 +126,11 @@
       "message": "Are you sure you want to duplicate {{name}}?",
       "confirm": "Duplicate"
     },
+    "confirmUnfavorite": {
+      "title": "Unfavorite Character",
+      "message": "Are you sure you want to unfavorite {{name}}?",
+      "confirm": "Unfavorite"
+    },
     "folders": {
       "all": "All",
       "manage": "Manage folders",

@@ -109,6 +109,11 @@
       "message": "Tem certeza que deseja duplicar {{name}}?",
       "confirm": "Duplicar"
     },
+    "confirmUnfavorite": {
+      "title": "Desfavoritar Personagem",
+      "message": "Tem certeza que deseja desfavoritar {{name}}?",
+      "confirm": "Desfavoritar"
+    },
     "folders": {
       "all": "Todas",
       "manage": "Gerenciar pastas",

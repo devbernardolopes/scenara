@@ -126,6 +126,11 @@
       "message": "Voulez-vous vraiment dupliquer {{name}} ?",
       "confirm": "Dupliquer"
     },
+    "confirmUnfavorite": {
+      "title": "Retirer des favoris",
+      "message": "Voulez-vous vraiment retirer {{name}} des favoris ?",
+      "confirm": "Retirer"
+    },
     "folders": {
       "all": "Tous",
       "manage": "Gérer les dossiers",

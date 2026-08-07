@@ -564,6 +564,15 @@ function CharacterDiscovery() {
   }
 
   async function handleFavorite(character) {
+    if (character.isFavorite) {
+      const ok = await confirm({
+        title: t('discovery.confirmUnfavorite.title'),
+        message: t('discovery.confirmUnfavorite.message', { name: character.name }),
+        confirmLabel: t('discovery.confirmUnfavorite.confirm'),
+        cancelLabel: t('cancel'),
+      })
+      if (!ok) return
+    }
     await updateCharacter(character.id, { isFavorite: !character.isFavorite })
   }
 

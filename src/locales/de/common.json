@@ -126,6 +126,11 @@
       "message": "Möchtest du {{name}} wirklich duplizieren?",
       "confirm": "Duplizieren"
     },
+    "confirmUnfavorite": {
+      "title": "Charakter nicht mehr zu Favoriten",
+      "message": "Möchtest du {{name}} wirklich aus den Favoriten entfernen?",
+      "confirm": "Entfernen"
+    },
     "folders": {
       "all": "Alle",
       "manage": "Ordner verwalten",
