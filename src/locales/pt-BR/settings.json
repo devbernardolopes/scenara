@@ -1113,6 +1113,7 @@
   },
   "versionLabel": "Versão",
   "languageOptions": {
+    "system": "Padrão do Sistema",
     "en": "English",
     "pt-BR": "Português (Brasil)",
     "fr": "Français",

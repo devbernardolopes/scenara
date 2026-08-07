@@ -1699,6 +1699,7 @@
   },
   "versionLabel": "Versión",
   "languageOptions": {
+    "system": "Predeterminado del sistema",
     "en": "English",
     "pt-BR": "Português (Brasil)",
     "fr": "Français",

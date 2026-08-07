@@ -1,4 +1,4 @@
-import i18n from '../lib/i18n'
+import i18n, { resolveLanguage } from '../lib/i18n'
 import db from '../db'
 import { COLOR_SLOTS, getPalette } from '../config/colorPalettes'
 import { DEFAULT_PP_RULES } from '../lib/postProcessing'
@@ -219,11 +219,12 @@ export const SETTINGS = [
     category: 'appearance',
     group: 'interface',
     type: 'select',
-    default: 'en',
-    options: ['en', 'pt-BR', 'fr', 'it', 'de', 'es'],
+    default: 'system',
+    options: ['system', 'en', 'pt-BR', 'fr', 'it', 'de', 'es'],
     labelKey: 'settings:appearance.language.label',
     descKey: 'settings:appearance.language.desc',
     optionLabels: {
+      system: 'settings:languageOptions.system',
       en: 'settings:languageOptions.en',
       'pt-BR': 'settings:languageOptions.pt-BR',
       fr: 'settings:languageOptions.fr',
@@ -1895,7 +1896,7 @@ const SETTING_EFFECTS = {
     applyThemeClass(value)
     migrateColorsOnThemeChange(value)
   },
-  language: (value) => i18n.changeLanguage(value),
+  language: (value) => i18n.changeLanguage(resolveLanguage(value)),
   highlightDeleteButtons: (value) => {
     document.documentElement.classList.toggle('show-delete-highlight', !!value)
   },

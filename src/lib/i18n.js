@@ -91,4 +91,26 @@ i18n.use(initReactI18next).init({
   },
 })
 
+const SUPPORTED_BASE = ['en', 'fr', 'it', 'de', 'es']
+
+export function resolveSystemLocale() {
+  if (typeof navigator === 'undefined') return 'en'
+  const tags = navigator.languages?.length ? navigator.languages : [navigator.language]
+  for (const tag of tags) {
+    const norm = String(tag || '')
+      .replace('_', '-')
+      .toLowerCase()
+    if (norm === 'pt-br') return 'pt-BR'
+    if (SUPPORTED_BASE.includes(norm)) return norm
+    if (norm.startsWith('pt-')) return 'pt-BR'
+    if (norm.startsWith('en-')) return 'en'
+  }
+  return 'en'
+}
+
+export function resolveLanguage(pref) {
+  if (pref === 'system') return resolveSystemLocale()
+  return pref || 'en'
+}
+
 export default i18n

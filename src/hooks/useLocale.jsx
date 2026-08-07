@@ -1,21 +1,28 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { getSetting, setSetting, applySettingEffect } from '../services/settings'
+import { resolveLanguage } from '../lib/i18n'
 
 const LocaleContext = createContext(null)
 
 export function LocaleProvider({ children }) {
   const [locale, setLocaleState] = useState('en')
 
-  useEffect(() => {
+  const applyStoredLocale = useCallback(() => {
     getSetting('language').then((val) => {
-      const resolved = val || 'en'
+      const resolved = resolveLanguage(val)
       setLocaleState(resolved)
       applySettingEffect('language', resolved)
     })
   }, [])
 
+  useEffect(() => {
+    applyStoredLocale()
+    window.addEventListener('languagechange', applyStoredLocale)
+    return () => window.removeEventListener('languagechange', applyStoredLocale)
+  }, [applyStoredLocale])
+
   const setLocale = useCallback((val) => {
-    setLocaleState(val)
+    setLocaleState(resolveLanguage(val))
     setSetting('language', val)
   }, [])
 
