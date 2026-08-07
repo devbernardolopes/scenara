@@ -689,6 +689,12 @@ function CharacterDiscovery() {
           openPersonaFor={openPersonaFor}
           onTogglePersona={(id) => setOpenPersonaFor((prev) => (prev === id ? null : id))}
           onClosePersona={() => setOpenPersonaFor(null)}
+          folders={folders}
+          onFavorite={handleFavorite}
+          onMoveToFolder={handleAssignFolder}
+          onDuplicate={handleDuplicate}
+          onExport={handleExport}
+          onDelete={handleDelete}
         />
         {loading ? (
           <div className="flex items-center justify-center h-full">

@@ -1,7 +1,100 @@
+import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isViewableImage } from '../../lib/image'
-import { Heart } from '../../lib/icons'
+import { Heart, MoreHorizontal } from '../../lib/icons'
 import StartChatButton from './StartChatButton'
+import CharacterActionsMenu from './CharacterActionsMenu'
+
+function ShelfItem({
+  char,
+  folders,
+  onSelect,
+  onToggleFavorite,
+  onStart,
+  openPersonaFor,
+  onTogglePersona,
+  onClosePersona,
+  onFavorite,
+  onMoveToFolder,
+  onDuplicate,
+  onExport,
+  onDelete,
+}) {
+  const { t } = useTranslation('common')
+  const anchorRef = useRef(null)
+  const [moreOpen, setMoreOpen] = useState(false)
+
+  return (
+    <div className="shrink-0 w-36 flex flex-col items-center">
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => onSelect(char)}
+          className="w-16 h-16 rounded-full overflow-hidden bg-surface-secondary flex items-center justify-center"
+          aria-label={t('sidebar.editCharacter')}
+          title={char.displayName || char.name}
+        >
+          {char.avatar && isViewableImage(char.avatar) ? (
+            <img
+              src={char.avatar}
+              alt={char.displayName || char.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-xl">{char.avatar || '👤'}</span>
+          )}
+        </button>
+        <button
+          ref={anchorRef}
+          type="button"
+          onClick={() => setMoreOpen((prev) => !prev)}
+          className="absolute -top-1 -left-1 size-8 flex items-center justify-center rounded-full bg-glass border-glass text-secondary hover:text-text shadow-surface-sm"
+          aria-label={t('discovery.actions.moreOptions')}
+          title={t('discovery.actions.moreOptions')}
+        >
+          <MoreHorizontal className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => onToggleFavorite(char)}
+          className="absolute -top-1 -right-1 size-8 flex items-center justify-center rounded-full bg-glass border-glass text-favorite hover:text-delete shadow-surface-sm"
+          aria-label={t('discovery.actions.unfavorite')}
+          title={t('discovery.actions.unfavorite')}
+        >
+          <Heart className="w-4 h-4 fill-current" />
+        </button>
+      </div>
+      <button
+        type="button"
+        onClick={() => onSelect(char)}
+        className="text-xs text-text truncate w-full mt-1 text-center"
+      >
+        {char.displayName || char.name}
+      </button>
+      <div className="mt-1.5 w-full">
+        <StartChatButton
+          character={char}
+          onStart={onStart}
+          open={openPersonaFor === char.id}
+          onToggle={() => onTogglePersona(char.id)}
+          onClose={onClosePersona}
+        />
+      </div>
+      <CharacterActionsMenu
+        open={moreOpen}
+        onClose={() => setMoreOpen(false)}
+        anchorRef={anchorRef}
+        character={char}
+        folders={folders}
+        onFavorite={onFavorite}
+        onMoveToFolder={(folderId) => onMoveToFolder(char, folderId)}
+        onDuplicate={onDuplicate}
+        onExport={onExport}
+        onDelete={onDelete}
+      />
+    </div>
+  )
+}
 
 function FavoritesShelf({
   characters,
@@ -11,6 +104,12 @@ function FavoritesShelf({
   openPersonaFor,
   onTogglePersona,
   onClosePersona,
+  folders,
+  onFavorite,
+  onMoveToFolder,
+  onDuplicate,
+  onExport,
+  onDelete,
 }) {
   const { t } = useTranslation('common')
   if (characters.length === 0) return null
@@ -24,52 +123,22 @@ function FavoritesShelf({
       </div>
       <div className="flex gap-3 overflow-x-auto pb-1">
         {characters.map((char) => (
-          <div key={char.id} className="shrink-0 w-36 flex flex-col items-center">
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => onSelect(char)}
-                className="w-16 h-16 rounded-full overflow-hidden bg-surface-secondary flex items-center justify-center"
-                aria-label={t('sidebar.editCharacter')}
-                title={char.displayName || char.name}
-              >
-                {char.avatar && isViewableImage(char.avatar) ? (
-                  <img
-                    src={char.avatar}
-                    alt={char.displayName || char.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-xl">{char.avatar || '👤'}</span>
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => onToggleFavorite(char)}
-                className="absolute -top-1 -right-1 size-8 flex items-center justify-center rounded-full bg-glass border-glass text-favorite hover:text-delete shadow-surface-sm"
-                aria-label={t('discovery.actions.unfavorite')}
-                title={t('discovery.actions.unfavorite')}
-              >
-                <Heart className="w-4 h-4 fill-current" />
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => onSelect(char)}
-              className="text-xs text-text truncate w-full mt-1 text-center"
-            >
-              {char.displayName || char.name}
-            </button>
-            <div className="mt-1.5 w-full">
-              <StartChatButton
-                character={char}
-                onStart={onStart}
-                open={openPersonaFor === char.id}
-                onToggle={() => onTogglePersona(char.id)}
-                onClose={onClosePersona}
-              />
-            </div>
-          </div>
+          <ShelfItem
+            key={char.id}
+            char={char}
+            folders={folders}
+            onSelect={onSelect}
+            onToggleFavorite={onToggleFavorite}
+            onStart={onStart}
+            openPersonaFor={openPersonaFor}
+            onTogglePersona={onTogglePersona}
+            onClosePersona={onClosePersona}
+            onFavorite={onFavorite}
+            onMoveToFolder={onMoveToFolder}
+            onDuplicate={onDuplicate}
+            onExport={onExport}
+            onDelete={onDelete}
+          />
         ))}
       </div>
     </div>
