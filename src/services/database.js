@@ -1,5 +1,6 @@
 import db from '../db'
-import { SETTINGS, applySettingEffect } from './settings'
+import { SETTINGS, setSetting, applySettingEffect } from './settings'
+import { resolveSystemTheme } from '../lib/systemTheme'
 import { getUIState } from './uiState'
 
 export async function exportDatabase(selection) {
@@ -375,7 +376,7 @@ export async function resetSettings() {
   }
   await db.settings.bulkAdd(apiKeyEntries)
 
-  applySettingEffect('theme', SETTINGS.find((s) => s.key === 'theme').default)
+  await setSetting('theme', resolveSystemTheme())
   applySettingEffect('language', SETTINGS.find((s) => s.key === 'language').default)
 
   window.dispatchEvent(new CustomEvent('settings-changed', { detail: { action: 'reset' } }))
@@ -403,7 +404,7 @@ export async function resetDatabase() {
     await db.settings.add({ key: setting.key, value: setting.default })
   }
 
-  applySettingEffect('theme', SETTINGS.find((s) => s.key === 'theme').default)
+  await setSetting('theme', resolveSystemTheme())
   applySettingEffect('language', SETTINGS.find((s) => s.key === 'language').default)
 
   const now = new Date()

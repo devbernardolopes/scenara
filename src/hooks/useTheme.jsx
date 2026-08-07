@@ -1,5 +1,10 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { getSetting, setSetting, applySettingEffect } from '../services/settings'
+import {
+  resolveThemeSetting,
+  getSetting,
+  setSetting,
+  applySettingEffect,
+} from '../services/settings'
 
 const ThemeContext = createContext(null)
 
@@ -7,8 +12,7 @@ export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState('light')
 
   useEffect(() => {
-    getSetting('theme').then((val) => {
-      const resolved = val || 'light'
+    resolveThemeSetting().then((resolved) => {
       setThemeState(resolved)
       applySettingEffect('theme', resolved)
     })

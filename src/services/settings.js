@@ -2,6 +2,7 @@ import i18n, { resolveLanguage } from '../lib/i18n'
 import db from '../db'
 import { COLOR_SLOTS, getPalette } from '../config/colorPalettes'
 import { DEFAULT_PP_RULES } from '../lib/postProcessing'
+import { resolveSystemTheme } from '../lib/systemTheme'
 
 export const DEFAULT_PERSONAS_HISTORY_TEMPLATE = `Personas in this conversation:\n{{personas_entries}}`
 export const DEFAULT_PERSONAS_HISTORY_ENTRY_TEMPLATE = '- {{name}}: {{description}}'
@@ -39,6 +40,14 @@ function applyThemeClass(theme) {
 
 export function applySettingEffect(key, value) {
   SETTING_EFFECTS[key]?.(value)
+}
+
+export async function resolveThemeSetting() {
+  const existing = await db.settings.where('key').equals('theme').first()
+  if (existing) return existing.value
+  const resolved = resolveSystemTheme()
+  await setSetting('theme', resolved)
+  return resolved
 }
 
 export const CATEGORIES = [
