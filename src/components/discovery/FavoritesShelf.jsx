@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isViewableImage } from '../../lib/image'
 import { Heart, MoreHorizontal } from '../../lib/icons'
@@ -14,6 +14,9 @@ function ShelfItem({
   openPersonaFor,
   onTogglePersona,
   onClosePersona,
+  openMore,
+  onToggleMore,
+  onCloseMore,
   onFavorite,
   onMoveToFolder,
   onDuplicate,
@@ -22,7 +25,6 @@ function ShelfItem({
 }) {
   const { t } = useTranslation('common')
   const anchorRef = useRef(null)
-  const [moreOpen, setMoreOpen] = useState(false)
 
   return (
     <div className="shrink-0 w-36 flex flex-col items-center">
@@ -47,7 +49,7 @@ function ShelfItem({
         <button
           ref={anchorRef}
           type="button"
-          onClick={() => setMoreOpen((prev) => !prev)}
+          onClick={() => onToggleMore(char.id)}
           className="absolute -top-1 -left-1 size-8 flex items-center justify-center rounded-full bg-glass border-glass text-secondary hover:text-text shadow-surface-sm"
           aria-label={t('discovery.actions.moreOptions')}
           title={t('discovery.actions.moreOptions')}
@@ -81,8 +83,8 @@ function ShelfItem({
         />
       </div>
       <CharacterActionsMenu
-        open={moreOpen}
-        onClose={() => setMoreOpen(false)}
+        open={openMore === char.id}
+        onClose={onCloseMore}
         anchorRef={anchorRef}
         character={char}
         folders={folders}
@@ -104,6 +106,9 @@ function FavoritesShelf({
   openPersonaFor,
   onTogglePersona,
   onClosePersona,
+  openMore,
+  onToggleMore,
+  onCloseMore,
   folders,
   onFavorite,
   onMoveToFolder,
@@ -133,6 +138,9 @@ function FavoritesShelf({
             openPersonaFor={openPersonaFor}
             onTogglePersona={onTogglePersona}
             onClosePersona={onClosePersona}
+            openMore={openMore}
+            onToggleMore={onToggleMore}
+            onCloseMore={onCloseMore}
             onFavorite={onFavorite}
             onMoveToFolder={onMoveToFolder}
             onDuplicate={onDuplicate}

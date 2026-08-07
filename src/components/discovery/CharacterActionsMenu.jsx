@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Heart, FolderPlus, Copy, Download, Trash2 } from '../../lib/icons'
 
 const PANEL_WIDTH = 224
+const PANEL_HEIGHT_ESTIMATE = 288
 const GAP = 8
 const MARGIN = 8
 
@@ -32,13 +33,13 @@ function CharacterActionsMenu({
   useEffect(() => {
     if (!open) return
     function handleMousedown(e) {
-      if (ref.current && !ref.current.contains(e.target)) {
-        onCloseRef.current()
-      }
+      if (ref.current && ref.current.contains(e.target)) return
+      if (anchorRef && anchorRef.current && anchorRef.current.contains(e.target)) return
+      onCloseRef.current()
     }
     document.addEventListener('mousedown', handleMousedown)
     return () => document.removeEventListener('mousedown', handleMousedown)
-  }, [open])
+  }, [anchorRef, open])
 
   useEffect(() => {
     if (!open) return
@@ -60,12 +61,13 @@ function CharacterActionsMenu({
       const rect = el.getBoundingClientRect()
       let left = rect.right - PANEL_WIDTH
       left = Math.max(MARGIN, Math.min(left, window.innerWidth - PANEL_WIDTH - MARGIN))
-      let top = rect.top - GAP
-      let above = true
-      if (top < MARGIN) {
-        top = rect.bottom + GAP
-        above = false
+      let top = rect.bottom + GAP
+      let above = false
+      if (top + PANEL_HEIGHT_ESTIMATE > window.innerHeight - MARGIN) {
+        top = rect.top - GAP
+        above = true
       }
+      top = Math.max(MARGIN, top)
       setCoords({ left, top, above })
     }
     compute()

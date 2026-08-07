@@ -251,7 +251,7 @@ function CharacterDiscovery() {
   const [folders, setFolders] = useState([])
   const [activeFolderId, setActiveFolderId] = useState('all')
   const [folderPickerFor, setFolderPickerFor] = useState(null)
-  const [actionsMenuFor, setActionsMenuFor] = useState(null)
+  const [moreMenuFor, setMoreMenuFor] = useState(null)
   const [cardSize, setCardSize] = useState('regular')
   const suppressNextReloadRef = useRef(false)
   const scrollRef = useRef(null)
@@ -591,6 +591,24 @@ function CharacterDiscovery() {
     )
   }
 
+  const togglePersonaFor = useCallback((id) => {
+    setOpenPersonaFor((prev) => (prev === id ? null : id))
+    setMoreMenuFor(null)
+    setFolderPickerFor(null)
+  }, [])
+
+  const toggleMoreMenuFor = useCallback((id) => {
+    setMoreMenuFor((prev) => (prev === id ? null : id))
+    setOpenPersonaFor(null)
+    setFolderPickerFor(null)
+  }, [])
+
+  const toggleFolderPickerFor = useCallback((id) => {
+    setFolderPickerFor((prev) => (prev === id ? null : id))
+    setOpenPersonaFor(null)
+    setMoreMenuFor(null)
+  }, [])
+
   const filterControl = (
     <div className="flex flex-col sm:flex-row sm:items-center gap-3">
       <div className="flex items-center gap-2">
@@ -687,8 +705,11 @@ function CharacterDiscovery() {
           onToggleFavorite={handleFavorite}
           onStart={handleSelectCharacter}
           openPersonaFor={openPersonaFor}
-          onTogglePersona={(id) => setOpenPersonaFor((prev) => (prev === id ? null : id))}
+          onTogglePersona={togglePersonaFor}
           onClosePersona={() => setOpenPersonaFor(null)}
+          openMore={moreMenuFor}
+          onToggleMore={toggleMoreMenuFor}
+          onCloseMore={() => setMoreMenuFor(null)}
           folders={folders}
           onFavorite={handleFavorite}
           onMoveToFolder={handleAssignFolder}
@@ -802,20 +823,16 @@ function CharacterDiscovery() {
                               character={char}
                               onStart={handleSelectCharacter}
                               open={openPersonaFor === char.id}
-                              onToggle={() =>
-                                setOpenPersonaFor((prev) => (prev === char.id ? null : char.id))
-                              }
+                              onToggle={() => togglePersonaFor(char.id)}
                               onClose={() => setOpenPersonaFor(null)}
                             />
                           </div>
                           <ActionsMenuButton
                             character={char}
                             folders={folders}
-                            open={actionsMenuFor === char.id}
-                            onToggle={() =>
-                              setActionsMenuFor((prev) => (prev === char.id ? null : char.id))
-                            }
-                            onClose={() => setActionsMenuFor(null)}
+                            open={moreMenuFor === char.id}
+                            onToggle={() => toggleMoreMenuFor(char.id)}
+                            onClose={() => setMoreMenuFor(null)}
                             onFavorite={handleFavorite}
                             onMoveToFolder={(folderId) => handleAssignFolder(char, folderId)}
                             onDuplicate={handleDuplicate}
@@ -854,9 +871,7 @@ function CharacterDiscovery() {
                             character={char}
                             folders={folders}
                             open={folderPickerFor === char.id}
-                            onToggle={() =>
-                              setFolderPickerFor((prev) => (prev === char.id ? null : char.id))
-                            }
+                            onToggle={() => toggleFolderPickerFor(char.id)}
                             onClose={() => setFolderPickerFor(null)}
                             onSelect={(folderId) => handleAssignFolder(char, folderId)}
                           />
@@ -865,9 +880,7 @@ function CharacterDiscovery() {
                           character={char}
                           onStart={handleSelectCharacter}
                           open={openPersonaFor === char.id}
-                          onToggle={() =>
-                            setOpenPersonaFor((prev) => (prev === char.id ? null : char.id))
-                          }
+                          onToggle={() => togglePersonaFor(char.id)}
                           onClose={() => setOpenPersonaFor(null)}
                         />
                       </>
