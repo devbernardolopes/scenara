@@ -12,6 +12,7 @@ import './lib/i18n'
 import './index.css'
 import { addLog } from './services/logs'
 import { seedBuiltInEntries } from './services/promptBank'
+import { seedBuiltInFolders } from './services/folders'
 import { migrateSettingsKeys } from './services/settings'
 
 import CharacterCreateModal from './components/modals/CharacterCreateModal'
@@ -155,4 +156,5 @@ createRoot(document.getElementById('root')).render(
 )
 
 seedBuiltInEntries()
+seedBuiltInFolders()
 migrateSettingsKeys()

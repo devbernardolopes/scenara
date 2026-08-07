@@ -381,7 +381,13 @@
       "confirm": "Supprimer"
     },
     "duplicate": "Le dossier « {{name}} » existe déjà",
-    "emptyName": "Le nom du dossier ne peut pas être vide"
+    "emptyName": "Le nom du dossier ne peut pas être vide",
+    "builtIn": {
+      "assistants": "Assistants",
+      "characters": "Personnages",
+      "scenarios": "Scénarios",
+      "trivias": "Curiosités"
+    }
   },
   "localInference": {
     "placeholder": "Les paramètres d'inférence locale seront disponibles ici."

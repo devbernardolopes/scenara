@@ -1,6 +1,39 @@
 import db from '../db'
 import { showToast } from '../lib/toast'
-import i18n from '../lib/i18n'
+import i18n, { resolveLanguage } from '../lib/i18n'
+import { getSetting } from './settings'
+import { getUIState, setUIState } from './uiState'
+
+const BUILT_IN_SEED_KEY = 'builtInFoldersSeeded'
+const BUILT_IN_FOLDER_KEYS = [
+  'folders.builtIn.assistants',
+  'folders.builtIn.characters',
+  'folders.builtIn.scenarios',
+  'folders.builtIn.trivias',
+]
+
+export async function seedBuiltInFolders() {
+  const seeded = await getUIState(BUILT_IN_SEED_KEY)
+  if (seeded) return
+  const [characterCount, threadCount, folderCount] = await Promise.all([
+    db.characters.count(),
+    db.threads.count(),
+    db.folders.count(),
+  ])
+  if (characterCount > 0 || threadCount > 0 || folderCount > 0) return
+
+  const lang = resolveLanguage(await getSetting('language'))
+  const now = new Date()
+  await db.folders.bulkAdd(
+    BUILT_IN_FOLDER_KEYS.map((key, index) => ({
+      name: i18n.t(key, { lng: lang }),
+      order: index,
+      createdAt: now,
+    })),
+  )
+  await setUIState(BUILT_IN_SEED_KEY, true)
+  window.dispatchEvent(new CustomEvent('folders-changed'))
+}
 
 export async function getAllFolders() {
   return db.folders.orderBy('order').toArray()

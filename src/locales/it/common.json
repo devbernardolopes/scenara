@@ -381,7 +381,13 @@
       "confirm": "Elimina"
     },
     "duplicate": "La cartella « {{name}} » esiste già",
-    "emptyName": "Il nome della cartella non può essere vuoto"
+    "emptyName": "Il nome della cartella non può essere vuoto",
+    "builtIn": {
+      "assistants": "Assistenti",
+      "characters": "Personaggi",
+      "scenarios": "Scenari",
+      "trivias": "Trivia"
+    }
   },
   "localInference": {
     "placeholder": "Le impostazioni di inferenza locale saranno disponibili qui."

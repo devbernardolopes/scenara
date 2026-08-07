@@ -2,6 +2,7 @@ import db from '../db'
 import { SETTINGS, setSetting, applySettingEffect } from './settings'
 import { resolveSystemTheme } from '../lib/systemTheme'
 import { getUIState } from './uiState'
+import { seedBuiltInFolders } from './folders'
 
 export async function exportDatabase(selection) {
   const data = {
@@ -399,6 +400,7 @@ export async function resetDatabase() {
   await db.lorebooks.clear()
   await db.lorebookEntries.clear()
   await db.cloudServices.clear()
+  await db.folders.clear()
 
   for (const setting of SETTINGS) {
     await db.settings.add({ key: setting.key, value: setting.default })
@@ -421,6 +423,8 @@ export async function resetDatabase() {
   })
 
   await db.settings.add({ key: 'defaultPersonaId', value: personaId })
+
+  await seedBuiltInFolders()
 
   window.dispatchEvent(new CustomEvent('settings-changed', { detail: { key: 'defaultPersonaId' } }))
   window.dispatchEvent(new CustomEvent('personas-changed', { detail: { action: 'reset' } }))

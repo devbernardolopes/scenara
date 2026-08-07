@@ -329,7 +329,13 @@
       "confirm": "Excluir"
     },
     "duplicate": "Pasta \"{{name}}\" já existe",
-    "emptyName": "O nome da pasta não pode estar vazio"
+    "emptyName": "O nome da pasta não pode estar vazio",
+    "builtIn": {
+      "assistants": "Assistentes",
+      "characters": "Personagens",
+      "scenarios": "Cenários",
+      "trivias": "Curiosidades"
+    }
   },
   "localInference": {
     "placeholder": "As configurações de inferência local estarão disponíveis aqui."

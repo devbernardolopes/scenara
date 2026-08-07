@@ -381,7 +381,13 @@
       "confirm": "Löschen"
     },
     "duplicate": "Ordner „{{name}}\" existiert bereits",
-    "emptyName": "Ordnername darf nicht leer sein"
+    "emptyName": "Ordnername darf nicht leer sein",
+    "builtIn": {
+      "assistants": "Assistenten",
+      "characters": "Charaktere",
+      "scenarios": "Szenarien",
+      "trivias": "Trivia"
+    }
   },
   "localInference": {
     "placeholder": "Lokale Inferenzeinstellungen werden hier verfügbar sein."

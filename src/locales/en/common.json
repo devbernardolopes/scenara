@@ -381,7 +381,13 @@
       "confirm": "Delete"
     },
     "duplicate": "Folder \"{{name}}\" already exists",
-    "emptyName": "Folder name cannot be empty"
+    "emptyName": "Folder name cannot be empty",
+    "builtIn": {
+      "assistants": "Assistants",
+      "characters": "Characters",
+      "scenarios": "Scenarios",
+      "trivias": "Trivias"
+    }
   },
   "localInference": {
     "placeholder": "Local inference settings will be available here."
