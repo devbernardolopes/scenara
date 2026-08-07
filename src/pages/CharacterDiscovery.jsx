@@ -26,18 +26,18 @@ import IconButton from '../components/shared/IconButton'
 import Pagination from '../components/shared/Pagination'
 import ModelStatusBar from '../components/shell/ModelStatusBar'
 import MarqueeText from '../components/shared/MarqueeText'
-import PersonaPicker from '../components/shared/PersonaPicker'
 import { getAllTags } from '../services/tags'
 import { getAllFolders } from '../services/folders'
 import FolderTabsBar from '../components/discovery/FolderTabsBar'
 import FavoritesShelf from '../components/discovery/FavoritesShelf'
 import FolderPicker from '../components/discovery/FolderPicker'
+import StartChatButton from '../components/discovery/StartChatButton'
+import CharacterActionsMenu from '../components/discovery/CharacterActionsMenu'
 import {
   Trash2,
   Heart,
   Copy,
   Download,
-  ChevronDown,
   MessageSquare,
   Search,
   X,
@@ -45,6 +45,7 @@ import {
   SlidersHorizontal,
   CloudCog,
   FolderPlus,
+  MoreHorizontal,
 } from '../lib/icons'
 
 const SORT_OPTIONS = ['createdAt', 'updatedAt', 'lastUsed', 'chatCount', 'name']
@@ -57,40 +58,40 @@ const CARD_SIZE_GRID = {
   xlarge: 'grid gap-5 sm:grid-cols-1 lg:grid-cols-1',
 }
 
-function StartChatButton({ character, onStart, open, onToggle, onClose }) {
+function ActionsMenuButton({
+  character,
+  folders,
+  open,
+  onToggle,
+  onClose,
+  onFavorite,
+  onMoveToFolder,
+  onDuplicate,
+  onExport,
+  onDelete,
+}) {
   const { t } = useTranslation('common')
   const anchorRef = useRef(null)
 
   return (
     <div className="relative" ref={anchorRef}>
-      <div className="character-card__start-btn flex bg-surface-secondary rounded-md overflow-hidden">
-        <button
-          type="button"
-          onClick={() => onStart(character, null)}
-          className="flex-1 min-h-[44px] px-3 text-sm font-medium text-primary hover:bg-surface-hover"
-        >
-          {t('discovery.startChat')}
-        </button>
-        <div className="w-px bg-border-light self-stretch" />
-        <button
-          type="button"
-          onClick={onToggle}
-          onMouseDown={(e) => e.stopPropagation()}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center text-secondary hover:text-text hover:bg-surface-hover"
-          aria-label={t('discovery.actions.selectPersona')}
-          title={t('discovery.actions.selectPersona')}
-        >
-          <ChevronDown className="w-4 h-4" />
-        </button>
-      </div>
-      <PersonaPicker
+      <IconButton
+        icon={MoreHorizontal}
+        label={t('discovery.actions.moreOptions')}
+        onClick={onToggle}
+        className={open ? 'bg-surface-hover text-text' : ''}
+      />
+      <CharacterActionsMenu
         open={open}
-        anchorRef={anchorRef}
         onClose={onClose}
-        onSelect={(persona) => {
-          onClose()
-          onStart(character, persona)
-        }}
+        anchorRef={anchorRef}
+        character={character}
+        folders={folders}
+        onFavorite={onFavorite}
+        onMoveToFolder={onMoveToFolder}
+        onDuplicate={onDuplicate}
+        onExport={onExport}
+        onDelete={onDelete}
       />
     </div>
   )
@@ -250,6 +251,7 @@ function CharacterDiscovery() {
   const [folders, setFolders] = useState([])
   const [activeFolderId, setActiveFolderId] = useState('all')
   const [folderPickerFor, setFolderPickerFor] = useState(null)
+  const [actionsMenuFor, setActionsMenuFor] = useState(null)
   const [cardSize, setCardSize] = useState('regular')
   const suppressNextReloadRef = useRef(false)
   const scrollRef = useRef(null)
@@ -318,6 +320,8 @@ function CharacterDiscovery() {
   const visibleCharacters = isUnlimited
     ? sortedCharacters
     : sortedCharacters.slice(start, start + cardsPerPage)
+
+  const isCompact = cardSize === 'smaller' || cardSize === 'small'
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -677,7 +681,15 @@ function CharacterDiscovery() {
         ref={scrollRef}
         className="flex-1 overflow-y-auto px-4 md:px-8 pt-1 pb-4 bg-gradient-surface-radial"
       >
-        <FavoritesShelf characters={favoriteCharacters} onSelect={handleEditCharacter} />
+        <FavoritesShelf
+          characters={favoriteCharacters}
+          onSelect={handleEditCharacter}
+          onToggleFavorite={handleFavorite}
+          onStart={handleSelectCharacter}
+          openPersonaFor={openPersonaFor}
+          onTogglePersona={(id) => setOpenPersonaFor((prev) => (prev === id ? null : id))}
+          onClosePersona={() => setOpenPersonaFor(null)}
+        />
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-secondary text-sm">{t('loading')}</p>
@@ -776,50 +788,84 @@ function CharacterDiscovery() {
                     </div>
                   </div>
                   <div className="p-3 space-y-3 mt-auto">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <IconButton
-                        icon={Trash2}
-                        label={t('discovery.actions.delete')}
-                        onClick={() => handleDelete(char)}
-                        className="bg-delete text-on-delete hover:bg-delete-hover"
-                      />
-                      <IconButton
-                        icon={Heart}
-                        label={t('discovery.actions.favorite')}
-                        onClick={() => handleFavorite(char)}
-                        className={char.isFavorite ? 'text-favorite' : ''}
-                        iconClassName={char.isFavorite ? 'fill-current' : ''}
-                      />
-                      <IconButton
-                        icon={Copy}
-                        label={t('discovery.actions.duplicate')}
-                        onClick={() => handleDuplicate(char)}
-                      />
-                      <IconButton
-                        icon={Download}
-                        label={t('discovery.actions.export')}
-                        onClick={() => handleExport(char)}
-                      />
-                      <FolderAssignButton
-                        character={char}
-                        folders={folders}
-                        open={folderPickerFor === char.id}
-                        onToggle={() =>
-                          setFolderPickerFor((prev) => (prev === char.id ? null : char.id))
-                        }
-                        onClose={() => setFolderPickerFor(null)}
-                        onSelect={(folderId) => handleAssignFolder(char, folderId)}
-                      />
-                    </div>
-                    <StartChatButton
-                      character={char}
-                      onStart={handleSelectCharacter}
-                      open={openPersonaFor === char.id}
-                      onToggle={() =>
-                        setOpenPersonaFor((prev) => (prev === char.id ? null : char.id))
-                      }
-                      onClose={() => setOpenPersonaFor(null)}
-                    />
+                    {isCompact ? (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 min-w-0">
+                            <StartChatButton
+                              character={char}
+                              onStart={handleSelectCharacter}
+                              open={openPersonaFor === char.id}
+                              onToggle={() =>
+                                setOpenPersonaFor((prev) => (prev === char.id ? null : char.id))
+                              }
+                              onClose={() => setOpenPersonaFor(null)}
+                            />
+                          </div>
+                          <ActionsMenuButton
+                            character={char}
+                            folders={folders}
+                            open={actionsMenuFor === char.id}
+                            onToggle={() =>
+                              setActionsMenuFor((prev) => (prev === char.id ? null : char.id))
+                            }
+                            onClose={() => setActionsMenuFor(null)}
+                            onFavorite={handleFavorite}
+                            onMoveToFolder={(folderId) => handleAssignFolder(char, folderId)}
+                            onDuplicate={handleDuplicate}
+                            onExport={handleExport}
+                            onDelete={handleDelete}
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <IconButton
+                            icon={Trash2}
+                            label={t('discovery.actions.delete')}
+                            onClick={() => handleDelete(char)}
+                            className="bg-delete text-on-delete hover:bg-delete-hover"
+                          />
+                          <IconButton
+                            icon={Heart}
+                            label={t('discovery.actions.favorite')}
+                            onClick={() => handleFavorite(char)}
+                            className={char.isFavorite ? 'text-favorite' : ''}
+                            iconClassName={char.isFavorite ? 'fill-current' : ''}
+                          />
+                          <IconButton
+                            icon={Copy}
+                            label={t('discovery.actions.duplicate')}
+                            onClick={() => handleDuplicate(char)}
+                          />
+                          <IconButton
+                            icon={Download}
+                            label={t('discovery.actions.export')}
+                            onClick={() => handleExport(char)}
+                          />
+                          <FolderAssignButton
+                            character={char}
+                            folders={folders}
+                            open={folderPickerFor === char.id}
+                            onToggle={() =>
+                              setFolderPickerFor((prev) => (prev === char.id ? null : char.id))
+                            }
+                            onClose={() => setFolderPickerFor(null)}
+                            onSelect={(folderId) => handleAssignFolder(char, folderId)}
+                          />
+                        </div>
+                        <StartChatButton
+                          character={char}
+                          onStart={handleSelectCharacter}
+                          open={openPersonaFor === char.id}
+                          onToggle={() =>
+                            setOpenPersonaFor((prev) => (prev === char.id ? null : char.id))
+                          }
+                          onClose={() => setOpenPersonaFor(null)}
+                        />
+                      </>
+                    )}
                   </div>
                 </div>
               )

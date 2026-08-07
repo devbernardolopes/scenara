@@ -70,10 +70,12 @@
     "actions": {
       "delete": "Excluir personagem",
       "favorite": "Favoritar personagem",
+      "unfavorite": "Desfavoritar personagem",
       "duplicate": "Duplicar personagem",
       "export": "Exportar personagem",
       "selectPersona": "Selecionar persona",
-      "moveToFolder": "Mover para pasta"
+      "moveToFolder": "Mover para pasta",
+      "moreOptions": "Mais ações"
     },
     "search": {
       "placeholder": "Pesquisar personagens...",

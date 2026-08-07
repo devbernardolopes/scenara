@@ -87,10 +87,12 @@
     "actions": {
       "delete": "Delete character",
       "favorite": "Favorite character",
+      "unfavorite": "Unfavorite character",
       "duplicate": "Duplicate character",
       "export": "Export character",
       "selectPersona": "Select persona",
-      "moveToFolder": "Move to folder"
+      "moveToFolder": "Move to folder",
+      "moreOptions": "More actions"
     },
     "search": {
       "placeholder": "Search characters...",

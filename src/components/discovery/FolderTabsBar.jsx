@@ -8,6 +8,7 @@ function FolderTabsBar({ folders, activeFolderId, onSelect, onManage }) {
       <button
         type="button"
         onClick={() => onSelect('all')}
+        aria-pressed={activeFolderId === 'all'}
         className={`shrink-0 min-h-[36px] px-3 rounded-full text-sm border whitespace-nowrap ${
           activeFolderId === 'all'
             ? 'border-primary bg-primary-subtle text-primary'
@@ -20,7 +21,8 @@ function FolderTabsBar({ folders, activeFolderId, onSelect, onManage }) {
         <button
           key={folder.id}
           type="button"
-          onClick={() => onSelect(folder.id)}
+          onClick={() => onSelect(folder.id === activeFolderId ? 'all' : folder.id)}
+          aria-pressed={activeFolderId === folder.id}
           className={`shrink-0 min-h-[36px] px-3 rounded-full text-sm border whitespace-nowrap ${
             activeFolderId === folder.id
               ? 'border-primary bg-primary-subtle text-primary'

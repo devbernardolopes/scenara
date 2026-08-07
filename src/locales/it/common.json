@@ -87,10 +87,12 @@
     "actions": {
       "delete": "Elimina personaggio",
       "favorite": "Aggiungi personaggio ai preferiti",
+      "unfavorite": "Rimuovi dai preferiti",
       "duplicate": "Duplica personaggio",
       "export": "Esporta personaggio",
       "selectPersona": "Seleziona persona",
-      "moveToFolder": "Sposta nella cartella"
+      "moveToFolder": "Sposta nella cartella",
+      "moreOptions": "Altre azioni"
     },
     "search": {
       "placeholder": "Cerca personaggi...",

@@ -87,10 +87,12 @@
     "actions": {
       "delete": "Charakter löschen",
       "favorite": "Charakter favorisieren",
+      "unfavorite": "Aus Favoriten entfernen",
       "duplicate": "Charakter duplizieren",
       "export": "Charakter exportieren",
       "selectPersona": "Persona auswählen",
-      "moveToFolder": "In Ordner verschieben"
+      "moveToFolder": "In Ordner verschieben",
+      "moreOptions": "Weitere Aktionen"
     },
     "search": {
       "placeholder": "Charaktere suchen...",

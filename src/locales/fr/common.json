@@ -87,10 +87,12 @@
     "actions": {
       "delete": "Supprimer le personnage",
       "favorite": "Ajouter le personnage aux favoris",
+      "unfavorite": "Retirer des favoris",
       "duplicate": "Dupliquer le personnage",
       "export": "Exporter le personnage",
       "selectPersona": "Sélectionner une persona",
-      "moveToFolder": "Déplacer vers un dossier"
+      "moveToFolder": "Déplacer vers un dossier",
+      "moreOptions": "Plus d'actions"
     },
     "search": {
       "placeholder": "Rechercher des personnages...",
