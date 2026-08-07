@@ -77,6 +77,11 @@ function Sidebar({ open, onClose }) {
     colors: [],
   })
   const fileInputRef = useRef(null)
+
+  useEffect(() => {
+    if (!open) setShowImportMenu(false)
+  }, [open])
+
   useUnread()
 
   function handleCreateCharacter() {
