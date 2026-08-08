@@ -236,6 +236,22 @@ export async function duplicatePersonas(ids) {
   }
 }
 
+// Threads that reference any of the given persona ids.
+export async function getPersonaUsage(ids) {
+  const threads = await db.threads.toArray()
+  const result = []
+  for (const id of ids) {
+    const linked = threads
+      .filter((t) => t.personaId === id)
+      .map((t) => ({ id: t.id, title: t.title, threadNumber: t.threadNumber }))
+    if (linked.length > 0) {
+      const p = await db.personas.get(id)
+      result.push({ id, name: p?.name || '', threads: linked })
+    }
+  }
+  return result
+}
+
 export async function setDefaultPersona(id) {
   const all = await db.personas.toArray()
   for (const p of all) {

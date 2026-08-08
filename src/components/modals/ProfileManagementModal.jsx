@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useConfirm } from '../../lib/confirm'
 import ListManagementModal from './shared/ListManagementModal'
+import { CompactBlock } from './shared/UsageWarning'
 import ProviderIcon from '../shared/ProviderIcon'
 import {
   getAllProfiles,
@@ -12,14 +13,23 @@ import {
   exportProfiles,
   importProfiles,
   updateConnectionProfileOrder,
-  REQUEST_KINDS,
+  getProfileUsage,
 } from '../../services/connectionProfiles'
 import { PROVIDERS } from '../../services/apiProviders'
-import { getSetting } from '../../services/settings'
 
 function ProfileManagementModal() {
   const { t } = useTranslation('settings')
   const { confirm } = useConfirm()
+
+  function kindLabel(kind) {
+    return t(`api.${kind}Profile.label`)
+  }
+
+  function overridesLine(override) {
+    return override.characters
+      .map((c) => `${c.name} (${c.kinds.map(kindLabel).join(', ')})`)
+      .join(', ')
+  }
 
   const config = {
     entityKey: 'api.profile',
@@ -42,31 +52,66 @@ function ProfileManagementModal() {
       return p.model ? `${base} · ${p.model}` : base
     },
     confirmDelete: async (p) => {
-      const assignedKinds = []
-      for (const kind of REQUEST_KINDS) {
-        const assignedId = await getSetting(`requestKind.${kind}.profileId`)
-        if (assignedId === p.id) assignedKinds.push(kind)
-      }
-      const children =
-        assignedKinds.length > 0 ? (
+      const { assignments, overrides } = await getProfileUsage([p.id])
+      const children = []
+      if (assignments.length > 0) {
+        children.push(
           <div className="text-sm text-secondary mb-4">
             <p>{t('api.profile.confirmDelete.assignedTo')}</p>
             <ul className="list-disc pl-5 mt-1 space-y-0.5">
-              {assignedKinds.map((kind) => (
-                <li key={kind}>{t(`api.${kind}Profile.label`)}</li>
+              {assignments[0].kinds.map((kind) => (
+                <li key={kind}>{kindLabel(kind)}</li>
               ))}
             </ul>
-          </div>
-        ) : null
+          </div>,
+        )
+      }
+      if (overrides.length > 0) {
+        children.push(
+          <div className="text-sm text-secondary mb-4">
+            <p>{t('api.profile.confirmDelete.usedByCharacters')}</p>
+            <ul className="list-disc pl-5 mt-1 space-y-0.5">
+              {overrides[0].characters.map((char) => (
+                <li key={char.id}>
+                  {char.name} — {char.kinds.map(kindLabel).join(', ')}
+                </li>
+              ))}
+            </ul>
+          </div>,
+        )
+      }
       const ok = await confirm({
         title: t('api.profile.confirmDelete.title'),
         message: t('api.profile.confirmDelete.message', { name: p.name }),
         confirmLabel: t('api.profile.actions.delete'),
         cancelLabel: t('common:cancel'),
         variant: 'danger',
-        children,
+        children: children.length > 0 ? children : null,
       })
       return { ok }
+    },
+    confirmDeleteMany: async (items) => {
+      const { assignments, overrides } = await getProfileUsage(items.map((i) => i.id))
+      const blocks = []
+      if (assignments.length > 0) {
+        blocks.push(
+          <CompactBlock
+            key="assignments"
+            heading={t('api.profile.confirmDelete.assignedToMany')}
+            lines={assignments.map((a) => `${a.name} — ${a.kinds.map(kindLabel).join(', ')}`)}
+          />,
+        )
+      }
+      if (overrides.length > 0) {
+        blocks.push(
+          <CompactBlock
+            key="overrides"
+            heading={t('api.profile.confirmDelete.usedByCharactersMany')}
+            lines={overrides.map((o) => `${o.name} — ${overridesLine(o)}`)}
+          />,
+        )
+      }
+      return blocks.length > 0 ? blocks : null
     },
     service: {
       getAll: getAllProfiles,

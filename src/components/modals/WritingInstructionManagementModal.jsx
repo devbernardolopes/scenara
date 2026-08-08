@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useConfirm } from '../../lib/confirm'
 import ListManagementModal from './shared/ListManagementModal'
-import Avatar from '../shared/Avatar'
+import { CharacterRows, CompactBlock } from './shared/UsageWarning'
 import { FileText } from '../../lib/icons'
 import {
   getAllWritingInstructions,
@@ -13,8 +13,8 @@ import {
   exportWritingInstructions,
   importWritingInstructions,
   updateWritingInstructionOrder,
+  getWritingInstructionUsage,
 } from '../../services/writingInstructions'
-import db from '../../db'
 
 function WritingInstructionManagementModal() {
   const { t } = useTranslation('settings')
@@ -31,28 +31,15 @@ function WritingInstructionManagementModal() {
     formProp: 'writingInstruction',
     getTitle: (wi) => wi.name,
     confirmDelete: async (wi) => {
-      const linked = (await db.characters.toArray()).filter((c) => c.writingInstruction === wi.id)
+      const usage = await getWritingInstructionUsage([wi.id])
       const children =
-        linked.length > 0 ? (
-          <div className="mb-6">
-            <p className="text-sm text-secondary mb-3">
-              {t('writingInstruction.confirmDelete.linkedCharacters', { count: linked.length })}
-            </p>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {linked.map((char) => (
-                <div
-                  key={char.id}
-                  className="flex items-center gap-3 p-2 rounded-md bg-surface-secondary"
-                >
-                  <Avatar src={char.avatar} size="md" />
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-sm font-medium text-text truncate">{char.name}</span>
-                    <span className="text-xs text-tertiary shrink-0">#{char.characterNumber}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        usage.length > 0 ? (
+          <CharacterRows
+            title={t('writingInstruction.confirmDelete.linkedCharacters', {
+              count: usage[0].characters.length,
+            })}
+            characters={usage[0].characters}
+          />
         ) : null
       const ok = await confirm({
         title: t('writingInstruction.confirmDelete.title'),
@@ -63,6 +50,21 @@ function WritingInstructionManagementModal() {
         children,
       })
       return { ok }
+    },
+    confirmDeleteMany: async (items) => {
+      const usage = await getWritingInstructionUsage(items.map((i) => i.id))
+      if (usage.length === 0) return null
+      return (
+        <CompactBlock
+          heading={t('writingInstruction.confirmDelete.linkedCharactersMany')}
+          lines={usage.map(
+            (u) =>
+              `${u.name} — ${t('writingInstruction.confirmDelete.linkedCharactersCount', {
+                count: u.characters.length,
+              })}`,
+          )}
+        />
+      )
     },
     service: {
       getAll: getAllWritingInstructions,

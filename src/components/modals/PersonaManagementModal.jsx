@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useConfirm } from '../../lib/confirm'
 import ListManagementModal from './shared/ListManagementModal'
+import { ThreadRows, CompactBlock } from './shared/UsageWarning'
 import {
   getAllPersonas,
   deletePersona,
@@ -12,6 +13,7 @@ import {
   exportPersonas,
   importPersonas,
   updatePersonaOrder,
+  getPersonaUsage,
 } from '../../services/personas'
 
 function PersonaManagementModal() {
@@ -42,14 +44,38 @@ function PersonaManagementModal() {
     onSetDefault: (p) => setDefaultPersona(p.id),
     disableDelete: (p, all) => all.length <= 1,
     confirmDelete: async (p) => {
+      const usage = await getPersonaUsage([p.id])
+      const children =
+        usage.length > 0 ? (
+          <ThreadRows
+            title={t('persona.confirmDelete.usedInThreads', { count: usage[0].threads.length })}
+            threads={usage[0].threads}
+          />
+        ) : null
       const ok = await confirm({
         title: t('persona.confirmDelete.title'),
         message: t('persona.confirmDelete.message', { name: p.name }),
         confirmLabel: t('persona.actions.delete'),
         cancelLabel: t('common:cancel'),
         variant: 'danger',
+        children,
       })
       return { ok }
+    },
+    confirmDeleteMany: async (items) => {
+      const usage = await getPersonaUsage(items.map((i) => i.id))
+      if (usage.length === 0) return null
+      return (
+        <CompactBlock
+          heading={t('persona.confirmDelete.usedInThreadsMany')}
+          lines={usage.map(
+            (u) =>
+              `${u.name} — ${t('persona.confirmDelete.usedThreadsCount', {
+                count: u.threads.length,
+              })}`,
+          )}
+        />
+      )
     },
     service: {
       getAll: getAllPersonas,

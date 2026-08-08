@@ -140,6 +140,27 @@ export async function duplicateWritingInstructions(ids) {
   }
 }
 
+// Characters that reference any of the given writing instruction ids.
+export async function getWritingInstructionUsage(ids) {
+  const chars = await db.characters.toArray()
+  const result = []
+  for (const id of ids) {
+    const linked = chars
+      .filter((c) => c.writingInstruction === id)
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        avatar: c.avatar,
+        characterNumber: c.characterNumber,
+      }))
+    if (linked.length > 0) {
+      const wi = await db.writingInstructions.get(id)
+      result.push({ id, name: wi?.name || '', characters: linked })
+    }
+  }
+  return result
+}
+
 export async function exportWritingInstruction(id) {
   const wi = await db.writingInstructions.get(id)
   if (!wi) {

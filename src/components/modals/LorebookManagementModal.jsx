@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useConfirm } from '../../lib/confirm'
 import ListManagementModal from './shared/ListManagementModal'
-import Avatar from '../shared/Avatar'
+import { CharacterRows, CompactBlock } from './shared/UsageWarning'
 import {
   getAllLorebooks,
   deleteLorebook,
@@ -12,8 +12,8 @@ import {
   exportLorebooks,
   importLorebooks,
   updateLorebookOrder,
+  getLorebookUsage,
 } from '../../services/lorebooks'
-import db from '../../db'
 
 function LorebookManagementModal() {
   const { t } = useTranslation('settings')
@@ -38,30 +38,15 @@ function LorebookManagementModal() {
       ) : null,
     getImageSrc: (l) => l.avatar,
     confirmDelete: async (l) => {
-      const linked = (await db.characters.toArray()).filter((c) =>
-        (c.lorebookIds || []).includes(l.id),
-      )
+      const usage = await getLorebookUsage([l.id])
       const children =
-        linked.length > 0 ? (
-          <div className="mb-6">
-            <p className="text-sm text-secondary mb-3">
-              {t('lorebook.confirmDelete.linkedCharacters', { count: linked.length })}
-            </p>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {linked.map((char) => (
-                <div
-                  key={char.id}
-                  className="flex items-center gap-3 p-2 rounded-md bg-surface-secondary"
-                >
-                  <Avatar src={char.avatar} size="md" />
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-sm font-medium text-text truncate">{char.name}</span>
-                    <span className="text-xs text-tertiary shrink-0">#{char.characterNumber}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        usage.length > 0 ? (
+          <CharacterRows
+            title={t('lorebook.confirmDelete.linkedCharacters', {
+              count: usage[0].characters.length,
+            })}
+            characters={usage[0].characters}
+          />
         ) : null
       const ok = await confirm({
         title: t('lorebook.confirmDelete.title'),
@@ -72,6 +57,21 @@ function LorebookManagementModal() {
         children,
       })
       return { ok }
+    },
+    confirmDeleteMany: async (items) => {
+      const usage = await getLorebookUsage(items.map((i) => i.id))
+      if (usage.length === 0) return null
+      return (
+        <CompactBlock
+          heading={t('lorebook.confirmDelete.linkedCharactersMany')}
+          lines={usage.map(
+            (u) =>
+              `${u.name} — ${t('lorebook.confirmDelete.linkedCharactersCount', {
+                count: u.characters.length,
+              })}`,
+          )}
+        />
+      )
     },
     service: {
       getAll: getAllLorebooks,

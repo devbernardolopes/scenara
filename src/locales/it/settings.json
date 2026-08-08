@@ -553,7 +553,10 @@
         "title": "Elimina profilo",
         "message": "Sei sicuro di voler eliminare «{{name}}»?",
         "messageMultiple": "Sei sicuro di voler eliminare {{count}} profili di connessione?",
-        "assignedTo": "Questo profilo è attualmente assegnato a:"
+        "assignedTo": "Questo profilo è attualmente assegnato a:",
+        "assignedToMany": "Questi profili sono attualmente assegnati a:",
+        "usedByCharacters": "Questo profilo è utilizzato nelle sostituzioni API per:",
+        "usedByCharactersMany": "Questi profili sono utilizzati nelle sostituzioni API per:"
       },
       "form": {
         "title": "Crea profilo",
@@ -986,7 +989,12 @@
     "confirmDelete": {
       "title": "Elimina Persona",
       "message": "Sei sicuro di voler eliminare \"{{name}}\"?",
-      "messageMultiple": "Sei sicuro di voler eliminare {{count}} persone?"
+      "messageMultiple": "Sei sicuro di voler eliminare {{count}} persone?",
+      "usedInThreads": "Questa persona è utilizzata in {{count}} conversazione:",
+      "usedInThreads_other": "Questa persona è utilizzata in {{count}} conversazioni:",
+      "usedInThreadsMany": "Queste persone sono utilizzate in conversazioni:",
+      "usedThreadsCount": "{{count}} conversazione",
+      "usedThreadsCount_other": "{{count}} conversazioni"
     },
     "form": {
       "title": "Crea Persona",
@@ -1040,7 +1048,10 @@
       "message": "Sei sicuro di voler eliminare «{{name}}»?",
       "messageMultiple": "Sei sicuro di voler eliminare {{count}} istruzioni di scrittura?",
       "linkedCharacters": "Questa istruzione di scrittura è utilizzata da {{count}} personaggio:",
-      "linkedCharacters_other": "Questa istruzione di scrittura è utilizzata da {{count}} personaggi:"
+      "linkedCharacters_other": "Questa istruzione di scrittura è utilizzata da {{count}} personaggi:",
+      "linkedCharactersMany": "Queste istruzioni di scrittura sono utilizzate da personaggi:",
+      "linkedCharactersCount": "{{count}} personaggio",
+      "linkedCharactersCount_other": "{{count}} personaggi"
     },
     "form": {
       "title": "Crea istruzione di scrittura",
@@ -1410,7 +1421,12 @@
     "confirmDelete": {
       "title": "Elimina Set di Scorciatoie",
       "message": "Sei sicuro di voler eliminare \"{{name}}\"?",
-      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?"
+      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?",
+      "usedInThreads": "Questo set di scorciatoie è utilizzato in {{count}} conversazione:",
+      "usedInThreads_other": "Questo set di scorciatoie è utilizzato in {{count}} conversazioni:",
+      "usedInThreadsMany": "Questi set di scorciatoie sono utilizzati in conversazioni:",
+      "usedThreadsCount": "{{count}} conversazione",
+      "usedThreadsCount_other": "{{count}} conversazioni"
     },
     "form": {
       "title": "Crea Set di Scorciatoie",
@@ -1455,7 +1471,10 @@
       "message": "Are you sure you want to delete \"{{name}}\"?",
       "messageMultiple": "Are you sure you want to delete {{count}} lorebooks?",
       "linkedCharacters": "Questo lorebook è utilizzato da {{count}} personaggio:",
-      "linkedCharacters_other": "Questo lorebook è utilizzato da {{count}} personaggi:"
+      "linkedCharacters_other": "Questo lorebook è utilizzato da {{count}} personaggi:",
+      "linkedCharactersMany": "Questi lorebook sono utilizzati da personaggi:",
+      "linkedCharactersCount": "{{count}} personaggio",
+      "linkedCharactersCount_other": "{{count}} personaggi"
     },
     "globalBadge": "Global",
     "form": {

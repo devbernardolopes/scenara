@@ -36,6 +36,7 @@ import { Plus, Upload } from '../../../lib/icons'
  *   isDefault:        (item) => boolean
  *   disableDelete:    (item, all) => boolean
  *   confirmDelete:    (item) => Promise<{ok, children?}>  (run before delete)
+ *   confirmDeleteMany:(items) => Promise<ReactNode|null> (usage children for batch confirm)
  *   formModal:        string  — modal type opened for create/edit
  *   formProp:         string  — prop name carrying the item on edit
  *   service: {
@@ -112,12 +113,15 @@ function ListManagementModal({ config }) {
 
   async function handleDeleteSelected() {
     if (selectedIds.size >= items.length) return
+    const selectedItems = items.filter((i) => selectedIds.has(i.id))
+    const children = config.confirmDeleteMany ? await config.confirmDeleteMany(selectedItems) : null
     const ok = await confirm({
       title: t(`${entityKey}.confirmDelete.title`),
       message: t(`${entityKey}.confirmDelete.messageMultiple`, { count: selectedIds.size }),
       confirmLabel: t(`${entityKey}.actions.delete`),
       cancelLabel: t('common:cancel'),
       variant: 'danger',
+      children,
     })
     if (!ok) return
     try {

@@ -553,7 +553,10 @@
         "title": "Supprimer le profil",
         "message": "Voulez-vous vraiment supprimer « {{name}} » ?",
         "messageMultiple": "Voulez-vous vraiment supprimer {{count}} profils de connexion ?",
-        "assignedTo": "Ce profil est actuellement attribué à :"
+        "assignedTo": "Ce profil est actuellement attribué à :",
+        "assignedToMany": "Ces profils sont actuellement attribués à :",
+        "usedByCharacters": "Ce profil est utilisé dans les remplacements d’API pour :",
+        "usedByCharactersMany": "Ces profils sont utilisés dans les remplacements d’API pour :"
       },
       "form": {
         "title": "Créer un profil",
@@ -986,7 +989,12 @@
     "confirmDelete": {
       "title": "Supprimer la Persona",
       "message": "Êtes-vous sûr de vouloir supprimer \"{{name}}\"?",
-      "messageMultiple": "Êtes-vous sûr de vouloir supprimer {{count}} personas?"
+      "messageMultiple": "Êtes-vous sûr de vouloir supprimer {{count}} personas?",
+      "usedInThreads": "Cette personne est utilisée dans {{count}} conversation :",
+      "usedInThreads_other": "Cette personne est utilisée dans {{count}} conversations :",
+      "usedInThreadsMany": "Ces personnes sont utilisées dans des conversations :",
+      "usedThreadsCount": "{{count}} conversation",
+      "usedThreadsCount_other": "{{count}} conversations"
     },
     "form": {
       "title": "Créer une Persona",
@@ -1040,7 +1048,10 @@
       "message": "Voulez-vous vraiment supprimer « {{name}} » ?",
       "messageMultiple": "Voulez-vous vraiment supprimer {{count}} instructions d’écriture ?",
       "linkedCharacters": "Cette instruction d’écriture est utilisée par {{count}} personnage :",
-      "linkedCharacters_other": "Cette instruction d’écriture est utilisée par {{count}} personnages :"
+      "linkedCharacters_other": "Cette instruction d’écriture est utilisée par {{count}} personnages :",
+      "linkedCharactersMany": "Ces instructions d’écriture sont utilisées par des personnages :",
+      "linkedCharactersCount": "{{count}} personnage",
+      "linkedCharactersCount_other": "{{count}} personnages"
     },
     "form": {
       "title": "Créer une instruction d’écriture",
@@ -1410,7 +1421,12 @@
     "confirmDelete": {
       "title": "Supprimer l'Ensemble de Raccourcis",
       "message": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ?",
-      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?"
+      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?",
+      "usedInThreads": "Ce jeu de raccourcis est utilisé dans {{count}} conversation :",
+      "usedInThreads_other": "Ce jeu de raccourcis est utilisé dans {{count}} conversations :",
+      "usedInThreadsMany": "Ces jeux de raccourcis sont utilisés dans des conversations :",
+      "usedThreadsCount": "{{count}} conversation",
+      "usedThreadsCount_other": "{{count}} conversations"
     },
     "form": {
       "title": "Créer un Ensemble de Raccourcis",
@@ -1455,7 +1471,10 @@
       "message": "Are you sure you want to delete \"{{name}}\"?",
       "messageMultiple": "Are you sure you want to delete {{count}} lorebooks?",
       "linkedCharacters": "Ce lorebook est utilisé par {{count}} personnage :",
-      "linkedCharacters_other": "Ce lorebook est utilisé par {{count}} personnages :"
+      "linkedCharacters_other": "Ce lorebook est utilisé par {{count}} personnages :",
+      "linkedCharactersMany": "Ces lorebooks sont utilisés par des personnages :",
+      "linkedCharactersCount": "{{count}} personnage",
+      "linkedCharactersCount_other": "{{count}} personnages"
     },
     "globalBadge": "Global",
     "form": {

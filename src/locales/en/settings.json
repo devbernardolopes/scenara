@@ -553,7 +553,10 @@
         "title": "Delete Profile",
         "message": "Are you sure you want to delete \"{{name}}\"?",
         "messageMultiple": "Are you sure you want to delete {{count}} connection profiles?",
-        "assignedTo": "This profile is currently assigned to:"
+        "assignedTo": "This profile is currently assigned to:",
+        "assignedToMany": "These profiles are currently assigned to:",
+        "usedByCharacters": "This profile is used in API overrides for:",
+        "usedByCharactersMany": "These profiles are used in API overrides for:"
       },
       "form": {
         "title": "Create Profile",
@@ -986,7 +989,12 @@
     "confirmDelete": {
       "title": "Delete Persona",
       "message": "Are you sure you want to delete \"{{name}}\"?",
-      "messageMultiple": "Are you sure you want to delete {{count}} personas?"
+      "messageMultiple": "Are you sure you want to delete {{count}} personas?",
+      "usedInThreads": "This persona is used in {{count}} thread:",
+      "usedInThreads_other": "This persona is used in {{count}} threads:",
+      "usedInThreadsMany": "These personas are used in threads:",
+      "usedThreadsCount": "{{count}} thread",
+      "usedThreadsCount_other": "{{count}} threads"
     },
     "form": {
       "title": "Create Persona",
@@ -1040,7 +1048,10 @@
       "message": "Are you sure you want to delete \"{{name}}\"?",
       "messageMultiple": "Are you sure you want to delete {{count}} writing instructions?",
       "linkedCharacters": "This writing instruction is used by {{count}} character:",
-      "linkedCharacters_other": "This writing instruction is used by {{count}} characters:"
+      "linkedCharacters_other": "This writing instruction is used by {{count}} characters:",
+      "linkedCharactersMany": "These writing instructions are used by characters:",
+      "linkedCharactersCount": "{{count}} character",
+      "linkedCharactersCount_other": "{{count}} characters"
     },
     "form": {
       "title": "Create Writing Instruction",
@@ -1410,7 +1421,12 @@
     "confirmDelete": {
       "title": "Delete Shortcut Set",
       "message": "Are you sure you want to delete \"{{name}}\"?",
-      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?"
+      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?",
+      "usedInThreads": "This shortcut set is used in {{count}} thread:",
+      "usedInThreads_other": "This shortcut set is used in {{count}} threads:",
+      "usedInThreadsMany": "These shortcut sets are used in threads:",
+      "usedThreadsCount": "{{count}} thread",
+      "usedThreadsCount_other": "{{count}} threads"
     },
     "import": {
       "invalidFormat": "The file does not appear to be a valid in-chat shortcut export.",
@@ -1459,7 +1475,10 @@
       "message": "Are you sure you want to delete \"{{name}}\"?",
       "messageMultiple": "Are you sure you want to delete {{count}} lorebooks?",
       "linkedCharacters": "This lorebook is used by {{count}} character:",
-      "linkedCharacters_other": "This lorebook is used by {{count}} characters:"
+      "linkedCharacters_other": "This lorebook is used by {{count}} characters:",
+      "linkedCharactersMany": "These lorebooks are used by characters:",
+      "linkedCharactersCount": "{{count}} character",
+      "linkedCharactersCount_other": "{{count}} characters"
     },
     "import": {
       "invalidFormat": "The file does not appear to be a valid lorebook export.",

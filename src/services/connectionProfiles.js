@@ -6,6 +6,16 @@ import i18n from '../lib/i18n'
 
 export const REQUEST_KINDS = ['chat', 'autoTitle', 'summarization', 'ooc', 'director', 'interface']
 
+// Per-character API override fields per request kind (Character > API Overrides).
+// `interface` has no character-level override field.
+export const CHARACTER_PROFILE_FIELDS = [
+  ['chat', 'apiProfileChatId'],
+  ['autoTitle', 'apiProfileAutoTitleId'],
+  ['summarization', 'apiProfileSummarizationId'],
+  ['ooc', 'apiProfileOocId'],
+  ['director', 'apiProfileDirectorId'],
+]
+
 async function getOrderIds(orderKey) {
   let order = await getSetting(orderKey)
   return order && Array.isArray(order) ? order : []
@@ -245,15 +255,49 @@ export async function usedByProfileCount(providerId, keyId) {
   return all.filter((p) => p.providerId === providerId && p.keyId === keyId).length
 }
 
-export async function getEffectiveProfileFor(requestKind, character) {
-  const CHARACTER_FIELD_MAP = {
-    chat: 'apiProfileChatId',
-    autoTitle: 'apiProfileAutoTitleId',
-    summarization: 'apiProfileSummarizationId',
-    ooc: 'apiProfileOocId',
-    director: 'apiProfileDirectorId',
+// Where a set of connection profiles are referenced: Settings > API > Profile
+// Assignment (requestKind.*.profileId) and Character > API Overrides.
+// Returns profile records with `kinds` (settings) and `characters` (overrides).
+export async function getProfileUsage(profileIds) {
+  const assignments = []
+  const overrides = []
+  if (profileIds.length === 0) return { assignments, overrides }
+  const profiles = (await db.connectionProfiles.bulkGet(profileIds)).filter(Boolean)
+  const byId = new Map(profiles.map((p) => [p.id, p]))
+
+  const settings = await Promise.all(
+    REQUEST_KINDS.map(async (kind) => ({
+      kind,
+      profileId: await getSetting(`requestKind.${kind}.profileId`),
+    })),
+  )
+  for (const id of profileIds) {
+    const kinds = settings.filter((s) => s.profileId === id).map((s) => s.kind)
+    if (kinds.length > 0) {
+      assignments.push({ id, name: byId.get(id)?.name || '', kinds })
+    }
   }
-  const charField = CHARACTER_FIELD_MAP[requestKind]
+
+  const characters = await db.characters.toArray()
+  for (const id of profileIds) {
+    const used = []
+    for (const char of characters) {
+      const kinds = CHARACTER_PROFILE_FIELDS.filter(([, field]) => char[field] === id).map(
+        ([kind]) => kind,
+      )
+      if (kinds.length > 0) {
+        used.push({ id: char.id, name: char.displayName || char.name, kinds })
+      }
+    }
+    if (used.length > 0) {
+      overrides.push({ id, name: byId.get(id)?.name || '', characters: used })
+    }
+  }
+  return { assignments, overrides }
+}
+
+export async function getEffectiveProfileFor(requestKind, character) {
+  const charField = CHARACTER_PROFILE_FIELDS.find(([kind]) => kind === requestKind)?.[1]
   let profileId = (charField && character?.[charField]) || null
   if (!profileId) {
     profileId = await getSetting(`requestKind.${requestKind}.profileId`)

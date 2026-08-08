@@ -553,7 +553,10 @@
         "title": "Delete Profile",
         "message": "Are you sure you want to delete \"{{name}}\"?",
         "messageMultiple": "Are you sure you want to delete {{count}} connection profiles?",
-        "assignedTo": "This profile is currently assigned to:"
+        "assignedTo": "This profile is currently assigned to:",
+        "assignedToMany": "Diese Profile sind derzeit zugewiesen an:",
+        "usedByCharacters": "Dieses Profil wird in API-Überschreibungen verwendet für:",
+        "usedByCharactersMany": "Diese Profile werden in API-Überschreibungen verwendet für:"
       },
       "form": {
         "title": "Create Profile",
@@ -986,7 +989,12 @@
     "confirmDelete": {
       "title": "Persona loschen",
       "message": "Sind Sie sicher, dass Sie \"{{name}}\" loschen mocyen?",
-      "messageMultiple": "Sind Sie sicher, dass Sie {{count}} Personas loschen mocyen?"
+      "messageMultiple": "Sind Sie sicher, dass Sie {{count}} Personas loschen mocyen?",
+      "usedInThreads": "Diese Persona wird in {{count}} Konversation verwendet:",
+      "usedInThreads_other": "Diese Persona wird in {{count}} Konversationen verwendet:",
+      "usedInThreadsMany": "Diese Personas werden in Konversationen verwendet:",
+      "usedThreadsCount": "{{count}} Konversation",
+      "usedThreadsCount_other": "{{count}} Konversationen"
     },
     "form": {
       "title": "Persona erstellen",
@@ -1040,7 +1048,10 @@
       "message": "Are you sure you want to delete \"{{name}}\"?",
       "messageMultiple": "Are you sure you want to delete {{count}} writing instructions?",
       "linkedCharacters": "This writing instruction is used by {{count}} character:",
-      "linkedCharacters_other": "This writing instruction is used by {{count}} characters:"
+      "linkedCharacters_other": "This writing instruction is used by {{count}} characters:",
+      "linkedCharactersMany": "Diese Schreibanweisungen werden von Charakteren verwendet:",
+      "linkedCharactersCount": "{{count}} Charakter",
+      "linkedCharactersCount_other": "{{count}} Charaktere"
     },
     "form": {
       "title": "Create Writing Instruction",
@@ -1410,7 +1421,12 @@
     "confirmDelete": {
       "title": "Verknüpfungssatz löschen",
       "message": "Bist du sicher, dass du \"{{name}}\" löschen möchtest?",
-      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?"
+      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?",
+      "usedInThreads": "Dieses Verknüpfungsset wird in {{count}} Konversation verwendet:",
+      "usedInThreads_other": "Dieses Verknüpfungsset wird in {{count}} Konversationen verwendet:",
+      "usedInThreadsMany": "Diese Verknüpfungssets werden in Konversationen verwendet:",
+      "usedThreadsCount": "{{count}} Konversation",
+      "usedThreadsCount_other": "{{count}} Konversationen"
     },
     "form": {
       "title": "Verknüpfungssatz erstellen",
@@ -1455,7 +1471,10 @@
       "message": "Are you sure you want to delete \"{{name}}\"?",
       "messageMultiple": "Are you sure you want to delete {{count}} lorebooks?",
       "linkedCharacters": "Dieses Lorebook wird von {{count}} Charakter verwendet:",
-      "linkedCharacters_other": "Dieses Lorebook wird von {{count}} Charakteren verwendet:"
+      "linkedCharacters_other": "Dieses Lorebook wird von {{count}} Charakteren verwendet:",
+      "linkedCharactersMany": "Diese Lorebooks werden von Charakteren verwendet:",
+      "linkedCharactersCount": "{{count}} Charakter",
+      "linkedCharactersCount_other": "{{count}} Charaktere"
     },
     "globalBadge": "Global",
     "form": {

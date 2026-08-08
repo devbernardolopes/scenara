@@ -141,6 +141,22 @@ export async function duplicateInChatShortcuts(ids) {
   }
 }
 
+// Threads that reference any of the given shortcut set ids.
+export async function getInChatShortcutUsage(ids) {
+  const threads = await db.threads.toArray()
+  const result = []
+  for (const id of ids) {
+    const linked = threads
+      .filter((t) => t.activeShortcutSetId === id)
+      .map((t) => ({ id: t.id, title: t.title, threadNumber: t.threadNumber }))
+    if (linked.length > 0) {
+      const s = await db.inChatShortcuts.get(id)
+      result.push({ id, name: s?.name || '', threads: linked })
+    }
+  }
+  return result
+}
+
 export async function exportInChatShortcut(id) {
   const wi = await db.inChatShortcuts.get(id)
   if (!wi) {

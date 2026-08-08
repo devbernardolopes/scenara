@@ -442,7 +442,10 @@
         "title": "Excluir Perfil",
         "message": "Tem certeza que deseja excluir \"{{name}}\"?",
         "messageMultiple": "Tem certeza que deseja excluir {{count}} perfis de conexão?",
-        "assignedTo": "Este perfil está atualmente atribuído a:"
+        "assignedTo": "Este perfil está atualmente atribuído a:",
+        "assignedToMany": "Estes perfis estão atualmente atribuídos a:",
+        "usedByCharacters": "Este perfil é usado nas substituições de API por:",
+        "usedByCharactersMany": "Estes perfis são usados nas substituições de API por:"
       },
       "form": {
         "title": "Criar Perfil",
@@ -786,7 +789,12 @@
     "confirmDelete": {
       "title": "Excluir Persona",
       "message": "Tem certeza que deseja excluir \"{{name}}\"?",
-      "messageMultiple": "Tem certeza que deseja excluir {{count}} personas?"
+      "messageMultiple": "Tem certeza que deseja excluir {{count}} personas?",
+      "usedInThreads": "Esta persona é usada em {{count}} conversa:",
+      "usedInThreads_other": "Esta persona é usada em {{count}} conversas:",
+      "usedInThreadsMany": "Estas personas são usadas em conversas:",
+      "usedThreadsCount": "{{count}} conversa",
+      "usedThreadsCount_other": "{{count}} conversas"
     },
     "form": {
       "title": "Criar Persona",
@@ -840,7 +848,10 @@
       "message": "Tem certeza que deseja excluir \"{{name}}\"?",
       "messageMultiple": "Tem certeza que deseja excluir {{count}} instruções de escrita?",
       "linkedCharacters": "Esta instrução é usada por {{count}} personagem:",
-      "linkedCharacters_other": "Esta instrução é usada por {{count}} personagens:"
+      "linkedCharacters_other": "Esta instrução é usada por {{count}} personagens:",
+      "linkedCharactersMany": "Estas instruções de escrita são usadas por personagens:",
+      "linkedCharactersCount": "{{count}} personagem",
+      "linkedCharactersCount_other": "{{count}} personagens"
     },
     "form": {
       "title": "Criar Instrução de Escrita",
@@ -1082,7 +1093,12 @@
     "confirmDelete": {
       "title": "Excluir Conjunto de Atalhos",
       "message": "Tem certeza que deseja excluir \"{{name}}\"?",
-      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?"
+      "messageMultiple": "Are you sure you want to delete {{count}} shortcut sets?",
+      "usedInThreads": "Este conjunto de atalhos é usado em {{count}} conversa:",
+      "usedInThreads_other": "Este conjunto de atalhos é usado em {{count}} conversas:",
+      "usedInThreadsMany": "Estes conjuntos de atalhos são usados em conversas:",
+      "usedThreadsCount": "{{count}} conversa",
+      "usedThreadsCount_other": "{{count}} conversas"
     },
     "form": {
       "title": "Criar Conjunto de Atalhos",
@@ -1150,7 +1166,10 @@
       "message": "Are you sure you want to delete \"{{name}}\"?",
       "messageMultiple": "Are you sure you want to delete {{count}} lorebooks?",
       "linkedCharacters": "This lorebook is used by {{count}} character:",
-      "linkedCharacters_other": "This lorebook is used by {{count}} characters:"
+      "linkedCharacters_other": "This lorebook is used by {{count}} characters:",
+      "linkedCharactersMany": "Estes livros de lore são usados por personagens:",
+      "linkedCharactersCount": "{{count}} personagem",
+      "linkedCharactersCount_other": "{{count}} personagens"
     },
     "globalBadge": "Global",
     "form": {

@@ -156,6 +156,27 @@ export async function duplicateLorebooks(ids) {
   }
 }
 
+// Characters that reference any of the given lorebook ids.
+export async function getLorebookUsage(ids) {
+  const chars = await db.characters.toArray()
+  const result = []
+  for (const id of ids) {
+    const linked = chars
+      .filter((c) => (c.lorebookIds || []).includes(id))
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        avatar: c.avatar,
+        characterNumber: c.characterNumber,
+      }))
+    if (linked.length > 0) {
+      const l = await db.lorebooks.get(id)
+      result.push({ id, name: l?.name || '', characters: linked })
+    }
+  }
+  return result
+}
+
 export async function exportLorebook(id) {
   const l = await db.lorebooks.get(id)
   if (!l) {
