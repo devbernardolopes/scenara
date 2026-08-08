@@ -4,12 +4,13 @@ import { useModal } from '../../../hooks/useModal'
 import { PROVIDERS, getBaseUrl, setBaseUrl } from '../../../services/apiProviders'
 import { getAllProfiles, migrateFromOldSettings } from '../../../services/connectionProfiles'
 import { getSetting, setSetting } from '../../../services/settings'
+import { redeemCode } from '../../../services/codeRedemption'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import ApiKeyManager from './controls/ApiKeyManager'
 import SettingSlider from './controls/SettingSlider'
 import ProfilePicker from '../../shared/ProfilePicker'
 import ProviderIcon from '../../shared/ProviderIcon'
-import { Edit3 } from '../../../lib/icons'
+import { Edit3, Key } from '../../../lib/icons'
 
 // UI labels for profile assignment rows (distinct from connectionProfiles.REQUEST_KINDS
 // which is a string array used for DB lookups).
@@ -110,6 +111,7 @@ function ProfileAssignmentRow({ kind, currentId, onAssign, open, onToggle, onClo
 
 function ApiSettingsPanel() {
   const { t } = useTranslation('settings')
+  const { openModal } = useModal()
 
   const [loading, setLoading] = useState(true)
   const [baseUrls, setBaseUrls] = useState({})
@@ -117,6 +119,8 @@ function ApiSettingsPanel() {
   const [selectedKind, setSelectedKind] = useState(null)
   const [cooldown, setCooldown] = useState(2)
   const [requestTimeout, setRequestTimeout] = useState(150)
+  const [redeemValue, setRedeemValue] = useState('')
+  const [redeeming, setRedeeming] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -173,6 +177,26 @@ function ApiSettingsPanel() {
     await setSetting('api.requestTimeout', val)
   }
 
+  async function handleRedeem() {
+    const code = redeemValue.trim()
+    if (!code || redeeming) return
+    setRedeeming(true)
+    try {
+      const summary = await redeemCode(code)
+      setRedeemValue('')
+      openModal('redeemCodeResult', { status: 'success', code: summary.code, summary })
+    } catch (err) {
+      setRedeemValue('')
+      openModal('redeemCodeResult', {
+        status: 'error',
+        code,
+        error: err?.code || 'invalid',
+      })
+    } finally {
+      setRedeeming(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -183,6 +207,34 @@ function ApiSettingsPanel() {
 
   return (
     <div className="space-y-6">
+      <div className="shadow-section pt-6">
+        <h3 className="text-sm font-semibold text-text mb-1">{t('api.redeem.title')}</h3>
+        <p className="text-xs text-secondary mb-4">{t('api.redeem.desc')}</p>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={redeemValue}
+            onChange={(e) => setRedeemValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleRedeem()
+            }}
+            placeholder={t('api.redeem.inputPlaceholder')}
+            autoComplete="off"
+            spellCheck={false}
+            className="flex-1 min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface-secondary text-text placeholder-tertiary text-sm uppercase"
+          />
+          <button
+            type="button"
+            onClick={handleRedeem}
+            disabled={redeeming || !redeemValue.trim()}
+            className="min-h-[44px] px-4 btn-primary text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Key className="w-4 h-4" />
+            {redeeming ? t('api.redeem.redeeming') : t('api.redeem.redeemButton')}
+          </button>
+        </div>
+      </div>
+
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-sm font-semibold text-text">{t('api.profileAssignment.title')}</h3>

@@ -1,0 +1,30 @@
+{
+  "code": "PROMO100",
+  "providerId": "groq",
+  "apiKeyLabel": "Promo — Example",
+  "encryptedKey": "SCENARA-CODE-1:ExqMuSv8h1/QM22sPbPnoaajYRoTVw9XGKCsWgEwg9VCzjuiHrgT3E102ePSnz9L+yfWImZ3zEa+",
+  "profiles": [
+    {
+      "name": "Promo Creative",
+      "model": "llama-3.3-70b-versatile",
+      "params": {
+        "temperature": 1.1,
+        "max_tokens": 1024
+      }
+    },
+    {
+      "name": "Promo Fast",
+      "model": "llama-3.1-8b-instant",
+      "params": {
+        "temperature": 0.9,
+        "max_tokens": 512
+      }
+    }
+  ],
+  "assign": {
+    "chat": "Promo Creative",
+    "autoTitle": "Promo Fast",
+    "summarization": "Promo Fast"
+  },
+  "createdAt": "2026-08-08T23:41:39.637Z"
+}

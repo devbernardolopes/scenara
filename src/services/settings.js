@@ -1223,6 +1223,12 @@ export const SETTINGS = [
     descKey: 'settings:api.interfaceProfile.desc',
   },
   {
+    key: 'redeemedCodes',
+    category: 'api',
+    type: 'text',
+    default: [],
+  },
+  {
     key: 'api.requestCooldown',
     category: 'api',
     type: 'slider',

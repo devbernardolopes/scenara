@@ -540,6 +540,23 @@
       "label": "Tiempo de espera API",
       "desc": "Tiempo máximo de inactividad (en segundos) entre tokens antes de cancelar una solicitud bloqueada."
     },
+    "redeem": {
+      "title": "Redeem Code",
+      "desc": "Have a promo code? Enter it below to add the key, connection profiles, and assignments that come with it.",
+      "inputPlaceholder": "Enter your code",
+      "redeemButton": "Redeem",
+      "redeeming": "Redeeming…",
+      "successTitle": "Code redeemed!",
+      "successMessage": "Your key for \"{{code}}\" has been added and configured.",
+      "errorTitle": "Could not redeem",
+      "errors": {
+        "invalid": "\"{{code}}\" is not a valid code.",
+        "already-used": "\"{{code}}\" has already been redeemed on this device."
+      },
+      "keyLabel": "API Key",
+      "profilesLabel": "Profiles created",
+      "kindsLabel": "Assigned to"
+    },
     "profile": {
       "createProfile": "Crear perfil",
       "noProfiles": "Aún no hay perfiles de conexión. Crea uno para agrupar proveedor, clave, modelo y parámetros.",

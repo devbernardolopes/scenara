@@ -638,10 +638,10 @@ function saveKeys(providerId, keys) {
   return setSetting(pKey(providerId, 'keys'), JSON.stringify(keys))
 }
 
-export async function addKey(providerId, { value, label }) {
+export async function addKey(providerId, { value, label, ...extra }) {
   const keys = await getKeys(providerId)
   const active = keys.length === 0
-  keys.push({ id: generateKeyId(), value, label: label || '', active })
+  keys.push({ id: generateKeyId(), value, label: label || '', active, ...extra })
   await saveKeys(providerId, keys)
   return keys
 }

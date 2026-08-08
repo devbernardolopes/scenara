@@ -1,16 +1,20 @@
 import { Routes, Route } from 'react-router-dom'
 import ShellLayout from './components/shell/ShellLayout'
+import RedeemCodeHandler from './components/shared/RedeemCodeHandler'
 import CharacterDiscovery from './pages/CharacterDiscovery'
 import ChatView from './pages/ChatView'
 
 function App() {
   return (
-    <Routes>
-      <Route element={<ShellLayout />}>
-        <Route index element={<CharacterDiscovery />} />
-        <Route path="chat/:threadId" element={<ChatView />} />
-      </Route>
-    </Routes>
+    <>
+      <RedeemCodeHandler />
+      <Routes>
+        <Route element={<ShellLayout />}>
+          <Route index element={<CharacterDiscovery />} />
+          <Route path="chat/:threadId" element={<ChatView />} />
+        </Route>
+      </Routes>
+    </>
   )
 }
 

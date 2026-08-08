@@ -1,4 +1,5 @@
 import db from '../db'
+import { decryptKey } from '../lib/codeCrypto'
 import { getSetting, setSetting } from './settings'
 import { getActiveKey, getActiveProvider, getModel, PROVIDERS } from './apiProviders'
 import { showToast } from '../lib/toast'
@@ -317,7 +318,7 @@ export async function getEffectiveProfileFor(requestKind, character) {
       try {
         const parsed = JSON.parse(keys.value)
         const entry = parsed.find((k) => k.id === profile.keyId)
-        if (entry) key = entry.value
+        if (entry) key = await decryptKey(entry.value)
       } catch {
         /* key entry not parseable */
       }

@@ -9,10 +9,15 @@ import {
   setActiveKey,
   maskKey,
 } from '../../../../services/apiProviders'
+import { isEncryptedKey, encryptKey, decryptKey } from '../../../../lib/codeCrypto'
 import { usedByProfileCount } from '../../../../services/connectionProfiles'
 import { useConfirm } from '../../../../lib/confirm'
 import KeyEditDialog from './KeyEditDialog'
-import { Plus, Edit3, Trash2, Check, Key, ExternalLink } from '../../../../lib/icons'
+import { Plus, Edit3, Trash2, Check, Key, ExternalLink, Lock } from '../../../../lib/icons'
+
+async function getKeyDisplayValue(key) {
+  return isEncryptedKey(key.value) ? decryptKey(key.value) : key.value || ''
+}
 
 function ApiKeyManager({ providerId }) {
   const { t } = useTranslation('settings')
@@ -25,27 +30,34 @@ function ApiKeyManager({ providerId }) {
   const [editingKey, setEditingKey] = useState(null)
 
   useEffect(() => {
-    getKeys(providerId).then((k) => {
-      setKeys(k)
-      setLoading(false)
-    })
+    loadKeys()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [providerId])
 
-  function reloadKeys() {
-    return getKeys(providerId).then(setKeys)
+  async function loadKeys() {
+    const raw = await getKeys(providerId)
+    const withDisplay = await Promise.all(
+      raw.map(async (k) => ({ ...k, displayValue: await getKeyDisplayValue(k) })),
+    )
+    setKeys(withDisplay)
+    setLoading(false)
   }
 
   async function handleAdd({ value, label }) {
     await addKey(providerId, { value, label })
-    await reloadKeys()
+    await loadKeys()
     setDialogOpen(false)
     setEditingKey(null)
   }
 
   async function handleEdit({ value, label }) {
     if (!editingKey) return
-    await updateKey(providerId, editingKey.id, { value, label })
-    await reloadKeys()
+    const codeGranted = editingKey.grantedViaCode || isEncryptedKey(editingKey.value)
+    await updateKey(providerId, editingKey.id, {
+      value: codeGranted ? await encryptKey(value) : value,
+      label,
+    })
+    await loadKeys()
     setDialogOpen(false)
     setEditingKey(null)
   }
@@ -64,13 +76,13 @@ function ApiKeyManager({ providerId }) {
     })
     if (confirmed) {
       await deleteKey(providerId, keyId)
-      await reloadKeys()
+      await loadKeys()
     }
   }
 
   async function handleSetActive(keyId) {
     await setActiveKey(providerId, keyId)
-    await reloadKeys()
+    await loadKeys()
   }
 
   function openAddDialog() {
@@ -85,7 +97,7 @@ function ApiKeyManager({ providerId }) {
 
   function handleUseTrial() {
     if (!provider?.trialKey) return
-    addKey(providerId, { value: provider.trialKey, label: '' }).then(() => reloadKeys())
+    addKey(providerId, { value: provider.trialKey, label: '' }).then(() => loadKeys())
   }
 
   if (loading) return null
@@ -115,8 +127,9 @@ function ApiKeyManager({ providerId }) {
               </button>
 
               <div className="flex-1 min-w-0">
-                <span className="text-sm text-text font-mono">{maskKey(key.value)}</span>
+                <span className="text-sm text-text font-mono">{maskKey(key.displayValue)}</span>
                 {key.label && <span className="text-xs text-tertiary ml-2">({key.label})</span>}
+                {key.grantedViaCode && <Lock className="w-3 h-3 inline text-tertiary ml-1" />}
               </div>
 
               <button
@@ -178,7 +191,7 @@ function ApiKeyManager({ providerId }) {
       {dialogOpen && (
         <KeyEditDialog
           title={editingKey ? t('api.editKeyDialogTitle') : t('api.addKeyDialogTitle')}
-          initialValue={editingKey?.value || ''}
+          initialValue={editingKey?.displayValue || ''}
           initialLabel={editingKey?.label || ''}
           onSave={editingKey ? handleEdit : handleAdd}
           onCancel={() => {

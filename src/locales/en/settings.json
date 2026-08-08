@@ -540,6 +540,23 @@
       "label": "API Timeout",
       "desc": "Maximum idle time (in seconds) between tokens before a stalled request is cancelled. Applies continuously — checked before the first token and after every token mid-stream — so a provider that streams a token and then hangs is also cancelled, not just one that never responds."
     },
+    "redeem": {
+      "title": "Redeem Code",
+      "desc": "Have a promo code? Enter it below to add the key, connection profiles, and assignments that come with it.",
+      "inputPlaceholder": "Enter your code",
+      "redeemButton": "Redeem",
+      "redeeming": "Redeeming…",
+      "successTitle": "Code redeemed!",
+      "successMessage": "Your key for \"{{code}}\" has been added and configured.",
+      "errorTitle": "Could not redeem",
+      "errors": {
+        "invalid": "\"{{code}}\" is not a valid code.",
+        "already-used": "\"{{code}}\" has already been redeemed on this device."
+      },
+      "keyLabel": "API Key",
+      "profilesLabel": "Profiles created",
+      "kindsLabel": "Assigned to"
+    },
     "profile": {
       "createProfile": "Create Profile",
       "noProfiles": "No connection profiles yet. Create one to bundle a provider, key, model, and parameters together.",

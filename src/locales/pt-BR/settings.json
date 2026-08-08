@@ -429,6 +429,23 @@
       "label": "Timeout da API",
       "desc": "Tempo máximo ocioso (em segundos) entre tokens antes de cancelar uma requisição parada."
     },
+    "redeem": {
+      "title": "Resgatar Código",
+      "desc": "Tem um código promocional? Digite-o abaixo para adicionar a chave, os perfis de conexão e as atribuições que o acompanham.",
+      "inputPlaceholder": "Digite seu código",
+      "redeemButton": "Resgatar",
+      "redeeming": "Resgatando…",
+      "successTitle": "Código resgatado!",
+      "successMessage": "Sua chave para \"{{code}}\" foi adicionada e configurada.",
+      "errorTitle": "Não foi possível resgatar",
+      "errors": {
+        "invalid": "\"{{code}}\" não é um código válido.",
+        "already-used": "\"{{code}}\" já foi resgatado neste dispositivo."
+      },
+      "keyLabel": "Chave da API",
+      "profilesLabel": "Perfis criados",
+      "kindsLabel": "Atribuído a"
+    },
     "profile": {
       "createProfile": "Criar Perfil",
       "noProfiles": "Nenhum perfil de conexão ainda. Crie um para agrupar provedor, chave, modelo e parâmetros.",
