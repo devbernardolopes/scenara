@@ -179,9 +179,7 @@
     "previousPage": "Pagina precedente",
     "nextPage": "Pagina successiva",
     "lastPage": "Ultima pagina",
-    "page": "Pagina {{page}}",
-    "pageOf": "Pagina {{current}} di {{total}}",
-    "jumpToPage": "Vai alla pagina"
+    "page": "Pagina {{page}}"
   },
   "toast": {
     "dismiss": "Ignora",

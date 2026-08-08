@@ -160,9 +160,7 @@
     "previousPage": "Página anterior",
     "nextPage": "Próxima página",
     "lastPage": "Última página",
-    "page": "Página {{page}}",
-    "pageOf": "Página {{current}} de {{total}}",
-    "jumpToPage": "Ir para a página"
+    "page": "Página {{page}}"
   },
   "toast": {
     "dismiss": "Dispensar",
