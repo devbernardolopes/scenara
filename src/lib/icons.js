@@ -74,4 +74,5 @@ export {
   Cloud,
   CloudCog,
   HardDrive,
+  ExternalLink,
 } from 'lucide-react'

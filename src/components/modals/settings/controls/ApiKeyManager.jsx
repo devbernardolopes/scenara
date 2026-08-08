@@ -12,12 +12,13 @@ import {
 import { usedByProfileCount } from '../../../../services/connectionProfiles'
 import { useConfirm } from '../../../../lib/confirm'
 import KeyEditDialog from './KeyEditDialog'
-import { Plus, Edit3, Trash2, Check, Key } from '../../../../lib/icons'
+import { Plus, Edit3, Trash2, Check, Key, ExternalLink } from '../../../../lib/icons'
 
 function ApiKeyManager({ providerId }) {
   const { t } = useTranslation('settings')
   const { confirm } = useConfirm()
 
+  const provider = PROVIDERS.find((p) => p.id === providerId)
   const [keys, setKeys] = useState([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -83,7 +84,6 @@ function ApiKeyManager({ providerId }) {
   }
 
   function handleUseTrial() {
-    const provider = PROVIDERS.find((p) => p.id === providerId)
     if (!provider?.trialKey) return
     addKey(providerId, { value: provider.trialKey, label: '' }).then(() => reloadKeys())
   }
@@ -162,6 +162,18 @@ function ApiKeyManager({ providerId }) {
           {t('api.useTrialKey')}
         </button>
       </div>
+
+      {provider.keyUrl && (
+        <a
+          href={provider.keyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="min-h-[44px] inline-flex items-center gap-1.5 text-xs text-secondary hover:text-text hover:underline"
+        >
+          <ExternalLink className="w-3 h-3" />
+          {t('api.getKey')}
+        </a>
+      )}
 
       {dialogOpen && (
         <KeyEditDialog

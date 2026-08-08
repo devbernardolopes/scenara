@@ -373,6 +373,7 @@
       "desc": "Selecione qual provedor de IA usar para chat."
     },
     "addKey": "Adicionar Chave",
+    "getKey": "Obter chave de API",
     "editKey": "Editar Chave",
     "deleteKey": "Excluir",
     "activeKey": "Ativa",

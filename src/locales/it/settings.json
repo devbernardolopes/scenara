@@ -484,6 +484,7 @@
       "desc": "Select which AI provider to use for chat."
     },
     "addKey": "Add Key",
+    "getKey": "Ottieni una chiave API",
     "editKey": "Edit Key",
     "deleteKey": "Delete",
     "activeKey": "Active",

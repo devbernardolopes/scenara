@@ -11,6 +11,7 @@ export const PROVIDERS = [
     hasModelEndpoint: true,
     supportsAnonymous: false,
     trialKey: 'gsk_placeholder_trial_groq_key',
+    keyUrl: 'https://console.groq.com/keys',
     params: [
       {
         key: 'max_completion_tokens',
@@ -89,6 +90,7 @@ export const PROVIDERS = [
     hasModelReasoning: true,
     supportsAnonymous: false,
     trialKey: null,
+    keyUrl: 'https://cloud.cerebras.ai/',
     params: [
       {
         key: 'max_completion_tokens',
@@ -166,6 +168,7 @@ export const PROVIDERS = [
     hasModelEndpoint: true,
     supportsAnonymous: false,
     trialKey: 'sk-or-placeholder-trial-openrouter-key',
+    keyUrl: 'https://openrouter.ai/settings/keys',
     params: [
       {
         key: 'max_completion_tokens',
@@ -243,6 +246,7 @@ export const PROVIDERS = [
     supportsAnonymous: false,
     supportsHordeMethods: true,
     trialKey: 'placeholder-horde-trial-key',
+    keyUrl: 'https://stablehorde.net/register',
     params: [
       // Common params (both methods)
       {
