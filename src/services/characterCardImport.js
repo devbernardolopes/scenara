@@ -1,6 +1,8 @@
 import { createLorebook, getAllLorebooks } from './lorebooks'
 import { createEntry, getEntriesForLorebook } from './lorebookEntries'
 import { mapLorebookFromST } from './lorebookImportExport'
+import { getAllTags, createTag } from './tags'
+import { getAllWritingInstructions, createWritingInstruction } from './writingInstructions'
 
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
 const LOREBOOK_SIGNIFICANT_FIELDS = [
@@ -331,6 +333,80 @@ export async function handleCharacterBook(characterBook, characterName) {
   return lorebookId
 }
 
+// Resolves the portable, self-contained Scenara character shape into a
+// DB-ready record: tags (names) become ids, an inline writing instruction
+// object becomes an id, and inline lorebooks (with entries) become ids in
+// `lorebookIds`. Existing ids pass through untouched. Used both when seeding
+// built-in characters and when re-importing an exported character file.
+export async function resolveInlineEntities(data) {
+  if (!data || typeof data !== 'object') return data
+  const result = { ...data }
+
+  if (Array.isArray(result.tags) && result.tags.every((t) => typeof t === 'string')) {
+    const allTags = await getAllTags()
+    const tagIdByName = new Map(allTags.map((t) => [t.name.toLowerCase(), t.id]))
+    const resolvedTags = []
+    for (const name of result.tags) {
+      const trimmed = name.trim()
+      if (!trimmed) continue
+      let id = tagIdByName.get(trimmed.toLowerCase())
+      if (id == null) {
+        id = await createTag(trimmed)
+        tagIdByName.set(trimmed.toLowerCase(), id)
+      }
+      resolvedTags.push(id)
+    }
+    result.tags = resolvedTags
+  }
+
+  const wi = result.writingInstruction
+  if (wi && typeof wi === 'object' && !Array.isArray(wi)) {
+    const name = (wi.name || '').trim()
+    const allWi = await getAllWritingInstructions()
+    const existing = name ? allWi.find((w) => w.name.toLowerCase() === name.toLowerCase()) : null
+    if (existing) {
+      result.writingInstruction = existing.id
+    } else {
+      result.writingInstruction = await createWritingInstruction({
+        name: name || 'Writing Instruction',
+        content: wi.content || '',
+      })
+    }
+  }
+
+  if (Array.isArray(result.lorebooks)) {
+    const allLorebooks = await getAllLorebooks()
+    const lorebookIdByName = new Map(allLorebooks.map((l) => [l.name.toLowerCase(), l.id]))
+    const ids = []
+    for (const lb of result.lorebooks) {
+      if (!lb || typeof lb !== 'object') continue
+      const name = (lb.name || '').trim()
+      if (!name) continue
+      let id = lorebookIdByName.get(name.toLowerCase())
+      if (id == null) {
+        id = await createLorebook({
+          name,
+          avatar: lb.avatar || '',
+          description: lb.description || '',
+          scanDepth: lb.scanDepth ?? null,
+          tokenBudget: lb.tokenBudget ?? null,
+          recursiveScanning: Boolean(lb.recursiveScanning),
+          isGlobal: false,
+        })
+        for (const entry of lb.entries || []) {
+          await createEntry(id, entry)
+        }
+        lorebookIdByName.set(name.toLowerCase(), id)
+      }
+      ids.push(id)
+    }
+    delete result.lorebooks
+    result.lorebookIds = ids
+  }
+
+  return result
+}
+
 export async function importCharacterCard(input) {
   let json
   if (input instanceof ArrayBuffer || input instanceof Uint8Array) {
@@ -347,7 +423,10 @@ export async function importCharacterCard(input) {
   }
 
   const format = detectCardFormat(json)
-  if (format === 'scenara') return { data: json, format }
+  if (format === 'scenara') {
+    const data = await resolveInlineEntities(json)
+    return { data, format }
+  }
 
   const mapped = format === 'v2' ? mapV2ToScenara(json) : mapV1ToScenara(json)
 

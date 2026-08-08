@@ -83,6 +83,27 @@ No business logic in `db.js` — just table definitions. Query/mutate from `serv
 
 **Migrating the schema:** add a new `db.version(N).stores({...})` block with the _entire_ table set (Dexie requires the full schema per version, not a diff), rather than editing an existing version in place.
 
+### Built-in Characters
+
+Built-in characters are not hardcoded — they are plain JSON files in `src/builtins/characters/`. Every `.json` file in that folder is a built-in; `src/services/builtinCharacters.js` bundles them at build time via `import.meta.glob` (no manifest to maintain). Adding a character = drop a file; removing = delete it; editing = change the JSON — then redeploy.
+
+**Seeding semantics** (`ensureBuiltInCharacters`): built-ins are seeded **only when the database is empty** — fresh install or after Settings → Database → Reset Database. Seeding is one-shot, guarded by the `builtInCharactersSeeded` settings key: once set (or once the user has any characters), built-ins are never re-added, even if the user deletes them manually. `getAllCharacters()` awaits the guard before listing, and `resetDatabase()` seeds explicitly.
+
+**File format** — Scenara-native and self-contained: the character fields plus related entities embedded by name:
+
+```json
+{
+  "name": "Eliza",
+  "avatar": "📚",
+  "prompt": "…",
+  "tags": ["Librarian"],
+  "writingInstruction": { "name": "…", "content": "…" },
+  "lorebooks": [{ "name": "…", "entries": [{ "name": "…", "keys": ["…"], "content": "…" }] }]
+}
+```
+
+`resolveInlineEntities` in `services/characterCardImport.js` turns this portable shape into DB records — tags (names) → ids, inline writing instruction → an id, inline lorebooks → `lorebookIds` — and is reused by the seeder and by the `scenara` import branch. `exportCharacter` emits this same shape (writing instruction + lorebooks dereferenced inline), so a character built in-app can be exported, dropped into `src/builtins/characters/`, and re-imported cleanly.
+
 ## AI Request Pipeline
 
 This is the core of the app and the most active area of development — read this before touching anything related to sending a message, providers, or prompts.
@@ -126,6 +147,8 @@ src/
     pt-BR/        — same namespaces (EFIGS + pt-BR supported)
     fr/, it/, de/, es/
   styles/         — tokens.css (design tokens, themes, utility classes)
+  builtins/
+    characters/   — built-in character JSON files (see "Built-in Characters" above)
   db.js           — Dexie database setup
   App.jsx         — route definitions
   main.jsx        — entry point, provider wiring, modal registration

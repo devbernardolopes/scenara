@@ -3,6 +3,7 @@ import { SETTINGS, setSetting, applySettingEffect } from './settings'
 import { resolveSystemTheme } from '../lib/systemTheme'
 import { getUIState } from './uiState'
 import { seedBuiltInFolders } from './folders'
+import { ensureBuiltInCharacters } from './builtinCharacters'
 
 export async function exportDatabase(selection) {
   const data = {
@@ -425,6 +426,7 @@ export async function resetDatabase() {
   await db.settings.add({ key: 'defaultPersonaId', value: personaId })
 
   await seedBuiltInFolders()
+  await ensureBuiltInCharacters()
 
   window.dispatchEvent(new CustomEvent('settings-changed', { detail: { key: 'defaultPersonaId' } }))
   window.dispatchEvent(new CustomEvent('personas-changed', { detail: { action: 'reset' } }))

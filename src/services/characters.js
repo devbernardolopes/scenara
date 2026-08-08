@@ -3,43 +3,13 @@ import { showToast } from '../lib/toast'
 import i18n from '../lib/i18n'
 import { deleteUIStateByKeyPrefix } from './uiState'
 import { importCharacterCard } from './characterCardImport'
-
-const SEED_CHARACTERS = [
-  {
-    name: 'Eliza',
-    avatar: '📚',
-    tagline: 'A wise AI librarian in a vast cyberpunk library.',
-    prompt:
-      'Warm, knowledgeable, patient, with a touch of mystery. She speaks in careful, measured sentences and loves sharing obscure knowledge.\n\nA vast, seemingly endless library filled with floating digital interfaces and glowing bookshelves that stretch into a star-lit digital sky.',
-  },
-  {
-    name: 'Captain Morgan',
-    avatar: '🚀',
-    tagline: 'A bold space pirate captain with a heart of gold.',
-    prompt:
-      'Boisterous, brave, dramatically inclined, loyal to a fault. Talks in exclamations and loves a good story.\n\nThe bridge of a retro-futuristic spaceship, all brass instruments and holographic displays, with a large window showing a nebula.',
-  },
-  {
-    name: 'Dr. Aria Chen',
-    avatar: '🔬',
-    tagline: 'A brilliant scientist at an arcane research facility blending magic and technology.',
-    prompt:
-      'Curious, precise, occasionally absent-minded when excited about a discovery. Uses technical jargon but tries to explain things simply.\n\nA cluttered laboratory filled with bubbling vials, glowing crystals wired to computers, and floating equations projected in the air.',
-  },
-  {
-    name: 'Kaito',
-    avatar: '🌙',
-    tagline: 'A wandering spirit guide who appears at crossroads in life.',
-    prompt:
-      'Mysterious, poetic, speaks in riddles, ancient and wise beyond appearance. Calm and soothing presence.\n\nA serene bamboo forest at twilight, with floating spirit lights drifting between the stalks, and a small stone bridge over a murmuring stream.',
-  },
-]
+import { ensureBuiltInCharacters } from './builtinCharacters'
+import { getLorebook } from './lorebooks'
+import { getEntriesForLorebook } from './lorebookEntries'
+import { getWritingInstruction } from './writingInstructions'
 
 export async function getAllCharacters() {
-  const count = await db.characters.count()
-  if (count === 0) {
-    await seedCharacters()
-  }
+  await ensureBuiltInCharacters()
   return db.characters.orderBy('createdAt').toArray()
 }
 
@@ -197,6 +167,33 @@ export async function exportCharacter(id) {
     const tagObjs = await Promise.all(data.tags.map((tid) => db.tags.get(tid)))
     data.tags = tagObjs.filter(Boolean).map((t) => t.name)
   }
+  if (data.writingInstruction) {
+    const wi = await getWritingInstruction(data.writingInstruction)
+    data.writingInstruction = wi ? { name: wi.name, content: wi.content } : null
+  }
+  if (data.lorebookIds?.length) {
+    data.lorebooks = await Promise.all(
+      data.lorebookIds.map(async (lid) => {
+        const l = await getLorebook(lid)
+        if (!l) return null
+        const entries = await getEntriesForLorebook(lid)
+        return {
+          name: l.name,
+          avatar: l.avatar || '',
+          description: l.description || '',
+          scanDepth: l.scanDepth ?? null,
+          tokenBudget: l.tokenBudget ?? null,
+          recursiveScanning: Boolean(l.recursiveScanning),
+          entries: entries.map((e) => {
+            const { id: _eid, lorebookId: _lid, createdAt: _eca, updatedAt: _eua, ...entryData } = e
+            return entryData
+          }),
+        }
+      }),
+    )
+    data.lorebooks = data.lorebooks.filter(Boolean)
+  }
+  delete data.lorebookIds
   showToast(i18n.t('common:toast.character.exported', { name: c.name }), { type: 'success' })
   return data
 }
@@ -215,12 +212,4 @@ export function importCharacterFromFile(file) {
     reader.onerror = () => reject(new Error(i18n.t('common:toast.import.fileError')))
     reader.readAsArrayBuffer(file)
   })
-}
-
-async function seedCharacters() {
-  for (const c of SEED_CHARACTERS) {
-    const now = new Date()
-    const characterNumber = await getNextCharacterNumber()
-    await db.characters.add({ ...c, characterNumber, createdAt: now, updatedAt: now })
-  }
 }
