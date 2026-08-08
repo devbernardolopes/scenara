@@ -8,6 +8,7 @@ import {
   replacePersonaTemplate,
   sendChatCompletion,
   isMessageHidden,
+  collapseBlanks,
 } from './chatApi'
 import {
   createThreadMemory,
@@ -235,15 +236,15 @@ export async function buildSummarizationPayload({
       .replace(/{{character_prompt}}/gi, charPromptSection)
       .replace(/{{status_block}}/gi, statusBlockSection)
 
-  systemContent = replaceTemplates(systemContent)
+  systemContent = collapseBlanks(replaceTemplates(systemContent))
 
   const payload = [{ role: 'system', content: systemContent }]
   if (userContent) {
-    userContent = replaceTemplates(userContent)
+    userContent = collapseBlanks(replaceTemplates(userContent))
     payload.push({ role: 'user', content: userContent })
   } else {
     const fallbackParts = [charPromptSection, memorySection, transcriptSection].filter(Boolean)
-    payload.push({ role: 'user', content: fallbackParts.join('\n\n') })
+    payload.push({ role: 'user', content: collapseBlanks(fallbackParts.join('\n\n')) })
   }
 
   return payload

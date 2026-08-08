@@ -250,6 +250,14 @@ export function getMessagesForApiRequest(
 const CODE_BLOCK_RE = /(```[\s\S]*?```|~~~[\s\S]*?~~~)/g
 const CODE_BLOCK_TEST_RE = /(```[\s\S]*?```|~~~[\s\S]*?~~~)/
 
+export function collapseBlanks(text) {
+  if (!text) return text
+  return text
+    .split(CODE_BLOCK_RE)
+    .map((part, i) => (i % 2 === 1 ? part : part.replace(/\n{3,}/g, '\n\n')))
+    .join('')
+}
+
 function hasCodeBlocks(text) {
   return typeof text === 'string' && CODE_BLOCK_TEST_RE.test(text)
 }
@@ -1087,8 +1095,6 @@ export async function buildOOCMessagesPayload({
       .replace(/{{memory}}/gi, memorySection)
       // {{content}} resolves last so the user message is never re-parsed.
       .replace(/\{\{content\}\}/gi, userMessage || '')
-
-  const collapseBlanks = (text) => text.replace(/\n{3,}/g, '\n\n')
 
   const defaultSystem = collapseBlanks(replaceOocTemplates(DEFAULT_OOC_SYSTEM))
   let systemContent = oocSystemInstr
