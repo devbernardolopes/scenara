@@ -22,72 +22,74 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
   const baseBtn = 'min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-sm'
 
   return (
-    <div className="overflow-x-auto max-w-full">
-      <div className="flex items-center gap-1 w-max mx-auto">
-        <button
-          type="button"
-          onClick={() => onPageChange(1)}
-          disabled={currentPage === 1}
-          className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
-          aria-label={t('pagination.firstPage')}
-        >
-          <ChevronsLeft className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
-          aria-label={t('pagination.previousPage')}
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
+    <div className="flex items-center justify-center gap-1">
+      <button
+        type="button"
+        onClick={() => onPageChange(1)}
+        disabled={currentPage === 1}
+        className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
+        aria-label={t('pagination.firstPage')}
+      >
+        <ChevronsLeft className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
+        aria-label={t('pagination.previousPage')}
+      >
+        <ChevronLeft className="w-4 h-4" />
+      </button>
 
-        {getPageRange(currentPage, totalPages).map((item, i) =>
-          item === '...' ? (
-            <span
-              key={`gap-${i}`}
-              className="min-w-[44px] text-center text-sm text-tertiary select-none"
-            >
-              …
-            </span>
-          ) : (
-            <button
-              key={item}
-              type="button"
-              onClick={() => onPageChange(item)}
-              className={`${baseBtn} ${
-                item === currentPage
-                  ? 'bg-primary-subtle text-primary font-medium'
-                  : 'text-secondary hover:bg-surface-hover'
-              }`}
-              aria-label={t('pagination.page', { page: item })}
-              aria-current={item === currentPage ? 'page' : undefined}
-            >
-              {item}
-            </button>
-          ),
-        )}
-
-        <button
-          type="button"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
-          aria-label={t('pagination.nextPage')}
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => onPageChange(totalPages)}
-          disabled={currentPage === totalPages}
-          className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
-          aria-label={t('pagination.lastPage')}
-        >
-          <ChevronsRight className="w-4 h-4" />
-        </button>
+      <div className="min-w-0 overflow-x-auto">
+        <div className="flex items-center gap-1 w-max mx-auto">
+          {getPageRange(currentPage, totalPages).map((item, i) =>
+            item === '...' ? (
+              <span
+                key={`gap-${i}`}
+                className="min-w-[44px] text-center text-sm text-tertiary select-none"
+              >
+                …
+              </span>
+            ) : (
+              <button
+                key={item}
+                type="button"
+                onClick={() => onPageChange(item)}
+                className={`${baseBtn} ${
+                  item === currentPage
+                    ? 'bg-primary-subtle text-primary font-medium'
+                    : 'text-secondary hover:bg-surface-hover'
+                }`}
+                aria-label={t('pagination.page', { page: item })}
+                aria-current={item === currentPage ? 'page' : undefined}
+              >
+                {item}
+              </button>
+            ),
+          )}
+        </div>
       </div>
+
+      <button
+        type="button"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
+        aria-label={t('pagination.nextPage')}
+      >
+        <ChevronRight className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => onPageChange(totalPages)}
+        disabled={currentPage === totalPages}
+        className={`${baseBtn} text-secondary hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none`}
+        aria-label={t('pagination.lastPage')}
+      >
+        <ChevronsRight className="w-4 h-4" />
+      </button>
     </div>
   )
 }
