@@ -69,7 +69,8 @@ function PersonaPicker({ open, onClose, onSelect, anchorRef, titleKey = 'persona
       setCoords({ left, top, above })
     }
     compute()
-    function handleScroll() {
+    function handleScroll(e) {
+      if (ref.current && ref.current.contains(e.target)) return
       onCloseRef.current()
     }
     window.addEventListener('scroll', handleScroll, true)
