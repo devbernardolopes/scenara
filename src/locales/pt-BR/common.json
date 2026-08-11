@@ -122,7 +122,9 @@
       "empty": "Esta pasta está vazia."
     },
     "favorites": {
-      "title": "Favoritos"
+      "title": "Favoritos",
+      "scrollLeft": "Rolar favoritos para a esquerda",
+      "scrollRight": "Rolar favoritos para a direita"
     }
   },
   "dismissModelBar": "Dispensar barra de modelo do chat",

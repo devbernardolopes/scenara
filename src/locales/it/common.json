@@ -139,7 +139,9 @@
       "empty": "Questa cartella è vuota."
     },
     "favorites": {
-      "title": "Preferiti"
+      "title": "Preferiti",
+      "scrollLeft": "Scorri i preferiti a sinistra",
+      "scrollRight": "Scorri i preferiti a destra"
     }
   },
   "loading": "Caricamento…",

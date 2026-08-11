@@ -139,7 +139,9 @@
       "empty": "Esta carpeta está vacía."
     },
     "favorites": {
-      "title": "Favoritos"
+      "title": "Favoritos",
+      "scrollLeft": "Desplazar favoritos a la izquierda",
+      "scrollRight": "Desplazar favoritos a la derecha"
     }
   },
   "loading": "Cargando…",

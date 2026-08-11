@@ -139,7 +139,9 @@
       "empty": "Ce dossier est vide."
     },
     "favorites": {
-      "title": "Favoris"
+      "title": "Favoris",
+      "scrollLeft": "Faire défiler les favoris vers la gauche",
+      "scrollRight": "Faire défiler les favoris vers la droite"
     }
   },
   "loading": "Chargement…",

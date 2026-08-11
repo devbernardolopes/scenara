@@ -139,7 +139,9 @@
       "empty": "This folder is empty."
     },
     "favorites": {
-      "title": "Favorites"
+      "title": "Favorites",
+      "scrollLeft": "Scroll favorites left",
+      "scrollRight": "Scroll favorites right"
     }
   },
   "loading": "Loading…",

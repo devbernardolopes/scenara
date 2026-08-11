@@ -139,7 +139,9 @@
       "empty": "Dieser Ordner ist leer."
     },
     "favorites": {
-      "title": "Favoriten"
+      "title": "Favoriten",
+      "scrollLeft": "Favoriten nach links scrollen",
+      "scrollRight": "Favoriten nach rechts scrollen"
     }
   },
   "loading": "Laden…",
