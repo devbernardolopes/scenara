@@ -27,6 +27,16 @@ const EVENT_MAP = {
       type: 'success',
       params: { name: d.entityName },
     }),
+    favorite: (d) => ({
+      key: 'toast.character.favorited',
+      type: 'success',
+      params: { name: d.entityName },
+    }),
+    unfavorite: (d) => ({
+      key: 'toast.character.unfavorited',
+      type: 'info',
+      params: { name: d.entityName },
+    }),
   },
   'threads-changed': {
     create: () => ({ key: 'toast.thread.created', type: 'success' }),

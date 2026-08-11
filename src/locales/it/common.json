@@ -192,6 +192,8 @@
       "deleted": "{{name}} eliminato",
       "deletedMultiple": "{{name}} e {{count}} chat eliminati",
       "duplicated": "{{name}} duplicato",
+      "favorited": "{{name}} aggiunto ai preferiti",
+      "unfavorited": "{{name}} rimosso dai preferiti",
       "exported": "{{name}} esportato"
     },
     "thread": {

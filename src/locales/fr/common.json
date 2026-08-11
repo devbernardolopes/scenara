@@ -192,6 +192,8 @@
       "deleted": "{{name}} supprimé",
       "deletedMultiple": "{{name}} et {{count}} discussions supprimés",
       "duplicated": "{{name}} dupliqué",
+      "favorited": "{{name}} ajouté aux favoris",
+      "unfavorited": "{{name}} retiré des favoris",
       "exported": "{{name}} exporté"
     },
     "thread": {

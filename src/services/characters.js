@@ -65,11 +65,13 @@ export async function createCharacter(data) {
 }
 
 export async function updateCharacter(id, data) {
+  const character = await db.characters.get(id)
   const updated = await db.characters.update(id, { ...data, updatedAt: new Date() })
   if (updated) {
+    const action = 'isFavorite' in data ? (data.isFavorite ? 'favorite' : 'unfavorite') : 'update'
     window.dispatchEvent(
       new CustomEvent('characters-changed', {
-        detail: { action: 'update', entityName: data.name },
+        detail: { action, entityName: data.name || character?.name },
       }),
     )
     return id
