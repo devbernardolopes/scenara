@@ -79,6 +79,20 @@ export async function updateCharacter(id, data) {
   throw new Error('Character not found')
 }
 
+export async function assignCharacterFolder(id, folderId) {
+  const character = await db.characters.get(id)
+  const updated = await db.characters.update(id, { folderId })
+  if (updated) {
+    window.dispatchEvent(
+      new CustomEvent('characters-changed', {
+        detail: { action: 'folder', entityName: character?.name },
+      }),
+    )
+    return id
+  }
+  throw new Error('Character not found')
+}
+
 export async function updateCharacterLastSection(id, section) {
   await db.characters.update(id, { lastSection: section })
 }

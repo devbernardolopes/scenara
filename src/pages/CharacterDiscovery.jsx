@@ -13,6 +13,7 @@ import {
   exportCharacter,
   getCharacterChatCounts,
   updateCharacter,
+  assignCharacterFolder,
 } from '../services/characters'
 import { downloadJson } from '../lib/download'
 import { showToast } from '../lib/toast'
@@ -340,7 +341,12 @@ function CharacterDiscovery() {
       setCharacters((prev) => {
         if (
           prev.length === chars.length &&
-          prev.every((c, i) => c.id === chars[i].id && c.updatedAt === chars[i].updatedAt)
+          prev.every(
+            (c, i) =>
+              c.id === chars[i].id &&
+              c.updatedAt === chars[i].updatedAt &&
+              c.folderId === chars[i].folderId,
+          )
         )
           return prev
         return chars
@@ -577,7 +583,7 @@ function CharacterDiscovery() {
   }
 
   async function handleAssignFolder(character, folderId) {
-    await updateCharacter(character.id, { folderId })
+    await assignCharacterFolder(character.id, folderId)
     setFolderPickerFor(null)
   }
 
