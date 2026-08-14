@@ -153,13 +153,21 @@ export async function duplicateCharacter(id) {
   if (!original) throw new Error('Character not found')
   const now = new Date()
   const characterNumber = await getNextCharacterNumber()
-  const { id: _id, createdAt: _ca, updatedAt: _ua, characterNumber: _cn, ...rest } = original
+  const {
+    id: _id,
+    createdAt: _ca,
+    updatedAt: _ua,
+    characterNumber: _cn,
+    isFavorite: _fav,
+    ...rest
+  } = original
   const newId = await db.characters.add({
     ...rest,
     name: original.name,
     displayName: original.displayName
       ? `${original.displayName} (Copy)`
       : `${original.name} (Copy)`,
+    isFavorite: false,
     characterNumber,
     createdAt: now,
     updatedAt: now,
