@@ -16,7 +16,6 @@ import { seedBuiltInFolders } from './services/folders'
 import { migrateSettingsKeys } from './services/settings'
 
 import CharacterCreateModal from './components/modals/CharacterCreateModal'
-import PersonaEditorModal from './components/modals/PersonaEditorModal'
 import PersonaFormModal from './components/modals/PersonaFormModal'
 import PersonaManagementModal from './components/modals/PersonaManagementModal'
 import EditThreadTitleModal from './components/modals/EditThreadTitleModal'
@@ -71,7 +70,6 @@ const ScenarioSelectorModal = lazy(() => import('./components/modals/ScenarioSel
 registerModal('settings', SettingsModal)
 registerModal('imageViewer', ImageViewerModal)
 registerModal('characterCreate', CharacterCreateModal)
-registerModal('personaEditor', PersonaEditorModal)
 registerModal('personaForm', PersonaFormModal)
 registerModal('personaManagement', PersonaManagementModal)
 registerModal('editThreadTitle', EditThreadTitleModal)

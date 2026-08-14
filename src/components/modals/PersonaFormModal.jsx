@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useModal } from '../../hooks/useModal'
 import { useSaveConfirm } from '../../lib/saveConfirm'
 import { isValidAvatar, normalizeAvatar } from '../../lib/image'
+import { showToast } from '../../lib/toast'
+import { Cloud } from '../../lib/icons'
 import ModalShell from '../shared/ModalShell'
 import SaveButton from '../shared/SaveButton'
 import CollapsibleSection from '../shared/CollapsibleSection'
@@ -14,6 +16,14 @@ import { estimateTokens } from '../../services/tokenEstimator'
 import { findColorSlot } from '../../config/colorPalettes'
 import { useTheme } from '../../hooks/useTheme'
 import ColorPicker from '../shared/ColorPicker'
+import {
+  getCatboxService,
+  catboxUploadAvatar,
+  getImgchestService,
+  imgchestUploadAvatar,
+} from '../../services/cloudServices'
+import { validateUploadSize } from '../../services/catbox'
+import { validateImgchestUploadSize } from '../../services/imgchest'
 
 const inputClass =
   'w-full px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm'
@@ -55,6 +65,7 @@ function ToggleRow({ label, checked, onChange, disabled = false }) {
 
 function PersonaFormModal({ persona }) {
   const { t } = useTranslation('settings')
+  const { t: tc } = useTranslation('characterCreation')
   const { closeModal, setCloseGuard, openModal } = useModal()
   const { theme } = useTheme()
   const { promptSave } = useSaveConfirm()
@@ -79,6 +90,12 @@ function PersonaFormModal({ persona }) {
   const [saving, setSaving] = useState(false)
   const [isLastDefault, setIsLastDefault] = useState(false)
   const savePendingRef = useRef(false)
+  const [catboxService, setCatboxService] = useState(null)
+  const [converting, setConverting] = useState(false)
+  const catboxAbortRef = useRef(null)
+  const [imgchestService, setImgchestService] = useState(null)
+  const [convertingImgchest, setConvertingImgchest] = useState(false)
+  const imgchestAbortRef = useRef(null)
 
   const isDirty = Object.keys(initial).some((key) => form[key] !== initial[key])
   const avatarInvalid = Boolean(form.avatar.trim()) && !isValidAvatar(form.avatar)
@@ -92,6 +109,103 @@ function PersonaFormModal({ persona }) {
       })
     }
   }, [editing, persona])
+
+  useEffect(
+    () => () => {
+      catboxAbortRef.current?.abort()
+      imgchestAbortRef.current?.abort()
+    },
+    [],
+  )
+
+  useEffect(() => {
+    getCatboxService().then(setCatboxService)
+    getImgchestService().then(setImgchestService)
+    const handler = () => {
+      getCatboxService().then(setCatboxService)
+      getImgchestService().then(setImgchestService)
+    }
+    window.addEventListener('cloudServices-changed', handler)
+    return () => window.removeEventListener('cloudServices-changed', handler)
+  }, [])
+
+  async function handleConvertToCatbox() {
+    if (!catboxService) {
+      showToast(tc('catboxNoService'), { type: 'warning' })
+      return
+    }
+    const validation = validateUploadSize(form.avatar)
+    if (!validation.ok) {
+      const isGif = form.avatar.includes('image/gif')
+      showToast(
+        tc('catboxSizeLimit', { limit: validation.limitMB, type: isGif ? 'GIF' : 'image' }),
+        {
+          type: 'error',
+        },
+      )
+      return
+    }
+    catboxAbortRef.current?.abort()
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 60000)
+    catboxAbortRef.current = controller
+    setConverting(true)
+    try {
+      const url = await catboxUploadAvatar(catboxService, form.avatar, {
+        signal: controller.signal,
+      })
+      setForm((prev) => ({ ...prev, avatar: url }))
+      showToast(tc('catboxConvertSuccess'), { type: 'success' })
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        showToast(tc('catboxConvertError', { error: 'Timed out' }), { type: 'error' })
+      } else {
+        showToast(tc('catboxConvertError', { error: err.message }), { type: 'error' })
+      }
+    } finally {
+      clearTimeout(timeoutId)
+      catboxAbortRef.current = null
+      setConverting(false)
+    }
+  }
+
+  async function handleConvertToImgchest() {
+    if (!imgchestService) {
+      showToast(tc('imgchestNoService'), { type: 'warning' })
+      return
+    }
+    const validation = validateImgchestUploadSize(form.avatar)
+    if (!validation.ok) {
+      const isGif = form.avatar.includes('image/gif')
+      showToast(
+        tc('imgchestSizeLimit', { limit: validation.limitMB, type: isGif ? 'GIF' : 'image' }),
+        { type: 'error' },
+      )
+      return
+    }
+    imgchestAbortRef.current?.abort()
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 60000)
+    imgchestAbortRef.current = controller
+    setConvertingImgchest(true)
+    try {
+      const url = await imgchestUploadAvatar(imgchestService, form.avatar, {
+        signal: controller.signal,
+      })
+      setForm((prev) => ({ ...prev, avatar: url }))
+      showToast(tc('imgchestConvertSuccess'), { type: 'success' })
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        showToast(tc('imgchestConvertError', { error: 'Timed out' }), { type: 'error' })
+      } else {
+        showToast(tc('imgchestConvertError', { error: err.message }), { type: 'error' })
+      }
+    } finally {
+      clearTimeout(timeoutId)
+      imgchestAbortRef.current = null
+      setConvertingImgchest(false)
+    }
+  }
 
   const handleCloseRef = useRef()
   useEffect(() => {
@@ -239,6 +353,28 @@ function PersonaFormModal({ persona }) {
             errorText={t('common:avatar.invalid')}
             onZoom={() => openModal('imageViewer', { src: form.avatar, modalSize: 'fullscreen' })}
           />
+          {form.avatar.startsWith('data:') && catboxService && (
+            <button
+              type="button"
+              onClick={handleConvertToCatbox}
+              disabled={converting}
+              className="flex items-center gap-1.5 mt-1.5 text-xs text-accent hover:underline disabled:opacity-50"
+            >
+              <Cloud className="w-3 h-3" />
+              {converting ? tc('convertingToCatbox') : tc('convertToCatbox')}
+            </button>
+          )}
+          {form.avatar.startsWith('data:') && imgchestService && (
+            <button
+              type="button"
+              onClick={handleConvertToImgchest}
+              disabled={convertingImgchest}
+              className="flex items-center gap-1.5 mt-1.5 text-xs text-accent hover:underline disabled:opacity-50"
+            >
+              <Cloud className="w-3 h-3" />
+              {convertingImgchest ? tc('convertingToImgchest') : tc('convertToImgchest')}
+            </button>
+          )}
         </div>
 
         <CollapsibleSection
