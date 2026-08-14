@@ -38,6 +38,7 @@ function ExportDatabaseModal() {
   const [selectedTags, setSelectedTags] = useState(true)
   const [selectedSettings, setSelectedSettings] = useState(true)
   const [selectedCloudServices, setSelectedCloudServices] = useState(true)
+  const [selectedFolders, setSelectedFolders] = useState(true)
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -125,6 +126,7 @@ function ExportDatabaseModal() {
         tags: selectedTags,
         settings: selectedSettings,
         cloudServices: selectedCloudServices,
+        folders: selectedFolders,
       })
 
       openModal('exportDestination', { exportData: data, modalSize: 'md' })
@@ -448,8 +450,14 @@ function ExportDatabaseModal() {
 
         <CollapsibleSection
           label={t('database.exportModal.extra')}
-          summary={`${[selectedTags, selectedSettings, selectedLogs, selectedCloudServices].filter(Boolean).length}`}
-          hasContent={selectedTags || selectedSettings || selectedLogs || selectedCloudServices}
+          summary={`${[selectedTags, selectedSettings, selectedLogs, selectedCloudServices, selectedFolders].filter(Boolean).length}`}
+          hasContent={
+            selectedTags ||
+            selectedSettings ||
+            selectedLogs ||
+            selectedCloudServices ||
+            selectedFolders
+          }
           storageKey="export.extra"
         >
           <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
@@ -524,6 +532,25 @@ function ExportDatabaseModal() {
               </span>
               <span className="text-xs text-tertiary ml-2">
                 {t('database.exportModal.cloudServicesDescription')}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-3 rounded-md hover:bg-surface-hover">
+            <label className="flex items-center min-h-[44px] min-w-[44px] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={selectedFolders}
+                onChange={(e) => setSelectedFolders(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+              />
+            </label>
+            <div className="flex-1 min-w-0">
+              <span className="text-sm font-medium text-text">
+                {t('database.exportModal.folders')}
+              </span>
+              <span className="text-xs text-tertiary ml-2">
+                {t('database.exportModal.foldersDescription')}
               </span>
             </div>
           </div>

@@ -1349,6 +1349,8 @@
       "logsDescription": "Alle Protokolle",
       "cloudServices": "Cloud Services",
       "cloudServicesDescription": "All cloud service configurations",
+      "folders": "Folders",
+      "foldersDescription": "All character folders",
       "lorebooks": "Lorebooks",
       "lorebooksDisabled": "Not yet implemented",
       "tags": "Tags",
