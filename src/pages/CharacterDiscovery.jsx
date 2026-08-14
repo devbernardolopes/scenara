@@ -250,7 +250,7 @@ function CharacterDiscovery() {
   const [chatCounts, setChatCounts] = useState(new Map())
   const [tagsMap, setTagsMap] = useState(new Map())
   const [folders, setFolders] = useState([])
-  const [activeFolderId, setActiveFolderId] = useState('all')
+  const [selectedFolderIds, setSelectedFolderIds] = useState([])
   const [folderPickerFor, setFolderPickerFor] = useState(null)
   const [moreMenuFor, setMoreMenuFor] = useState(null)
   const [cardSize, setCardSize] = useState('regular')
@@ -258,9 +258,9 @@ function CharacterDiscovery() {
   const scrollRef = useRef(null)
 
   const scopedCharacters = useMemo(() => {
-    if (activeFolderId === 'all') return characters
-    return characters.filter((c) => c.folderId === activeFolderId)
-  }, [characters, activeFolderId])
+    if (selectedFolderIds.length === 0) return characters
+    return characters.filter((c) => selectedFolderIds.includes(c.folderId))
+  }, [characters, selectedFolderIds])
 
   const filteredCharacters = useMemo(() => {
     const q = searchQuery.toLowerCase().trim()
@@ -383,13 +383,15 @@ function CharacterDiscovery() {
     setFolders(data)
     if (!foldersLoadedOnceRef.current) {
       foldersLoadedOnceRef.current = true
-      const saved = await getUIState('discovery.activeFolderId')
-      const valid = saved && data.some((f) => f.id === saved)
-      setActiveFolderId(valid ? saved : 'all')
+      let ids = await getUIState('discovery.selectedFolderIds')
+      if (!Array.isArray(ids)) {
+        const old = await getUIState('discovery.activeFolderId')
+        ids = old && old !== 'all' && data.some((f) => f.id === old) ? [old] : []
+      }
+      ids = ids.filter((id) => data.some((f) => f.id === id))
+      setSelectedFolderIds(ids)
     } else {
-      setActiveFolderId((prev) =>
-        prev !== 'all' && !data.some((f) => f.id === prev) ? 'all' : prev,
-      )
+      setSelectedFolderIds((prev) => prev.filter((id) => data.some((f) => f.id === id)))
     }
   }
 
@@ -439,7 +441,7 @@ function CharacterDiscovery() {
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, sortBy, sortOrder, activeFolderId])
+  }, [searchQuery, sortBy, sortOrder, selectedFolderIds])
 
   const persistSortBy = useCallback((val) => {
     setSortBy(val)
@@ -456,10 +458,24 @@ function CharacterDiscovery() {
     setUIState('discovery.searchQuery', val)
   }, [])
 
-  const persistActiveFolderId = useCallback((val) => {
-    setActiveFolderId(val)
-    setUIState('discovery.activeFolderId', val)
+  const persistSelectedFolders = useCallback((ids) => {
+    setSelectedFolderIds(ids)
+    setUIState('discovery.selectedFolderIds', ids)
   }, [])
+
+  const handleSelectAllFolders = useCallback(() => {
+    persistSelectedFolders([])
+  }, [persistSelectedFolders])
+
+  const handleToggleFolder = useCallback(
+    (folderId) => {
+      const next = selectedFolderIds.includes(folderId)
+        ? selectedFolderIds.filter((id) => id !== folderId)
+        : [...selectedFolderIds, folderId]
+      persistSelectedFolders(next)
+    },
+    [selectedFolderIds, persistSelectedFolders],
+  )
 
   const handlePageChange = useCallback((page) => {
     setCurrentPage(page)
@@ -662,8 +678,9 @@ function CharacterDiscovery() {
       <div className="shrink-0 px-4 md:px-8 pt-4 pb-1 space-y-2">
         <FolderTabsBar
           folders={folders}
-          activeFolderId={activeFolderId}
-          onSelect={persistActiveFolderId}
+          selectedFolderIds={selectedFolderIds}
+          onSelectAll={handleSelectAllFolders}
+          onToggleFolder={handleToggleFolder}
           onManage={() => openModal('folderManagement')}
         />
         <CollapsibleSection
@@ -740,7 +757,7 @@ function CharacterDiscovery() {
           <p className="text-secondary text-sm py-8 text-center">
             {searchQuery
               ? t('discovery.search.noResults')
-              : activeFolderId !== 'all'
+              : selectedFolderIds.length > 0
                 ? t('discovery.folders.empty')
                 : t('discovery.noCharacters')}
           </p>
