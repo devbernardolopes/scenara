@@ -736,7 +736,7 @@ function CharacterDiscovery() {
           <div className="flex items-center justify-center h-full">
             <p className="text-secondary text-sm">{t('loading')}</p>
           </div>
-        ) : sortedCharacters.length === 0 ? (
+        ) : filteredCharacters.length === 0 ? (
           <p className="text-secondary text-sm py-8 text-center">
             {searchQuery
               ? t('discovery.search.noResults')
