@@ -335,7 +335,9 @@ function CharacterCreateModal({ character: existing, initialData }) {
 
       if (form.statusBlock) total += estimateTokens(replaceVars(form.statusBlock))
 
-      if (form.globalContext) total += estimateTokens(replaceVars(form.globalContext))
+      const gcLifetime = form.globalContextLifetime || 'always'
+      if (form.globalContext && gcLifetime === 'always')
+        total += estimateTokens(replaceVars(form.globalContext))
 
       if (form.systemPrompt) total += estimateTokens(replaceVars(form.systemPrompt))
 
@@ -363,6 +365,7 @@ function CharacterCreateModal({ character: existing, initialData }) {
     form.personality,
     form.statusBlock,
     form.globalContext,
+    form.globalContextLifetime,
     form.systemPrompt,
     form.postHistoryInstructions,
     form.writingInstruction,
