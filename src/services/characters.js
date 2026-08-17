@@ -66,7 +66,9 @@ export async function createCharacter(data) {
 
 export async function updateCharacter(id, data) {
   const character = await db.characters.get(id)
-  const updated = await db.characters.update(id, { ...data, updatedAt: new Date() })
+  const isFavoriteOnly = Object.keys(data).length === 1 && 'isFavorite' in data
+  const updateData = isFavoriteOnly ? data : { ...data, updatedAt: new Date() }
+  const updated = await db.characters.update(id, updateData)
   if (updated) {
     const action = 'isFavorite' in data ? (data.isFavorite ? 'favorite' : 'unfavorite') : 'update'
     window.dispatchEvent(
