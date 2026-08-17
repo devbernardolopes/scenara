@@ -105,10 +105,14 @@ function LorebookFormModal({ lorebook }) {
   const [imgchestService, setImgchestService] = useState(null)
   const [convertingImgchest, setConvertingImgchest] = useState(false)
   const imgchestAbortRef = useRef(null)
+  const catboxCancelledRef = useRef(false)
+  const imgchestCancelledRef = useRef(false)
 
   useEffect(() => {
     return () => {
+      catboxCancelledRef.current = true
       catboxAbortRef.current?.abort()
+      imgchestCancelledRef.current = true
       imgchestAbortRef.current?.abort()
     }
   }, [])
@@ -159,6 +163,11 @@ function LorebookFormModal({ lorebook }) {
   }
 
   async function handleConvertToCatbox() {
+    if (converting) {
+      catboxCancelledRef.current = true
+      catboxAbortRef.current?.abort()
+      return
+    }
     if (!catboxService) {
       showToast(t('characterCreation:catboxNoService'), { type: 'warning' })
       return
@@ -188,9 +197,11 @@ function LorebookFormModal({ lorebook }) {
       showToast(t('characterCreation:catboxConvertSuccess'), { type: 'success' })
     } catch (err) {
       if (err.name === 'AbortError') {
-        showToast(t('characterCreation:catboxConvertError', { error: 'Timed out' }), {
-          type: 'error',
-        })
+        if (!catboxCancelledRef.current) {
+          showToast(t('characterCreation:catboxConvertError', { error: 'Timed out' }), {
+            type: 'error',
+          })
+        }
       } else {
         showToast(t('characterCreation:catboxConvertError', { error: err.message }), {
           type: 'error',
@@ -199,11 +210,17 @@ function LorebookFormModal({ lorebook }) {
     } finally {
       clearTimeout(timeoutId)
       catboxAbortRef.current = null
+      catboxCancelledRef.current = false
       setConverting(false)
     }
   }
 
   async function handleConvertToImgchest() {
+    if (convertingImgchest) {
+      imgchestCancelledRef.current = true
+      imgchestAbortRef.current?.abort()
+      return
+    }
     if (!imgchestService) {
       showToast(t('characterCreation:imgchestNoService'), { type: 'warning' })
       return
@@ -233,9 +250,11 @@ function LorebookFormModal({ lorebook }) {
       showToast(t('characterCreation:imgchestConvertSuccess'), { type: 'success' })
     } catch (err) {
       if (err.name === 'AbortError') {
-        showToast(t('characterCreation:imgchestConvertError', { error: 'Timed out' }), {
-          type: 'error',
-        })
+        if (!imgchestCancelledRef.current) {
+          showToast(t('characterCreation:imgchestConvertError', { error: 'Timed out' }), {
+            type: 'error',
+          })
+        }
       } else {
         showToast(t('characterCreation:imgchestConvertError', { error: err.message }), {
           type: 'error',
@@ -244,6 +263,7 @@ function LorebookFormModal({ lorebook }) {
     } finally {
       clearTimeout(timeoutId)
       imgchestAbortRef.current = null
+      imgchestCancelledRef.current = false
       setConvertingImgchest(false)
     }
   }
@@ -406,12 +426,12 @@ function LorebookFormModal({ lorebook }) {
             <button
               type="button"
               onClick={handleConvertToCatbox}
-              disabled={converting}
+              disabled={convertingImgchest}
               className="flex items-center gap-1.5 mt-1.5 text-xs text-accent hover:underline disabled:opacity-50"
             >
               <Cloud className="w-3 h-3" />
               {converting
-                ? t('characterCreation:convertingToCatbox')
+                ? t('characterCreation:cancelConvertToCatbox')
                 : t('characterCreation:convertToCatbox')}
             </button>
           )}
@@ -419,12 +439,12 @@ function LorebookFormModal({ lorebook }) {
             <button
               type="button"
               onClick={handleConvertToImgchest}
-              disabled={convertingImgchest}
+              disabled={converting}
               className="flex items-center gap-1.5 mt-1.5 text-xs text-accent hover:underline disabled:opacity-50"
             >
               <Cloud className="w-3 h-3" />
               {convertingImgchest
-                ? t('characterCreation:convertingToImgchest')
+                ? t('characterCreation:cancelConvertToImgchest')
                 : t('characterCreation:convertToImgchest')}
             </button>
           )}

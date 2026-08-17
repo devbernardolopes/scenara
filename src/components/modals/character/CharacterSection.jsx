@@ -39,10 +39,14 @@ function CharacterSection({ form, onChange, characterId }) {
   const [imgchestService, setImgchestService] = useState(null)
   const [convertingImgchest, setConvertingImgchest] = useState(false)
   const imgchestAbortRef = useRef(null)
+  const catboxCancelledRef = useRef(false)
+  const imgchestCancelledRef = useRef(false)
 
   useEffect(() => {
     return () => {
+      catboxCancelledRef.current = true
       catboxAbortRef.current?.abort()
+      imgchestCancelledRef.current = true
       imgchestAbortRef.current?.abort()
     }
   }, [])
@@ -72,6 +76,11 @@ function CharacterSection({ form, onChange, characterId }) {
     : null
 
   async function handleConvertToCatbox() {
+    if (converting) {
+      catboxCancelledRef.current = true
+      catboxAbortRef.current?.abort()
+      return
+    }
     if (!catboxService) {
       showToast(t('catboxNoService'), { type: 'warning' })
       return
@@ -98,18 +107,26 @@ function CharacterSection({ form, onChange, characterId }) {
       showToast(t('catboxConvertSuccess'), { type: 'success' })
     } catch (err) {
       if (err.name === 'AbortError') {
-        showToast(t('catboxConvertError', { error: 'Timed out' }), { type: 'error' })
+        if (!catboxCancelledRef.current) {
+          showToast(t('catboxConvertError', { error: 'Timed out' }), { type: 'error' })
+        }
       } else {
         showToast(t('catboxConvertError', { error: err.message }), { type: 'error' })
       }
     } finally {
       clearTimeout(timeoutId)
       catboxAbortRef.current = null
+      catboxCancelledRef.current = false
       setConverting(false)
     }
   }
 
   async function handleConvertToImgchest() {
+    if (convertingImgchest) {
+      imgchestCancelledRef.current = true
+      imgchestAbortRef.current?.abort()
+      return
+    }
     if (!imgchestService) {
       showToast(t('imgchestNoService'), { type: 'warning' })
       return
@@ -136,13 +153,16 @@ function CharacterSection({ form, onChange, characterId }) {
       showToast(t('imgchestConvertSuccess'), { type: 'success' })
     } catch (err) {
       if (err.name === 'AbortError') {
-        showToast(t('imgchestConvertError', { error: 'Timed out' }), { type: 'error' })
+        if (!imgchestCancelledRef.current) {
+          showToast(t('imgchestConvertError', { error: 'Timed out' }), { type: 'error' })
+        }
       } else {
         showToast(t('imgchestConvertError', { error: err.message }), { type: 'error' })
       }
     } finally {
       clearTimeout(timeoutId)
       imgchestAbortRef.current = null
+      imgchestCancelledRef.current = false
       setConvertingImgchest(false)
     }
   }
@@ -214,22 +234,22 @@ function CharacterSection({ form, onChange, characterId }) {
           <button
             type="button"
             onClick={handleConvertToCatbox}
-            disabled={converting}
+            disabled={convertingImgchest}
             className="flex items-center gap-1.5 mt-1.5 text-xs text-accent hover:underline disabled:opacity-50"
           >
             <Cloud className="w-3 h-3" />
-            {converting ? t('convertingToCatbox') : t('convertToCatbox')}
+            {converting ? t('cancelConvertToCatbox') : t('convertToCatbox')}
           </button>
         )}
         {form.avatar.startsWith('data:') && imgchestService && (
           <button
             type="button"
             onClick={handleConvertToImgchest}
-            disabled={convertingImgchest}
+            disabled={converting}
             className="flex items-center gap-1.5 mt-1.5 text-xs text-accent hover:underline disabled:opacity-50"
           >
             <Cloud className="w-3 h-3" />
-            {convertingImgchest ? t('convertingToImgchest') : t('convertToImgchest')}
+            {convertingImgchest ? t('cancelConvertToImgchest') : t('convertToImgchest')}
           </button>
         )}
       </div>
