@@ -191,6 +191,7 @@ function ProfileFormModal({ profile }) {
   const [modelNames, setModelNames] = useState({})
   const [modelSupportedParams, setModelSupportedParams] = useState({})
   const [fetching, setFetching] = useState(false)
+  const [fetchError, setFetchError] = useState(null)
   const abortRef = useRef(null)
   const savePendingRef = useRef(false)
 
@@ -310,6 +311,7 @@ function ProfileFormModal({ profile }) {
   }, [])
 
   useEffect(() => {
+    setFetchError(null)
     if (form.providerId) {
       getCachedModels(form.providerId, hordeMethod).then(setCachedModels)
       if (form.providerId === 'ai-horde') {
@@ -471,6 +473,7 @@ function ProfileFormModal({ profile }) {
   async function handleRefresh() {
     if (fetching) return
     setFetching(true)
+    setFetchError(null)
     abortRef.current = new AbortController()
     try {
       const result = await fetchModels(form.providerId, {
@@ -500,7 +503,8 @@ function ProfileFormModal({ profile }) {
         setModelSupportedParams({})
       }
     } catch (err) {
-      if (err.name !== 'AbortError') throw err
+      if (err.name === 'AbortError') return
+      setFetchError(err)
     } finally {
       setFetching(false)
       abortRef.current = null
@@ -646,7 +650,10 @@ function ProfileFormModal({ profile }) {
               id={formId + '-baseurl'}
               type="url"
               value={form.baseUrl}
-              onChange={(e) => setForm((prev) => ({ ...prev, baseUrl: e.target.value }))}
+              onChange={(e) => {
+                setFetchError(null)
+                setForm((prev) => ({ ...prev, baseUrl: e.target.value }))
+              }}
               placeholder={t('api.profile.form.baseUrlPlaceholder')}
               className="w-full min-h-[44px] px-3 py-2 border border-border rounded-md bg-surface bg-surface-secondary text-text placeholder-tertiary text-sm"
             />
@@ -801,6 +808,7 @@ function ProfileFormModal({ profile }) {
                 modelNames={modelNames}
                 modelMeta={modelMeta}
                 fetching={fetching}
+                fetchError={fetchError}
                 onCancelFetch={handleCancelFetch}
                 onRefresh={() => handleRefresh(selectedProvider.id)}
                 cooldownRemaining={getCooldownRemaining()}

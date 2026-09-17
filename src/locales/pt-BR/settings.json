@@ -409,6 +409,8 @@
     "refreshModels": "Atualizar modelos",
     "fetchingModels": "Buscando modelos…",
     "cooldown": "Aguarde {{seconds}}s antes de atualizar novamente",
+    "modelFetchFailed": "Não foi possível carregar os modelos: {{message}}",
+    "modelFetchCorsHint": "Servidores locais como o LM Studio bloqueiam requisições do navegador a menos que o CORS esteja ativado. No LM Studio, ative “Enable CORS” nas configurações do servidor, reinicie-o e atualize novamente.",
     "profileAssignment": {
       "title": "Atribuição de Perfil",
       "clearAll": "Limpar tudo",

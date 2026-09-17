@@ -520,6 +520,8 @@
     "refreshModels": "Refresh models",
     "fetchingModels": "Fetching models…",
     "cooldown": "Wait {{seconds}}s before refreshing again",
+    "modelFetchFailed": "Impossibile caricare i modelli: {{message}}",
+    "modelFetchCorsHint": "I server locali come LM Studio bloccano le richieste del browser se CORS non è abilitato. In LM Studio, attiva “Enable CORS” nelle impostazioni del server, riavvialo e aggiorna di nuovo.",
     "profileAssignment": {
       "title": "Assegnazione profilo",
       "clearAll": "Cancella tutto",

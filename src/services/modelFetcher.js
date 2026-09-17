@@ -19,6 +19,54 @@ export function resetCooldown() {
   _lastFetchTime = 0
 }
 
+// A bodyless GET must not send `Content-Type: application/json`: the header is
+// meaningless without a body and forces a CORS preflight (OPTIONS) that local
+// servers like LM Studio reject unless "Enable CORS" is turned on. Omitting it
+// keeps the request CORS-simple whenever no Authorization header is needed.
+function buildGetHeaders(apiKey) {
+  const headers = {}
+  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`
+  return headers
+}
+
+// Matches loopback hosts: the only case where we can tell the user exactly
+// what to do (enable CORS / start the server) instead of showing a generic
+// network error.
+export function isLocalBaseUrl(url) {
+  try {
+    const { hostname } = new URL(url)
+    return (
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '::1' ||
+      hostname === '[::1]'
+    )
+  } catch {
+    return false
+  }
+}
+
+// Browser CORS and connection failures surface as an opaque TypeError
+// ("Failed to fetch"). For loopback URLs that almost always means the local
+// server is offline or rejected the cross-origin request, so tag the error and
+// let the UI explain the fix. AbortErrors pass through untouched.
+async function fetchLocalModels(url, { headers, signal, providerId }) {
+  try {
+    return await fetch(url, { headers, signal })
+  } catch (err) {
+    if (err?.name === 'AbortError') throw err
+    if (isLocalBaseUrl(url) && err instanceof TypeError) {
+      const wrapped = new Error(`Request to ${url} was blocked or refused.`)
+      wrapped.code = 'LOCAL_FETCH_BLOCKED'
+      wrapped.baseUrl = url
+      wrapped.providerId = providerId
+      wrapped.cause = err
+      throw wrapped
+    }
+    throw err
+  }
+}
+
 const STRATEGIES = {
   groq: { type: 'openai', needsKey: true },
   cerebras: { type: 'openai', needsKey: true },
@@ -27,12 +75,14 @@ const STRATEGIES = {
   'lm-studio': { type: 'openai', needsKey: false },
 }
 
-async function fetchOpenAIModels(baseUrl, apiKey, signal, modelsPath) {
+async function fetchOpenAIModels(baseUrl, apiKey, signal, modelsPath, providerId) {
   const url = modelsPath ? `${baseUrl}${modelsPath}` : `${baseUrl}/v1/models`
-  const headers = { 'Content-Type': 'application/json' }
-  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`
 
-  const res = await fetch(url, { headers, signal })
+  const res = await fetchLocalModels(url, {
+    headers: buildGetHeaders(apiKey),
+    signal,
+    providerId,
+  })
   if (!res.ok) {
     const body = await res.text().catch(() => '')
     throw new Error(`HTTP ${res.status}${body ? `: ${body}` : ''}`)
@@ -46,12 +96,14 @@ async function fetchOpenAIModels(baseUrl, apiKey, signal, modelsPath) {
   return models
 }
 
-async function fetchOpenRouterModels(baseUrl, apiKey, signal) {
+async function fetchOpenRouterModels(baseUrl, apiKey, signal, providerId) {
   const url = `${baseUrl}/v1/models?max_price=0&input_modalities=text`
-  const headers = { 'Content-Type': 'application/json' }
-  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`
 
-  const res = await fetch(url, { headers, signal })
+  const res = await fetchLocalModels(url, {
+    headers: buildGetHeaders(apiKey),
+    signal,
+    providerId,
+  })
   if (!res.ok) {
     const body = await res.text().catch(() => '')
     throw new Error(`HTTP ${res.status}${body ? `: ${body}` : ''}`)
@@ -135,7 +187,7 @@ export async function fetchModels(
       baseUrl = def ? def.replace(/\/v1\/?$/, '') : null
     }
     if (!baseUrl) throw new Error(`No base URL configured for ${providerId}`)
-    const result = await fetchOpenRouterModels(baseUrl, apiKey, signal)
+    const result = await fetchOpenRouterModels(baseUrl, apiKey, signal, providerId)
     startCooldown()
     return result
   }
@@ -164,7 +216,7 @@ export async function fetchModels(
       baseUrl = def ? def.replace(/\/v1\/?$/, '') : null
     }
     if (!baseUrl) throw new Error(`No base URL configured for ${providerId}`)
-    models = await fetchOpenAIModels(baseUrl, apiKey, signal)
+    models = await fetchOpenAIModels(baseUrl, apiKey, signal, undefined, providerId)
   } else {
     throw new Error(`Unknown fetch strategy "${strategy.type}" for ${providerId}`)
   }

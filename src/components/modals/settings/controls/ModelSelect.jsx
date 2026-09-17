@@ -235,6 +235,7 @@ function ModelSelect({
   modelNames = {},
   modelMeta = {},
   fetching,
+  fetchError,
   onCancelFetch,
   onRefresh,
   cooldownRemaining,
@@ -397,8 +398,20 @@ function ModelSelect({
     </CollapsibleSection>
   ) : null
 
+  const showCorsHint =
+    Boolean(fetchError) &&
+    (providerId === 'lm-studio' || fetchError?.code === 'LOCAL_FETCH_BLOCKED')
+
   return (
     <div className="space-y-2">
+      {fetchError && !fetching && (
+        <div role="alert" className="bg-error-subtle rounded-md p-3 text-sm">
+          <p className="font-medium text-error">
+            {t('api.modelFetchFailed', { message: fetchError.message })}
+          </p>
+          {showCorsHint && <p className="mt-1 text-error">{t('api.modelFetchCorsHint')}</p>}
+        </div>
+      )}
       {fetching ? (
         <div className="flex items-center justify-between px-3 py-2 min-h-[44px] border border-border rounded-md bg-surface bg-surface-secondary">
           <span className="flex items-center gap-2 text-sm text-secondary">
