@@ -41,6 +41,7 @@ const HORDE_TEMPLATE_OPTIONS = [
   { key: 'simple-roleplay', labelKey: 'api.profile.form.promptTemplate.simpleRoleplay' },
   { key: 'bracketed', labelKey: 'api.profile.form.promptTemplate.bracketed' },
   { key: 'chatml', labelKey: 'api.profile.form.promptTemplate.chatml' },
+  { key: 'gemma4', labelKey: 'api.profile.form.promptTemplate.gemma4' },
   { key: 'mistral-instruct', labelKey: 'api.profile.form.promptTemplate.mistralInstruct' },
   { key: 'metharme', labelKey: 'api.profile.form.promptTemplate.metharme' },
   { key: 'custom', labelKey: 'api.profile.form.promptTemplate.custom' },

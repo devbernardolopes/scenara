@@ -38,6 +38,12 @@ export const HORDE_PROMPT_TEMPLATES = {
 // <|im_start|>assistant`,
 
   metharme: `<|system|>{{system}}{{#history}}<|{{roleTag}}|>{{content}}{{/history}}<|model|>`,
+
+  gemma4: `<|turn>system
+{{system}}<turn|>
+{{#history}}<|turn>{{roleTag}}
+{{content}}<turn|>
+{{/history}}<|turn>model`,
 }
 
 function resolveSpeaker(msg, personaMap, personaName, assistantSpeaker, charName) {
@@ -539,6 +545,13 @@ export async function sendHordeNativeChatCompletion({
     if (!stopSequences) stopSequences = []
     if (!stopSequences.includes('<|user|>')) {
       stopSequences.push('<|user|>')
+    }
+  }
+
+  if (templateName === 'gemma4') {
+    if (!stopSequences) stopSequences = []
+    for (const s of ['<turn|>', '<|turn>']) {
+      if (!stopSequences.includes(s)) stopSequences.push(s)
     }
   }
 

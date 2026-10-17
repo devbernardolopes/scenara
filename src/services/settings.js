@@ -1773,11 +1773,12 @@ export const SETTINGS = [
     group: 'hordeNative',
     type: 'select',
     default: 'simple-roleplay',
-    options: ['simple-roleplay', 'bracketed', 'chatml', 'mistral-instruct', 'metharme', 'custom'],
+    options: ['simple-roleplay', 'bracketed', 'chatml', 'gemma4', 'mistral-instruct', 'metharme', 'custom'],
     optionLabels: {
       'simple-roleplay': 'settings:prompting.hordeNative.options.simpleRoleplay',
       bracketed: 'settings:prompting.hordeNative.options.bracketed',
       chatml: 'settings:prompting.hordeNative.options.chatml',
+      gemma4: 'settings:prompting.hordeNative.options.gemma4',
       'mistral-instruct': 'settings:prompting.hordeNative.options.mistralInstruct',
       metharme: 'settings:prompting.hordeNative.options.metharme',
       custom: 'settings:prompting.hordeNative.options.custom',
