@@ -1,5 +1,6 @@
 import { getSetting } from './settings'
 import { replaceVars } from './chatApi'
+import { substituteTokens } from './templateTokens'
 
 const HORDE_BASE_URL = 'https://aihorde.net/api/v2'
 const CLIENT_AGENT = 'scenara:1.0:contact'
@@ -45,6 +46,10 @@ export const HORDE_PROMPT_TEMPLATES = {
 {{content}}<turn|>
 {{/history}}<|turn>model`,
 }
+
+// Matches either a history block or a single `{{token}}`. Both are resolved in
+// one pass so text inserted for a message is never re-scanned for other tokens.
+const TOKEN_OR_HISTORY = /\{\{#history\}\}([\s\S]*?)\{\{\/history\}\}|\{\{(\w+)\}\}/g
 
 function resolveSpeaker(msg, personaMap, personaName, assistantSpeaker, charName) {
   if (msg.role === 'assistant') {
@@ -188,27 +193,29 @@ export function renderHordeNativePrompt({
     }
   })
 
-  let result = resolvedTemplate
-
-  result = result.replace(/\{\{#history\}\}([\s\S]*?)\{\{\/history\}\}/g, (_, block) => {
-    return history
-      .map((msg) =>
-        block
-          .replace(/\{\{speaker\}\}/g, msg.speaker)
-          .replace(/\{\{content\}\}/g, msg.content)
-          .replace(/\{\{role\}\}/g, msg.role)
-          .replace(/\{\{roleTag\}\}/g, msg.roleTag),
-      )
-      .join('')
+  // Both history blocks and outer tokens resolve in this single pass, and
+  // `substituteTokens` inserts values verbatim, so message text containing `$&`
+  // or a literal `{{system}}` is preserved instead of being rewritten.
+  return resolvedTemplate.replace(TOKEN_OR_HISTORY, (match, block) => {
+    if (block !== undefined) {
+      return history
+        .map((msg) =>
+          substituteTokens(block, {
+            speaker: msg.speaker,
+            content: msg.content,
+            role: msg.role,
+            roleTag: msg.roleTag,
+          }),
+        )
+        .join('')
+    }
+    return substituteTokens(match, {
+      system: systemBlock,
+      charName: charName || 'Assistant',
+      personaName: personaName || 'User',
+      assistantName: charName || 'Assistant',
+    })
   })
-
-  result = result
-    .replace(/\{\{system\}\}/g, systemBlock)
-    .replace(/\{\{charName\}\}/g, charName || 'Assistant')
-    .replace(/\{\{personaName\}\}/g, personaName || 'User')
-    .replace(/\{\{assistantName\}\}/g, charName || 'Assistant')
-
-  return result
 }
 
 export function getHordeNativeParams(profile) {

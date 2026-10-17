@@ -135,7 +135,8 @@ export async function triggerAutoTitle({
     personaName = persona?.name || ''
   }
   const currentPersonaName = currentPersona?.name || personaName
-  const replaceVarsIn = (text) => replaceVars(text, { charName, personaName, currentPersonaName })
+  const replaceVarsIn = (text, extraTokens) =>
+    replaceVars(text, { charName, personaName, currentPersonaName, extraTokens })
 
   const defaultPersonaId = await getSetting('defaultPersonaId')
   const defaultPersona = defaultPersonaId ? await getPersona(defaultPersonaId) : null
@@ -192,18 +193,20 @@ export async function triggerAutoTitle({
     getEffectiveStatusBlock(character, thread.statusBlock),
   )
 
-  systemContent = replaceVarsIn(systemContent)
-    .replace(/{{transcript}}/gi, transcript)
-    .replace(/{{status_block}}/gi, statusBlockResolved)
+  systemContent = replaceVarsIn(systemContent, {
+    transcript,
+    status_block: statusBlockResolved,
+  })
 
   const payload = [{ role: 'system', content: systemContent }]
   const memoryText = await buildInjectedMemory(character, thread)
   const payloadWithMemory = appendMemoryToPayload(payload, memoryText, '')
 
   if (userContent) {
-    userContent = replaceVarsIn(userContent)
-      .replace(/{{transcript}}/gi, transcript)
-      .replace(/{{status_block}}/gi, statusBlockResolved)
+    userContent = replaceVarsIn(userContent, {
+      transcript,
+      status_block: statusBlockResolved,
+    })
     payloadWithMemory.push({ role: 'user', content: userContent })
   } else {
     payloadWithMemory.push({ role: 'user', content: transcript })

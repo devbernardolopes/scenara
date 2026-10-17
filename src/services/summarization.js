@@ -29,6 +29,7 @@ import {
 import { removeCodeBlocksFromMessages, removeMarkdownImagesFromMessages } from './chatApi'
 import { parseBundleEntries } from './chatGeneration'
 import { applyResponseTrims } from './messages'
+import { substituteTokens } from './templateTokens'
 
 const DEFAULT_SYSTEM_INSTRUCTION = 'You are a memory generator for conversational AI.'
 
@@ -230,11 +231,12 @@ export async function buildSummarizationPayload({
   )
 
   const replaceTemplates = (text) =>
-    replaceVarsWithDesc(text)
-      .replace(/{{transcript}}/gi, transcriptSection)
-      .replace(/{{memory}}/gi, memorySection)
-      .replace(/{{character_prompt}}/gi, charPromptSection)
-      .replace(/{{status_block}}/gi, statusBlockSection)
+    substituteTokens(replaceVarsWithDesc(text), {
+      transcript: transcriptSection,
+      memory: memorySection,
+      character_prompt: charPromptSection,
+      status_block: statusBlockSection,
+    })
 
   systemContent = collapseBlanks(replaceTemplates(systemContent))
 

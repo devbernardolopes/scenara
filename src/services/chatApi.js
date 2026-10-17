@@ -14,6 +14,7 @@ import { getEffectiveStatusBlock } from './statusBlocks'
 import { getPersona } from './personas'
 import { parseBundleEntries } from './chatGeneration'
 import { getActiveLoreBlocks } from './lorebookActivation'
+import { substituteTokens } from './templateTokens'
 
 // A message is hidden for payload purposes when its currently-active slot
 // entry carries `hidden: true`. Visibility is stored per-slot (each entry in
@@ -50,12 +51,17 @@ function extractErrorDetail(errBody) {
   return errBody
 }
 
-export function replaceVars(text, { charName, personaName, currentPersonaName }) {
+// `extraTokens` lets a caller fold additional `{{token}}` values into the same
+// single pass, so callers never have to chain a second `.replace()` over text
+// that already contains substituted content.
+export function replaceVars(text, { charName, personaName, currentPersonaName, extraTokens } = {}) {
   if (!text) return text
-  return text
-    .replace(/{{char}}/gi, charName || '')
-    .replace(/{{user}}/gi, personaName || '')
-    .replace(/{{name}}/gi, currentPersonaName || personaName || '')
+  return substituteTokens(text, {
+    char: charName || '',
+    user: personaName || '',
+    name: currentPersonaName || personaName || '',
+    ...extraTokens,
+  })
 }
 
 // Resolves {{char}}/{{user}}/{{name}} inside activated lorebook content blocks
@@ -100,18 +106,20 @@ export function replacePersonaTemplate(
     chatPersona,
     defaultPersona,
     personasHistory = '',
-  },
+    extraTokens,
+  } = {},
 ) {
   if (!text) return text
-  const resolved = replaceVars(text, { charName, personaName, currentPersonaName })
-  const desc = currentPersona?.description || ''
-  const descChat = chatPersona?.description || ''
-  const descDefault = defaultPersona?.description || ''
-  return resolved
-    .replace(/{{description}}/gi, desc)
-    .replace(/{{description_chat}}/gi, descChat)
-    .replace(/{{description_default}}/gi, descDefault)
-    .replace(/{{personas_history}}/gi, personasHistory)
+  return substituteTokens(text, {
+    char: charName || '',
+    user: personaName || '',
+    name: currentPersonaName || personaName || '',
+    description: currentPersona?.description || '',
+    description_chat: chatPersona?.description || '',
+    description_default: defaultPersona?.description || '',
+    personas_history: personasHistory,
+    ...extraTokens,
+  })
 }
 
 // Builds the {{personas_history}} block: the persona that started the chat
@@ -152,9 +160,7 @@ export function buildPersonasHistory(
     entries.push(
       useFallback
         ? `- ${p.name}`
-        : entryTemplate
-            .replace(/{{name}}/gi, p.name || '')
-            .replace(/{{description}}/gi, desc || ''),
+        : substituteTokens(entryTemplate, { name: p.name || '', description: desc || '' }),
     )
   }
   push(chatPersona)
@@ -163,12 +169,15 @@ export function buildPersonasHistory(
   }
   if (entries.length === 0) return ''
 
-  let block = replaceVars(template || '', { charName, personaName, currentPersonaName })
-  block = block
-    .replace(/{{description}}/gi, currentPersona?.description || '')
-    .replace(/{{description_chat}}/gi, chatPersona?.description || '')
-    .replace(/{{description_default}}/gi, defaultPersona?.description || '')
-  return block.replace(/{{personas_entries}}/gi, entries.join('\n'))
+  return substituteTokens(template || '', {
+    char: charName || '',
+    user: personaName || '',
+    name: currentPersonaName || personaName || '',
+    description: currentPersona?.description || '',
+    description_chat: chatPersona?.description || '',
+    description_default: defaultPersona?.description || '',
+    personas_entries: entries.join('\n'),
+  })
 }
 
 // Strips the configured OOC delimiters from message content when the
@@ -572,9 +581,10 @@ export async function buildMessagesPayload({
         } else if (msg.role === 'user') {
           if (userPersonaPrefixOverride && userRolePrefixWithPersona) {
             const pName = personaMap?.[msg.personaId]?.name || currentPersonaName || personaName
-            let resolved = userRolePrefixWithPersona
-              .replace(/{{name}}/gi, pName)
-              .replace(/{{persona_name}}/gi, pName)
+            let resolved = substituteTokens(userRolePrefixWithPersona, {
+              name: pName,
+              persona_name: pName,
+            })
             resolved = replaceVarsWithDesc(resolved)
             if (resolved && !/\s$/.test(resolved)) resolved += '\n'
             content = resolved + content
@@ -779,9 +789,10 @@ export async function buildTranscript({
         case 'user':
           if (userPersonaPrefixOverride && msg.personaId) {
             const pName = personaMap?.[msg.personaId]?.name || currentPersonaName || personaName
-            prefix = (userRolePrefixWithPersona || '[USER as {{name}}]:')
-              .replace(/{{name}}/gi, pName)
-              .replace(/{{persona_name}}/gi, pName)
+            prefix = substituteTokens(userRolePrefixWithPersona || '[USER as {{name}}]:', {
+              name: pName,
+              persona_name: pName,
+            })
           } else {
             prefix = userRolePrefix || '[USER]:'
           }
@@ -1086,15 +1097,18 @@ export async function buildOOCMessagesPayload({
   const memorySection = memoryText || ''
 
   const replaceOocTemplates = (text) =>
-    replaceVarsWithDesc(text)
-      .replace(/{{system_prompt}}/gi, systemPromptResolved)
-      .replace(/{{character_prompt}}/gi, charPromptSection)
-      .replace(/{{status_block}}/gi, statusBlockResolved)
-      .replace(/{{lore}}/gi, loreSection)
-      .replace(/{{transcript}}/gi, transcriptSection)
-      .replace(/{{memory}}/gi, memorySection)
-      // {{content}} resolves last so the user message is never re-parsed.
-      .replace(/\{\{content\}\}/gi, userMessage || '')
+    substituteTokens(replaceVarsWithDesc(text), {
+      // Resolved in a single pass, so inserted transcript/memory/user text can
+      // never be picked up by another token (e.g. a message that literally
+      // contains `{{content}}`).
+      system_prompt: systemPromptResolved,
+      character_prompt: charPromptSection,
+      status_block: statusBlockResolved,
+      lore: loreSection,
+      transcript: transcriptSection,
+      memory: memorySection,
+      content: userMessage || '',
+    })
 
   const defaultSystem = collapseBlanks(replaceOocTemplates(DEFAULT_OOC_SYSTEM))
   let systemContent = oocSystemInstr

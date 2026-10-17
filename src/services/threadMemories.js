@@ -52,11 +52,13 @@ function formatMemoryEntry(
   if (memorySlots <= 1) return content
   const level = Math.floor((seq - 1) / memorySlots) + 1
   const slot = ((seq - 1) % memorySlots) + 1
-  const vars = { charName, personaName, currentPersonaName }
   const entryHeader = memoryEntry.value
-    ? replaceVars(memoryEntry.value, vars)
-        .replace(/{{level}}/gi, String(level))
-        .replace(/{{slot}}/gi, String(slot))
+    ? replaceVars(memoryEntry.value, {
+        charName,
+        personaName,
+        currentPersonaName,
+        extraTokens: { level: String(level), slot: String(slot) },
+      })
     : ''
   return entryHeader ? `${entryHeader}${memoryEntry.enabled ? '\n\n' : '\n'}${content}` : content
 }
