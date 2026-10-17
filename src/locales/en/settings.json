@@ -145,6 +145,8 @@
       "confirmDeleteTitle": "Delete model?",
       "confirmDeleteMessage": "This will remove the downloaded model files. You can re-download them later.",
       "webgpuUnavailable": "WebGPU is not available in this browser.",
+      "webgpuNoF16": "Your GPU does not support WebGPU float16 shaders (shader-f16), so Kitten TTS cannot use WebGPU.",
+      "webgpuFallback": "WebGPU is unavailable — using WASM instead.",
       "backendLocked": "Unload the model first to change backend.",
       "speed": {
         "label": "Speech Speed",

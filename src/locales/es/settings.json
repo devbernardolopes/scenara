@@ -144,7 +144,9 @@
       "iosWarning": "The WASM phonemizer may hang on iOS Safari.",
       "confirmDeleteTitle": "Delete model?",
       "confirmDeleteMessage": "This will remove the downloaded model files. You can re-download them later.",
-      "webgpuUnavailable": "WebGPU is not available in this browser.",
+      "webgpuUnavailable": "WebGPU no está disponible en este navegador.",
+      "webgpuNoF16": "Tu GPU no admite sombreadores WebGPU float16 (shader-f16), por lo que Kitten TTS no puede usar WebGPU.",
+      "webgpuFallback": "WebGPU no disponible: se usará WASM en su lugar.",
       "backendLocked": "Unload the model first to change backend.",
       "speed": {
         "label": "Speech Speed",

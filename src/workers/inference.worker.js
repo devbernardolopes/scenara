@@ -90,6 +90,29 @@ function detectWebGPU() {
   return webgpuSupport
 }
 
+// `navigator.gpu` only proves the WebGPU API is exposed — not that the adapter
+// can run a given model. KittenTTS graphs cast to float16, so the WebGPU
+// execution provider needs the optional `shader-f16` feature. Probe the real
+// adapter (no device allocation) and cache the result.
+let webgpuCapabilities = null
+async function detectWebGPUCapabilities() {
+  if (webgpuCapabilities) return webgpuCapabilities
+  const caps = { available: false, shaderF16: false }
+  try {
+    if (typeof navigator !== 'undefined' && navigator.gpu) {
+      const adapter = await navigator.gpu.requestAdapter()
+      if (adapter) {
+        caps.available = true
+        caps.shaderF16 = adapter.features.has('shader-f16')
+      }
+    }
+  } catch {
+    // treat an unexpected failure as "unavailable"
+  }
+  webgpuCapabilities = caps
+  return caps
+}
+
 function makeProgressCallback(modelKey, callId) {
   return (data) => {
     self.postMessage({
@@ -780,33 +803,63 @@ async function loadTtsModel(modelKey, callId, backend) {
   if (!response) throw new Error('Model file not found in cache. Download it first.')
   const buffer = await response.arrayBuffer()
 
-  const useWebgpu = backend === 'webgpu' || (backend === 'auto' && config.webgpu)
-  const executionProviders = useWebgpu ? ['webgpu', 'wasm'] : ['wasm']
+  const caps = await detectWebGPUCapabilities()
+  const wantsWebgpu = backend === 'webgpu' || (backend === 'auto' && config.webgpu)
+  const useWebgpu = wantsWebgpu && caps.shaderF16
+
+  let fallbackReason = null
+  if (wantsWebgpu && !caps.shaderF16) {
+    fallbackReason = caps.available ? 'no-shader-f16' : 'no-adapter'
+  }
+
+  const createSession = (executionProviders) =>
+    ort.InferenceSession.create(buffer, { executionProviders })
 
   let session
   let actualBackend = useWebgpu ? 'webgpu' : 'wasm'
   try {
-    session = await ort.InferenceSession.create(buffer, { executionProviders })
+    session = await createSession(useWebgpu ? ['webgpu', 'wasm'] : ['wasm'])
   } catch (err) {
-    if (executionProviders.length > 1) {
-      session = await ort.InferenceSession.create(buffer, {
-        executionProviders: ['wasm'],
-      })
+    if (useWebgpu) {
+      session = await createSession(['wasm'])
       actualBackend = 'wasm'
+      fallbackReason = 'ep-failed'
     } else {
       throw err
     }
   }
 
-  kittenSessions.set(modelKey, { session, config, voices: null })
+  const entry = { session, config, voices: null }
+  kittenSessions.set(modelKey, entry)
   try {
-    const voices = await loadVoicesFromCache(modelKey)
-    kittenSessions.get(modelKey).voices = voices
+    entry.voices = await loadVoicesFromCache(modelKey)
   } catch {
     // voices will remain null — preview will fail gracefully
   }
+
+  // Validate the lazily-provisioned WebGPU kernels with a tiny synthesis and
+  // rebuild on WASM if the device turns out not to support them. Skipped when
+  // voices failed to load — that failure is unrelated to the execution provider.
+  if (actualBackend === 'webgpu' && entry.voices && entry.voices.size > 0) {
+    try {
+      await warmUpTtsEntry(entry)
+    } catch {
+      await releaseSession(entry.session)
+      entry.session = await createSession(['wasm'])
+      actualBackend = 'wasm'
+      fallbackReason = 'ep-failed'
+      try {
+        await warmUpTtsEntry(entry)
+      } catch (wasmErr) {
+        kittenSessions.delete(modelKey)
+        await releaseSession(entry.session)
+        throw wasmErr
+      }
+    }
+  }
+
   scheduleIdleUnload(modelKey)
-  return { modelKey, success: true, actualBackend }
+  return { modelKey, success: true, actualBackend, fallbackReason }
 }
 
 async function unloadKittenModel(modelKey) {
@@ -818,12 +871,7 @@ async function unloadKittenModel(modelKey) {
     clearTimeout(timer)
     idleTimers.delete(modelKey)
   }
-  try {
-    if (entry.session?.release) await entry.session.release()
-    else if (entry.session?.dispose) await entry.session.dispose()
-  } catch {
-    // ignore disposal errors
-  }
+  await releaseSession(entry.session)
   return { modelKey, success: true }
 }
 
@@ -831,6 +879,65 @@ async function deleteTtsModel(modelKey) {
   await unloadKittenModel(modelKey)
   const deleted = await caches.delete(kittenCacheName(modelKey))
   return { modelKey, success: deleted }
+}
+
+async function synthChunk(entry, chunk, internalVoice, effectiveSpeed, displayVoice) {
+  const { ids } = await phonemizeAndTokenize(chunk)
+  const inputIds = new BigInt64Array(ids.map((n) => BigInt(n)))
+
+  const embeddings = entry.voices.get(internalVoice)
+  if (!embeddings || embeddings.length === 0) {
+    throw new Error(`Voice "${displayVoice}" not found`)
+  }
+  const refId = Math.min(ids.length, embeddings.length - 1)
+  const styleEmbedding = embeddings[refId]
+
+  const feeds = {
+    input_ids: new ort.Tensor('int64', inputIds, [1, ids.length]),
+    style: new ort.Tensor('float32', styleEmbedding, [1, styleEmbedding.length]),
+    speed: new ort.Tensor('float32', new Float32Array([effectiveSpeed]), [1]),
+  }
+
+  const results = await entry.session.run(feeds)
+  const outputName = entry.session.outputNames[0]
+  const outputTensor = results[outputName]
+  let audio = new Float32Array(outputTensor.data)
+  if (audio.length > 5000) audio = audio.slice(0, audio.length - 5000)
+  return audio
+}
+
+function mergeAudioChunks(allAudio) {
+  const totalLen = allAudio.reduce((sum, a) => sum + a.length, 0)
+  const merged = new Float32Array(totalLen)
+  let offset = 0
+  for (const a of allAudio) {
+    merged.set(a, offset)
+    offset += a.length
+  }
+  return merged
+}
+
+// WebGPU kernels are provisioned lazily, so a session can be created
+// successfully yet fail on the very first run (e.g. a missing shader-f16
+// feature). Run one tiny synthesis to validate the execution provider.
+async function warmUpTtsEntry(entry) {
+  if (!entry.voices || entry.voices.size === 0) throw new Error('Voices not loaded')
+  const displayVoice = 'Leo'
+  let internalVoice = KITTEN_VOICE_ALIASES[displayVoice] || displayVoice
+  if (!entry.voices.get(internalVoice)) {
+    internalVoice = entry.voices.keys().next().value
+  }
+  const effectiveSpeed = KITTEN_SPEED_PRIORS[internalVoice] ?? 1.0
+  await synthChunk(entry, 'Hi', internalVoice, effectiveSpeed, displayVoice)
+}
+
+async function releaseSession(session) {
+  try {
+    if (session?.release) await session.release()
+    else if (session?.dispose) await session.dispose()
+  } catch {
+    // ignore disposal errors
+  }
 }
 
 async function previewTtsVoice(modelKey, voiceName, text, speed) {
@@ -848,38 +955,10 @@ async function previewTtsVoice(modelKey, voiceName, text, speed) {
 
   const allAudio = []
   for (const chunk of chunks) {
-    const { ids } = await phonemizeAndTokenize(chunk)
-    const inputIds = new BigInt64Array(ids.map((n) => BigInt(n)))
-
-    const embeddings = entry.voices.get(internalVoice)
-    if (!embeddings || embeddings.length === 0) {
-      throw new Error(`Voice "${displayVoice}" not found`)
-    }
-    const refId = Math.min(ids.length, embeddings.length - 1)
-    const styleEmbedding = embeddings[refId]
-
-    const feeds = {
-      input_ids: new ort.Tensor('int64', inputIds, [1, ids.length]),
-      style: new ort.Tensor('float32', styleEmbedding, [1, styleEmbedding.length]),
-      speed: new ort.Tensor('float32', new Float32Array([effectiveSpeed]), [1]),
-    }
-
-    const results = await entry.session.run(feeds)
-    const outputName = entry.session.outputNames[0]
-    const outputTensor = results[outputName]
-    let audio = new Float32Array(outputTensor.data)
-    if (audio.length > 5000) audio = audio.slice(0, audio.length - 5000)
-    allAudio.push(audio)
+    allAudio.push(await synthChunk(entry, chunk, internalVoice, effectiveSpeed, displayVoice))
   }
 
-  const totalLen = allAudio.reduce((sum, a) => sum + a.length, 0)
-  const merged = new Float32Array(totalLen)
-  let offset = 0
-  for (const a of allAudio) {
-    merged.set(a, offset)
-    offset += a.length
-  }
-
+  const merged = mergeAudioChunks(allAudio)
   const wavBuf = encodeWav(merged, TTS_SAMPLE_RATE)
   return {
     modelKey,
@@ -907,40 +986,12 @@ async function speakTtsFull(modelKey, text, voiceName, speed) {
   const allAudio = []
   for (const chunk of chunks) {
     if (ttsCancelled) throw new Error('Cancelled')
-    const { ids } = await phonemizeAndTokenize(chunk)
-    const inputIds = new BigInt64Array(ids.map((n) => BigInt(n)))
-
-    const embeddings = entry.voices.get(internalVoice)
-    if (!embeddings || embeddings.length === 0) {
-      throw new Error(`Voice "${displayVoice}" not found`)
-    }
-    const refId = Math.min(ids.length, embeddings.length - 1)
-    const styleEmbedding = embeddings[refId]
-
-    const feeds = {
-      input_ids: new ort.Tensor('int64', inputIds, [1, ids.length]),
-      style: new ort.Tensor('float32', styleEmbedding, [1, styleEmbedding.length]),
-      speed: new ort.Tensor('float32', new Float32Array([effectiveSpeed]), [1]),
-    }
-
-    const results = await entry.session.run(feeds)
-    const outputName = entry.session.outputNames[0]
-    const outputTensor = results[outputName]
-    let audio = new Float32Array(outputTensor.data)
-    if (audio.length > 5000) audio = audio.slice(0, audio.length - 5000)
-    allAudio.push(audio)
+    allAudio.push(await synthChunk(entry, chunk, internalVoice, effectiveSpeed, displayVoice))
   }
 
   if (ttsCancelled) throw new Error('Cancelled')
 
-  const totalLen = allAudio.reduce((sum, a) => sum + a.length, 0)
-  const merged = new Float32Array(totalLen)
-  let offset = 0
-  for (const a of allAudio) {
-    merged.set(a, offset)
-    offset += a.length
-  }
-
+  const merged = mergeAudioChunks(allAudio)
   const wavBuf = encodeWav(merged, TTS_SAMPLE_RATE)
   return {
     modelKey,
@@ -951,6 +1002,7 @@ async function speakTtsFull(modelKey, text, voiceName, speed) {
 }
 
 const TTS_TASK_HANDLERS = {
+  'tts-capabilities': () => detectWebGPUCapabilities(),
   'tts-check-cache': (payload, options, modelKey) => checkTtsCache(modelKey),
   'tts-download': (payload, options, modelKey, callId) => downloadTtsModel(modelKey, callId),
   'tts-load': (payload, options, modelKey, callId) =>

@@ -7,6 +7,7 @@ import {
   KITTEN_TTS_MODELS,
   KITTEN_TTS_VOICES,
   checkTtsCache,
+  getTtsCapabilities,
   downloadTtsModel,
   loadTtsModel,
   unloadTtsModel,
@@ -190,7 +191,7 @@ function TtsSettingsPanel() {
   const [modelStates, setModelStates] = useState({})
   const [storageInfo, setStorageInfo] = useState(null)
   const [actionDisabled, setActionDisabled] = useState(false)
-  const [hasWebGPU] = useState(() => typeof navigator !== 'undefined' && !!navigator.gpu)
+  const [gpuCaps, setGpuCaps] = useState({ available: false, shaderF16: false })
   const [loadedBackend, setLoadedBackend] = useState(null)
   const [previewPhase, setPreviewPhase] = useState('idle')
   const [browserPreviewPhase, setBrowserPreviewPhase] = useState('idle')
@@ -231,6 +232,20 @@ function TtsSettingsPanel() {
       if (kittenSpeedVal != null) setKittenSpeed(kittenSpeedVal)
     }
     load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    getTtsCapabilities()
+      .then((caps) => {
+        if (!cancelled && caps) setGpuCaps(caps)
+      })
+      .catch(() => {
+        // leave defaults — treat WebGPU as unavailable
+      })
     return () => {
       cancelled = true
     }
@@ -453,8 +468,12 @@ function TtsSettingsPanel() {
             setLoadedBackend(result.actualBackend)
           }
           await saveProvider(modelKey)
-          const backendLabel = t(`tts.kitten.backend.${result.actualBackend || backend}`)
-          showToast(`${backendLabel} — ${t('tts.kitten.status.loaded')}`, { type: 'success' })
+          if (result.fallbackReason) {
+            showToast(t('tts.kitten.webgpuFallback'), { type: 'warning' })
+          } else {
+            const backendLabel = t(`tts.kitten.backend.${result.actualBackend || backend}`)
+            showToast(`${backendLabel} — ${t('tts.kitten.status.loaded')}`, { type: 'success' })
+          }
         } catch (err) {
           showToast(err.message || 'Load failed', { type: 'error' })
           setModelStates((prev) => ({
@@ -712,6 +731,7 @@ function TtsSettingsPanel() {
               const isModelLoaded = KITTEN_TTS_MODELS.some(
                 (m) => modelStates[m.key]?.status === 'loaded',
               )
+              const hasWebGPU = gpuCaps.available && gpuCaps.shaderF16
               return (
                 <div className="flex items-center gap-2">
                   {['auto', 'wasm', 'webgpu'].map((b) => {
@@ -721,7 +741,11 @@ function TtsSettingsPanel() {
                     const tooltip = locked
                       ? t('tts.kitten.backendLocked')
                       : webgpuDisabled
-                        ? t('tts.kitten.webgpuUnavailable')
+                        ? t(
+                            gpuCaps.available
+                              ? 'tts.kitten.webgpuNoF16'
+                              : 'tts.kitten.webgpuUnavailable',
+                          )
                         : undefined
                     return (
                       <button

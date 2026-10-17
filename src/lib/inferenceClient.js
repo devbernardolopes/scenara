@@ -147,6 +147,10 @@ export function checkTtsCache(modelKey) {
   return run('tts-check-cache', {}, { modelKey }, { timeout: 10000 })
 }
 
+export function getTtsCapabilities() {
+  return run('tts-capabilities', {}, {}, { timeout: 10000 })
+}
+
 export function downloadTtsModel(modelKey) {
   return run('tts-download', {}, { modelKey }, { timeout: 600000 })
 }
