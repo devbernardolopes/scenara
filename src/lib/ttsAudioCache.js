@@ -1,8 +1,8 @@
-// In-memory cache of synthesized TTS audio chunks.
+// In-memory cache of synthesized TTS chunks.
 //
 // Progressive playback synthesizes a message one chunk at a time; caching the
-// resulting WAV buffers means replays (and re-renders) are instant instead of
-// re-running inference. Bounded with a simple LRU eviction.
+// resulting `{ pcm, sampleRate }` payloads means replays (and re-renders) are
+// instant instead of re-running inference. Bounded with a simple LRU eviction.
 
 const MAX_ENTRIES = 48
 
@@ -21,9 +21,9 @@ export function getTtsChunk(key) {
   return value
 }
 
-export function setTtsChunk(key, audioBuffer) {
-  if (!audioBuffer) return
-  cache.set(key, audioBuffer)
+export function setTtsChunk(key, chunk) {
+  if (!chunk) return
+  cache.set(key, chunk)
   while (cache.size > MAX_ENTRIES) {
     const oldest = cache.keys().next().value
     cache.delete(oldest)

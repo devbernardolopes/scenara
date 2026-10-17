@@ -6,10 +6,14 @@ import { showToast } from './toast'
 
 let state = { speakingMessageId: null, phase: 'idle' }
 const listeners = new Set()
-let currentAudio = null
+let audioContext = null
+const activeSources = new Set()
 let currentUtterances = []
 let activeMessageId = null
 let currentPlayResolve = null
+
+// Fallback only — the worker reports the true sample rate with each chunk.
+const FALLBACK_SAMPLE_RATE = 24000
 
 function emit() {
   listeners.forEach((fn) => {
@@ -64,10 +68,14 @@ export function stop() {
   }
   currentUtterances = []
 
-  if (currentAudio) {
-    currentAudio.pause()
-    currentAudio = null
+  for (const source of activeSources) {
+    try {
+      source.stop()
+    } catch {
+      // already stopped
+    }
   }
+  activeSources.clear()
   if (currentPlayResolve) {
     const resolve = currentPlayResolve
     currentPlayResolve = null
@@ -152,29 +160,21 @@ function chunkForBrowserTts(text, maxLen = 200) {
   return chunks.length ? chunks : [text]
 }
 
-function playWavBuffer(buffer) {
-  return new Promise((resolve) => {
-    const blob = new Blob([buffer], { type: 'audio/wav' })
-    const url = URL.createObjectURL(blob)
-    const audio = new Audio(url)
-    currentAudio = audio
-
-    const finish = () => {
-      URL.revokeObjectURL(url)
-      if (currentAudio === audio) currentAudio = null
-      if (currentPlayResolve === finish) currentPlayResolve = null
-      resolve()
-    }
-
-    currentPlayResolve = finish
-    audio.onended = finish
-    audio.onerror = finish
-    const playPromise = audio.play()
-    if (playPromise && typeof playPromise.catch === 'function') {
-      playPromise.catch(finish)
-    }
-  })
+function getAudioContext() {
+  if (!audioContext || audioContext.state === 'closed') {
+    const Ctor = window.AudioContext || window.webkitAudioContext
+    audioContext = new Ctor()
+  }
+  return audioContext
 }
+
+function toAudioBuffer(ctx, pcm, sampleRate) {
+  const buffer = ctx.createBuffer(1, pcm.length, sampleRate)
+  buffer.copyToChannel(pcm, 0)
+  return buffer
+}
+
+const TTS_PREFETCH = 3
 
 async function speakKitten(messageId, text, modelKey, voice, speed, backend, keepLoaded) {
   const myId = messageId
@@ -197,43 +197,89 @@ async function speakKitten(messageId, text, modelKey, voice, speed, backend, kee
       return
     }
 
-    const synthChunkAt = async (index) => {
+    const loadChunk = async (index) => {
       const key = ttsChunkKey(modelKey, voiceName, speed, myId, index)
       const cached = getTtsChunk(key)
       if (cached) return cached
       try {
         const result = await synthTtsChunk(modelKey, chunks[index], voiceName, speed)
-        setTtsChunk(key, result.audio)
-        return result.audio
+        setTtsChunk(key, result)
+        return result
       } catch (err) {
         if (!/not loaded/i.test(err?.message || '')) throw err
         // The session was idle-unloaded mid-utterance — reload and retry once.
         await ensureLoaded()
         const result = await synthTtsChunk(modelKey, chunks[index], voiceName, speed)
-        setTtsChunk(key, result.audio)
-        return result.audio
+        setTtsChunk(key, result)
+        return result
       }
     }
 
-    // Kick off synthesis of the first chunk, then keep one chunk ahead while
-    // the current one plays so playback stays gapless.
-    let nextAudio = synthChunkAt(0)
+    const ctx = getAudioContext()
+    try {
+      if (ctx.state === 'suspended') await ctx.resume()
+    } catch {
+      // the state guard below reports it
+    }
+    if (activeMessageId !== myId) return
+    if (ctx.state !== 'running') {
+      throw new Error('Audio playback is blocked until you interact with the page.')
+    }
+
+    // Decode each chunk into an AudioBuffer and schedule it on a single timeline
+    // so playback is gapless — no per-chunk player startup latency.
+    let nextStartTime = 0
+    let lastDone = Promise.resolve()
+
+    const scheduleChunk = (result) => {
+      if (!result?.pcm || result.pcm.length === 0) return
+      const buffer = toAudioBuffer(ctx, result.pcm, result.sampleRate || FALLBACK_SAMPLE_RATE)
+      const source = ctx.createBufferSource()
+      source.buffer = buffer
+      source.connect(ctx.destination)
+      const startAt = Math.max(nextStartTime, ctx.currentTime)
+      source.start(startAt)
+      nextStartTime = startAt + buffer.duration
+      activeSources.add(source)
+      if (state.phase !== 'playing') setState({ phase: 'playing' })
+
+      lastDone = new Promise((resolve) => {
+        const finish = () => {
+          activeSources.delete(source)
+          if (currentPlayResolve === finish) currentPlayResolve = null
+          resolve()
+        }
+        currentPlayResolve = finish
+        source.onended = finish
+      })
+    }
+
+    // Keep a small window of synthesis in flight so the next chunk is ready well
+    // before the current one finishes playing.
+    const pending = new Array(chunks.length)
+    const track = (promise) => {
+      // Swallow late rejections so a cancelled prefetch can't surface as an
+      // unhandled rejection; awaiting the same promise still throws.
+      promise.catch(() => {})
+      return promise
+    }
+    for (let i = 0; i < Math.min(TTS_PREFETCH, chunks.length); i++) {
+      pending[i] = track(loadChunk(i))
+    }
 
     for (let i = 0; i < chunks.length; i++) {
-      const audio = await nextAudio
+      const result = await pending[i]
       if (activeMessageId !== myId) return
 
-      if (i + 1 < chunks.length) {
-        nextAudio = synthChunkAt(i + 1)
+      const nextIndex = i + TTS_PREFETCH
+      if (nextIndex < chunks.length) {
+        pending[nextIndex] = track(loadChunk(nextIndex))
       }
 
-      if (!audio) continue
-
-      setState({ phase: 'playing' })
-      await playWavBuffer(audio)
-      if (activeMessageId !== myId) return
+      scheduleChunk(result)
     }
 
+    await lastDone
     if (activeMessageId === myId) resetState()
   } catch (err) {
     if (err?.message === 'Cancelled' || activeMessageId !== myId) {

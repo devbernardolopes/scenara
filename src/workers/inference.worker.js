@@ -668,7 +668,9 @@ async function loadVoicesFromCache(modelKey) {
 
 // ── Audio encoding ──────────────────────────────────────────────────────────
 
-function encodeWav(audio, sampleRate) {
+// Scales the signal so a chunk isn't clipped and isn't near-silent. Applied
+// per chunk before it is handed to the caller (WAV or raw PCM).
+function normalizeAudio(audio) {
   let maxAbs = 0
   for (let i = 0; i < audio.length; i++) {
     const a = Math.abs(audio[i])
@@ -678,6 +680,11 @@ function encodeWav(audio, sampleRate) {
     const factor = maxAbs > 0 ? 0.9 / maxAbs : 1.0
     for (let i = 0; i < audio.length; i++) audio[i] *= factor
   }
+  return audio
+}
+
+function encodeWav(audio, sampleRate) {
+  normalizeAudio(audio)
   const pcm = new Int16Array(audio.length)
   for (let i = 0; i < audio.length; i++) {
     const v = Math.max(-1, Math.min(1, audio[i]))
@@ -1023,7 +1030,7 @@ async function synthTtsChunk(modelKey, chunk, voiceName, speed) {
   if (!entry) throw new Error('Model not loaded')
   if (!entry.voices || entry.voices.size === 0) throw new Error('Voices not loaded')
   if (!chunk || !chunk.trim()) {
-    return { modelKey, audio: null, sampleRate: TTS_SAMPLE_RATE, duration: 0 }
+    return { modelKey, pcm: null, sampleRate: TTS_SAMPLE_RATE, duration: 0 }
   }
 
   const displayVoice = voiceName || 'Leo'
@@ -1031,11 +1038,14 @@ async function synthTtsChunk(modelKey, chunk, voiceName, speed) {
   const speedPrior = KITTEN_SPEED_PRIORS[internalVoice] ?? 1.0
   const effectiveSpeed = speed != null ? Number(speed) : speedPrior
 
-  const audio = await synthChunk(entry, chunk, internalVoice, effectiveSpeed, displayVoice)
-  const wavBuf = encodeWav(audio, TTS_SAMPLE_RATE)
+  const audio = normalizeAudio(
+    await synthChunk(entry, chunk, internalVoice, effectiveSpeed, displayVoice),
+  )
+  // Raw Float32 PCM: the main thread builds an AudioBuffer directly, so there's
+  // no per-chunk WAV encode/decode in the playback path.
   return {
     modelKey,
-    audio: wavBuf,
+    pcm: audio,
     sampleRate: TTS_SAMPLE_RATE,
     duration: audio.length / TTS_SAMPLE_RATE,
   }
