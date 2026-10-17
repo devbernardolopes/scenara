@@ -3,6 +3,7 @@ import db from '../db'
 import { COLOR_SLOTS, getPalette } from '../config/colorPalettes'
 import { DEFAULT_PP_RULES } from '../lib/postProcessing'
 import { resolveSystemTheme } from '../lib/systemTheme'
+import { setTtsKeepAlive } from '../lib/inferenceClient'
 
 export const DEFAULT_PERSONAS_HISTORY_TEMPLATE = `Personas in this conversation:\n{{personas_entries}}`
 export const DEFAULT_PERSONAS_HISTORY_ENTRY_TEMPLATE = '- {{name}}: {{description}}'
@@ -1898,6 +1899,14 @@ export const SETTINGS = [
     descKey: 'settings:tts.kitten.speed.desc',
   },
   {
+    key: 'tts.kittenKeepModel',
+    category: 'tts',
+    type: 'toggle',
+    default: false,
+    labelKey: 'settings:tts.kitten.keepLoaded.label',
+    descKey: 'settings:tts.kitten.keepLoaded.desc',
+  },
+  {
     key: 'database.importUrl',
     category: 'database',
     type: 'text',
@@ -1914,6 +1923,10 @@ const SETTING_EFFECTS = {
   language: (value) => i18n.changeLanguage(resolveLanguage(value)),
   highlightDeleteButtons: (value) => {
     document.documentElement.classList.toggle('show-delete-highlight', !!value)
+  },
+  'tts.kittenKeepModel': (value) => {
+    // Keep the worker's idle-unload policy in lock-step with the persisted setting.
+    setTtsKeepAlive(!!value).catch(() => {})
   },
 }
 

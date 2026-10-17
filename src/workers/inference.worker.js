@@ -15,8 +15,9 @@ try {
 }
 
 const DEFAULT_IDLE_TIMEOUT_MS = 5 * 60 * 1000
-// TTS sessions are expensive to (re)build; keep them warm longer.
-const TTS_IDLE_TIMEOUT_MS = 30 * 60 * 1000
+// TTS sessions are expensive to (re)build; keep them warm longer. The timer is
+// refreshed on every use, so this is "idle since last synthesis".
+const TTS_IDLE_TIMEOUT_MS = 10 * 60 * 1000
 
 const TITLE_PROMPT_TEMPLATE =
   'Summarize the topic of this conversation in a short title of 8 words or fewer. ' +
@@ -91,6 +92,11 @@ const TASK_HANDLERS = {
 const pipelineCache = new Map()
 const kittenSessions = new Map()
 const idleTimers = new Map()
+
+// TTS sessions: prevent the idle timer from dropping a model mid-utterance, and
+// honour a user "keep loaded" pin that disables idle unloading entirely.
+let ttsInFlight = 0
+let ttsKeepLoaded = false
 
 let webgpuSupport = null
 function detectWebGPU() {
@@ -193,11 +199,7 @@ async function disposeModel(modelKey) {
     await unloadKittenModel(modelKey)
     return true
   }
-  const timer = idleTimers.get(modelKey)
-  if (timer) {
-    clearTimeout(timer)
-    idleTimers.delete(modelKey)
-  }
+  clearIdleTimer(modelKey)
   const entry = pipelineCache.get(modelKey)
   if (!entry) return false
   pipelineCache.delete(modelKey)
@@ -212,13 +214,27 @@ async function disposeModel(modelKey) {
   return true
 }
 
+function clearIdleTimer(modelKey) {
+  const timer = idleTimers.get(modelKey)
+  if (timer) {
+    clearTimeout(timer)
+    idleTimers.delete(modelKey)
+  }
+}
+
 function scheduleIdleUnload(modelKey) {
   const config = MODEL_REGISTRY[modelKey] || KITTEN_MODEL_REGISTRY[modelKey]
   const timeout = config?.idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS
-  const existing = idleTimers.get(modelKey)
-  if (existing) clearTimeout(existing)
+  clearIdleTimer(modelKey)
+  // A pinned Kitten model stays resident until the user unpins it.
+  if (ttsKeepLoaded && KITTEN_MODEL_REGISTRY[modelKey]) return
   const timer = setTimeout(() => {
     idleTimers.delete(modelKey)
+    // Never drop a model while a synthesis is running; re-arm instead.
+    if (ttsInFlight > 0) {
+      scheduleIdleUnload(modelKey)
+      return
+    }
     if (kittenSessions.has(modelKey)) {
       unloadKittenModel(modelKey)
     } else {
@@ -226,6 +242,18 @@ function scheduleIdleUnload(modelKey) {
     }
   }, timeout)
   idleTimers.set(modelKey, timer)
+}
+
+function setTtsKeepLoaded(value) {
+  ttsKeepLoaded = !!value
+  for (const modelKey of kittenSessions.keys()) {
+    if (ttsKeepLoaded) {
+      clearIdleTimer(modelKey)
+    } else {
+      scheduleIdleUnload(modelKey)
+    }
+  }
+  return { keepLoaded: ttsKeepLoaded }
 }
 
 function emitDebug({ id, task, modelKey, prompt, rawOutput, postProcessedOutput }) {
@@ -802,9 +830,10 @@ async function downloadTtsModel(modelKey, callId) {
   return { modelKey, success: true }
 }
 
-async function loadTtsModel(modelKey, callId, backend) {
+async function loadTtsModel(modelKey, callId, backend, keepLoaded) {
   const config = KITTEN_MODEL_REGISTRY[modelKey]
   if (!config) throw new Error(`Unknown TTS model: ${modelKey}`)
+  if (keepLoaded !== undefined) setTtsKeepLoaded(keepLoaded)
   if (kittenSessions.has(modelKey)) {
     scheduleIdleUnload(modelKey)
     return { modelKey, success: true, alreadyLoaded: true }
@@ -879,11 +908,7 @@ async function unloadKittenModel(modelKey) {
   const entry = kittenSessions.get(modelKey)
   if (!entry) return { modelKey, success: true, alreadyUnloaded: true }
   kittenSessions.delete(modelKey)
-  const timer = idleTimers.get(modelKey)
-  if (timer) {
-    clearTimeout(timer)
-    idleTimers.delete(modelKey)
-  }
+  clearIdleTimer(modelKey)
   await releaseSession(entry.session)
   return { modelKey, success: true }
 }
@@ -1016,12 +1041,17 @@ async function synthTtsChunk(modelKey, chunk, voiceName, speed) {
   }
 }
 
+// TTS tasks that count as "using" the model: they keep the idle timer fresh and
+// must not overlap an idle unload.
+const TTS_KEEPALIVE_TASKS = new Set(['tts-plan', 'tts-synth-chunk', 'tts-preview'])
+
 const TTS_TASK_HANDLERS = {
   'tts-capabilities': () => detectWebGPUCapabilities(),
   'tts-check-cache': (payload, options, modelKey) => checkTtsCache(modelKey),
   'tts-download': (payload, options, modelKey, callId) => downloadTtsModel(modelKey, callId),
   'tts-load': (payload, options, modelKey, callId) =>
-    loadTtsModel(modelKey, callId, options?.backend),
+    loadTtsModel(modelKey, callId, options?.backend, options?.keepLoaded),
+  'tts-keep-alive': (payload, options) => setTtsKeepLoaded(options?.value ?? payload?.value),
   'tts-plan': (payload) => planTtsText(payload?.text),
   'tts-synth-chunk': (payload, options, modelKey) =>
     synthTtsChunk(modelKey, payload?.chunk, options?.voice, options?.speed),
@@ -1048,8 +1078,18 @@ async function handleMessage(message) {
 
   const ttsHandler = TTS_TASK_HANDLERS[task]
   if (ttsHandler) {
-    const result = await ttsHandler(payload, options, modelKey, id)
-    self.postMessage({ id, type: 'result', data: result })
+    const isUseTask = TTS_KEEPALIVE_TASKS.has(task)
+    if (isUseTask) ttsInFlight++
+    try {
+      const result = await ttsHandler(payload, options, modelKey, id)
+      // Refresh the idle timer so it counts from last use, not last load.
+      if (isUseTask && kittenSessions.has(modelKey)) {
+        scheduleIdleUnload(modelKey)
+      }
+      self.postMessage({ id, type: 'result', data: result })
+    } finally {
+      if (isUseTask) ttsInFlight--
+    }
     return
   }
 

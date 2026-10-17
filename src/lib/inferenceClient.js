@@ -155,8 +155,8 @@ export function downloadTtsModel(modelKey) {
   return run('tts-download', {}, { modelKey }, { timeout: 600000 })
 }
 
-export function loadTtsModel(modelKey, backend) {
-  return run('tts-load', {}, { modelKey, backend }, { timeout: 120000 })
+export function loadTtsModel(modelKey, backend, keepLoaded) {
+  return run('tts-load', {}, { modelKey, backend, keepLoaded }, { timeout: 120000 })
 }
 
 export function unloadTtsModel(modelKey) {
@@ -169,6 +169,25 @@ export function deleteTtsModel(modelKey) {
 
 export function previewTtsModel(modelKey, voice, text, speed) {
   return run('tts-preview', {}, { modelKey, voice, text, speed }, { timeout: 30000 })
+}
+
+export function setTtsKeepAlive(value) {
+  return run('tts-keep-alive', { value }, {}, { timeout: 10000 })
+}
+
+// Loading a session is idempotent (the worker returns `alreadyLoaded` when warm),
+// so callers can use this to lazily ensure a model is available. Dedupes
+// concurrent requests so two rapid speaks can't race session creation.
+const loadPromises = new Map()
+
+export function ensureTtsModelLoaded(modelKey, backend = 'auto', keepLoaded = false) {
+  const existing = loadPromises.get(modelKey)
+  if (existing) return existing
+  const promise = loadTtsModel(modelKey, backend, keepLoaded).finally(() => {
+    loadPromises.delete(modelKey)
+  })
+  loadPromises.set(modelKey, promise)
+  return promise
 }
 
 export function planTts(text) {

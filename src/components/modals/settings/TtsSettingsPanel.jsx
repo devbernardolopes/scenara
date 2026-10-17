@@ -13,10 +13,12 @@ import {
   unloadTtsModel,
   deleteTtsModel,
   previewTtsModel,
+  ensureTtsModelLoaded,
   onModelLoading,
 } from '../../../lib/inferenceClient'
 import CollapsibleSection from '../../shared/CollapsibleSection'
 import SettingSlider from './controls/SettingSlider'
+import SettingToggle from './controls/SettingToggle'
 import { Download, Trash2, Play, Volume2, Loader, HardDrive, Square } from '../../../lib/icons'
 
 function formatBytes(bytes) {
@@ -64,11 +66,13 @@ function KittenModelCard({
   model,
   state,
   loadedBackend,
+  isActive,
   t,
   onDownload,
   onLoad,
   onUnload,
   onDelete,
+  onActivate,
   disabled,
 }) {
   const status = state?.status || 'not-downloaded'
@@ -159,6 +163,21 @@ function KittenModelCard({
             {t('tts.kitten.actions.unload')}
           </button>
         )}
+        {isDownloaded && !isActive && (
+          <button
+            type="button"
+            onClick={onActivate}
+            disabled={disabled}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md bg-surface-secondary text-text hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {t('tts.kitten.actions.setActive')}
+          </button>
+        )}
+        {isActive && (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md bg-primary text-on-primary">
+            {t('tts.kitten.actions.active')}
+          </span>
+        )}
         {isDownloaded && (
           <button
             type="button"
@@ -187,6 +206,7 @@ function TtsSettingsPanel() {
   const [browserPitch, setBrowserPitch] = useState(1)
   const [browserVolume, setBrowserVolume] = useState(1)
   const [kittenSpeed, setKittenSpeed] = useState(1)
+  const [keepModelLoaded, setKeepModelLoaded] = useState(false)
   const [browserVoices, setBrowserVoices] = useState([])
   const [modelStates, setModelStates] = useState({})
   const [storageInfo, setStorageInfo] = useState(null)
@@ -211,6 +231,7 @@ function TtsSettingsPanel() {
         browserPitchVal,
         browserVolumeVal,
         kittenSpeedVal,
+        keepModelLoadedVal,
       ] = await Promise.all([
         getSetting('tts.provider'),
         getSetting('tts.backend'),
@@ -220,6 +241,7 @@ function TtsSettingsPanel() {
         getSetting('tts.browserPitch'),
         getSetting('tts.browserVolume'),
         getSetting('tts.kittenSpeed'),
+        getSetting('tts.kittenKeepModel'),
       ])
       if (cancelled) return
       if (provider) setActiveProvider(provider)
@@ -230,6 +252,7 @@ function TtsSettingsPanel() {
       if (browserPitchVal != null) setBrowserPitch(browserPitchVal)
       if (browserVolumeVal != null) setBrowserVolume(browserVolumeVal)
       if (kittenSpeedVal != null) setKittenSpeed(kittenSpeedVal)
+      if (keepModelLoadedVal != null) setKeepModelLoaded(!!keepModelLoadedVal)
     }
     load()
     return () => {
@@ -364,6 +387,12 @@ function TtsSettingsPanel() {
     await setSetting('tts.kittenSpeed', val)
   }, [])
 
+  const saveKeepModel = useCallback(async (val) => {
+    setKeepModelLoaded(val)
+    // Persisting runs the tts.kittenKeepModel effect, which tells the worker.
+    await setSetting('tts.kittenKeepModel', val)
+  }, [])
+
   const handleBrowserPreview = useCallback(() => {
     if (!window.speechSynthesis) return
 
@@ -459,7 +488,7 @@ function TtsSettingsPanel() {
         })
 
         try {
-          const result = await loadTtsModel(modelKey, backend)
+          const result = await loadTtsModel(modelKey, backend, keepModelLoaded)
           setModelStates((prev) => ({
             ...prev,
             [modelKey]: { ...prev[modelKey], status: 'loaded' },
@@ -482,7 +511,7 @@ function TtsSettingsPanel() {
           }))
         }
       })(),
-    [backend, modelStates, withActionLock, saveProvider, t],
+    [backend, modelStates, withActionLock, saveProvider, t, keepModelLoaded],
   )
 
   const handleUnload = useCallback(
@@ -495,12 +524,11 @@ function TtsSettingsPanel() {
             [modelKey]: { ...prev[modelKey], status: 'downloaded' },
           }))
           setLoadedBackend(null)
-          await saveProvider('browser')
         } catch (err) {
           showToast(err.message || 'Unload failed', { type: 'error' })
         }
       })(),
-    [withActionLock, saveProvider],
+    [withActionLock],
   )
 
   const handleDelete = useCallback(
@@ -520,16 +548,27 @@ function TtsSettingsPanel() {
             ...prev,
             [modelKey]: { status: 'not-downloaded' },
           }))
+          if (activeProvider === modelKey) {
+            await saveProvider('browser')
+          }
         } catch (err) {
           showToast(err.message || 'Delete failed', { type: 'error' })
         }
       })(),
-    [confirm, t, withActionLock],
+    [confirm, t, withActionLock, activeProvider, saveProvider],
+  )
+
+  const handleActivate = useCallback(
+    async (modelKey) => {
+      await saveProvider(modelKey)
+    },
+    [saveProvider],
   )
 
   const handleKittenPreview = useCallback(async () => {
     if (!activeProvider || activeProvider === 'browser') return
-    if (modelStates[activeProvider]?.status !== 'loaded') return
+    const status = modelStates[activeProvider]?.status
+    if (status !== 'loaded' && status !== 'downloaded') return
 
     if (previewPhase === 'playing') {
       if (previewAudioRef.current) {
@@ -542,6 +581,14 @@ function TtsSettingsPanel() {
 
     setPreviewPhase('loading')
     try {
+      // Preview the active model, loading it on demand if it was idle-unloaded.
+      if (status !== 'loaded') {
+        await ensureTtsModelLoaded(activeProvider, backend, keepModelLoaded)
+        setModelStates((prev) => ({
+          ...prev,
+          [activeProvider]: { ...prev[activeProvider], status: 'loaded' },
+        }))
+      }
       const result = await previewTtsModel(activeProvider, kittenVoice, undefined, kittenSpeed)
       if (result?.audio) {
         const blob = new Blob([result.audio], { type: 'audio/wav' })
@@ -567,7 +614,15 @@ function TtsSettingsPanel() {
       showToast(err.message || 'Preview failed', { type: 'error' })
       setPreviewPhase('idle')
     }
-  }, [activeProvider, modelStates, kittenVoice, kittenSpeed, previewPhase])
+  }, [
+    activeProvider,
+    modelStates,
+    kittenVoice,
+    kittenSpeed,
+    previewPhase,
+    backend,
+    keepModelLoaded,
+  ])
 
   return (
     <div className="space-y-8">
@@ -812,7 +867,7 @@ function TtsSettingsPanel() {
               (previewPhase === 'loading' || previewPhase === 'idle') &&
               (actionDisabled ||
                 activeProvider === 'browser' ||
-                modelStates[activeProvider]?.status !== 'loaded')
+                !['loaded', 'downloaded'].includes(modelStates[activeProvider]?.status))
             }
             className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-xs font-medium rounded-md bg-surface-secondary text-text hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
@@ -826,6 +881,19 @@ function TtsSettingsPanel() {
             {previewPhase === 'playing' ? t('chat:stop') : t('tts.kitten.actions.preview')}
           </button>
 
+          {/* Keep model loaded */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-text">{t('tts.kitten.keepLoaded.label')}</p>
+              <p className="text-xs text-secondary mt-0.5">{t('tts.kitten.keepLoaded.desc')}</p>
+            </div>
+            <SettingToggle
+              value={keepModelLoaded}
+              onChange={saveKeepModel}
+              id="tts-kitten-keep-loaded"
+            />
+          </div>
+
           {/* Model cards */}
           <div className="space-y-3">
             {KITTEN_TTS_MODELS.map((model) => (
@@ -834,11 +902,13 @@ function TtsSettingsPanel() {
                 model={model}
                 state={modelStates[model.key]}
                 loadedBackend={modelStates[model.key]?.status === 'loaded' ? loadedBackend : null}
+                isActive={activeProvider === model.key}
                 t={t}
                 onDownload={() => handleDownload(model.key)}
                 onLoad={() => handleLoad(model.key)}
                 onUnload={() => handleUnload(model.key)}
                 onDelete={() => handleDelete(model.key)}
+                onActivate={() => handleActivate(model.key)}
                 disabled={actionDisabled}
               />
             ))}

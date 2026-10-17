@@ -1,5 +1,5 @@
 import { getSetting } from '../services/settings'
-import { planTts, synthTtsChunk, cancelTtsTask } from './inferenceClient'
+import { planTts, synthTtsChunk, ensureTtsModelLoaded, cancelTtsTask } from './inferenceClient'
 import { getTtsChunk, setTtsChunk, ttsChunkKey } from './ttsAudioCache'
 import { prepareTtsText } from './ttsText'
 import { showToast } from './toast'
@@ -52,7 +52,9 @@ export async function speak(messageId, message, context) {
   } else {
     const voice = await getSetting('tts.kittenVoice')
     const speed = await getSetting('tts.kittenSpeed')
-    speakKitten(messageId, text, provider, voice, speed)
+    const backend = await getSetting('tts.backend')
+    const keepLoaded = await getSetting('tts.kittenKeepModel')
+    speakKitten(messageId, text, provider, voice, speed, backend, keepLoaded)
   }
 }
 
@@ -174,23 +176,20 @@ function playWavBuffer(buffer) {
   })
 }
 
-async function getOrSynthChunk(modelKey, chunk, voice, speed, messageId, index) {
-  const key = ttsChunkKey(modelKey, voice, speed, messageId, index)
-  const cached = getTtsChunk(key)
-  if (cached) return cached
-  const result = await synthTtsChunk(modelKey, chunk, voice, speed)
-  setTtsChunk(key, result.audio)
-  return result.audio
-}
-
-async function speakKitten(messageId, text, modelKey, voice, speed) {
+async function speakKitten(messageId, text, modelKey, voice, speed, backend, keepLoaded) {
   const myId = messageId
   activeMessageId = myId
   setState({ speakingMessageId: myId, phase: 'loading' })
 
   const voiceName = voice || 'Leo'
+  const ensureLoaded = () => ensureTtsModelLoaded(modelKey, backend || 'auto', !!keepLoaded)
 
   try {
+    // Lazily (re)load the session: it may have been idle-unloaded since the last
+    // utterance, and the user should never have to reload it by hand.
+    await ensureLoaded()
+    if (activeMessageId !== myId) return
+
     const { chunks } = await planTts(text)
     if (activeMessageId !== myId) return
     if (!chunks || chunks.length === 0) {
@@ -198,16 +197,34 @@ async function speakKitten(messageId, text, modelKey, voice, speed) {
       return
     }
 
+    const synthChunkAt = async (index) => {
+      const key = ttsChunkKey(modelKey, voiceName, speed, myId, index)
+      const cached = getTtsChunk(key)
+      if (cached) return cached
+      try {
+        const result = await synthTtsChunk(modelKey, chunks[index], voiceName, speed)
+        setTtsChunk(key, result.audio)
+        return result.audio
+      } catch (err) {
+        if (!/not loaded/i.test(err?.message || '')) throw err
+        // The session was idle-unloaded mid-utterance — reload and retry once.
+        await ensureLoaded()
+        const result = await synthTtsChunk(modelKey, chunks[index], voiceName, speed)
+        setTtsChunk(key, result.audio)
+        return result.audio
+      }
+    }
+
     // Kick off synthesis of the first chunk, then keep one chunk ahead while
     // the current one plays so playback stays gapless.
-    let nextAudio = getOrSynthChunk(modelKey, chunks[0], voiceName, speed, myId, 0)
+    let nextAudio = synthChunkAt(0)
 
     for (let i = 0; i < chunks.length; i++) {
       const audio = await nextAudio
       if (activeMessageId !== myId) return
 
       if (i + 1 < chunks.length) {
-        nextAudio = getOrSynthChunk(modelKey, chunks[i + 1], voiceName, speed, myId, i + 1)
+        nextAudio = synthChunkAt(i + 1)
       }
 
       if (!audio) continue
@@ -224,7 +241,7 @@ async function speakKitten(messageId, text, modelKey, voice, speed) {
       return
     }
     console.error('[TTS] Kitten synthesis error:', err)
-    showToast('Speech synthesis failed.', { type: 'error' })
+    showToast(err?.message || 'Speech synthesis failed.', { type: 'error' })
     if (activeMessageId === myId) resetState()
   }
 }

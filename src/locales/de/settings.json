@@ -119,7 +119,9 @@
         "load": "Load",
         "unload": "Unload",
         "delete": "Delete",
-        "preview": "Preview"
+        "preview": "Preview",
+        "setActive": "Als aktiv festlegen",
+        "active": "Aktiv"
       },
       "models": {
         "mini": {
@@ -151,6 +153,10 @@
       "speed": {
         "label": "Speech Speed",
         "desc": "How fast the voice speaks. 1 is normal speed."
+      },
+      "keepLoaded": {
+        "label": "Modell geladen lassen",
+        "desc": "Verhindert, dass das Stimmenmodell nach einer Phase der Inaktivität entladen wird. Verbraucht mehr Arbeitsspeicher."
       }
     }
   },
