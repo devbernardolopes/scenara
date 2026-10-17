@@ -1,5 +1,6 @@
 import { getSetting } from '../services/settings'
-import { speakTts, cancelTtsTask } from './inferenceClient'
+import { planTts, synthTtsChunk, cancelTtsTask } from './inferenceClient'
+import { getTtsChunk, setTtsChunk, ttsChunkKey } from './ttsAudioCache'
 import { prepareTtsText } from './ttsText'
 import { showToast } from './toast'
 
@@ -8,6 +9,7 @@ const listeners = new Set()
 let currentAudio = null
 let currentUtterances = []
 let activeMessageId = null
+let currentPlayResolve = null
 
 function emit() {
   listeners.forEach((fn) => {
@@ -49,9 +51,8 @@ export async function speak(messageId, message, context) {
     speakBrowser(messageId, text, voiceName, rate, pitch, volume)
   } else {
     const voice = await getSetting('tts.kittenVoice')
-    const backend = await getSetting('tts.backend')
     const speed = await getSetting('tts.kittenSpeed')
-    speakKitten(messageId, text, provider, voice, backend, speed)
+    speakKitten(messageId, text, provider, voice, speed)
   }
 }
 
@@ -64,6 +65,11 @@ export function stop() {
   if (currentAudio) {
     currentAudio.pause()
     currentAudio = null
+  }
+  if (currentPlayResolve) {
+    const resolve = currentPlayResolve
+    currentPlayResolve = null
+    resolve()
   }
   cancelTtsTask().catch(() => {})
 
@@ -144,36 +150,74 @@ function chunkForBrowserTts(text, maxLen = 200) {
   return chunks.length ? chunks : [text]
 }
 
-async function speakKitten(messageId, text, modelKey, voice, backend, speed) {
-  const myId = messageId
-  activeMessageId = myId
-  setState({ speakingMessageId: myId, phase: 'loading' })
-
-  try {
-    const result = await speakTts(modelKey, text, voice || 'Leo', backend || 'auto', speed)
-
-    if (activeMessageId !== myId) return
-
-    const blob = new Blob([result.audio], { type: 'audio/wav' })
+function playWavBuffer(buffer) {
+  return new Promise((resolve) => {
+    const blob = new Blob([buffer], { type: 'audio/wav' })
     const url = URL.createObjectURL(blob)
     const audio = new Audio(url)
     currentAudio = audio
 
-    setState({ phase: 'playing' })
-
-    audio.onended = () => {
+    const finish = () => {
       URL.revokeObjectURL(url)
       if (currentAudio === audio) currentAudio = null
-      if (activeMessageId === myId) resetState()
+      if (currentPlayResolve === finish) currentPlayResolve = null
+      resolve()
     }
 
-    audio.onerror = () => {
-      URL.revokeObjectURL(url)
-      if (currentAudio === audio) currentAudio = null
-      if (activeMessageId === myId) resetState()
+    currentPlayResolve = finish
+    audio.onended = finish
+    audio.onerror = finish
+    const playPromise = audio.play()
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(finish)
+    }
+  })
+}
+
+async function getOrSynthChunk(modelKey, chunk, voice, speed, messageId, index) {
+  const key = ttsChunkKey(modelKey, voice, speed, messageId, index)
+  const cached = getTtsChunk(key)
+  if (cached) return cached
+  const result = await synthTtsChunk(modelKey, chunk, voice, speed)
+  setTtsChunk(key, result.audio)
+  return result.audio
+}
+
+async function speakKitten(messageId, text, modelKey, voice, speed) {
+  const myId = messageId
+  activeMessageId = myId
+  setState({ speakingMessageId: myId, phase: 'loading' })
+
+  const voiceName = voice || 'Leo'
+
+  try {
+    const { chunks } = await planTts(text)
+    if (activeMessageId !== myId) return
+    if (!chunks || chunks.length === 0) {
+      resetState()
+      return
     }
 
-    await audio.play()
+    // Kick off synthesis of the first chunk, then keep one chunk ahead while
+    // the current one plays so playback stays gapless.
+    let nextAudio = getOrSynthChunk(modelKey, chunks[0], voiceName, speed, myId, 0)
+
+    for (let i = 0; i < chunks.length; i++) {
+      const audio = await nextAudio
+      if (activeMessageId !== myId) return
+
+      if (i + 1 < chunks.length) {
+        nextAudio = getOrSynthChunk(modelKey, chunks[i + 1], voiceName, speed, myId, i + 1)
+      }
+
+      if (!audio) continue
+
+      setState({ phase: 'playing' })
+      await playWavBuffer(audio)
+      if (activeMessageId !== myId) return
+    }
+
+    if (activeMessageId === myId) resetState()
   } catch (err) {
     if (err?.message === 'Cancelled' || activeMessageId !== myId) {
       if (activeMessageId === myId) resetState()

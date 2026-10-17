@@ -3,7 +3,20 @@ import * as ort from 'onnxruntime-web/webgpu'
 
 env.allowLocalModels = false
 
+// WASM EP tuning. Multi-threading requires cross-origin isolation (COOP/COEP);
+// without it ONNX Runtime silently falls back to a single thread. The
+// threaded-SIMD build is already what the webgpu bundle loads, so this is the
+// main lever for local inference speed.
+try {
+  ort.env.wasm.simd = true
+  ort.env.wasm.numThreads = Math.min(4, Math.max(1, navigator.hardwareConcurrency || 1))
+} catch {
+  // leave ONNX Runtime defaults in place
+}
+
 const DEFAULT_IDLE_TIMEOUT_MS = 5 * 60 * 1000
+// TTS sessions are expensive to (re)build; keep them warm longer.
+const TTS_IDLE_TIMEOUT_MS = 30 * 60 * 1000
 
 const TITLE_PROMPT_TEMPLATE =
   'Summarize the topic of this conversation in a short title of 8 words or fewer. ' +
@@ -46,28 +59,28 @@ const KITTEN_MODEL_REGISTRY = {
     modelFile: 'kitten_tts_mini_v0_8.onnx',
     files: ['config.json', 'kitten_tts_mini_v0_8.onnx', 'voices.npz'],
     webgpu: false,
-    idleTimeoutMs: DEFAULT_IDLE_TIMEOUT_MS,
+    idleTimeoutMs: TTS_IDLE_TIMEOUT_MS,
   },
   'kitten-micro': {
     repoId: 'KittenML/kitten-tts-micro-0.8',
     modelFile: 'kitten_tts_micro_v0_8.onnx',
     files: ['config.json', 'kitten_tts_micro_v0_8.onnx', 'voices.npz'],
     webgpu: false,
-    idleTimeoutMs: DEFAULT_IDLE_TIMEOUT_MS,
+    idleTimeoutMs: TTS_IDLE_TIMEOUT_MS,
   },
   'kitten-nano-fp32': {
     repoId: 'KittenML/kitten-tts-nano-0.8-fp32',
     modelFile: 'kitten_tts_nano_v0_8.onnx',
     files: ['config.json', 'kitten_tts_nano_v0_8.onnx', 'voices.npz'],
     webgpu: true,
-    idleTimeoutMs: DEFAULT_IDLE_TIMEOUT_MS,
+    idleTimeoutMs: TTS_IDLE_TIMEOUT_MS,
   },
   'kitten-nano-int8': {
     repoId: 'KittenML/kitten-tts-nano-0.8-int8',
     modelFile: 'kitten_tts_nano_v0_8.onnx',
     files: ['config.json', 'kitten_tts_nano_v0_8.onnx', 'voices.npz'],
     webgpu: true,
-    idleTimeoutMs: DEFAULT_IDLE_TIMEOUT_MS,
+    idleTimeoutMs: TTS_IDLE_TIMEOUT_MS,
   },
 }
 
@@ -968,36 +981,38 @@ async function previewTtsVoice(modelKey, voiceName, text, speed) {
   }
 }
 
-async function speakTtsFull(modelKey, text, voiceName, speed) {
+// ── Progressive (chunk-by-chunk) synthesis ──────────────────────────────────
+// The main thread plans the text into chunks, then requests one chunk of audio
+// at a time so playback can start before the whole message is synthesized.
+
+function planTtsText(text) {
   ttsCancelled = false
+  const inputText = (text || '').toString()
+  if (!inputText.trim()) return { chunks: [] }
+  return { chunks: chunkTtsText(preprocessTtsText(inputText)) }
+}
+
+async function synthTtsChunk(modelKey, chunk, voiceName, speed) {
+  if (ttsCancelled) throw new Error('Cancelled')
   const entry = kittenSessions.get(modelKey)
   if (!entry) throw new Error('Model not loaded')
   if (!entry.voices || entry.voices.size === 0) throw new Error('Voices not loaded')
+  if (!chunk || !chunk.trim()) {
+    return { modelKey, audio: null, sampleRate: TTS_SAMPLE_RATE, duration: 0 }
+  }
 
   const displayVoice = voiceName || 'Leo'
   const internalVoice = KITTEN_VOICE_ALIASES[displayVoice] || displayVoice
   const speedPrior = KITTEN_SPEED_PRIORS[internalVoice] ?? 1.0
   const effectiveSpeed = speed != null ? Number(speed) : speedPrior
 
-  const inputText = (text || '').toString()
-  if (!inputText.trim()) throw new Error('Empty text')
-  const chunks = chunkTtsText(preprocessTtsText(inputText))
-
-  const allAudio = []
-  for (const chunk of chunks) {
-    if (ttsCancelled) throw new Error('Cancelled')
-    allAudio.push(await synthChunk(entry, chunk, internalVoice, effectiveSpeed, displayVoice))
-  }
-
-  if (ttsCancelled) throw new Error('Cancelled')
-
-  const merged = mergeAudioChunks(allAudio)
-  const wavBuf = encodeWav(merged, TTS_SAMPLE_RATE)
+  const audio = await synthChunk(entry, chunk, internalVoice, effectiveSpeed, displayVoice)
+  const wavBuf = encodeWav(audio, TTS_SAMPLE_RATE)
   return {
     modelKey,
     audio: wavBuf,
     sampleRate: TTS_SAMPLE_RATE,
-    duration: merged.length / TTS_SAMPLE_RATE,
+    duration: audio.length / TTS_SAMPLE_RATE,
   }
 }
 
@@ -1007,12 +1022,13 @@ const TTS_TASK_HANDLERS = {
   'tts-download': (payload, options, modelKey, callId) => downloadTtsModel(modelKey, callId),
   'tts-load': (payload, options, modelKey, callId) =>
     loadTtsModel(modelKey, callId, options?.backend),
+  'tts-plan': (payload) => planTtsText(payload?.text),
+  'tts-synth-chunk': (payload, options, modelKey) =>
+    synthTtsChunk(modelKey, payload?.chunk, options?.voice, options?.speed),
   'tts-unload': (payload, options, modelKey) => unloadKittenModel(modelKey),
   'tts-delete': (payload, options, modelKey) => deleteTtsModel(modelKey),
   'tts-preview': (payload, options, modelKey) =>
     previewTtsVoice(modelKey, options?.voice, options?.text, options?.speed),
-  'tts-speak': (payload, options, modelKey) =>
-    speakTtsFull(modelKey, payload?.text, options?.voice, options?.speed),
   'tts-cancel': () => {
     ttsCancelled = true
     return { success: true }

@@ -171,8 +171,12 @@ export function previewTtsModel(modelKey, voice, text, speed) {
   return run('tts-preview', {}, { modelKey, voice, text, speed }, { timeout: 30000 })
 }
 
-export function speakTts(modelKey, text, voice, backend, speed) {
-  return run('tts-speak', { text }, { modelKey, voice, backend, speed }, { timeout: 300000 })
+export function planTts(text) {
+  return run('tts-plan', { text }, {}, { timeout: 15000 })
+}
+
+export function synthTtsChunk(modelKey, chunk, voice, speed) {
+  return run('tts-synth-chunk', { chunk }, { modelKey, voice, speed }, { timeout: 120000 })
 }
 
 export function cancelTtsTask() {
