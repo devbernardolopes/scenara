@@ -699,7 +699,11 @@ function MessageBubble({
           if (isSpeakingThis) {
             stop()
           } else {
-            speak(message.id, message, {
+            // Speak the slot currently on screen — `message.content` and the
+            // active slot can drift across navigation/regeneration.
+            const visible =
+              activeEntry?.content != null ? { ...message, content: activeEntry.content } : message
+            speak(message.id, visible, {
               character,
               oocDelimiters,
             })

@@ -2056,6 +2056,10 @@ function ChatView() {
         ]
       }
 
+      // The viewed slot is about to switch to the new one — drop playback of the
+      // previous slot so it doesn't keep speaking over the regenerated content.
+      if (getPlaybackState().speakingMessageId === messageId) stopTts()
+
       slotIndex = regenEntries.length
       regenEntries.push({
         content: '',

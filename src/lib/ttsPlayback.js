@@ -1,6 +1,6 @@
 import { getSetting } from '../services/settings'
 import { planTts, synthTtsChunk, ensureTtsModelLoaded, cancelTtsTask } from './inferenceClient'
-import { getTtsChunk, setTtsChunk, ttsChunkKey } from './ttsAudioCache'
+import { getTtsChunk, setTtsChunk, ttsChunkKey, hashTtsText } from './ttsAudioCache'
 import { prepareTtsText } from './ttsText'
 import { showToast } from './toast'
 
@@ -197,8 +197,12 @@ async function speakKitten(messageId, text, modelKey, voice, speed, backend, kee
       return
     }
 
+    // Key cached chunks by the spoken text so a regenerated or edited slot never
+    // replays another slot's audio.
+    const textHash = hashTtsText(text)
+
     const loadChunk = async (index) => {
-      const key = ttsChunkKey(modelKey, voiceName, speed, myId, index)
+      const key = ttsChunkKey(modelKey, voiceName, speed, textHash, index)
       const cached = getTtsChunk(key)
       if (cached) return cached
       try {
