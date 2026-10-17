@@ -1,1 +1,2 @@
+node scripts/check-json-duplicates.cjs
 node scripts/bump-version.cjs

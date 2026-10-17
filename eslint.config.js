@@ -24,5 +24,11 @@ export default [
     files: sharedFiles,
     languageOptions: { globals: { ...globals.browser } },
   },
+  {
+    // Node scripts (pre-commit hooks) rely on __dirname/process rather than
+    // the browser API.
+    files: ['scripts/**/*.{js,cjs,mjs}'],
+    languageOptions: { globals: { ...globals.node } },
+  },
   { ignores: ['dist/', 'node_modules/', 'api/'] },
 ]

@@ -184,7 +184,6 @@
   "confirmDeleteExampleMessage": "Are you sure you want to delete this example message?",
   "confirmDeleteExampleMessageTitle": "Delete Example Message",
   "noExampleMessages": "No example messages yet. Add one to instruct the model on how to respond.",
-  "sectionScenarios": "Scenarios",
   "addScenario": "Add Scenario",
   "scenarioLabel": "Scenario",
   "scenarioNamePlaceholder": "Scenario name (optional)",

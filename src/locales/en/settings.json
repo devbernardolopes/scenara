@@ -1459,10 +1459,6 @@
       "usedThreadsCount": "{{count}} thread",
       "usedThreadsCount_other": "{{count}} threads"
     },
-    "import": {
-      "invalidFormat": "The file does not appear to be a valid in-chat shortcut export.",
-      "fileError": "Failed to read the file."
-    },
     "form": {
       "title": "Create Shortcut Set",
       "editTitle": "Edit Shortcut Set",
@@ -1510,10 +1506,6 @@
       "linkedCharactersMany": "These lorebooks are used by characters:",
       "linkedCharactersCount": "{{count}} character",
       "linkedCharactersCount_other": "{{count}} characters"
-    },
-    "import": {
-      "invalidFormat": "The file does not appear to be a valid lorebook export.",
-      "fileError": "Failed to read the file."
     },
     "globalBadge": "Global",
     "form": {
