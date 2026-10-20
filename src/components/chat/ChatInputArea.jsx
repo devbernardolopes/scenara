@@ -101,6 +101,25 @@ const CHAT_BUTTON_DEFS = {
 
 const SHORTCUT_KEYS = ['name', 'message', 'insertionType', 'autoSend', 'clearAfterSend']
 
+function parseBoolean(val) {
+  if (typeof val === 'boolean') return val
+  if (typeof val !== 'string') return false
+  const v = val.trim().toLowerCase()
+  if (v === 'true' || v === '1' || v === 'yes') return true
+  if (v === 'false' || v === '0' || v === 'no') return false
+  return false
+}
+
+function normalizeInsertionType(val) {
+  if (typeof val !== 'string') return 'replace'
+  const v = val.trim().toLowerCase()
+  if (v === 'replace') return 'replace'
+  if (v === 'start' || v === 'prepend') return 'prepend'
+  if (v === 'end' || v === 'append') return 'append'
+  if (v === 'cursor') return 'cursor'
+  return 'replace'
+}
+
 function parseShortcuts(content) {
   if (typeof content !== 'string' || !content.trim()) return null
   const blocks = content.split(/\n\s*\n/)
@@ -124,7 +143,13 @@ function parseShortcuts(content) {
       }
     }
     if (!entry.name || !entry.message) return null
-    result.push({ name: entry.name, message: entry.message })
+    result.push({
+      name: entry.name,
+      message: entry.message,
+      insertionType: normalizeInsertionType(entry.insertionType),
+      autoSend: parseBoolean(entry.autoSend),
+      clearAfterSend: entry.clearAfterSend === undefined ? true : parseBoolean(entry.clearAfterSend),
+    })
   }
   return result.length > 0 ? result : null
 }
@@ -429,6 +454,89 @@ function ChatInputArea({
     if (parsed && shortcutsSet.order === 'desc') return [...parsed].reverse()
     return parsed
   }, [shortcutsSet])
+
+  const applyShortcutInsertion = useCallback(
+    (shortcut) => {
+      const el = textareaRef.current
+      const current = inputValue
+      const message = shortcut?.message || ''
+      const insertionType = shortcut?.insertionType || 'replace'
+
+      if (insertionType === 'replace') {
+        setInputValue(message)
+        requestAnimationFrame(() => {
+          if (el) {
+            el.focus()
+            autoResize(el)
+          }
+        })
+        return message
+      }
+
+      if (insertionType === 'prepend') {
+        const next = message + current
+        setInputValue(next)
+        requestAnimationFrame(() => {
+          if (el) {
+            el.focus()
+            autoResize(el)
+            try {
+              el.setSelectionRange(message.length, message.length)
+            } catch {}
+          }
+        })
+        return next
+      }
+
+      if (insertionType === 'append') {
+        const next = current + message
+        setInputValue(next)
+        requestAnimationFrame(() => {
+          if (el) {
+            el.focus()
+            autoResize(el)
+            try {
+              el.setSelectionRange(next.length, next.length)
+            } catch {}
+          }
+        })
+        return next
+      }
+
+      if (insertionType === 'cursor') {
+        if (!el) {
+          const next = current + message
+          setInputValue(next)
+          return next
+        }
+        el.focus()
+        const start = el.selectionStart ?? current.length
+        const end = el.selectionEnd ?? start
+        const next = current.slice(0, start) + message + current.slice(end)
+        setInputValue(next)
+        requestAnimationFrame(() => {
+          if (el) {
+            autoResize(el)
+            try {
+              const pos = start + message.length
+              el.setSelectionRange(pos, pos)
+            } catch {}
+          }
+        })
+        return next
+      }
+
+      setInputValue(message)
+      requestAnimationFrame(() => {
+        if (el) {
+          el.focus()
+          autoResize(el)
+        }
+      })
+      return message
+    },
+    [inputValue],
+  )
 
   const handleSetChange = useCallback(
     async (setId) => {
@@ -765,26 +873,42 @@ function ChatInputArea({
                     key={i}
                     type="button"
                     onClick={() => {
-                      setInputValue(s.message)
+                      const composed = applyShortcutInsertion(s)
                       setShortcutsActive(false)
-                      requestAnimationFrame(() => {
-                        textareaRef.current?.focus()
-                        if (textareaRef.current) autoResize(textareaRef.current)
-                      })
-                    }}
-                    onDoubleClick={() => {
-                      setInputValue(s.message)
-                      setShortcutsActive(false)
-                      if (!sendDisabled) {
+                      if (s.autoSend && !sendDisabled) {
                         requestAnimationFrame(() => {
                           onSend?.(
-                            s.message,
+                            composed,
                             selectedPersona?.id,
                             oocActive,
                             quickSettings.autoReply,
                           )
-                          setInputValue('')
-                          persistNow({ inputValue: '' })
+                          if (s.clearAfterSend !== false) {
+                            setInputValue('')
+                            persistNow({ inputValue: '' })
+                          } else {
+                            persistNow({ inputValue: composed })
+                          }
+                        })
+                      }
+                    }}
+                    onDoubleClick={() => {
+                      const composed = applyShortcutInsertion(s)
+                      setShortcutsActive(false)
+                      if (!sendDisabled) {
+                        requestAnimationFrame(() => {
+                          onSend?.(
+                            composed,
+                            selectedPersona?.id,
+                            oocActive,
+                            quickSettings.autoReply,
+                          )
+                          if (s.clearAfterSend !== false) {
+                            setInputValue('')
+                            persistNow({ inputValue: '' })
+                          } else {
+                            persistNow({ inputValue: composed })
+                          }
                         })
                       }
                     }}
